@@ -2,7 +2,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { ThemeProvider } from "@/components/theme-provider";
+
+// 1. IMPORT FIX: We now use the official next-themes provider
+import { ThemeProvider } from "next-themes";
 
 // Guard against missing Supabase environment variables
 // This prevents the "White Screen of Death" by showing a clear error if keys are missing
@@ -32,7 +34,8 @@ if (missingVars.length > 0) {
 } else {
   createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <ThemeProvider defaultTheme="light" storageKey="pryme-theme">
+      {/* 2. PROVIDER FIX: Using attribute="class" to connect with Tailwind's dark mode */}
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <App />
       </ThemeProvider>
     </React.StrictMode>

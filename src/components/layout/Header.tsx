@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   Menu, X, Phone, User, LogOut, Settings, ChevronDown, 
@@ -25,7 +25,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import prymeLogo from "@/assets/pryme-logo.png";
+import prymeLogo from "@/assets/pryme-logo.svg";
 
 // Register GSAP Plugin
 if (typeof window !== "undefined") {

@@ -1,35 +1,24 @@
 import { useRef, useEffect, memo, useCallback } from "react";
-import { Shield, CheckCircle, TrendingUp, Clock, Star } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
+import { useGSAP } from "@gsap/react";
 import SmartInput from "./SmartInput";
-import prymeLogo from "@/assets/pryme-logo.png";
 
-// Register GSAP Plugin
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
+// Values are numbers so GSAP can calculate the math
 const stats = [
-  { value: 500, suffix: "Cr+", prefix: "₹", label: "Loans Disbursed", icon: TrendingUp },
-  { value: 24, suffix: " Hrs", prefix: "", label: "Avg. Approval", icon: Clock },
-  { value: 98, suffix: ".5%", prefix: "", label: "Success Rate", icon: CheckCircle },
+  { value: 500, suffix: "Cr+", prefix: "₹", label: "Capital Disbursed" },
+  { value: 24, suffix: "h", prefix: "", label: "Average Approval" },
+  { value: 98, suffix: "%", prefix: "", label: "Success Rate" },
 ];
 
 const HeroSection = memo(() => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const heroLogoRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const blob1Ref = useRef<HTMLDivElement>(null);
-  const blob2Ref = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
 
-  // Parallax blobs tracking mouse
+  // Track Mouse for ambient glow
   const handleMouseMove = useCallback((e: MouseEvent) => {
     mouseRef.current = { x: e.clientX, y: e.clientY };
   }, []);
@@ -39,197 +28,153 @@ const HeroSection = memo(() => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove]);
 
-  // GSAP blob parallax ticker
-  useEffect(() => {
-    const quickX1 = gsap.quickTo(blob1Ref.current, "x", { duration: 1.5, ease: "power3.out" });
-    const quickY1 = gsap.quickTo(blob1Ref.current, "y", { duration: 1.5, ease: "power3.out" });
-    const quickX2 = gsap.quickTo(blob2Ref.current, "x", { duration: 2, ease: "power3.out" });
-    const quickY2 = gsap.quickTo(blob2Ref.current, "y", { duration: 2, ease: "power3.out" });
+  useGSAP(() => {
+    // 1. Mouse Follow Glow (Hardware Accelerated)
+    const glow = glowRef.current;
+    if (glow) {
+      const xTo = gsap.quickTo(glow, "x", { duration: 0.8, ease: "power3" });
+      const yTo = gsap.quickTo(glow, "y", { duration: 0.8, ease: "power3" });
 
-    const tick = () => {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const dx = mouseRef.current.x - cx;
-      const dy = mouseRef.current.y - cy;
-      quickX1(-dx * 0.05);
-      quickY1(-dy * 0.05);
-      quickX2(dx * 0.04);
-      quickY2(dy * 0.04);
-    };
+      const tick = () => {
+        xTo(mouseRef.current.x - window.innerWidth / 2);
+        yTo(mouseRef.current.y - window.innerHeight / 2);
+      };
+      gsap.ticker.add(tick);
+    }
 
-    gsap.ticker.add(tick);
-    return () => gsap.ticker.remove(tick);
-  }, []);
+    // 2. Aggressive Entrance Animation
+    const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
-  // Main entrance animation
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "back.out(1.7)" } });
-
-      // Logo entrance: start huge, settle at display size
+    // Stagger text reveal
+    if (headlineRef.current) {
       tl.fromTo(
-        heroLogoRef.current,
-        { scale: 3, opacity: 0, rotateY: 180 },
-        { scale: 1, opacity: 1, rotateY: 0, duration: 1.4, ease: "expo.out" },
-        0
+        headlineRef.current.children,
+        { y: 60, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 1.2, stagger: 0.15 },
+        0.1
       );
+    }
 
-      // Gold Trust Badge Pop-in
-      tl.fromTo(
-        badgeRef.current,
-        { opacity: 0, y: 20, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6 },
-        0.3
-      );
+    // Fade up Smart Input & Stats Pill
+    tl.fromTo(
+      ".hero-fade-up",
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, stagger: 0.1 },
+      0.4
+    );
 
-      // Headline character animation with SplitType
-      if (headlineRef.current) {
-        const split = new SplitType(headlineRef.current, { types: "chars,words" });
-        if (split.chars) {
-          gsap.set(split.chars, { y: "100%", opacity: 0 });
-          tl.to(
-            split.chars,
-            {
-              y: "0%",
-              opacity: 1,
-              duration: 0.8,
-              ease: "back.out(1.7)",
-              stagger: 0.02,
-            },
-            0.4
-          );
-        }
-      }
-
-      // Subtitle
-      tl.fromTo(
-        subtitleRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-        0.8
-      );
-
-      // Smart input
-      tl.fromTo(
-        inputRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-        1.0
-      );
-
-      // Stats cards
-      if (statsRef.current) {
-        const cards = statsRef.current.querySelectorAll(".stat-card-item");
-        tl.fromTo(
-          cards,
-          { opacity: 0, y: 50, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "back.out(1.4)", stagger: 0.1 },
-          1.2
+    // 3. Live Counting Numbers Animation
+    if (statsRef.current) {
+      const numberElements = statsRef.current.querySelectorAll('.stat-number');
+      
+      numberElements.forEach((el, index) => {
+        const targetValue = stats[index].value;
+        
+        gsap.fromTo(el, 
+          { textContent: 0 }, 
+          { 
+            textContent: targetValue, 
+            duration: 2.5, // Slow, premium tick up
+            ease: "power3.out", 
+            snap: { textContent: 1 }, // Forces whole numbers so no decimals flash
+            delay: 0.8 // Waits for the pill to fade up first
+          }
         );
-      }
-
-      // ScrollTrigger: Logo shrinks and flies to header as user scrolls
-      // This synchronizes perfectly with the Header.tsx animation
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: "+=200",
-        scrub: 0.5,
-        onUpdate: (self) => {
-          const p = self.progress;
-          // As p goes from 0 to 1, logo fades out and moves up
-          gsap.set(heroLogoRef.current, {
-            scale: 1 - p * 0.6,
-            opacity: 1 - p, 
-            y: -p * 100,
-            rotateY: p * 15,
-          });
-        },
       });
-    }, containerRef);
+    }
 
-    return () => ctx.revert();
-  }, []);
+  }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative overflow-hidden min-h-[95vh] flex items-center bg-slate-50/50">
-      
-      {/* Background Blobs - Updated to Brand Green & Gold */}
-      <div
-        ref={blob1Ref}
-        className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px] will-change-transform opacity-40 pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(42, 172, 100, 0.15) 0%, rgba(255,255,255,0) 70%)" }}
-      />
-      <div
-        ref={blob2Ref}
-        className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full blur-[150px] will-change-transform opacity-30 pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(255, 214, 0, 0.12) 0%, rgba(255,255,255,0) 70%)" }}
-      />
-
-      <div className="container relative mx-auto px-4 py-24 md:py-32 text-center">
+    <section 
+      ref={containerRef} 
+      // FIXED BG COLORS: Explicitly White for light mode, Pure Black for dark mode
+      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-white dark:bg-[#030303] pt-24 pb-16"
+    >
+      {/* --- Ambient Glows & 160 IQ CSS 3D Orbs --- */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
+        {/* Dynamic Green Glow attached to mouse */}
+        <div 
+          ref={glowRef}
+          className="absolute w-[30rem] md:w-[45rem] h-[30rem] md:h-[45rem] bg-[#2aac64]/15 dark:bg-[#2aac64]/10 rounded-full blur-[100px] md:blur-[140px] mix-blend-screen will-change-transform"
+        />
         
-        {/* Hero logo - starts large, docks to header on scroll */}
-        <div className="flex justify-center mb-8" style={{ perspective: "1000px" }}>
-          <img
-            ref={heroLogoRef}
-            src={prymeLogo}
-            alt="PRYME"
-            className="h-24 md:h-32 w-auto object-contain will-change-transform drop-shadow-2xl"
-            style={{ transformStyle: "preserve-3d" }}
-          />
-        </div>
+        {/* Pure CSS 3D Glass Sphere 1 (Top Left) */}
+        <div className="absolute top-[15%] left-[10%] w-32 h-32 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-white/40 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.1),0_15px_30px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_-10px_20px_rgba(255,255,255,0.05),0_15px_30px_rgba(0,0,0,0.5)] animate-float-slow" />
+        
+        {/* Pure CSS 3D Glass Sphere 2 (Bottom Right) */}
+        <div className="absolute bottom-[20%] right-[10%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-tr from-[#2aac64]/30 to-white/20 dark:from-[#2aac64]/20 dark:to-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-[inset_0_-8px_16px_rgba(0,0,0,0.1),0_10px_20px_rgba(42,172,100,0.1)] dark:shadow-[inset_0_-8px_16px_rgba(255,255,255,0.05),0_10px_20px_rgba(0,0,0,0.5)] animate-float-medium blur-[1px]" />
+      </div>
 
-        {/* Premium Gold Trust Signal */}
-        <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200/60 rounded-full mb-10 opacity-0 shadow-sm shadow-amber-100">
-          <Star className="w-3.5 h-3.5 text-[#ffd600] fill-[#ffd600]" />
-          <span className="text-xs font-bold text-amber-700 tracking-wide uppercase">
-            Gold Standard Lending Partners
+      {/* --- Main Content --- */}
+      <div className="container mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center text-center">
+        
+        {/* Premium Tagline Overline */}
+        <div className="hero-fade-up inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md mb-8 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-[#2aac64] animate-pulse" />
+          <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-slate-800 dark:text-white/80 uppercase">
+            Unfair Financial Advantage
           </span>
         </div>
-
-        {/* Headline with SplitType character animation */}
-        <h1
-          ref={headlineRef}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[0.95] tracking-tight overflow-hidden text-slate-900"
-          style={{ clipPath: "inset(0 0 0 0)" }}
+        
+        {/* Massive Aggressive Typography */}
+        <h1 
+          ref={headlineRef} 
+          className="flex flex-col text-[3.5rem] sm:text-6xl md:text-7xl lg:text-[6rem] font-black text-slate-900 dark:text-white tracking-tighter leading-[0.9] mb-8"
         >
-          <span className="inline-block">Smart Loans.</span>
-          <br />
-          {/* Brand Green Gradient */}
-          <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] via-emerald-500 to-[#2aac64] bg-[length:200%_auto] animate-shimmer">
-            Better Future.
+          <span className="block will-change-transform">INSTANT CAPITAL.</span>
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] via-emerald-500 to-[#166534] dark:from-[#2aac64] dark:via-[#4ade80] dark:to-[#2aac64] will-change-transform pb-2">
+            ZERO FRICTION.
           </span>
         </h1>
-
+        
         {/* Subtitle */}
-        <p
-          ref={subtitleRef}
-          className="text-lg md:text-xl text-slate-500 mb-12 leading-relaxed max-w-2xl mx-auto opacity-0 font-medium"
-        >
-          Compare rates from 15+ banks, calculate EMIs instantly, and get
-          personalized loan offers — all in one place.
+        <p className="hero-fade-up text-base sm:text-lg md:text-xl text-slate-600 dark:text-white/50 font-medium max-w-2xl mb-12 leading-relaxed tracking-tight">
+          Bypass the bureaucracy. Compare premium rates from 15+ top-tier banks, calculate EMIs instantly, and unlock your financial trajectory today.
         </p>
 
         {/* Smart Command Bar */}
-        <div ref={inputRef} className="mb-24 opacity-0 relative z-20">
-          <SmartInput />
+        <div className="hero-fade-up w-full max-w-2xl mb-8 relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#2aac64]/20 to-[#ffd600]/20 rounded-[2rem] blur-lg opacity-50 dark:opacity-30"></div>
+          <div className="relative bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl p-2 shadow-2xl">
+            <SmartInput />
+          </div>
         </div>
 
-        {/* Stats cards - Green Accents */}
-        <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto relative z-10">
-          {stats.map((stat, i) => (
-            <div 
-              key={i} 
-              className="stat-card-item group bg-white/60 backdrop-blur-xl rounded-3xl border border-slate-200/50 p-6 hover:border-[#2aac64]/30 hover:shadow-lg transition-all duration-300 opacity-0"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#2aac64] transition-colors duration-300">
-                <stat.icon className="w-6 h-6 text-[#2aac64] group-hover:text-white transition-colors" />
+        {/* --- DYNAMIC STATS PILL WITH LIVE COUNTING --- */}
+        <div ref={statsRef} className="hero-fade-up mt-8 w-full max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-evenly gap-8 md:gap-4 bg-white/50 dark:bg-white/5 backdrop-blur-2xl border border-slate-200/60 dark:border-white/10 rounded-3xl md:rounded-full py-6 md:py-4 px-8 shadow-2xl shadow-emerald-900/5 dark:shadow-none">
+            {stats.map((stat, i) => (
+              <div key={i} className="flex flex-col items-center justify-center w-full relative">
+                <p className="flex items-center text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
+                  <span>{stat.prefix}</span>
+                  {/* The GSAP Counter hooks into this specific span with tabular-nums */}
+                  <span className="stat-number tabular-nums">{stat.value}</span>
+                  <span className="text-[#2aac64]">{stat.suffix}</span>
+                </p>
+                <p className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1">
+                  {stat.label}
+                </p>
+                
+                {/* Minimalist Divider Line (Desktop) */}
+                {i !== stats.length - 1 && (
+                  <div className="hidden md:block absolute right-[-10%] top-1/2 -translate-y-1/2 w-px h-10 bg-slate-300 dark:bg-white/10" />
+                )}
+                
+                {/* Minimalist Divider Line (Mobile) */}
+                {i !== stats.length - 1 && (
+                  <div className="block md:hidden absolute -bottom-4 left-1/2 -translate-x-1/2 w-10 h-px bg-slate-200 dark:bg-white/10" />
+                )}
               </div>
-              <p className="text-3xl font-bold text-slate-900">{stat.prefix}{stat.value}{stat.suffix}</p>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{stat.label}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Bottom Security Signal */}
+        <div className="hero-fade-up mt-12 flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+          <ShieldCheck className="w-4 h-4 text-[#2aac64]" /> Bank Grade Security
+        </div>
+
       </div>
     </section>
   );
