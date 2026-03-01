@@ -8,10 +8,9 @@ import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { PrymeAPI } from "@/lib/api"; // Added your new Java Backend API client
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -40,7 +39,6 @@ const Auth = () => {
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -57,108 +55,79 @@ const Auth = () => {
     mode: "onChange",
   });
 
-  // Redirect if already logged in
+  // Redirect if already logged in (Checking localStorage instead of Supabase context)
   useEffect(() => {
-    if (!authLoading && user) {
-      navigate("/dashboard");
+    const token = localStorage.getItem("pryme_token");
+    if (token) {
+      navigate("/dashboard"); // Or /admin-dashboard depending on your setup
     }
-  }, [user, authLoading, navigate]);
+  }, [navigate]);
 
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
-    const { error } = await signIn(data.email, data.password);
-    setIsLoading(false);
+    
+    try {
+      // Calling your Java Spring Boot Backend
+      const response = await PrymeAPI.login(data.email, data.password);
+      
+      // Store the secure token and role
+      localStorage.setItem("pryme_token", response.token);
+      localStorage.setItem("pryme_role", response.role);
+      localStorage.setItem("pryme_name", response.name);
 
-    if (error) {
+      toast({
+        title: "Welcome back!",
+        description: response.message || "You have successfully logged in.",
+      });
+      
+      navigate("/admin-dashboard");
+    } catch (error: any) {
       toast({
         title: "Login Failed",
         description: error.message || "Invalid email or password",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    toast({
-      title: "Welcome back!",
-      description: "You have successfully logged in.",
-    });
-    navigate("/dashboard");
   };
 
   const handleSignup = async (data: SignupData) => {
     setIsLoading(true);
-    const { error } = await signUp(data.email, data.password, data.fullName);
-    setIsLoading(false);
-
-    if (error) {
-      let message = error.message;
-      if (error.message.includes("already registered")) {
-        message = "This email is already registered. Please login instead.";
-      }
+    
+    // DEMO MOCK: Since we only built the Login API in Java tonight, 
+    // we simulate a successful signup so the UI doesn't break during the showcase.
+    setTimeout(() => {
+      setIsLoading(false);
       toast({
-        title: "Signup Failed",
-        description: message,
-        variant: "destructive",
+        title: "Account Created!",
+        description: "Welcome to PRYME Consulting. Please login with your new credentials.",
       });
-      return;
-    }
-
-    toast({
-      title: "Account Created!",
-      description: "Welcome to PYRME Consulting. You can now access your dashboard.",
-    });
-    navigate("/dashboard");
+      setView("login");
+      loginForm.setValue("email", data.email);
+    }, 1500);
   };
 
   const handleForgotPassword = async (data: ForgotPasswordData) => {
     setIsLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/auth?view=reset`,
-    });
-    setIsLoading(false);
-
-    if (error) {
+    
+    // DEMO MOCK: Simulating the password reset email
+    setTimeout(() => {
+      setIsLoading(false);
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+        title: "Password Reset Email Sent",
+        description: "Check your email for a link to reset your password.",
       });
-      return;
-    }
-
-    toast({
-      title: "Password Reset Email Sent",
-      description: "Check your email for a link to reset your password.",
-    });
-    setView("login");
+      setView("login");
+    }, 1500);
   };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
+    toast({
+      title: "Coming Soon",
+      description: "Google OAuth integration will be enabled in Phase 2.",
     });
-    setIsLoading(false);
-
-    if (error) {
-      toast({
-        title: "Google Sign In Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
   };
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <>

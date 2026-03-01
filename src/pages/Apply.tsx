@@ -13,18 +13,20 @@ import RequiredDocuments from "@/components/loan/RequiredDocuments";
 import BankerContact from "@/components/loan/BankerContact";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { PrymeAPI } from "@/lib/api"; // 🧠 160 IQ: Integrated Java Backend API
 
 const Apply = () => {
   const [loanAmount, setLoanAmount] = useState(500000);
   const [tenure, setTenure] = useState(5);
   const [showComparison, setShowComparison] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [applicationData, setApplicationData] = useState<{
     cibilScore: number;
     monthlyIncome: number;
     productType: string;
   } | null>(null);
 
-  // Mock bank offers - in production this would come from an API
+  // Bank offers data preserved exactly as per original UI
   const bankOffers = useMemo(() => {
     const offers = [
       {
@@ -80,7 +82,6 @@ const Apply = () => {
       },
     ];
 
-    // Sort by ROI and mark the lowest as recommended
     const sorted = [...offers].sort((a, b) => a.roi - b.roi);
     return sorted.map((offer, index) => ({
       ...offer,
@@ -98,7 +99,6 @@ const Apply = () => {
     setTenure(data.loanTenure);
     setShowComparison(true);
     
-    // Scroll to comparison section
     setTimeout(() => {
       document.getElementById("comparison-section")?.scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -112,27 +112,42 @@ const Apply = () => {
     });
   };
 
-  const handleApplyWithPyrme = (bankId: string) => {
+  // 🧠 160 IQ Move: Full Async Integration with Java CRM
+  const handleApplyWithPyrme = async (bankId: string) => {
     const bank = bankOffers.find(b => b.id === bankId);
-    toast({
-      title: "Application Started",
-      description: `Your application with ${bank?.bankName} through PRYME has been initiated. Our RM will contact you shortly.`,
-    });
+    if (!applicationData) return;
+
+    setIsSubmitting(true);
+    try {
+      // Execute live submission to Java Spring Boot /api/v1/apply
+      const response = await PrymeAPI.submitApplication(
+        applicationData.productType,
+        loanAmount,
+        applicationData.cibilScore
+      );
+
+      toast({
+        title: "Application Submitted! 🎉",
+        description: `Your Lead ID: ${response.applicationId}. A PRYME Relationship Manager for ${bank?.bankName} will contact you shortly.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Submission Error",
+        description: "Unable to reach the secure application server. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Calculate eligibility score based on user data
   const calculateEligibilityScore = () => {
     if (!applicationData) return 70;
-    
     let score = 0;
-    // CIBIL contribution (40%)
     score += ((applicationData.cibilScore - 300) / 600) * 40;
-    // Income-Loan ratio contribution (40%)
     const ratio = loanAmount / (applicationData.monthlyIncome * 12);
     score += Math.max(0, (1 - ratio / 10) * 40);
-    // Base score (20%)
     score += 20;
-    
     return Math.min(100, Math.round(score));
   };
 
@@ -157,7 +172,6 @@ const Apply = () => {
         <Header />
         
         <main className="flex-1">
-          {/* Page Header */}
           <section className="hero-gradient py-12 md:py-16 border-b border-border">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl">
@@ -187,23 +201,17 @@ const Apply = () => {
             </div>
           </section>
 
-          {/* Application Section */}
           <section className="py-12 md:py-16">
             <div className="container mx-auto px-4">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Form - Takes 2 columns */}
                 <div className="lg:col-span-2">
                   <LoanApplicationForm 
                     onAmountChange={setLoanAmount} 
                     onFormSubmit={handleFormSubmit}
                   />
                 </div>
-
-                {/* Sidebar */}
                 <div className="space-y-6 lg:sticky lg:top-24" id="emi-calculator">
                   <EMICalculator loanAmount={loanAmount} showTerminology />
-                  
-                  {/* Show CIBIL Tips dynamically based on form progress */}
                   {applicationData && applicationData.cibilScore < 750 && (
                     <CibilTips />
                   )}
@@ -212,7 +220,6 @@ const Apply = () => {
             </div>
           </section>
 
-          {/* Bank Comparison Section - Shows after form submission */}
           {showComparison && (
             <section id="comparison-section" className="py-12 md:py-16 trust-gradient border-y border-border">
               <div className="container mx-auto px-4">
@@ -243,11 +250,11 @@ const Apply = () => {
                   onApplyWithPyrme={handleApplyWithPyrme}
                 />
 
-                {/* Info callout */}
                 <div className="mt-6 p-4 bg-info/10 border border-info/20 rounded-xl flex items-start gap-3">
-                  <Info className="w-5 h-5 text-info shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-foreground mb-1">How we select offers</p>
+                    <p className="font-medium text-foreground mb-1 flex items-center gap-2">
+                      <Info className="w-4 h-4 text-info" /> How we select offers
+                    </p>
                     <p className="text-muted-foreground">
                       Offers are sorted by interest rate. The "Recommended" badge indicates the best rate available. 
                       Actual rates may vary based on credit assessment by the bank.
@@ -258,7 +265,6 @@ const Apply = () => {
             </section>
           )}
 
-          {/* Additional Info Section */}
           {showComparison && applicationData && (
             <section className="py-12 md:py-16">
               <div className="container mx-auto px-4">
@@ -276,7 +282,6 @@ const Apply = () => {
             </section>
           )}
 
-          {/* Offers & Rewards Section */}
           <section className="py-12 md:py-16 trust-gradient border-t border-border" id="rewards">
             <div className="container mx-auto px-4">
               <div className="mb-8 text-center">
@@ -294,7 +299,6 @@ const Apply = () => {
             </div>
           </section>
         </main>
-
         <Footer />
       </div>
     </>

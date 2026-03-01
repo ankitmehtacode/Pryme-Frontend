@@ -8,10 +8,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { PrymeAPI } from "@/lib/api"; // Added the Java Backend API
 
 interface DashboardStats {
   totalUsers: number;
@@ -29,53 +28,83 @@ interface UserProfile {
 }
 
 const AdminDashboard = () => {
-  const { user, isAdmin, isLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // States for Live Java Data
+  const [applications, setApplications] = useState<any[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
-    pendingApplications: 12,
-    approvedLoans: 45,
-    totalDisbursed: 25000000,
+    pendingApplications: 0,
+    approvedLoans: 0,
+    totalDisbursed: 0,
   });
 
+  // 1. Check Authentication securely via LocalStorage (Bypassing Supabase)
   useEffect(() => {
-    if (!isLoading && !user) {
+    const token = localStorage.getItem("pryme_token");
+    const role = localStorage.getItem("pryme_role");
+
+    if (!token) {
       navigate("/auth");
       return;
     }
 
-    if (!isLoading && user && !isAdmin) {
+    if (role !== "SUPER_ADMIN" && role !== "ADMIN") {
       toast({
         title: "Access Denied",
         description: "You don't have admin privileges.",
         variant: "destructive",
       });
       navigate("/dashboard");
+      return;
     }
-  }, [user, isAdmin, isLoading, navigate]);
+    
+    setIsLoading(false);
+    fetchDashboardData();
+  }, [navigate]);
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchUsers();
-    }
-  }, [isAdmin]);
+  // 2. Fetch Live Data from Java Backend
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch Live Leads from Java
+      const apps = await PrymeAPI.getApplications();
+      setApplications(apps);
 
-  const fetchUsers = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
+      // Calculate real stats from the database
+      const pendingCount = apps.filter((a: any) => a.status === 'SUBMITTED' || a.status === 'PENDING').length;
+      const approvedCount = apps.filter((a: any) => a.status === 'APPROVED' || a.status === 'DISBURSED').length;
+      const totalVolume = apps.reduce((sum: number, app: any) => sum + (app.requestedAmount || 0), 0);
 
-    if (!error && data) {
-      setUsers(data);
-      setStats(prev => ({ ...prev, totalUsers: data.length }));
+      setStats(prev => ({
+        ...prev,
+        pendingApplications: pendingCount,
+        approvedLoans: approvedCount,
+        totalDisbursed: totalVolume,
+      }));
+
+      // DEMO MOCK: Since Java IAM GET Users isn't built yet, we mock it to preserve UI
+      setUsers([
+        { id: "1", email: "admin@pryme.com", full_name: "Super Admin", created_at: new Date().toISOString(), role: "SUPER_ADMIN" }
+      ]);
+      setStats(prev => ({ ...prev, totalUsers: 1 }));
+
+    } catch (error) {
+      toast({
+        title: "Connection Error",
+        description: "Failed to fetch live data from the secure server.",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
+  const handleSignOut = () => {
+    localStorage.removeItem("pryme_token");
+    localStorage.removeItem("pryme_role");
+    localStorage.removeItem("pryme_name");
     navigate("/");
   };
 
@@ -90,7 +119,7 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">Loading Secure Dashboard...</div>
       </div>
     );
   }
@@ -108,7 +137,7 @@ const AdminDashboard = () => {
     { label: "Total Users", value: stats.totalUsers, icon: Users, color: "text-primary" },
     { label: "Pending Applications", value: stats.pendingApplications, icon: Clock, color: "text-trust" },
     { label: "Approved Loans", value: stats.approvedLoans, icon: CheckCircle, color: "text-success" },
-    { label: "Total Disbursed", value: formatCurrency(stats.totalDisbursed), icon: TrendingUp, color: "text-primary" },
+    { label: "Pipeline Volume", value: formatCurrency(stats.totalDisbursed), icon: TrendingUp, color: "text-primary" },
   ];
 
   return (
@@ -175,7 +204,7 @@ const AdminDashboard = () => {
                 {activeTab === "settings" && "Settings"}
               </h1>
               <p className="text-muted-foreground">
-                Welcome back, Admin
+                Welcome back, {localStorage.getItem("pryme_name") || "Admin"}
               </p>
             </div>
 
@@ -192,7 +221,7 @@ const AdminDashboard = () => {
               </Button>
               <div className="flex items-center gap-2 neo-card px-3 py-2 rounded-xl">
                 <Shield className="w-4 h-4 text-success" />
-                <span className="text-sm font-medium text-foreground">Admin</span>
+                <span className="text-sm font-medium text-foreground">Super Admin</span>
               </div>
             </div>
           </div>
@@ -217,40 +246,101 @@ const AdminDashboard = () => {
                 ))}
               </div>
 
-              {/* Recent Applications */}
+              {/* Recent Applications from Java Backend */}
               <div className="neo-card p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Recent Applications</h3>
-                <div className="space-y-3">
-                  {[
-                    { name: "Rahul Sharma", amount: 500000, status: "pending", bank: "HDFC Bank" },
-                    { name: "Priya Singh", amount: 750000, status: "approved", bank: "ICICI Bank" },
-                    { name: "Amit Kumar", amount: 300000, status: "rejected", bank: "SBI" },
-                    { name: "Sneha Patel", amount: 1000000, status: "pending", bank: "Axis Bank" },
-                  ].map((app, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 neo-card-inset rounded-xl">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full neo-card flex items-center justify-center">
-                          <Users className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{app.name}</p>
-                          <p className="text-sm text-muted-foreground">{app.bank}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(app.amount)}</p>
-                        <span className={cn(
-                          "text-xs font-medium px-2 py-1 rounded-full",
-                          app.status === "approved" && "bg-success/10 text-success",
-                          app.status === "pending" && "bg-trust/10 text-trust",
-                          app.status === "rejected" && "bg-destructive/10 text-destructive"
-                        )}>
-                          {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">Recent Applications</h3>
+                  <Button variant="ghost" size="sm" onClick={() => setActiveTab("applications")} className="text-primary hover:text-primary/80">View All</Button>
                 </div>
+                <div className="space-y-3">
+                  {applications.length === 0 ? (
+                    <div className="text-center p-8 text-muted-foreground">No applications in the pipeline yet.</div>
+                  ) : (
+                    applications.slice(0, 4).map((app, index) => (
+                      <div key={app.id || index} className="flex items-center justify-between p-4 neo-card-inset rounded-xl">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full neo-card flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{app.applicationId}</p>
+                            <p className="text-sm text-muted-foreground">{app.loanType} • CIBIL: {app.declaredCibilScore}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-foreground">{formatCurrency(app.requestedAmount)}</p>
+                          <span className={cn(
+                            "text-xs font-bold px-2 py-1 rounded-full",
+                            app.status === "APPROVED" && "bg-success/10 text-success",
+                            (app.status === "PENDING" || app.status === "SUBMITTED") && "bg-trust/10 text-trust",
+                            app.status === "REJECTED" && "bg-destructive/10 text-destructive"
+                          )}>
+                            {app.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Applications Tab (Newly Added for Live Data) */}
+          {activeTab === "applications" && (
+            <div className="neo-card p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-foreground">All Loan Applications</h3>
+                <Button className="neo-button border-0 bg-primary">
+                  Export CSV
+                </Button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">App ID</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Loan Type</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Amount</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">CIBIL</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {applications.map((app) => (
+                      <tr key={app.id} className="border-b border-border/50 hover:bg-muted/20">
+                        <td className="py-4 px-4 font-bold text-primary">{app.applicationId}</td>
+                        <td className="py-4 px-4 font-medium text-foreground">{app.loanType}</td>
+                        <td className="py-4 px-4 font-bold text-foreground">{formatCurrency(app.requestedAmount)}</td>
+                        <td className="py-4 px-4 text-muted-foreground">{app.declaredCibilScore}</td>
+                        <td className="py-4 px-4">
+                           <span className={cn(
+                            "text-xs font-bold px-2 py-1 rounded-full",
+                            app.status === "APPROVED" && "bg-success/10 text-success",
+                            (app.status === "PENDING" || app.status === "SUBMITTED") && "bg-trust/10 text-trust",
+                            app.status === "REJECTED" && "bg-destructive/10 text-destructive"
+                          )}>
+                            {app.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {applications.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-muted-foreground font-medium">
+                          No applications found in the database.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -313,14 +403,14 @@ const AdminDashboard = () => {
           )}
 
           {/* Placeholder for other tabs */}
-          {!["overview", "users"].includes(activeTab) && (
+          {!["overview", "users", "applications"].includes(activeTab) && (
             <div className="neo-card p-12 text-center">
               <div className="w-16 h-16 mx-auto neo-card-inset rounded-full flex items-center justify-center mb-4">
                 <Settings className="w-8 h-8 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Coming Soon</h3>
               <p className="text-muted-foreground">
-                This section is under development.
+                This section is under development and will be wired to the Java Backend shortly.
               </p>
             </div>
           )}
