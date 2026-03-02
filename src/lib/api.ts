@@ -13,12 +13,35 @@ export const PrymeAPI = {
     return res.json();
   },
 
-  // 2. CRM Module (Admin)
+  // 2. CRM Module (Admin Data Fetch)
   getApplications: async () => {
     const res = await fetch(`${API_BASE_URL}/admin/applications`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
+    if (!res.ok) throw new Error("Failed to fetch applications");
+    return res.json();
+  },
+
+  // 🧠 NEW: CRM Status Update Route
+  updateStatus: async (applicationId: string, status: string) => {
+    const res = await fetch(`${API_BASE_URL}/admin/applications/${applicationId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error("Failed to update status");
+    return res.json();
+  },
+
+  // 🧠 NEW: CRM Lead Assignment Route
+  assignLead: async (applicationId: string, assigneeId: string) => {
+    const res = await fetch(`${API_BASE_URL}/admin/applications/${applicationId}/assign`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assigneeId }),
+    });
+    if (!res.ok) throw new Error("Failed to assign lead");
     return res.json();
   },
 
@@ -29,6 +52,7 @@ export const PrymeAPI = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ loanType, requestedAmount, cibilScore }),
     });
+    if (!res.ok) throw new Error("Failed to submit application");
     return res.json();
   }
 };
