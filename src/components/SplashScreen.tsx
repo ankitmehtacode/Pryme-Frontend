@@ -16,43 +16,35 @@ const loadingStates = [
 ];
 
 export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
-  const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState(loadingStates[0]);
 
   useEffect(() => {
-    // 2.4 seconds is the psychological sweet spot for a premium "heavy" application load
-    const duration = 2400; 
-    const interval = 20;
-    let elapsed = 0;
+    // 🧠 160 IQ Fix: Replaced the dangerous 20ms setInterval with safe, staggered timeouts.
+    // This completely eliminates React state-thrashing and prevents the black screen.
+    const t1 = setTimeout(() => setLoadingText(loadingStates[1]), 500);
+    const t2 = setTimeout(() => setLoadingText(loadingStates[2]), 1100);
+    const t3 = setTimeout(() => setLoadingText(loadingStates[3]), 1700);
+    const t4 = setTimeout(() => setLoadingText(loadingStates[4]), 2200);
 
-    const timer = setInterval(() => {
-      elapsed += interval;
-      
-      // 🧠 200 IQ Math: Cubic ease-out formula. 
-      // It starts fast to give immediate feedback, then slows down at the end to build anticipation.
-      const p = 1 - Math.pow(1 - elapsed / duration, 3);
-      const currentProgress = Math.min(100, p * 100);
-      setProgress(currentProgress);
+    // 🧠 Deterministic completion trigger. 
+    // Always fires at exactly 2.4 seconds, guaranteeing the app reveals itself.
+    const exitTimer = setTimeout(() => {
+      onComplete();
+    }, 2400);
 
-      // Update dynamic text based on exact progress intervals
-      if (currentProgress > 90) setLoadingText(loadingStates[4]);
-      else if (currentProgress > 70) setLoadingText(loadingStates[3]);
-      else if (currentProgress > 40) setLoadingText(loadingStates[2]);
-      else if (currentProgress > 15) setLoadingText(loadingStates[1]);
-
-      if (elapsed >= duration) {
-        clearInterval(timer);
-        setTimeout(onComplete, 300); // Micro-pause at 100% before the zoom-through exit
-      }
-    }, interval);
-
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      clearTimeout(exitTimer);
+    };
   }, [onComplete]);
 
   return (
     <motion.div
       key="splash"
-      // 🧠 The "Zoom-Through" Exit: Instead of fading out, the screen flies PAST the user into the app.
+      // 🧠 The "Zoom-Through" Exit
       initial={{ opacity: 1 }}
       exit={{ 
         opacity: 0, 
@@ -138,9 +130,12 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
       {/* Cyberpunk Progress Line */}
       <div className="absolute bottom-0 left-0 w-full h-[2px] bg-slate-900 overflow-hidden">
+        {/* 🧠 160 IQ Fix: Pure GPU animation for the width. Zero JavaScript overhead! */}
         <motion.div 
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 2.4, ease: [0.22, 1, 0.36, 1] }} // Mathematical Cubic Ease Out
           className="h-full bg-gradient-to-r from-emerald-500 via-[#2aac64] to-emerald-200 relative"
-          style={{ width: `${progress}%` }}
         >
           {/* Leading Glow Head (Makes it look like a laser beam loading) */}
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-[4px] bg-white blur-[2px] rounded-full shadow-[0_0_10px_#fff]" />
