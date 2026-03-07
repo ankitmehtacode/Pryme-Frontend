@@ -9,10 +9,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Providers
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/components/theme-provider"; // 🧠 For Dark/Light Mode
+import { ThemeProvider } from "@/components/theme-provider";
 
 // Components & Pages
-import { SplashScreen } from "@/components/SplashScreen"; // 🧠 The Cinematic Entry
+import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
@@ -22,13 +22,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// 🧠 160 IQ Move: Native Route Protection for the Java Spring Boot Backend
-// This intercepts unauthenticated users BEFORE they even hit the dashboard component.
+// Native Route Protection for the Java Spring Boot Backend
 const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("pryme_token");
   const role = localStorage.getItem("pryme_role");
   
-  // If there is no token, or they are not an Admin, instantly bounce them to login
   if (!token || (role !== "SUPER_ADMIN" && role !== "ADMIN")) {
     return <Navigate to="/auth" replace />;
   }
@@ -37,58 +35,60 @@ const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  // 🧠 Application Lifecycle State for the Premium Loading Experience
+  // Application Lifecycle State
   const [isSplashVisible, setIsSplashVisible] = useState(true);
 
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="pryme_theme">
-          {/* AuthProvider kept purely so old Supabase components don't crash during transition */}
           <AuthProvider>
             <TooltipProvider>
               
-              {/* 🧠 Orchestrating the Cinematic Entry Sequence */}
-              <AnimatePresence mode="wait">
-                {isSplashVisible ? (
+              {/* THE FIX: The Splash Screen is now an overlay. 
+                The BrowserRouter is NEVER unmounted, which prevents the black screen crash.
+              */}
+              <AnimatePresence>
+                {isSplashVisible && (
                   <SplashScreen key="splash" onComplete={() => setIsSplashVisible(false)} />
-                ) : (
-                  <motion.div
-                    key="app"
-                    initial={{ opacity: 0, scale: 0.96, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="min-h-screen bg-background text-foreground transition-colors duration-300"
-                  >
-                    <Toaster />
-                    <Sonner />
-                    <BrowserRouter>
-                      <Routes>
-                        {/* Public Routes */}
-                        <Route path="/" element={<Index />} />
-                        <Route path="/apply" element={<Apply />} />
-                        <Route path="/auth" element={<Auth />} />
-                        
-                        {/* Legacy Application Dashboard */}
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        
-                        {/* 🛡️ Secure Admin Route (Wired to Java Backend) */}
-                        <Route 
-                          path="/admin" 
-                          element={
-                            <AdminProtectedRoute>
-                              <AdminDashboard />
-                            </AdminProtectedRoute>
-                          } 
-                        />
-                        
-                        {/* 404 Catch-All */}
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </BrowserRouter>
-                  </motion.div>
                 )}
               </AnimatePresence>
+
+              <BrowserRouter>
+                <motion.div
+                  key="app-content"
+                  // App stays hidden and blurred in the background while Splash is active
+                  initial={false}
+                  animate={{ 
+                    opacity: isSplashVisible ? 0 : 1, 
+                    scale: isSplashVisible ? 0.98 : 1, 
+                    filter: isSplashVisible ? "blur(10px)" : "blur(0px)",
+                    pointerEvents: isSplashVisible ? "none" : "auto"
+                  }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="min-h-screen bg-background text-foreground transition-colors duration-300"
+                >
+                  <Toaster />
+                  <Sonner />
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/apply" element={<Apply />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    
+                    <Route 
+                      path="/admin" 
+                      element={
+                        <AdminProtectedRoute>
+                          <AdminDashboard />
+                        </AdminProtectedRoute>
+                      } 
+                    />
+                    
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </motion.div>
+              </BrowserRouter>
 
             </TooltipProvider>
           </AuthProvider>
