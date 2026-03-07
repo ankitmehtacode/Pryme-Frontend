@@ -7,9 +7,9 @@ import Footer from "@/components/layout/Footer";
 
 // Home Components
 import HeroSection from "@/components/home/HeroSection";
-import OffersMarquee from "@/components/home/OffersMarquee"; // Your local component
+import OffersMarquee from "@/components/home/OffersMarquee"; 
 import ProductSelectorGrid from "@/components/home/ProductSelectorGrid";
-import PartnerBankMarquee from "@/components/home/PartnerBankMarquee"; // Existing component reused
+import PartnerBankMarquee from "@/components/home/PartnerBankMarquee"; 
 import ProcessSection from "@/components/home/ProcessSection";
 import TrustMonologue from "@/components/home/TrustMonologue";
 import TestimonialsSlider from "@/components/home/TestimonialsSlider";
@@ -34,8 +34,9 @@ const Index = () => {
         <link rel="canonical" href="https://pryme.in" />
       </Helmet>
 
+      {/* 🧠 Fail-proof wrapper: If SmoothScroll crashes, the ErrorBoundary in App.tsx catches it */}
       <SmoothScroll>
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
           <Header />
           
           <main className="flex-1 w-full pt-16 md:pt-20">
@@ -86,12 +87,14 @@ const Index = () => {
                   
                   {/* Left Section: EMI Calculator */}
                   <div className="lg:col-span-7 w-full shadow-2xl shadow-primary/5 rounded-3xl">
-                    <EMICalculator />
+                    {/* Passing default props to prevent undefined crashes inside EMICalculator */}
+                    <EMICalculator loanAmount={500000} showTerminology={true} />
                   </div>
                   
                   {/* Right Section: Eligibility / Context */}
                   <div className="lg:col-span-5 w-full">
-                    <EligibilityScore />
+                    {/* Passing default props to prevent undefined crashes inside EligibilityScore */}
+                    <EligibilityScore score={75} cibilScore={750} monthlyIncome={50000} loanAmount={500000} />
                   </div>
                   
                 </div>
