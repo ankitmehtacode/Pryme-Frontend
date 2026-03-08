@@ -1,4 +1,5 @@
 import { Gift, Percent, Tag, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface Offer {
@@ -15,7 +16,7 @@ const defaultOffers: Offer[] = [
     id: "1",
     type: "discount",
     title: "50% Off Processing Fee",
-    description: "Apply through PYRME and get 50% off on processing charges",
+    description: "Apply through PRYME and get 50% off on processing charges",
     bank: "HDFC Bank",
     validTill: "31 Dec 2024"
   },
@@ -55,54 +56,91 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
     }
   };
 
-  const getOfferColor = (type: Offer["type"]) => {
+  const getOfferStyling = (type: Offer["type"]) => {
     switch (type) {
-      case "discount": return "text-success bg-success/10";
-      case "cashback": return "text-primary bg-primary/10";
-      case "gift": return "text-accent bg-accent/10";
-      case "reward": return "text-trust bg-trust/10";
+      case "discount": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(52,211,153,0.1)] group-hover:shadow-[0_0_25px_rgba(52,211,153,0.2)]";
+      case "cashback": return "text-primary bg-primary/10 border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)] group-hover:shadow-[0_0_25px_rgba(var(--primary),0.2)]";
+      case "gift": return "text-amber-400 bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.1)] group-hover:shadow-[0_0_25px_rgba(251,191,36,0.2)]";
+      case "reward": return "text-blue-400 bg-blue-500/10 border-blue-500/20 shadow-[0_0_15px_rgba(96,165,250,0.1)] group-hover:shadow-[0_0_25px_rgba(96,165,250,0.2)]";
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } }
+  };
+
   return (
-    <div className="neo-card p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-          <Gift className="w-5 h-5 text-accent" />
+    <div className="bg-white/5 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full">
+      
+      {/* Ambient Inner Glow */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
+
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8 relative z-10">
+        <div className="w-12 h-12 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-inner flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-amber-500/20 animate-pulse mix-blend-overlay" />
+          <Gift className="w-6 h-6 text-amber-500 relative z-10" />
         </div>
         <div>
-          <h3 className="font-semibold text-foreground">Offers & Rewards</h3>
-          <p className="text-xs text-muted-foreground">Exclusive deals for you</p>
+          <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Offers & Rewards</h3>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Exclusive algorithms unlocked</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Offers Grid */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10"
+      >
         {offers.map((offer) => {
           const Icon = getOfferIcon(offer.type);
+          const styling = getOfferStyling(offer.type);
+          
           return (
-            <div 
+            <motion.div 
+              variants={itemVariants}
               key={offer.id} 
-              className="p-4 neo-card-inset rounded-xl hover:scale-[1.02] transition-transform cursor-pointer"
+              className="bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[1.5rem] p-5 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer group flex flex-col h-full"
             >
-              <div className="flex items-start gap-3">
-                <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", getOfferColor(offer.type))}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-foreground truncate">{offer.title}</p>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{offer.description}</p>
-                  {offer.bank && (
-                    <p className="text-xs text-primary mt-2">{offer.bank}</p>
-                  )}
-                  {offer.validTill && (
-                    <p className="text-xs text-muted-foreground">Valid till: {offer.validTill}</p>
-                  )}
-                </div>
+              {/* Icon Top */}
+              <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-5 border transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3", styling)}>
+                <Icon className="w-6 h-6" />
               </div>
-            </div>
+              
+              {/* Content */}
+              <h4 className="font-black text-base md:text-lg text-slate-900 dark:text-white mb-2 leading-tight tracking-tight">
+                {offer.title}
+              </h4>
+              <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-1">
+                {offer.description}
+              </p>
+              
+              {/* Footer Meta */}
+              <div className="mt-auto pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
+                {offer.bank && (
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
+                    {offer.bank}
+                  </span>
+                )}
+                {offer.validTill && (
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    Valid: {offer.validTill}
+                  </span>
+                )}
+              </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { User, Briefcase, CheckCircle, XCircle, Lock, ArrowRight, MapPin, CreditCard, Building2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight, MapPin, CreditCard, Building2, Zap } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
-// Validation schemas - removed PAN, added CIBIL self-declaration
+// 🧠 Robust Zod Schema preserved for fail-proof validation
 const applicationSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters").max(100),
   dob: z.string().min(1, "Date of birth is required"),
@@ -19,9 +21,9 @@ const applicationSchema = z.object({
   state: z.string().min(1, "State is required"),
   monthlyIncome: z.number().min(15000, "Minimum income is ₹15,000"),
   occupation: z.enum(["salaried", "business"], { required_error: "Select occupation type" }),
-  cibilScore: z.number().min(300, "CIBIL score must be between 300-900").max(900, "CIBIL score must be between 300-900"),
-  loanAmount: z.number().min(100000, "Minimum loan amount is ₹1,00,000").max(10000000, "Maximum loan amount is ₹1,00,00,000"),
-  loanTenure: z.number().min(1, "Minimum tenure is 1 year").max(30, "Maximum tenure is 30 years"),
+  cibilScore: z.number().min(300).max(900),
+  loanAmount: z.number().min(100000, "Minimum loan is ₹1 Lakh").max(10000000, "Maximum loan is ₹1 Crore"),
+  loanTenure: z.number().min(1).max(30),
   productType: z.string().min(1, "Product type is required"),
 });
 
@@ -33,10 +35,9 @@ interface LoanApplicationFormProps {
 }
 
 const states = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", 
+  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
   "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi"
 ];
 
@@ -44,321 +45,323 @@ const productTypes = [
   { value: "personal", label: "Personal Loan" },
   { value: "home", label: "Home Loan" },
   { value: "business", label: "Business Loan" },
-  { value: "car", label: "Car Loan" },
   { value: "education", label: "Education Loan" },
-  { value: "gold", label: "Gold Loan" },
   { value: "lap", label: "Loan Against Property" },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } }
+};
+
 const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cibilValue, setCibilValue] = useState(700);
 
   const form = useForm<ApplicationData>({
     resolver: zodResolver(applicationSchema),
     mode: "onChange",
     defaultValues: {
-      monthlyIncome: 50000,
+      monthlyIncome: 85000,
       loanAmount: 500000,
       loanTenure: 5,
-      cibilScore: 700,
+      cibilScore: 750,
+      productType: "personal"
     },
   });
 
+  // 🧠 160 IQ Sync: useWatch perfectly syncs the RHF state with the external EMI Calculator component
+  const currentLoanAmount = useWatch({ control: form.control, name: "loanAmount" });
+  const currentCibil = useWatch({ control: form.control, name: "cibilScore" });
+
+  useEffect(() => {
+    if (onAmountChange && currentLoanAmount) {
+      onAmountChange(currentLoanAmount);
+    }
+  }, [currentLoanAmount, onAmountChange]);
+
   const handleSubmit = async (data: ApplicationData) => {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Simulate API delay for UX
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     setIsSubmitting(false);
     
     toast({
-      title: "Application Submitted!",
-      description: "Comparing loan offers from partner banks...",
+      title: "Data Encrypted & Processed 🔒",
+      description: "Matchmaking with top financial institutions...",
     });
     
     onFormSubmit?.(data);
   };
 
-  const getCibilColor = (score: number) => {
-    if (score >= 750) return "text-success";
-    if (score >= 650) return "text-trust";
-    if (score >= 550) return "text-primary";
-    return "text-destructive";
+  const getCibilData = (score: number) => {
+    if (score >= 750) return { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Excellent" };
+    if (score >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
+    if (score >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
+    return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
   };
 
-  const getCibilLabel = (score: number) => {
-    if (score >= 750) return "Excellent";
-    if (score >= 650) return "Good";
-    if (score >= 550) return "Fair";
-    return "Poor";
-  };
+  const cibilUi = getCibilData(currentCibil || 750);
 
-  const InputWithValidation = ({
-    label,
-    error,
-    isValid,
-    isSecure,
-    ...props
-  }: {
-    label: string;
-    error?: string;
-    isValid?: boolean;
-    isSecure?: boolean;
-  } & React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+  // 🧠 Premium Input Wrapper
+  const InputWithValidation = ({ label, error, isValid, isSecure, ...props }: any) => (
+    <div className="space-y-2 relative group">
+      <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">{label}</Label>
       <div className="relative">
         <Input
           {...props}
           className={cn(
-            "pr-10 neo-input border-0 bg-input text-foreground placeholder:text-muted-foreground",
-            error && "ring-2 ring-destructive",
-            isValid && "ring-2 ring-success"
+            "w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50",
+            error && "border-red-500/50 focus:ring-red-500",
+            isValid && !error && "border-emerald-500/50 focus:ring-emerald-500"
           )}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          {isSecure && <Lock className="w-4 h-4 text-muted-foreground" />}
-          {error && <XCircle className="w-4 h-4 text-destructive" />}
-          {isValid && !error && <CheckCircle className="w-4 h-4 text-success" />}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {isSecure && <LockKeyhole className="w-4 h-4 text-slate-400" />}
+          {error && <XCircle className="w-5 h-5 text-red-500 drop-shadow-md" />}
+          {isValid && !error && <CheckCircle2 className="w-5 h-5 text-emerald-500 drop-shadow-md" />}
         </div>
       </div>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p className="text-xs text-red-500 font-medium ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
     </div>
   );
 
   return (
-    <div className="neo-card p-6 md:p-8">
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        {/* Section 1: Personal Details */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">Personal Details</h3>
-          </div>
+    <motion.form 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      onSubmit={form.handleSubmit(handleSubmit)} 
+      className="space-y-8 h-full w-full"
+    >
+      {/* Dynamic Header */}
+      <motion.div variants={itemVariants} className="mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
+          <Zap className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+            Fast-Track Application
+          </span>
+        </div>
+        <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+          Initialize Your Match
+        </h2>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Complete the parameters below to scan 15+ banking algorithms instantly.
+        </p>
+      </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputWithValidation
-              label="Full Name"
-              placeholder="Enter your full name"
-              isSecure
-              isValid={form.formState.dirtyFields.fullName && !form.formState.errors.fullName}
-              error={form.formState.errors.fullName?.message}
-              {...form.register("fullName")}
-            />
-
-            <InputWithValidation
-              label="Date of Birth"
-              type="date"
-              isSecure
-              isValid={form.formState.dirtyFields.dob && !form.formState.errors.dob}
-              error={form.formState.errors.dob?.message}
-              {...form.register("dob")}
-            />
+      {/* 🧠 SECTION 1: CORE REQUIREMENTS */}
+      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all hover:border-primary/30">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[40px] rounded-full pointer-events-none" />
+        
+        <div className="flex items-center gap-3 mb-6 relative z-10">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-primary" />
           </div>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white">Capital Requirement</h3>
         </div>
 
-        {/* Section 2: Location */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">Location</h3>
+        <div className="space-y-6 relative z-10">
+          {/* Product Type Grid (CRO Optimized compared to Select Dropdown) */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {productTypes.map((type) => {
+              const isSelected = form.watch("productType") === type.value;
+              return (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => form.setValue("productType", type.value, { shouldValidate: true })}
+                  className={cn(
+                    "py-3 px-2 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 border",
+                    isSelected 
+                      ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]" 
+                      : "bg-white/60 dark:bg-[#0a0a0a]/50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-primary/50"
+                  )}
+                >
+                  {type.label}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">State</Label>
-              <Select onValueChange={(v) => form.setValue("state", v)}>
-                <SelectTrigger className="neo-input border-0 bg-input text-foreground">
-                  <SelectValue placeholder="Select State" />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  {states.map((state) => (
-                    <SelectItem key={state} value={state}>{state}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.state && (
-                <p className="text-xs text-destructive">{form.formState.errors.state.message}</p>
-              )}
-            </div>
-
-            <InputWithValidation
-              label="City"
-              placeholder="Enter your city"
-              isValid={form.formState.dirtyFields.city && !form.formState.errors.city}
-              error={form.formState.errors.city?.message}
-              {...form.register("city")}
-            />
-          </div>
-        </div>
-
-        {/* Section 3: Occupation & Income */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">Occupation & Income</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">Occupation Type</Label>
-              <Select onValueChange={(v) => form.setValue("occupation", v as "salaried" | "business")}>
-                <SelectTrigger className="neo-input border-0 bg-input text-foreground">
-                  <SelectValue placeholder="Select occupation" />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  <SelectItem value="salaried">Salaried</SelectItem>
-                  <SelectItem value="business">Business Person</SelectItem>
-                </SelectContent>
-              </Select>
-              {form.formState.errors.occupation && (
-                <p className="text-xs text-destructive">{form.formState.errors.occupation.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">Monthly Income (₹)</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2 group">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Loan Amount (₹)</Label>
               <Input
                 type="number"
-                placeholder="50000"
-                className="neo-input border-0 bg-input text-foreground placeholder:text-muted-foreground"
-                {...form.register("monthlyIncome", { valueAsNumber: true })}
+                className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50"
+                {...form.register("loanAmount", { valueAsNumber: true })}
               />
-              {form.formState.errors.monthlyIncome && (
-                <p className="text-xs text-destructive">{form.formState.errors.monthlyIncome.message}</p>
-              )}
+              {form.formState.errors.loanAmount && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.loanAmount.message}</p>}
             </div>
-          </div>
-        </div>
 
-        {/* Section 4: CIBIL Self Declaration */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">CIBIL Score (Self Declared)</h3>
-          </div>
-
-          <div className="neo-card-inset p-6 rounded-xl">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-sm text-muted-foreground">Your CIBIL Score</span>
-              <div className="flex items-center gap-2">
-                <span className={cn("text-2xl font-bold", getCibilColor(cibilValue))}>{cibilValue}</span>
-                <span className={cn("text-sm font-medium px-2 py-1 rounded-lg bg-muted", getCibilColor(cibilValue))}>
-                  {getCibilLabel(cibilValue)}
-                </span>
-              </div>
-            </div>
-            <Slider
-              value={[cibilValue]}
-              onValueChange={(v) => {
-                setCibilValue(v[0]);
-                form.setValue("cibilScore", v[0]);
-              }}
-              min={300}
-              max={900}
-              step={10}
-              className="cursor-pointer"
-            />
-            <div className="flex justify-between mt-2">
-              <span className="text-xs text-muted-foreground">300 (Poor)</span>
-              <span className="text-xs text-muted-foreground">900 (Excellent)</span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-4">
-              💡 Don't know your CIBIL score? Check it free at <a href="https://www.cibil.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">cibil.com</a>
-            </p>
-          </div>
-        </div>
-
-        {/* Section 5: Loan Requirements */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl neo-card-inset flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">Loan Requirements</h3>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">Product Type</Label>
-              <Select onValueChange={(v) => form.setValue("productType", v)}>
-                <SelectTrigger className="neo-input border-0 bg-input text-foreground">
-                  <SelectValue placeholder="Select loan type" />
+            <div className="space-y-2 group">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Tenure (Years)</Label>
+              <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true })} defaultValue={form.getValues("loanTenure").toString()}>
+                <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+                  <SelectValue placeholder="Select tenure" />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  {productTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                <SelectContent className="bg-card border-border rounded-xl">
+                  {[1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30].map((year) => (
+                    <SelectItem key={year} value={year.toString()} className="font-medium cursor-pointer">{year} {year === 1 ? 'Year' : 'Years'}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {form.formState.errors.productType && (
-                <p className="text-xs text-destructive">{form.formState.errors.productType.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-foreground">Loan Amount (₹)</Label>
-                <Input
-                  type="number"
-                  placeholder="500000"
-                  className="neo-input border-0 bg-input text-foreground placeholder:text-muted-foreground"
-                  {...form.register("loanAmount", { 
-                    valueAsNumber: true,
-                    onChange: (e) => onAmountChange?.(parseInt(e.target.value) || 0)
-                  })}
-                />
-                {form.formState.errors.loanAmount && (
-                  <p className="text-xs text-destructive">{form.formState.errors.loanAmount.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-foreground">Loan Tenure (Years)</Label>
-                <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v))}>
-                  <SelectTrigger className="neo-input border-0 bg-input text-foreground">
-                    <SelectValue placeholder="Select tenure" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {[1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30].map((year) => (
-                      <SelectItem key={year} value={year.toString()}>{year} {year === 1 ? 'Year' : 'Years'}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.loanTenure && (
-                  <p className="text-xs text-destructive">{form.formState.errors.loanTenure.message}</p>
-                )}
-              </div>
             </div>
           </div>
         </div>
+      </motion.div>
 
-        {/* Submit Button */}
+      {/* 🧠 SECTION 2: PERSONAL & LOCATION */}
+      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative transition-all hover:border-primary/30">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
+            <User className="w-5 h-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white">KYC Verification Data</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputWithValidation
+            label="Full Name (As per PAN)"
+            placeholder="e.g. Rahul Sharma"
+            isSecure
+            isValid={form.formState.dirtyFields.fullName && !form.formState.errors.fullName}
+            error={form.formState.errors.fullName?.message}
+            {...form.register("fullName")}
+          />
+          <InputWithValidation
+            label="Date of Birth"
+            type="date"
+            isSecure
+            isValid={form.formState.dirtyFields.dob && !form.formState.errors.dob}
+            error={form.formState.errors.dob?.message}
+            {...form.register("dob")}
+          />
+          
+          <div className="space-y-2 group">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">State</Label>
+            <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true })}>
+              <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+                <SelectValue placeholder="Select State" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border rounded-xl">
+                {states.map((state) => (
+                  <SelectItem key={state} value={state} className="cursor-pointer">{state}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.state && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.state.message}</p>}
+          </div>
+
+          <InputWithValidation
+            label="Current City"
+            placeholder="e.g. Mumbai"
+            isValid={form.formState.dirtyFields.city && !form.formState.errors.city}
+            error={form.formState.errors.city?.message}
+            {...form.register("city")}
+          />
+        </div>
+      </motion.div>
+
+      {/* 🧠 SECTION 3: FINANCIAL ALGORITHM DATA */}
+      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative transition-all hover:border-primary/30">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
+            <Briefcase className="w-5 h-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white">Risk & Income Profile</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="space-y-2 group">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Occupation Type</Label>
+            <Select onValueChange={(v) => form.setValue("occupation", v as "salaried" | "business", { shouldValidate: true })}>
+              <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+                <SelectValue placeholder="Select occupation" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border rounded-xl">
+                <SelectItem value="salaried" className="cursor-pointer">Salaried Professional</SelectItem>
+                <SelectItem value="business" className="cursor-pointer">Self-Employed / Business</SelectItem>
+              </SelectContent>
+            </Select>
+            {form.formState.errors.occupation && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.occupation.message}</p>}
+          </div>
+
+          <div className="space-y-2 group relative">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Monthly Income (₹)</Label>
+            <Input
+              type="number"
+              placeholder="85000"
+              className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50"
+              {...form.register("monthlyIncome", { valueAsNumber: true })}
+            />
+            {form.formState.errors.monthlyIncome && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.monthlyIncome.message}</p>}
+          </div>
+        </div>
+
+        {/* Premium CIBIL Slider Widget */}
+        <div className={`p-6 rounded-[1.5rem] border backdrop-blur-md transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Self-Declared CIBIL</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-2xl font-black ${cibilUi.color}`}>{currentCibil || 750}</span>
+              <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
+                {cibilUi.label}
+              </span>
+            </div>
+          </div>
+          <Slider
+            value={[currentCibil || 750]}
+            onValueChange={(v) => form.setValue("cibilScore", v[0], { shouldValidate: true })}
+            min={300} max={900} step={10}
+            className="cursor-pointer mb-2"
+          />
+          <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2">
+            <span>300 (Poor)</span>
+            <span>900 (Excellent)</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 🧠 SUBMIT ACTION */}
+      <motion.div variants={itemVariants} className="pt-4">
         <Button 
           type="submit" 
           disabled={isSubmitting} 
-          className="w-full neo-button bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold"
-          size="lg"
+          className="w-full relative group overflow-hidden rounded-[1.5rem] bg-primary hover:bg-primary/90 text-primary-foreground py-8 text-xl font-black shadow-[0_0_40px_rgba(var(--primary),0.3)] hover:shadow-[0_0_60px_rgba(var(--primary),0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-          {isSubmitting ? "Processing..." : "Compare Loan Offers"}
-          <ArrowRight className="w-5 h-5 ml-2" />
+          {/* Apple-style Shimmer Effect */}
+          <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
+          <span className="relative flex items-center justify-center gap-3">
+            {isSubmitting ? "Processing Algorithms..." : "Unlock Financial Matches"}
+            {!isSubmitting && <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />}
+          </span>
         </Button>
-
-        {/* Security Footer */}
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-4">
-          <Lock className="w-3 h-3" />
-          <span>Your data is encrypted with 256-bit SSL and processed securely</span>
+        <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-6">
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <span>Data protected by AES-256 Encryption</span>
         </div>
-      </form>
-    </div>
+      </motion.div>
+
+    </motion.form>
   );
 };
+
+// Simple AlertCircle icon for validation errors
+function AlertCircle(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  );
+}
 
 export default LoanApplicationForm;

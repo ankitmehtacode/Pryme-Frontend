@@ -1,22 +1,50 @@
-import { useRef, useEffect, memo, useCallback } from "react";
-import { ShieldCheck } from "lucide-react";
+import { useRef, useEffect, memo, useCallback, useState } from "react";
+import { ArrowRight, Percent, Zap, Sparkles } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import SmartInput from "./SmartInput";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Values are numbers so GSAP can calculate the math
-const stats = [
-  { value: 500, suffix: "Cr+", prefix: "₹", label: "Capital Disbursed" },
-  { value: 24, suffix: "h", prefix: "", label: "Average Approval" },
-  { value: 98, suffix: "%", prefix: "", label: "Success Rate" },
+// 🧠 Dynamic Offers Payload configured exactly to the screenshot reference
+const initialOffers = [
+  { 
+    id: "hdfc-holi", 
+    bank: "HDFC BANK", 
+    title: "Holi Special Sale: 25% Off\nProcessing Fees", 
+    desc: "• Lowest Interest Rates starting at 10.25%*\n• Zero pre-closure charges after 12 months", 
+    tag: "NEED URGENT FUNDS THIS MONTH?",
+    icon: Percent,
+    bgClass: "bg-[#0f462b]", // Exact dark green from screenshot
+    shadowClass: "shadow-[0_20px_40px_rgba(15,70,43,0.3)]"
+  },
+  { 
+    id: "icici-cashback", 
+    bank: "ICICI BANK", 
+    title: "Get ₹5,000 Instant\nCashback on Approval", 
+    desc: "• Direct credit to your account on 1st EMI\n• 100% Digital Process & Fast Approval", 
+    tag: "EXCLUSIVE PRYME OFFER",
+    icon: Zap,
+    bgClass: "bg-[#1e3a8a]", // Deep blue
+    shadowClass: "shadow-[0_20px_40px_rgba(30,58,138,0.3)]"
+  },
+  { 
+    id: "axis-pre", 
+    bank: "AXIS BANK", 
+    title: "Pre-Approved Limit\nup to ₹50,00,000", 
+    desc: "• Zero documentation for salary accounts\n• Funds disbursed within 3 hours", 
+    tag: "FAST TRACK APPROVAL",
+    icon: Sparkles,
+    bgClass: "bg-[#4c1d95]", // Deep purple
+    shadowClass: "shadow-[0_20px_40px_rgba(76,29,149,0.3)]"
+  }
 ];
 
 const HeroSection = memo(() => {
   const containerRef = useRef<HTMLElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const headlineRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+
+  const [offers, setOffers] = useState(initialOffers);
 
   // Track Mouse for ambient glow
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -29,7 +57,7 @@ const HeroSection = memo(() => {
   }, [handleMouseMove]);
 
   useGSAP(() => {
-    // 1. Mouse Follow Glow (Hardware Accelerated)
+    // 1. Mouse Follow Glow
     const glow = glowRef.current;
     if (glow) {
       const xTo = gsap.quickTo(glow, "x", { duration: 0.8, ease: "power3" });
@@ -42,137 +70,140 @@ const HeroSection = memo(() => {
       gsap.ticker.add(tick);
     }
 
-    // 2. Aggressive Entrance Animation
+    // 2. Pure Typography Entrance Animation
     const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
-    // Stagger text reveal
     if (headlineRef.current) {
       tl.fromTo(
         headlineRef.current.children,
-        { y: 60, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 1.2, stagger: 0.15 },
+        { y: 20, opacity: 0, filter: "blur(5px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1, stagger: 0.1 },
         0.1
       );
     }
-
-    // Fade up Smart Input & Stats Pill
-    tl.fromTo(
-      ".hero-fade-up",
-      { y: 40, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, stagger: 0.1 },
-      0.4
-    );
-
-    // 3. Live Counting Numbers Animation
-    if (statsRef.current) {
-      const numberElements = statsRef.current.querySelectorAll('.stat-number');
-      
-      numberElements.forEach((el, index) => {
-        const targetValue = stats[index].value;
-        
-        gsap.fromTo(el, 
-          { textContent: 0 }, 
-          { 
-            textContent: targetValue, 
-            duration: 2.5, // Slow, premium tick up
-            ease: "power3.out", 
-            snap: { textContent: 1 }, // Forces whole numbers so no decimals flash
-            delay: 0.8 // Waits for the pill to fade up first
-          }
-        );
-      });
-    }
-
   }, { scope: containerRef });
+
+  // 🧠 ReactBits Card Swap Logic
+  const handleSwap = () => {
+    setOffers((prev) => {
+      const newOffers = [...prev];
+      const topOffer = newOffers.shift();
+      if (topOffer) newOffers.push(topOffer);
+      return newOffers;
+    });
+  };
 
   return (
     <section 
       ref={containerRef} 
-      // FIXED BG COLORS: Explicitly White for light mode, Pure Black for dark mode
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-white dark:bg-[#030303] pt-24 pb-16"
+      // 🧠 1. BLANK SPACE REMOVED: pt-24 drops to pt-16/20. pb-6 dropped to pb-0!
+      // 🧠 2. CLIPPING FIXED: "overflow-hidden" completely removed from this wrapper so the Product Grid can overlap it safely.
+      className="relative w-full flex items-center justify-center bg-[#0a0a0a] pt-16 md:pt-20 pb-0 border-b border-white/5 z-10"
     >
-      {/* --- Ambient Glows & 160 IQ CSS 3D Orbs --- */}
+      {/* Background Layers (Overflow hidden isolated here so the glow doesn't cause horizontal scrolling) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
-        {/* Dynamic Green Glow attached to mouse */}
+        {/* Subtle dynamic green glow */}
         <div 
           ref={glowRef}
-          className="absolute w-[30rem] md:w-[45rem] h-[30rem] md:h-[45rem] bg-[#2aac64]/15 dark:bg-[#2aac64]/10 rounded-full blur-[100px] md:blur-[140px] mix-blend-screen will-change-transform"
+          className="absolute w-[25rem] h-[25rem] bg-[#2aac64]/10 rounded-full blur-[120px] mix-blend-screen will-change-transform"
         />
-        
-        {/* Pure CSS 3D Glass Sphere 1 (Top Left) */}
-        <div className="absolute top-[15%] left-[10%] w-32 h-32 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-white/40 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.1),0_15px_30px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_-10px_20px_rgba(255,255,255,0.05),0_15px_30px_rgba(0,0,0,0.5)] animate-float-slow" />
-        
-        {/* Pure CSS 3D Glass Sphere 2 (Bottom Right) */}
-        <div className="absolute bottom-[20%] right-[10%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-tr from-[#2aac64]/30 to-white/20 dark:from-[#2aac64]/20 dark:to-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-[inset_0_-8px_16px_rgba(0,0,0,0.1),0_10px_20px_rgba(42,172,100,0.1)] dark:shadow-[inset_0_-8px_16px_rgba(255,255,255,0.05),0_10px_20px_rgba(0,0,0,0.5)] animate-float-medium blur-[1px]" />
       </div>
 
-      {/* --- Main Content --- */}
-      <div className="container mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center text-center">
+      {/* Tightly packed horizontal flex container with reduced vertical gap for mobile */}
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 relative z-10 flex flex-col xl:flex-row items-center justify-between gap-6 xl:gap-4 mb-4 md:mb-8">
         
-        {/* Premium Tagline Overline */}
-        <div className="hero-fade-up inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md mb-8 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-[#2aac64] animate-pulse" />
-          <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-slate-800 dark:text-white/80 uppercase">
-            Unfair Financial Advantage
-          </span>
-        </div>
-        
-        {/* Massive Aggressive Typography */}
-        <h1 
-          ref={headlineRef} 
-          className="flex flex-col text-[3.5rem] sm:text-6xl md:text-7xl lg:text-[6rem] font-black text-slate-900 dark:text-white tracking-tighter leading-[0.9] mb-8"
-        >
-          <span className="block will-change-transform">INSTANT CAPITAL.</span>
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] via-emerald-500 to-[#166534] dark:from-[#2aac64] dark:via-[#4ade80] dark:to-[#2aac64] will-change-transform pb-2">
-            ZERO FRICTION.
-          </span>
-        </h1>
-        
-        {/* Subtitle */}
-        <p className="hero-fade-up text-base sm:text-lg md:text-xl text-slate-600 dark:text-white/50 font-medium max-w-2xl mb-12 leading-relaxed tracking-tight">
-          Bypass the bureaucracy. Compare premium rates from 15+ top-tier banks, calculate EMIs instantly, and unlock your financial trajectory today.
-        </p>
-
-        {/* Smart Command Bar */}
-        <div className="hero-fade-up w-full max-w-2xl mb-8 relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#2aac64]/20 to-[#ffd600]/20 rounded-[2rem] blur-lg opacity-50 dark:opacity-30"></div>
-          <div className="relative bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl p-2 shadow-2xl">
-            <SmartInput />
+        {/* 🧠 LEFT COLUMN: Ultra-Compressed Typography */}
+        <div className="w-full xl:w-[50%] flex flex-col items-center xl:items-start text-center xl:text-left z-20">
+          <div ref={headlineRef} className="w-full max-w-[550px]">
+            
+            <p className="text-base md:text-xl lg:text-2xl font-bold text-slate-300 tracking-tight leading-none mb-2">
+              Bypass the bureaucracy.
+            </p>
+            
+            <h1 className="text-[2.75rem] md:text-[4rem] lg:text-[4.5rem] font-black tracking-tighter leading-[0.95] mb-3">
+              <span className="block text-white">INSTANT</span>
+              <span className="block text-white">CAPITAL.</span>
+              <span className="block text-[#2aac64] drop-shadow-[0_0_15px_rgba(42,172,100,0.3)]">
+                ZERO FRICTION.
+              </span>
+            </h1>
+            
+            <p className="text-xs md:text-sm text-slate-400 font-medium leading-snug max-w-[90%] mx-auto xl:mx-0">
+              Compare premium rates from 15+ top-tier banks, calculate EMIs instantly, and unlock your financial trajectory today.
+            </p>
+            
           </div>
         </div>
 
-        {/* --- DYNAMIC STATS PILL WITH LIVE COUNTING --- */}
-        <div ref={statsRef} className="hero-fade-up mt-8 w-full max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-evenly gap-8 md:gap-4 bg-white/50 dark:bg-white/5 backdrop-blur-2xl border border-slate-200/60 dark:border-white/10 rounded-3xl md:rounded-full py-6 md:py-4 px-8 shadow-2xl shadow-emerald-900/5 dark:shadow-none">
-            {stats.map((stat, i) => (
-              <div key={i} className="flex flex-col items-center justify-center w-full relative">
-                <p className="flex items-center text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
-                  <span>{stat.prefix}</span>
-                  {/* The GSAP Counter hooks into this specific span with tabular-nums */}
-                  <span className="stat-number tabular-nums">{stat.value}</span>
-                  <span className="text-[#2aac64]">{stat.suffix}</span>
-                </p>
-                <p className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1">
-                  {stat.label}
-                </p>
-                
-                {/* Minimalist Divider Line (Desktop) */}
-                {i !== stats.length - 1 && (
-                  <div className="hidden md:block absolute right-[-10%] top-1/2 -translate-y-1/2 w-px h-10 bg-slate-300 dark:bg-white/10" />
-                )}
-                
-                {/* Minimalist Divider Line (Mobile) */}
-                {i !== stats.length - 1 && (
-                  <div className="block md:hidden absolute -bottom-4 left-1/2 -translate-x-1/2 w-10 h-px bg-slate-200 dark:bg-white/10" />
-                )}
-              </div>
-            ))}
+        {/* 🧠 RIGHT COLUMN: Compact Card Swap Engine */}
+        <div className="w-full xl:w-[50%] h-[200px] md:h-[220px] shrink-0 relative z-20 flex items-center justify-center perspective-[1200px] mt-2 xl:mt-0">
+          
+          {/* Aligned tightly to the top to save space */}
+          <div className="absolute top-0 right-4 flex flex-col items-end z-30 pointer-events-none">
+            <span className="text-[9px] font-bold text-[#2aac64] uppercase tracking-widest animate-pulse">LIVE BANK OFFERS</span>
+            <span className="text-[9px] text-slate-500">Tap card to cycle</span>
           </div>
-        </div>
 
-        {/* Bottom Security Signal */}
-        <div className="hero-fade-up mt-12 flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-          <ShieldCheck className="w-4 h-4 text-[#2aac64]" /> Bank Grade Security
+          {/* Wrapper height massively reduced to force the next section up */}
+          <div className="relative w-full max-w-[460px] lg:max-w-[500px] h-[160px] md:h-[190px] mt-4">
+            <AnimatePresence mode="popLayout">
+              {offers.map((offer, index) => {
+                const isTop = index === 0;
+                const Icon = offer.icon;
+
+                return (
+                  <motion.div
+                    key={offer.id}
+                    layout
+                    onClick={isTop ? handleSwap : undefined}
+                    initial={false}
+                    animate={{
+                      y: index * 14, // Tighter visual stacking height
+                      scale: 1 - index * 0.05,
+                      zIndex: offers.length - index,
+                      opacity: 1 - index * 0.15,
+                    }}
+                    transition={{ type: "spring", stiffness: 280, damping: 25 }}
+                    className={`absolute top-0 w-full h-full rounded-[1.25rem] transform-gpu origin-top will-change-transform ${isTop ? 'cursor-pointer hover:-translate-y-1 transition-transform duration-300' : 'pointer-events-none'}`}
+                  >
+                    <div className={`relative w-full h-full ${offer.bgClass} border border-white/10 rounded-[1.25rem] flex flex-col p-4 overflow-hidden ${isTop ? offer.shadowClass : ''}`}>
+                      
+                      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+                      <div className="absolute -right-4 -bottom-4 w-28 h-28 opacity-10 pointer-events-none transform -rotate-12">
+                        <Icon className="w-full h-full text-white" />
+                      </div>
+
+                      <div className="relative z-10 flex justify-between items-start mb-2">
+                        <div className="bg-[#facc15] text-[#422006] text-[8px] md:text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-sm flex items-center gap-1 shadow-sm">
+                          <Zap className="w-3 h-3 fill-current" /> {offer.tag}
+                        </div>
+                        <span className="bg-black/30 text-white/90 text-[8px] font-bold px-2 py-1 rounded-full uppercase tracking-widest border border-white/5 backdrop-blur-md">
+                          {offer.bank}
+                        </span>
+                      </div>
+
+                      <div className="relative z-10 flex-1 flex flex-col justify-center">
+                        <h3 className="text-base md:text-lg lg:text-xl font-black text-[#fde047] leading-tight tracking-tight mb-1 drop-shadow-sm">
+                          {offer.title}
+                        </h3>
+                        <p className="text-[9px] md:text-[11px] font-medium text-white/90 whitespace-pre-line leading-snug">
+                          {offer.desc}
+                        </p>
+                      </div>
+
+                      {isTop && (
+                        <div className="relative z-10 mt-auto pt-1">
+                          <button className="bg-[#111] text-white px-4 py-1.5 rounded-full font-bold text-[10px] shadow-xl hover:bg-black transition-colors flex items-center gap-1.5 border border-white/10 w-max">
+                            Apply Now <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </div>
 
       </div>

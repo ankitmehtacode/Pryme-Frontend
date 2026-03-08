@@ -1,6 +1,7 @@
-import { Star, Quote } from "lucide-react";
+import { Star, ShieldCheck, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 import CircularGallery from "@/components/ui/CircularGallery";
+import { cn } from "@/lib/utils";
 
 const TestimonialsSlider = () => {
   const testimonials = [
@@ -61,6 +62,7 @@ const TestimonialsSlider = () => {
     },
   ];
 
+  // Map to the exact prop structure required by ReactBits CircularGallery
   const galleryItems = testimonials.map((t) => ({
     image: t.image,
     quote: t.quote,
@@ -69,70 +71,110 @@ const TestimonialsSlider = () => {
   }));
 
   return (
-    <section className="py-20 md:py-28 section-gradient overflow-hidden">
-      <div className="container mx-auto px-4">
-        {/* Header */}
+    <section className="py-24 md:py-32 bg-[#030303] relative overflow-hidden z-10 border-t border-white/5">
+      
+      {/* 🧠 Holographic Background Engine */}
+      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 pointer-events-none mix-blend-overlay" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-20">
+        
+        {/* Header Block */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16 md:mb-20"
         >
-          <span className="inline-block text-xs font-medium text-primary uppercase tracking-widest mb-4">
-            Testimonials
-          </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Trusted by Thousands
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 shadow-xl">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            <span className="text-[10px] md:text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">
+              Verified Algorithm Success
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tighter">
+            Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Thousands.</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See what our customers have to say about their experience with PRYME
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium">
+            See what our customers have to say about their experience with the PRYME financial algorithm.
           </p>
         </motion.div>
 
-        {/* Circular Gallery */}
+        {/* 🧠 WebGL Circular Gallery (Holographic Masking Applied) */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="h-[400px] md:h-[500px] w-full max-w-6xl mx-auto"
+          transition={{ duration: 1, ease: "easeOut" }}
+          // The mask-image makes the edges of the canvas fade smoothly into the black background
+          className="relative h-[450px] md:h-[550px] w-full max-w-7xl mx-auto"
+          style={{ maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)', WebkitMaskImage: '-webkit-radial-gradient(center, ellipse cover, black 40%, transparent 80%)' }}
         >
           <CircularGallery
             items={galleryItems}
             bend={3}
-            textColor="hsl(var(--foreground))"
-            borderRadius={0.08}
-            scrollSpeed={2}
+            textColor="#ffffff" // Force white text for dark mode WebGL canvas
+            borderRadius={0.05}
+            scrollSpeed={1.5} // Slightly slower for a more premium, heavy feel
             scrollEase={0.05}
           />
         </motion.div>
 
-        {/* Trust indicators */}
+        {/* Floating Trust Indicators Dashboard */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex items-center justify-center gap-8 mt-12"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="max-w-4xl mx-auto mt-12"
         >
-          <div className="flex items-center gap-2">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 fill-trust text-trust" />
-              ))}
+          <div className="flex flex-col md:flex-row items-center justify-evenly gap-6 md:gap-12 p-6 md:p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+            
+            {/* Rating */}
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-primary text-primary drop-shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                ))}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-black text-white leading-none">4.9/5</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Average Rating</span>
+              </div>
             </div>
-            <span className="text-sm font-medium text-foreground">4.9/5</span>
-          </div>
-          <div className="h-6 w-px bg-border" />
-          <div className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">10,000+</span> Happy Customers
-          </div>
-          <div className="h-6 w-px bg-border hidden sm:block" />
-          <div className="text-sm text-muted-foreground hidden sm:block">
-            <span className="font-semibold text-foreground">₹500Cr+</span> Loans Disbursed
+
+            <div className="hidden md:block w-px h-12 bg-white/10" />
+            <div className="block md:hidden w-12 h-px bg-white/10" />
+
+            {/* Customers */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                <ShieldCheck className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xl font-black text-white leading-none">10,000+</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Happy Customers</span>
+              </div>
+            </div>
+
+            <div className="hidden md:block w-px h-12 bg-white/10" />
+            <div className="block md:hidden w-12 h-px bg-white/10" />
+
+            {/* Disbursed */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                <Activity className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xl font-black text-white leading-none">₹500Cr+</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Capital Disbursed</span>
+              </div>
+            </div>
+
           </div>
         </motion.div>
+
       </div>
     </section>
   );

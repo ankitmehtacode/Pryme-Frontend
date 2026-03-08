@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Calculator, TrendingUp, IndianRupee, Info, ChevronDown } from "lucide-react";
+import { Calculator, Info } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   Accordion,
@@ -27,6 +27,7 @@ const EMICalculator = ({
   const [rate, setRate] = useState(initialRate);
   const [months, setMonths] = useState(initialTenure);
 
+  // 🧠 Unchanged robust math logic
   useEffect(() => {
     setAmount(initialAmount);
   }, [initialAmount]);
@@ -72,30 +73,12 @@ const EMICalculator = ({
   };
 
   const terminology = [
-    {
-      term: "EMI (Equated Monthly Installment)",
-      definition: "A fixed payment amount made by a borrower to a lender at a specified date each calendar month.",
-    },
-    {
-      term: "Principal Amount",
-      definition: "The original sum of money borrowed in a loan. This is the amount you actually receive.",
-    },
-    {
-      term: "Rate of Interest (ROI)",
-      definition: "The percentage of principal charged by the lender for the use of its money. Usually expressed as an annual percentage.",
-    },
-    {
-      term: "MCLR (Marginal Cost of Funds based Lending Rate)",
-      definition: "A methodology used by banks in India to determine interest rates for loans. It's the minimum interest rate below which a bank cannot lend.",
-    },
-    {
-      term: "Repo Rate",
-      definition: "The rate at which RBI lends money to commercial banks. Changes in repo rate affect your loan interest rates.",
-    },
-    {
-      term: "Processing Fee",
-      definition: "A one-time fee charged by lenders for processing your loan application, typically 0.5% to 2% of the loan amount.",
-    },
+    { term: "EMI (Equated Monthly Installment)", definition: "A fixed payment amount made by a borrower to a lender at a specified date each calendar month." },
+    { term: "Principal Amount", definition: "The original sum of money borrowed in a loan. This is the amount you actually receive." },
+    { term: "Rate of Interest (ROI)", definition: "The percentage of principal charged by the lender for the use of its money. Usually expressed as an annual percentage." },
+    { term: "MCLR (Marginal Cost of Funds based Lending Rate)", definition: "A methodology used by banks in India to determine interest rates for loans. It's the minimum interest rate below which a bank cannot lend." },
+    { term: "Repo Rate", definition: "The rate at which RBI lends money to commercial banks. Changes in repo rate affect your loan interest rates." },
+    { term: "Processing Fee", definition: "A one-time fee charged by lenders for processing your loan application, typically 0.5% to 2% of the loan amount." },
   ];
 
   // Calculate SVG arc for pie chart
@@ -104,181 +87,141 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={`card-elevated p-6 ${className}`}>
+    <div className={`bg-white/40 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden ${className}`}>
+      
+      {/* 🧠 Ambient Glow Engine */}
+      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Calculator className="w-5 h-5 text-primary" />
+      <div className="flex items-center gap-4 mb-8 relative z-10">
+        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/5 shadow-md flex items-center justify-center border border-slate-100 dark:border-white/10">
+          <Calculator className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-foreground">EMI Calculator</h3>
-          <p className="text-xs text-muted-foreground">Estimate your monthly payments</p>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">EMI Calculator</h3>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Real-time payment estimation</p>
         </div>
       </div>
 
-      {/* EMI Display with Pie Chart */}
-      <div className="flex flex-col md:flex-row items-center gap-6 p-6 bg-muted/30 rounded-xl mb-6">
-        {/* Pie Chart */}
-        <div className="relative w-40 h-40 shrink-0">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
-            {/* Background circle */}
+      {/* Glassmorphic EMI Display & Pie Chart */}
+      <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-white/60 dark:bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/60 dark:border-white/10 shadow-inner mb-10 relative z-10">
+        
+        {/* Glowing Pie Chart */}
+        <div className="relative w-40 h-40 shrink-0 drop-shadow-xl">
+          <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r={radius} fill="none" stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="18" />
+            
+            {/* Principal Segment */}
             <circle
-              cx="100"
-              cy="100"
-              r={radius}
-              fill="none"
-              stroke="hsl(var(--muted))"
-              strokeWidth="20"
+              cx="100" cy="100" r={radius} fill="none" stroke="hsl(var(--primary))" strokeWidth="18"
+              strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
+              className="transition-all duration-1000 ease-out"
             />
-            {/* Principal segment */}
+            {/* Interest Segment (Using a distinct generic blue/purple to contrast with the primary brand color) */}
             <circle
-              cx="100"
-              cy="100"
-              r={radius}
-              fill="none"
-              stroke="hsl(var(--primary))"
-              strokeWidth="20"
-              strokeDasharray={`${principalArc} ${circumference}`}
-              strokeLinecap="round"
-              className="transition-all duration-500"
-            />
-            {/* Interest segment */}
-            <circle
-              cx="100"
-              cy="100"
-              r={radius}
-              fill="none"
-              stroke="hsl(var(--trust))"
-              strokeWidth="20"
-              strokeDasharray={`${circumference - principalArc} ${circumference}`}
-              strokeDashoffset={-principalArc}
-              strokeLinecap="round"
-              className="transition-all duration-500"
+              cx="100" cy="100" r={radius} fill="none" stroke="#8b5cf6" strokeWidth="18"
+              strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
+              className="transition-all duration-1000 ease-out"
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xs text-muted-foreground">Monthly EMI</span>
-            <span className="text-xl font-bold text-primary">{formatShortCurrency(emi)}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white">{formatShortCurrency(emi)}</span>
           </div>
         </div>
 
         {/* Legend */}
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center justify-between p-3 bg-card rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-primary" />
-              <span className="text-sm text-foreground">Principal</span>
+        <div className="flex-1 space-y-4 w-full">
+          <div className="flex items-center justify-between p-3.5 bg-white/80 dark:bg-[#0a0a0a]/50 rounded-xl shadow-sm border border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-3.5 h-3.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Principal</span>
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold text-foreground">{formatCurrency(amount)}</p>
-              <p className="text-xs text-muted-foreground">{principalPercentage.toFixed(1)}%</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(amount)}</p>
+              <p className="text-xs font-bold text-slate-400">{principalPercentage.toFixed(1)}%</p>
             </div>
           </div>
-          <div className="flex items-center justify-between p-3 bg-card rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-trust" />
-              <span className="text-sm text-foreground">Interest</span>
+          
+          <div className="flex items-center justify-between p-3.5 bg-white/80 dark:bg-[#0a0a0a]/50 rounded-xl shadow-sm border border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-3.5 h-3.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Total Interest</span>
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold text-trust-foreground">{formatCurrency(totalInterest)}</p>
-              <p className="text-xs text-muted-foreground">{interestPercentage.toFixed(1)}%</p>
+              <p className="text-sm font-black text-violet-600 dark:text-violet-400">{formatCurrency(totalInterest)}</p>
+              <p className="text-xs font-bold text-slate-400">{interestPercentage.toFixed(1)}%</p>
             </div>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
-            <span className="text-sm font-medium text-foreground">Total Payment</span>
-            <span className="text-lg font-bold text-foreground">{formatCurrency(totalPayment)}</span>
           </div>
         </div>
       </div>
 
-      {/* Sliders */}
-      <div className="space-y-6">
-        {/* Loan Amount */}
-        <div>
-          <div className="flex justify-between mb-3">
-            <span className="text-sm font-medium text-foreground">Loan Amount</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {formatCurrency(amount)}
-              </span>
-            </div>
+      {/* Interactive Sliders */}
+      <div className="space-y-8 relative z-10">
+        
+        {/* Amount Slider */}
+        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+          <div className="flex justify-between items-center mb-5">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Loan Amount</span>
+            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
+              {formatCurrency(amount)}
+            </span>
           </div>
-          <Slider
-            value={[amount]}
-            onValueChange={(v) => setAmount(v[0])}
-            min={100000}
-            max={10000000}
-            step={50000}
-            className="cursor-pointer"
-          />
-          <div className="flex justify-between mt-2">
-            <span className="text-xs text-muted-foreground">₹1 Lakh</span>
-            <span className="text-xs text-muted-foreground">₹1 Crore</span>
+          <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={10000000} step={50000} className="cursor-pointer" />
+          <div className="flex justify-between mt-3">
+            <span className="text-xs font-medium text-slate-400">₹1 Lakh</span>
+            <span className="text-xs font-medium text-slate-400">₹1 Crore</span>
           </div>
         </div>
 
-        {/* Interest Rate */}
-        <div>
-          <div className="flex justify-between mb-3">
-            <span className="text-sm font-medium text-foreground">Interest Rate (p.a.)</span>
-            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-              {rate}%
+        {/* Rate Slider */}
+        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+          <div className="flex justify-between items-center mb-5">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Interest Rate</span>
+            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
+              {rate}% <span className="text-xs font-medium text-primary/70">p.a.</span>
             </span>
           </div>
-          <Slider
-            value={[rate]}
-            onValueChange={(v) => setRate(v[0])}
-            min={6}
-            max={24}
-            step={0.25}
-            className="cursor-pointer"
-          />
-          <div className="flex justify-between mt-2">
-            <span className="text-xs text-muted-foreground">6%</span>
-            <span className="text-xs text-muted-foreground">24%</span>
+          <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={6} max={24} step={0.25} className="cursor-pointer" />
+          <div className="flex justify-between mt-3">
+            <span className="text-xs font-medium text-slate-400">6%</span>
+            <span className="text-xs font-medium text-slate-400">24%</span>
           </div>
         </div>
 
-        {/* Tenure */}
-        <div>
-          <div className="flex justify-between mb-3">
-            <span className="text-sm font-medium text-foreground">Loan Tenure</span>
-            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-              {months} months ({(months / 12).toFixed(1)} years)
+        {/* Tenure Slider */}
+        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+          <div className="flex justify-between items-center mb-5">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Loan Tenure</span>
+            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
+              {months} Mo <span className="text-xs font-medium text-primary/70">({(months / 12).toFixed(1)} Yrs)</span>
             </span>
           </div>
-          <Slider
-            value={[months]}
-            onValueChange={(v) => setMonths(v[0])}
-            min={12}
-            max={360}
-            step={12}
-            className="cursor-pointer"
-          />
-          <div className="flex justify-between mt-2">
-            <span className="text-xs text-muted-foreground">1 Year</span>
-            <span className="text-xs text-muted-foreground">30 Years</span>
+          <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={12} max={360} step={12} className="cursor-pointer" />
+          <div className="flex justify-between mt-3">
+            <span className="text-xs font-medium text-slate-400">1 Year</span>
+            <span className="text-xs font-medium text-slate-400">30 Years</span>
           </div>
         </div>
       </div>
 
       {/* Terminology Accordion */}
       {showTerminology && (
-        <div className="mt-6 pt-6 border-t border-border">
+        <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-white/10 relative z-10">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="terminology" className="border-0">
-              <AccordionTrigger className="text-sm font-medium text-muted-foreground hover:text-foreground py-2 hover:no-underline">
+              <AccordionTrigger className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary py-2 hover:no-underline uppercase tracking-widest transition-colors">
                 <div className="flex items-center gap-2">
                   <Info className="w-4 h-4" />
-                  <span>Loan Terminology Guide</span>
+                  <span>Terminology Guide</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-3 pt-2">
+                <div className="grid gap-3 pt-4">
                   {terminology.map((item) => (
-                    <div key={item.term} className="p-3 bg-muted/30 rounded-lg">
-                      <p className="text-sm font-medium text-foreground mb-1">{item.term}</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{item.definition}</p>
+                    <div key={item.term} className="p-4 bg-white/50 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-slate-100 dark:border-white/5 shadow-sm">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">{item.term}</p>
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.definition}</p>
                     </div>
                   ))}
                 </div>
