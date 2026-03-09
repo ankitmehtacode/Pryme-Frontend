@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import Silk from "@/components/ui/Silk";
 
 // Assets safely imported from local directory
 import cardPersonal from "@/assets/card-personal.png";
@@ -55,10 +56,29 @@ const spring = { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.7
 
 const ProductSelectorGrid = memo(() => {
   return (
-    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-10 pt-0">
+    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-10 pt-0 overflow-x-clip">
       
+      {/* 🧠 Silk Background Animation (PRO UI/UX Blending) */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none mix-blend-screen opacity-80"
+        style={{ 
+          width: '1400px', 
+          height: '1000px',
+          maskImage: 'radial-gradient(circle at center, black 20%, transparent 60%)',
+          WebkitMaskImage: 'radial-gradient(circle at center, black 20%, transparent 60%)'
+        }}
+      >
+        <Silk
+          speed={2.3}
+          scale={0.7}
+          color="#0f462b"
+          noiseIntensity={1.5}
+          rotation={0}
+        />
+      </div>
+
       {/* 🧠 Tightly nested against the Hero */}
-      <div className="container mx-auto px-4 max-w-[1300px] -mt-10 md:-mt-14 relative z-20">
+      <div className="container mx-auto px-4 max-w-[1300px] relative z-20">
         
         {/* Ambient glow centered behind the products */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[150px] bg-[#2aac64]/10 blur-[100px] rounded-full pointer-events-none" />
@@ -86,9 +106,9 @@ const ProductSelectorGrid = memo(() => {
                 className="relative flex flex-col items-center cursor-pointer group outline-none"
                 style={{ perspective: "1000px" }} 
               >
-                {/* 🧠 AGGRESSIVE DOWNSIZING: w-24 (96px) to md:w-32 (128px) */}
+                {/* 🧠 SIZE ADJUSTED to prevent clipping: larger dimensions and object-cover */}
                 <motion.div
-                  className="relative w-[96px] h-[96px] sm:w-[110px] sm:h-[110px] md:w-[128px] md:h-[128px] rounded-2xl md:rounded-[1.5rem]"
+                  className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] aspect-square shrink-0 rounded-2xl md:rounded-[1.5rem]"
                   initial={{ rotateY: index % 2 === 0 ? -10 : 10, rotateX: 8, y: 0 }}
                   whileHover={{ 
                     scale: 1.05, 
@@ -116,7 +136,7 @@ const ProductSelectorGrid = memo(() => {
                   {/* Ribbon Tag (Floats safely above without clipping) */}
                   {product.tag && (
                     <div 
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0f462b] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-black uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300 group-hover:-translate-y-1"
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0f462b] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300 group-hover:-translate-y-1"
                       style={{ transform: "translateZ(20px) translateX(-50%)" }} 
                     >
                       {product.tag}
@@ -134,7 +154,7 @@ const ProductSelectorGrid = memo(() => {
                 </motion.div>
 
                 {/* Typography perfectly aligned below */}
-                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-bold text-slate-400 group-hover:text-white transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10">
+                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-medium text-slate-400 group-hover:text-white transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10">
                   {product.label}
                 </span>
               </Link>
@@ -151,10 +171,10 @@ const ProductSelectorGrid = memo(() => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block text-[9px] font-bold text-[#2aac64] uppercase tracking-[0.3em] bg-[#2aac64]/10 border border-[#2aac64]/20 px-3 py-1 rounded-full mb-3">
+          <span className="inline-block text-[9px] font-medium text-[#2aac64] uppercase tracking-[0.3em] bg-[#2aac64]/10 border border-[#2aac64]/20 px-3 py-1 rounded-full mb-3">
             Financial Arsenal
           </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter mb-3 uppercase leading-none">
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-white tracking-tighter mb-3 uppercase leading-none">
             Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] to-emerald-400">Weapon.</span>
           </h2>
           <p className="text-xs md:text-sm text-slate-400 font-medium max-w-lg mx-auto">

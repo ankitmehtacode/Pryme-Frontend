@@ -133,7 +133,7 @@ const Dashboard = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: "spring", ...springConfig }}
                 >
-                  <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2" style={{ letterSpacing: "-0.02em" }}>
+                  <h1 className="text-xl md:text-2xl font-medium text-foreground mb-2" style={{ letterSpacing: "-0.02em" }}>
                     Welcome back, {user?.email?.split("@")[0]}
                   </h1>
                   <p className="text-muted-foreground text-lg">
@@ -172,7 +172,7 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">{stat.label}</p>
-                        <p className="text-2xl font-bold text-foreground tabular-nums">{stat.value}</p>
+                        <p className="text-2xl font-medium text-foreground tabular-nums">{stat.value}</p>
                       </div>
                     </div>
                   </motion.div>

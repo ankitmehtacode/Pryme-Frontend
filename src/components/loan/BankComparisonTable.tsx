@@ -92,12 +92,12 @@ const BankComparisonTable = ({
                 </div>
                 <div>
                   {offer.recommended && (
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-primary/30 bg-primary/10 text-[10px] font-bold tracking-widest uppercase text-primary mb-1">
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-primary/30 bg-primary/10 text-[10px] font-medium tracking-widest uppercase text-primary mb-1">
                       <Star className="w-3 h-3 fill-primary" /> Top Match
                     </div>
                   )}
-                  <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">{offer.bankName}</h4>
-                  <div className="flex items-center gap-1 mt-0.5 text-xs font-bold text-slate-500">
+                  <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight">{offer.bankName}</h4>
+                  <div className="flex items-center gap-1 mt-0.5 text-xs font-medium text-slate-500">
                     <ShieldCheck className="w-3.5 h-3.5" /> 
                     <span>Max {formatCurrency(offer.maxLoanAmount)}</span>
                   </div>
@@ -107,18 +107,18 @@ const BankComparisonTable = ({
               {/* 2. Core Financial Metrics (The 3-Column Split) */}
               <div className="w-full xl:w-[45%] grid grid-cols-3 gap-4 xl:gap-8 border-y xl:border-y-0 xl:border-x border-slate-200 dark:border-white/10 py-5 xl:py-0 xl:px-8 relative z-10">
                 <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Interest Rate</p>
-                  <p className={cn("text-xl md:text-2xl font-black", offer.recommended ? "text-primary" : "text-slate-900 dark:text-white")}>
+                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Interest Rate</p>
+                  <p className={cn("text-xl md:text-2xl font-semibold", offer.recommended ? "text-primary" : "text-slate-900 dark:text-white")}>
                     {offer.roi}% <span className="text-xs font-medium text-slate-500">p.a.</span>
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</p>
-                  <p className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{formatCurrency(offer.emi)}</p>
+                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</p>
+                  <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">{formatCurrency(offer.emi)}</p>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Processing</p>
-                  <p className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-300">{offer.processingFee}</p>
+                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Processing</p>
+                  <p className="text-sm md:text-base font-medium text-slate-700 dark:text-slate-300">{offer.processingFee}</p>
                 </div>
               </div>
 
@@ -129,8 +129,8 @@ const BankComparisonTable = ({
                 <div className={`p-3 rounded-xl border flex items-center justify-between gap-4 ${approval.bgLight} ${approval.border}`}>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Approval Probability</span>
-                      <span className={`text-xs font-black ${approval.text}`}>{offer.approvalProbability}%</span>
+                      <span className="text-[10px] font-medium uppercase tracking-widest text-slate-600 dark:text-slate-400">Approval Probability</span>
+                      <span className={`text-xs font-semibold ${approval.text}`}>{offer.approvalProbability}%</span>
                     </div>
                     <div className="w-full h-1.5 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
                       <motion.div 
@@ -148,7 +148,7 @@ const BankComparisonTable = ({
                   <Button
                     onClick={() => onApplyWithPyrme(offer.id)}
                     className={cn(
-                      "flex-1 group relative overflow-hidden rounded-xl text-sm md:text-base font-bold py-6 transition-all duration-300 hover:scale-[1.02]",
+                      "flex-1 group relative overflow-hidden rounded-xl text-sm md:text-base font-medium py-6 transition-all duration-300 hover:scale-[1.02]",
                       offer.recommended 
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)]" 
                         : "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-xl"

@@ -87,130 +87,130 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={`bg-white/40 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden ${className}`}>
+    <div className={`bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden transition-all hover:border-[#2aac64]/40 ${className}`}>
       
       {/* 🧠 Ambient Glow Engine */}
-      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-[#2aac64]/10 blur-[80px] rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 relative z-10">
-        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/5 shadow-md flex items-center justify-center border border-slate-100 dark:border-white/10">
-          <Calculator className="w-6 h-6 text-primary" />
+        <div className="w-12 h-12 rounded-2xl bg-[#111] shadow-sm flex items-center justify-center border border-[#2aac64]/20">
+          <Calculator className="w-6 h-6 text-[#2aac64]" />
         </div>
         <div>
-          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">EMI Calculator</h3>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Real-time payment estimation</p>
+          <h3 className="text-2xl font-semibold text-white tracking-tight">EMI Calculator</h3>
+          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Real-time payment estimation</p>
         </div>
       </div>
 
-      {/* Glassmorphic EMI Display & Pie Chart */}
-      <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-white/60 dark:bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/60 dark:border-white/10 shadow-inner mb-10 relative z-10">
+      {/* Sleek EMI Display & Pie Chart */}
+      <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-[#111] rounded-[2rem] border border-white/5 shadow-inner mb-10 relative z-10">
         
         {/* Glowing Pie Chart */}
-        <div className="relative w-40 h-40 shrink-0 drop-shadow-xl">
-          <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r={radius} fill="none" stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="18" />
+        <div className="relative w-40 h-40 shrink-0 drop-shadow-2xl">
+          <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(42,172,100,0.3)]" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r={radius} fill="none" stroke="#222" className="text-slate-800" strokeWidth="18" />
             
             {/* Principal Segment */}
             <circle
-              cx="100" cy="100" r={radius} fill="none" stroke="hsl(var(--primary))" strokeWidth="18"
+              cx="100" cy="100" r={radius} fill="none" stroke="#2aac64" strokeWidth="18"
               strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
               className="transition-all duration-1000 ease-out"
             />
-            {/* Interest Segment (Using a distinct generic blue/purple to contrast with the primary brand color) */}
+            {/* Interest Segment (Using a sleek dark violet for CRED vibe) */}
             <circle
-              cx="100" cy="100" r={radius} fill="none" stroke="#8b5cf6" strokeWidth="18"
+              cx="100" cy="100" r={radius} fill="none" stroke="#6366f1" strokeWidth="18"
               strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
               className="transition-all duration-1000 ease-out"
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</span>
-            <span className="text-2xl font-black text-slate-900 dark:text-white">{formatShortCurrency(emi)}</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] mb-1">Monthly EMI</span>
+            <span className="text-2xl font-semibold text-white">{formatShortCurrency(emi)}</span>
           </div>
         </div>
 
         {/* Legend */}
         <div className="flex-1 space-y-4 w-full">
-          <div className="flex items-center justify-between p-3.5 bg-white/80 dark:bg-[#0a0a0a]/50 rounded-xl shadow-sm border border-slate-100 dark:border-white/5">
+          <div className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-xl shadow-sm border border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-3.5 h-3.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Principal</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-[#2aac64] shadow-[0_0_8px_rgba(42,172,100,0.6)]" />
+              <span className="text-xs font-medium uppercase tracking-widest text-slate-300">Principal</span>
             </div>
             <div className="text-right">
-              <p className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(amount)}</p>
-              <p className="text-xs font-bold text-slate-400">{principalPercentage.toFixed(1)}%</p>
+              <p className="text-sm font-semibold text-white">{formatCurrency(amount)}</p>
+              <p className="text-[10px] font-medium text-[#2aac64]">{principalPercentage.toFixed(1)}%</p>
             </div>
           </div>
           
-          <div className="flex items-center justify-between p-3.5 bg-white/80 dark:bg-[#0a0a0a]/50 rounded-xl shadow-sm border border-slate-100 dark:border-white/5">
+          <div className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-xl shadow-sm border border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-3.5 h-3.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Total Interest</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+              <span className="text-xs font-medium uppercase tracking-widest text-slate-300">Total Interest</span>
             </div>
             <div className="text-right">
-              <p className="text-sm font-black text-violet-600 dark:text-violet-400">{formatCurrency(totalInterest)}</p>
-              <p className="text-xs font-bold text-slate-400">{interestPercentage.toFixed(1)}%</p>
+              <p className="text-sm font-semibold text-indigo-400">{formatCurrency(totalInterest)}</p>
+              <p className="text-[10px] font-medium text-indigo-500">{interestPercentage.toFixed(1)}%</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Interactive Sliders */}
-      <div className="space-y-8 relative z-10">
+      <div className="space-y-6 relative z-10">
         
         {/* Amount Slider */}
-        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+        <div className="p-5 bg-[#111] rounded-[1.5rem] border border-white/5 shadow-sm transition-all hover:border-[#2aac64]/30">
           <div className="flex justify-between items-center mb-5">
-            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Loan Amount</span>
-            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
+            <span className="text-[10px] font-medium text-[#2aac64] uppercase tracking-widest">Loan Amount</span>
+            <span className="text-lg font-semibold text-white bg-[#0a0a0a] px-4 py-1.5 rounded-xl border border-white/5">
               {formatCurrency(amount)}
             </span>
           </div>
           <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={10000000} step={50000} className="cursor-pointer" />
           <div className="flex justify-between mt-3">
-            <span className="text-xs font-medium text-slate-400">₹1 Lakh</span>
-            <span className="text-xs font-medium text-slate-400">₹1 Crore</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">₹1 Lakh</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">₹1 Crore</span>
           </div>
         </div>
 
         {/* Rate Slider */}
-        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+        <div className="p-5 bg-[#111] rounded-[1.5rem] border border-white/5 shadow-sm transition-all hover:border-[#2aac64]/30">
           <div className="flex justify-between items-center mb-5">
-            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Interest Rate</span>
-            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
-              {rate}% <span className="text-xs font-medium text-primary/70">p.a.</span>
+            <span className="text-[10px] font-medium text-[#2aac64] uppercase tracking-widest">Interest Rate</span>
+            <span className="text-lg font-semibold text-white bg-[#0a0a0a] px-4 py-1.5 rounded-xl border border-white/5">
+              {rate}% <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">p.a.</span>
             </span>
           </div>
           <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={6} max={24} step={0.25} className="cursor-pointer" />
           <div className="flex justify-between mt-3">
-            <span className="text-xs font-medium text-slate-400">6%</span>
-            <span className="text-xs font-medium text-slate-400">24%</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">6%</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">24%</span>
           </div>
         </div>
 
         {/* Tenure Slider */}
-        <div className="p-5 bg-white/40 dark:bg-white/5 rounded-[1.5rem] border border-white/60 dark:border-white/10 shadow-sm transition-all hover:shadow-md">
+        <div className="p-5 bg-[#111] rounded-[1.5rem] border border-white/5 shadow-sm transition-all hover:border-[#2aac64]/30">
           <div className="flex justify-between items-center mb-5">
-            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Loan Tenure</span>
-            <span className="text-lg font-black text-primary bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">
-              {months} Mo <span className="text-xs font-medium text-primary/70">({(months / 12).toFixed(1)} Yrs)</span>
+            <span className="text-[10px] font-medium text-[#2aac64] uppercase tracking-widest">Loan Tenure</span>
+            <span className="text-lg font-semibold text-white bg-[#0a0a0a] px-4 py-1.5 rounded-xl border border-white/5">
+              {months} Mo <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">({(months / 12).toFixed(1)} Yrs)</span>
             </span>
           </div>
           <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={12} max={360} step={12} className="cursor-pointer" />
           <div className="flex justify-between mt-3">
-            <span className="text-xs font-medium text-slate-400">1 Year</span>
-            <span className="text-xs font-medium text-slate-400">30 Years</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">1 Year</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">30 Years</span>
           </div>
         </div>
       </div>
 
       {/* Terminology Accordion */}
       {showTerminology && (
-        <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-white/10 relative z-10">
+        <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="terminology" className="border-0">
-              <AccordionTrigger className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary py-2 hover:no-underline uppercase tracking-widest transition-colors">
+              <AccordionTrigger className="text-[10px] font-medium text-slate-500 hover:text-[#2aac64] py-2 hover:no-underline uppercase tracking-widest transition-colors">
                 <div className="flex items-center gap-2">
                   <Info className="w-4 h-4" />
                   <span>Terminology Guide</span>
@@ -219,9 +219,9 @@ const EMICalculator = ({
               <AccordionContent>
                 <div className="grid gap-3 pt-4">
                   {terminology.map((item) => (
-                    <div key={item.term} className="p-4 bg-white/50 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-slate-100 dark:border-white/5 shadow-sm">
-                      <p className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">{item.term}</p>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.definition}</p>
+                    <div key={item.term} className="p-4 bg-[#111] rounded-xl border border-white/5 shadow-sm">
+                      <p className="text-xs font-medium text-white mb-1.5 uppercase tracking-wide">{item.term}</p>
+                      <p className="text-xs font-medium text-slate-400 leading-relaxed">{item.definition}</p>
                     </div>
                   ))}
                 </div>

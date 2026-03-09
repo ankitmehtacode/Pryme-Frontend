@@ -6,13 +6,13 @@ interface SplashScreenProps {
   onComplete: () => void;
 }
 
-// 🧠 CRO Tactic: Rapidly changing text distracts the user and makes the load feel 50% faster
+// 🧠 160 IQ CRO Tactic: High-tier algorithmic phrasing builds unmatched psychological trust
 const loadingStates = [
-  "Initializing secure environment...",
-  "Establishing encrypted DB connection...",
-  "Loading PRYME CRM workspace...",
-  "Optimizing dashboard interface...",
-  "Ready."
+  "Initializing institutional-grade infrastructure...",
+  "Calibrating real-time lending algorithms...",
+  "Deploying cryptographic security protocols...",
+  "Aggregating premium bank matchmaking logic...",
+  "Capital deployment systems operational."
 ];
 
 export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
@@ -78,16 +78,16 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             transition={{ duration: 8, ease: "linear", repeat: Infinity }}
           />
           
-          {/* Main Logo Box */}
-          <div className="absolute inset-2 bg-gradient-to-br from-[#2aac64] to-emerald-600 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(42,172,100,0.4)] overflow-hidden">
+          {/* Main Logo Box - Transparent & Premium */}
+          <div className="absolute inset-2 bg-black/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.02),0_0_40px_rgba(42,172,100,0.15)] overflow-hidden">
             {/* Apple-style Glass Shimmer Sweep */}
             <motion.div 
-              className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+              className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
               transition={{ duration: 1.5, ease: "easeInOut", delay: 0.4 }}
             />
-            <ShieldCheck className="w-10 h-10 text-white relative z-10" strokeWidth={2} />
+            <img src="/src/assets/pryme-logo.svg" alt="Pryme Logo" className="w-14 h-14 relative z-10 drop-shadow-[0_0_25px_rgba(42,172,100,0.6)]" />
           </div>
         </motion.div>
 
@@ -97,9 +97,9 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", damping: 20, delay: 0.3 }}
-            className="text-5xl font-black text-white tracking-tighter"
+            className="text-xl font-semibold text-white tracking-tight"
           >
-            PRYME
+            Go Pryme
           </motion.h1>
         </div>
 
@@ -109,7 +109,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", damping: 20, delay: 0.4 }}
-            className="text-sm font-bold text-[#2aac64] tracking-[0.3em] uppercase"
+            className="text-sm font-medium text-[#2aac64] tracking-[0.3em] uppercase"
           >
             Intelligent Lending
           </motion.p>

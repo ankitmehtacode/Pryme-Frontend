@@ -88,7 +88,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
           <Gift className="w-6 h-6 text-amber-500 relative z-10" />
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Offers & Rewards</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Offers & Rewards</h3>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Exclusive algorithms unlocked</p>
         </div>
       </div>
@@ -117,7 +117,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
               </div>
               
               {/* Content */}
-              <h4 className="font-black text-base md:text-lg text-slate-900 dark:text-white mb-2 leading-tight tracking-tight">
+              <h4 className="font-semibold text-base md:text-lg text-slate-900 dark:text-white mb-2 leading-tight tracking-tight">
                 {offer.title}
               </h4>
               <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-1">
@@ -127,12 +127,12 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
               {/* Footer Meta */}
               <div className="mt-auto pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
                 {offer.bank && (
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
                     {offer.bank}
                   </span>
                 )}
                 {offer.validTill && (
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">
                     Valid: {offer.validTill}
                   </span>
                 )}

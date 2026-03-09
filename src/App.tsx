@@ -40,10 +40,10 @@ class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {
       return (
         <div className="min-h-screen bg-red-950 text-white p-8 md:p-16 flex flex-col items-start justify-center font-mono selection:bg-red-500">
           <div className="max-w-5xl w-full bg-black/60 p-8 rounded-2xl border border-red-500/30 shadow-2xl">
-            <h1 className="text-3xl font-bold text-red-500 mb-2">🚨 Application Crashed</h1>
+            <h1 className="text-xl font-medium text-red-500 mb-2">🚨 Application Crashed</h1>
             <p className="text-slate-300 mb-6">Instead of a blank screen, here is the exact error causing the failure:</p>
             <div className="bg-red-950/50 p-4 rounded-xl overflow-x-auto border border-red-900">
-              <p className="text-red-300 font-bold text-lg mb-4">{this.state.error?.toString()}</p>
+              <p className="text-red-300 font-medium text-lg mb-4">{this.state.error?.toString()}</p>
               <pre className="text-red-400 text-xs leading-relaxed">{this.state.errorInfo?.componentStack}</pre>
             </div>
           </div>
@@ -98,7 +98,7 @@ const App = () => {
                 <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                   <Toaster />
                   <Sonner />
-                  <BrowserRouter>
+                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/apply" element={<Apply />} />

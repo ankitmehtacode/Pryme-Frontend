@@ -14,10 +14,12 @@ import PartnerBankMarquee from "@/components/home/PartnerBankMarquee";
 import ProcessSection from "@/components/home/ProcessSection";
 import TrustMonologue from "@/components/home/TrustMonologue";
 import TestimonialsSlider from "@/components/home/TestimonialsSlider";
+import CustomerReviews from "@/components/home/CustomerReviews";
 
 // Loan Utility Components (Paisabazaar Dashboards)
 import EMICalculator from "@/components/loan/EMICalculator";
 import EligibilityScore from "@/components/loan/EligibilityScore";
+import PrepaymentCalculator from "@/components/loan/PrepaymentCalculator";
 
 // 🧠 1. NATIVE ERROR BOUNDARY: Localized crash protection. 
 class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
@@ -36,7 +38,7 @@ class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {h
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10 font-mono">
-          <h2 className="text-3xl text-destructive font-bold mb-4">UI Component Crash Prevented</h2>
+          <h2 className="text-xl text-destructive font-medium mb-4">UI Component Crash Prevented</h2>
           <pre className="bg-muted p-6 rounded-xl border border-destructive/50 max-w-4xl w-full overflow-auto text-sm text-foreground">
             {this.state.error?.toString()}
           </pre>
@@ -76,15 +78,15 @@ const Index = () => {
               <HeroSection />
             </div>
 
-            {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Pulled up seamlessly under Hero) */}
-            <div id="products" className="relative z-20 bg-[#0a0a0a] -mt-8 md:-mt-12 pt-8">
+            {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Restored normal layout flow to prevent clipping) */}
+            <div id="products" className="relative z-20 pt-4 md:pt-8 bg-[#0a0a0a]">
               <ProductSelectorGrid />
             </div>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
             <section className="py-10 md:py-14 bg-[#050505] border-y border-white/5 relative z-10">
               <div className="container mx-auto px-4 text-center mb-8">
-                <p className="text-[10px] md:text-xs font-bold tracking-[0.3em] text-slate-500 uppercase flex items-center justify-center gap-2">
+                <p className="text-[10px] md:text-xs font-medium tracking-[0.3em] text-slate-500 uppercase flex items-center justify-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   Trusted by over 15+ Premium Lending Partners
                 </p>
@@ -99,11 +101,11 @@ const Index = () => {
 
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
                 <div className="text-center mb-16 md:mb-20">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-6 border border-primary/20">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
                   </span>
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">
+                  <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-tighter">
                     Calculate & Evaluate
                   </h2>
                   <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
@@ -124,22 +126,22 @@ const Index = () => {
                     {/* 🧠 THE STATS BLOCK (Moved perfectly under the EMI Calculator) */}
                     <div className="grid grid-cols-3 gap-4 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-[2rem] p-6 border border-slate-200 dark:border-white/10 shadow-xl">
                       <div className="text-center border-r border-slate-200 dark:border-white/10">
-                        <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
                           ₹500<span className="text-primary">Cr+</span>
                         </p>
-                        <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase mt-2 tracking-widest">Capital Disbursed</p>
+                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Capital Disbursed</p>
                       </div>
                       <div className="text-center border-r border-slate-200 dark:border-white/10">
-                        <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
                           24<span className="text-primary">h</span>
                         </p>
-                        <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase mt-2 tracking-widest">Avg Approval</p>
+                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Avg Approval</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
                           98<span className="text-primary">%</span>
                         </p>
-                        <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase mt-2 tracking-widest">Success Rate</p>
+                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Success Rate</p>
                       </div>
                     </div>
 
@@ -148,10 +150,11 @@ const Index = () => {
                   {/* Right: The Data Context */}
                   <div className="lg:col-span-5 w-full space-y-6">
                     <EligibilityScore score={82} cibilScore={750} monthlyIncome={85000} loanAmount={500000} />
+                    <PrepaymentCalculator />
                     
                     {/* Trust Mini-Card under Eligibility */}
                     <div className="bg-primary/5 border border-primary/20 rounded-[2rem] p-6 backdrop-blur-md shadow-inner">
-                      <h4 className="text-primary font-black text-lg mb-2 flex items-center gap-2">
+                      <h4 className="text-primary font-semibold text-lg mb-2 flex items-center gap-2">
                         <Building2 className="w-5 h-5" /> Real-Time Analytics
                       </h4>
                       <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
@@ -168,7 +171,7 @@ const Index = () => {
             <div className="relative z-10 bg-slate-50 dark:bg-[#030303]">
               <ProcessSection />
               <TrustMonologue />
-              <TestimonialsSlider />
+              <CustomerReviews />
             </div>
 
           </main>

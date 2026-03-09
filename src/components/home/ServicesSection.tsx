@@ -55,7 +55,7 @@ const ServicesSection = () => {
           <span className="inline-block text-xs font-medium text-primary uppercase tracking-widest mb-4">
             Our Services
           </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4" style={{ letterSpacing: "-0.02em" }}>
+          <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-foreground mb-4" style={{ letterSpacing: "-0.02em" }}>
             Financial Solutions for Every Need
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -94,11 +94,11 @@ const ServicesSection = () => {
                 <div className="flex items-center gap-6 mb-6 pb-6 border-b border-border/50">
                   <div>
                     <span className="text-xs text-muted-foreground uppercase tracking-wider">Starting at</span>
-                    <p className="text-lg font-bold holographic-text">{service.rate} p.a.</p>
+                    <p className="text-lg font-medium holographic-text">{service.rate} p.a.</p>
                   </div>
                   <div>
                     <span className="text-xs text-muted-foreground uppercase tracking-wider">Up to</span>
-                    <p className="text-lg font-bold text-foreground">{service.maxAmount}</p>
+                    <p className="text-lg font-medium text-foreground">{service.maxAmount}</p>
                   </div>
                 </div>
 

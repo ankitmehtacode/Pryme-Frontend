@@ -19,7 +19,7 @@ import OffersRewards from "@/components/loan/OffersRewards";
 import RequiredDocuments from "@/components/loan/RequiredDocuments";
 import BankerContact from "@/components/loan/BankerContact";
 
-const springConfig = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
+const springConfig: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
 
 const Apply = () => {
   const [loanAmount, setLoanAmount] = useState(500000);
@@ -108,70 +108,85 @@ const Apply = () => {
         <meta name="description" content="Compare loan offers from top banks. Apply for personal, business, or home loans securely." />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#030303] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
+      <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
         
-        {/* Ambient Glassmorphic Glows */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#2aac64]/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+        {/* Ambient Glassmorphic Glows - Darkened for Bank Grade look */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-[#0f462b]/10 blur-[120px] rounded-full pointer-events-none" />
 
         <Header />
         
         <main className="flex-1 w-full pt-20 relative z-10">
           
           {/* 1. Header & Intake Area */}
-          <section className="py-12 md:py-16">
+          <section className="py-8 md:py-12">
             <div className="container mx-auto px-4 max-w-7xl">
               
-              <div className="max-w-3xl mb-12">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
-                  <LockKeyhole className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">
-                    Bank-Grade Security Protocol Active
-                  </span>
-                </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-tight">
-                  Intelligent Loan <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Matchmaking.</span>
-                </h1>
-                <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 font-medium">
-                  Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits and lowest interest rates instantly.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  {features.map((feature) => (
-                    <div key={feature.label} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-full shadow-sm">
-                      <feature.icon className={`w-4 h-4 ${feature.color}`} />
-                      <span className="font-bold tracking-wide">{feature.label}</span>
+              {/* 🧠 Split Screen: Text & Calculators (Left) vs Input Form (Right) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                
+                {/* Left Column: Hero Text & Sticky Calculators */}
+                <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-24">
+                  
+                  {/* Hero Text */}
+                  <div className="max-w-xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-[#2aac64]/20 shadow-sm mb-6 mt-2">
+                      <LockKeyhole className="w-3.5 h-3.5 text-[#2aac64]" />
+                      <span className="text-[10px] font-medium text-slate-300 uppercase tracking-widest">
+                        Bank-Grade Security Protocol Active
+                      </span>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 🧠 Split Screen: Input Form vs Calculators */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-                
-                {/* Left: The existing form component, wrapped in glass */}
-                <div className="lg:col-span-7 w-full bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 md:p-8 rounded-[2rem] shadow-2xl">
-                  <LoanApplicationForm 
-                    onAmountChange={setLoanAmount} 
-                    onFormSubmit={handleFormSubmit}
-                  />
-                </div>
-                
-                {/* Right: The Calculators & Tips (Sticky) */}
-                <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-28">
-                  <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-xl">
-                    <EMICalculator loanAmount={loanAmount} showTerminology />
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight">
+                      Intelligent Loan <span className="text-[#2aac64]">Matchmaking.</span>
+                    </h1>
+                    <p className="text-base text-slate-400 mb-8 font-medium max-w-md leading-relaxed">
+                      Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits and lowest interest rates instantly.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      {features.map((feature) => (
+                        <div key={feature.label} className="flex items-center gap-2 text-[10px] text-white bg-transparent border border-white/10 px-3 py-2 rounded-full shadow-sm">
+                          <feature.icon className={`w-3.5 h-3.5 ${feature.color}`} />
+                          <span className="font-medium tracking-widest uppercase">{feature.label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <AnimatePresence>
-                    {applicationData && applicationData.cibilScore < 750 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -20, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: "auto" }}
-                        className="bg-amber-50/80 dark:bg-amber-950/30 backdrop-blur-xl border border-amber-200 dark:border-amber-900/50 rounded-[2rem] p-6 shadow-xl"
-                      >
-                        <CibilTips />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+
+                  {/* EMIs & Tips (Hidden on Mobile, shown Below Text on Desktop) */}
+                  <div className="space-y-6 hidden lg:block">
+                    <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
+                      <EMICalculator loanAmount={loanAmount} showTerminology={false} />
+                    </div>
+                    <AnimatePresence>
+                      {applicationData && applicationData.cibilScore < 750 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -20, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: "auto" }}
+                          className="bg-amber-50/80 dark:bg-amber-950/30 backdrop-blur-xl border border-amber-200 dark:border-amber-900/50 rounded-[2rem] p-6 shadow-xl"
+                        >
+                          <CibilTips />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                {/* Right Column: The Input Form */}
+                <div className="lg:col-span-7 w-full space-y-8">
+                  <div className="bg-[#111] border border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+                    <LoanApplicationForm 
+                      onAmountChange={setLoanAmount} 
+                      onFormSubmit={handleFormSubmit}
+                    />
+                  </div>
+                  
+                  {/* Mobile-only Calculator (shown below form on small screens) */}
+                  <div className="space-y-6 lg:hidden">
+                    <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
+                      <EMICalculator loanAmount={loanAmount} showTerminology={false} />
+                    </div>
+                  </div>
                 </div>
 
               </div>
@@ -198,17 +213,17 @@ const Apply = () => {
                     <div>
                       <div className="inline-flex items-center gap-2 mb-3">
                         <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-                        <span className="text-sm font-bold text-primary uppercase tracking-widest">Analysis Complete</span>
+                        <span className="text-sm font-medium text-primary uppercase tracking-widest">Analysis Complete</span>
                       </div>
-                      <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
                         Your Custom Loan Offers
                       </h2>
                     </div>
                     <div className="flex items-center gap-3 px-5 py-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl">
                       <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                       <div>
-                        <p className="text-xs font-bold text-emerald-700 dark:text-emerald-500 uppercase tracking-wider">Matches Found</p>
-                        <p className="text-xl font-black text-emerald-800 dark:text-emerald-400 leading-none">{bankOffers.length} Banks</p>
+                        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-500 uppercase tracking-wider">Matches Found</p>
+                        <p className="text-xl font-semibold text-emerald-800 dark:text-emerald-400 leading-none">{bankOffers.length} Banks</p>
                       </div>
                     </div>
                   </div>
@@ -253,7 +268,7 @@ const Apply = () => {
                   {/* Rewards Section */}
                   <div className="pt-8">
                     <div className="text-center mb-8">
-                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Exclusive PRYME Rewards</h3>
+                      <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Exclusive PRYME Rewards</h3>
                       <p className="text-slate-500 font-medium">Apply through us to unlock these benefits instantly.</p>
                     </div>
                     <OffersRewards />

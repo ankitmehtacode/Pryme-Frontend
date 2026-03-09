@@ -89,11 +89,11 @@ const TestimonialsSlider = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 shadow-xl">
             <ShieldCheck className="w-4 h-4 text-primary" />
-            <span className="text-[10px] md:text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">
+            <span className="text-[10px] md:text-xs font-medium text-slate-300 uppercase tracking-[0.2em]">
               Verified Algorithm Success
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tighter">
+          <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-white mb-6 tracking-tighter">
             Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Thousands.</span>
           </h2>
           <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium">
@@ -139,8 +139,8 @@ const TestimonialsSlider = () => {
                 ))}
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-black text-white leading-none">4.9/5</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Average Rating</span>
+                <span className="text-xl font-semibold text-white leading-none">4.9/5</span>
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-1">Average Rating</span>
               </div>
             </div>
 
@@ -153,8 +153,8 @@ const TestimonialsSlider = () => {
                 <ShieldCheck className="w-6 h-6 text-primary" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-xl font-black text-white leading-none">10,000+</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Happy Customers</span>
+                <span className="text-xl font-semibold text-white leading-none">10,000+</span>
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-1">Happy Customers</span>
               </div>
             </div>
 
@@ -167,8 +167,8 @@ const TestimonialsSlider = () => {
                 <Activity className="w-6 h-6 text-primary" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-xl font-black text-white leading-none">₹500Cr+</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Capital Disbursed</span>
+                <span className="text-xl font-semibold text-white leading-none">₹500Cr+</span>
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-1">Capital Disbursed</span>
               </div>
             </div>
 

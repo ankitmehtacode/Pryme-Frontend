@@ -145,12 +145,12 @@ const Auth = () => {
                 <Building2 className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">PYRME</h1>
+                <h1 className="text-2xl font-medium text-foreground">PYRME</h1>
                 <p className="text-sm text-muted-foreground">CONSULTING</p>
               </div>
             </div>
             
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-xl font-medium text-foreground mb-4">
               Compare Loans. Save Money. Get Funded.
             </h2>
             <p className="text-muted-foreground mb-8">
@@ -160,19 +160,19 @@ const Auth = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-3 neo-card-inset p-4 rounded-xl">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-bold">1</span>
+                  <span className="text-primary font-medium">1</span>
                 </div>
                 <span className="text-foreground">Compare offers from multiple banks</span>
               </div>
               <div className="flex items-center gap-3 neo-card-inset p-4 rounded-xl">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-bold">2</span>
+                  <span className="text-primary font-medium">2</span>
                 </div>
                 <span className="text-foreground">Track your application status</span>
               </div>
               <div className="flex items-center gap-3 neo-card-inset p-4 rounded-xl">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-bold">3</span>
+                  <span className="text-primary font-medium">3</span>
                 </div>
                 <span className="text-foreground">Get personalized RM support</span>
               </div>
@@ -188,7 +188,7 @@ const Auth = () => {
                 <Building2 className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">PYRME</h1>
+                <h1 className="text-xl font-medium text-foreground">PYRME</h1>
                 <p className="text-xs text-muted-foreground">CONSULTING</p>
               </div>
             </div>
@@ -204,7 +204,7 @@ const Auth = () => {
                     <ArrowLeft className="w-4 h-4" />
                     Back to Login
                   </button>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Reset Password</h2>
+                  <h2 className="text-2xl font-medium text-foreground mb-2">Reset Password</h2>
                   <p className="text-muted-foreground mb-8">
                     Enter your email and we'll send you a reset link
                   </p>
@@ -237,7 +237,7 @@ const Auth = () => {
               {/* Login/Signup View */}
               {view !== "forgot-password" && (
                 <>
-                  <h2 className="text-2xl font-bold text-foreground mb-2 text-center">
+                  <h2 className="text-2xl font-medium text-foreground mb-2 text-center">
                     {view === "login" ? "Welcome Back" : "Create Account"}
                   </h2>
                   <p className="text-muted-foreground text-center mb-6">

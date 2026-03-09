@@ -79,12 +79,18 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       <div className={cn("absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "opacity-0")} onClick={onClose} />
       <div className={cn("absolute right-0 top-0 h-full w-[300px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-2xl transition-transform duration-300", isOpen ? "translate-x-0" : "translate-x-full")}>
         <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-          <span className="font-bold text-lg dark:text-white">Menu</span>
+          <span className="font-medium text-lg dark:text-white">Menu</span>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X className="w-5 h-5 dark:text-white" /></button>
         </div>
         <div className="p-5 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Products</p>
+            <Link to="/" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center shadow-sm"><Home className="w-4 h-4 text-slate-700 dark:text-slate-300" /></div>
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Home</span>
+            </Link>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Products</p>
             <div className="space-y-1">
               {productLinks.map((item) => (
                 <Link key={item.href} to={item.href} onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
@@ -95,7 +101,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             </div>
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tools</p>
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Tools</p>
             <div className="space-y-1">
               {toolLinks.map((item) => (
                 <Link key={item.href} to={item.href} onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors">
@@ -117,8 +123,8 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               </div>
             ) : (
               <div className="space-y-3 mt-4">
-                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/auth?mode=signup" onClick={onClose}>Get Started</Link></Button>
-                <Button asChild variant="outline" className="w-full"><Link to="/auth" onClick={onClose}>Sign In</Link></Button>
+                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/apply" onClick={onClose}>Apply Now</Link></Button>
+                <Button asChild variant="outline" className="w-full"><Link to="/auth" onClick={onClose}>Log In</Link></Button>
               </div>
             )}
           </div>
@@ -223,8 +229,16 @@ const Header = memo(() => {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-            {navLinks.slice(1).map(link => (
-              <Link key={link.href} to={link.href} className={cn("px-4 py-2 text-sm font-medium rounded-full transition-all hover:bg-black/5 dark:hover:bg-white/10", location.pathname === link.href ? "text-[#2aac64]" : "text-slate-600 dark:text-slate-300")}>{link.label}</Link>
+            {navLinks.map(link => (
+              <Link key={link.href} to={link.href} className={cn("px-4 py-2 text-sm font-medium rounded-full transition-all hover:bg-black/5 dark:hover:bg-white/10", location.pathname === link.href ? "text-[#2aac64]" : "text-slate-600 dark:text-slate-300")}>
+                {link.label === "Home" ? (
+                  <div className="flex items-center gap-1.5">
+                    <Home className="w-4 h-4" /> {link.label}
+                  </div>
+                ) : (
+                  link.label
+                )}
+              </Link>
             ))}
           </nav>
 
@@ -251,7 +265,10 @@ const Header = memo(() => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth?mode=signup" className="px-6 py-2.5 bg-[#2aac64] hover:bg-[#259b5a] text-white text-sm font-bold rounded-full shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:scale-105 active:scale-95">Get Started</Link>
+              <div className="flex items-center gap-5">
+                <Link to="/auth" className="text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-[#2aac64] transition-colors">Log In</Link>
+                <Link to="/apply" className="px-6 py-2.5 bg-[#2aac64] hover:bg-[#259b5a] text-white text-sm font-medium rounded-full shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:scale-105 active:scale-95">Apply Now</Link>
+              </div>
             )}
           </div>
 

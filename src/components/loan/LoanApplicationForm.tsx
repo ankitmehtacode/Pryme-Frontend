@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { motion } from "framer-motion";
-import { User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight, MapPin, CreditCard, Building2, Zap } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight, MapPin, CreditCard, Building2, Zap, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,12 +49,12 @@ const productTypes = [
   { value: "lap", label: "Loan Against Property" },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } }
 };
@@ -110,20 +110,20 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // 🧠 Premium Input Wrapper
   const InputWithValidation = ({ label, error, isValid, isSecure, ...props }: any) => (
     <div className="space-y-2 relative group">
-      <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">{label}</Label>
+      <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">{label}</Label>
       <div className="relative">
         <Input
           {...props}
           className={cn(
-            "w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50",
+            "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50",
             error && "border-red-500/50 focus:ring-red-500",
-            isValid && !error && "border-emerald-500/50 focus:ring-emerald-500"
+            isValid && !error && "border-[#2aac64]/50 focus:ring-[#2aac64]"
           )}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
           {isSecure && <LockKeyhole className="w-4 h-4 text-slate-400" />}
           {error && <XCircle className="w-5 h-5 text-red-500 drop-shadow-md" />}
-          {isValid && !error && <CheckCircle2 className="w-5 h-5 text-emerald-500 drop-shadow-md" />}
+          {isValid && !error && <CheckCircle2 className="w-5 h-5 text-[#2aac64] drop-shadow-md" />}
         </div>
       </div>
       {error && <p className="text-xs text-red-500 font-medium ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
@@ -142,11 +142,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       <motion.div variants={itemVariants} className="mb-6">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
           <Zap className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+          <span className="text-[10px] font-medium text-primary uppercase tracking-widest">
             Fast-Track Application
           </span>
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+        <h2 className="text-2xl md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">
           Initialize Your Match
         </h2>
         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -155,14 +155,14 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       </motion.div>
 
       {/* 🧠 SECTION 1: CORE REQUIREMENTS */}
-      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all hover:border-primary/30">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[40px] rounded-full pointer-events-none" />
+      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden transition-all hover:border-[#2aac64]/40">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/10 blur-[40px] rounded-full pointer-events-none" />
         
         <div className="flex items-center gap-3 mb-6 relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-[#2aac64]" />
           </div>
-          <h3 className="text-lg font-black text-slate-900 dark:text-white">Capital Requirement</h3>
+          <h3 className="text-xl font-semibold text-white tracking-tight">Capital Requirement</h3>
         </div>
 
         <div className="space-y-6 relative z-10">
@@ -176,10 +176,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   type="button"
                   onClick={() => form.setValue("productType", type.value, { shouldValidate: true })}
                   className={cn(
-                    "py-3 px-2 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 border",
+                    "py-3 px-2 rounded-xl text-xs md:text-sm font-medium transition-all duration-300 border",
                     isSelected 
-                      ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]" 
-                      : "bg-white/60 dark:bg-[#0a0a0a]/50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-primary/50"
+                      ? "bg-[#2aac64] text-white border-[#2aac64] shadow-[0_0_15px_rgba(42,172,100,0.3)]" 
+                      : "bg-[#111] text-slate-300 border-white/10 hover:border-[#2aac64]/50"
                   )}
                 >
                   {type.label}
@@ -190,19 +190,19 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2 group">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Loan Amount (₹)</Label>
+              <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Loan Amount (₹)</Label>
               <Input
                 type="number"
-                className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50"
                 {...form.register("loanAmount", { valueAsNumber: true })}
               />
               {form.formState.errors.loanAmount && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.loanAmount.message}</p>}
             </div>
 
             <div className="space-y-2 group">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Tenure (Years)</Label>
+              <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Tenure (Years)</Label>
               <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true })} defaultValue={form.getValues("loanTenure").toString()}>
-                <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+                <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
                   <SelectValue placeholder="Select tenure" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border rounded-xl">
@@ -217,12 +217,12 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       </motion.div>
 
       {/* 🧠 SECTION 2: PERSONAL & LOCATION */}
-      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative transition-all hover:border-primary/30">
+      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative transition-all hover:border-[#2aac64]/40">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
-            <User className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
+            <User className="w-5 h-5 text-[#2aac64]" />
           </div>
-          <h3 className="text-lg font-black text-slate-900 dark:text-white">KYC Verification Data</h3>
+          <h3 className="text-xl font-semibold text-white tracking-tight">KYC Verification Data</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -244,9 +244,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           />
           
           <div className="space-y-2 group">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">State</Label>
+            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">State</Label>
             <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true })}>
-              <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+              <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
                 <SelectValue placeholder="Select State" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border rounded-xl">
@@ -269,19 +269,19 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       </motion.div>
 
       {/* 🧠 SECTION 3: FINANCIAL ALGORITHM DATA */}
-      <motion.div variants={itemVariants} className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-xl relative transition-all hover:border-primary/30">
+      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative transition-all hover:border-[#2aac64]/40">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
+            <Briefcase className="w-5 h-5 text-[#2aac64]" />
           </div>
-          <h3 className="text-lg font-black text-slate-900 dark:text-white">Risk & Income Profile</h3>
+          <h3 className="text-xl font-semibold text-white tracking-tight">Risk & Income Profile</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="space-y-2 group">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Occupation Type</Label>
+            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Occupation Type</Label>
             <Select onValueChange={(v) => form.setValue("occupation", v as "salaried" | "business", { shouldValidate: true })}>
-              <SelectTrigger className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50">
+              <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
                 <SelectValue placeholder="Select occupation" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border rounded-xl">
@@ -293,11 +293,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           </div>
 
           <div className="space-y-2 group relative">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Monthly Income (₹)</Label>
+            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Monthly Income (₹)</Label>
             <Input
               type="number"
               placeholder="85000"
-              className="w-full bg-white/80 dark:bg-[#0a0a0a]/80 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner group-hover:border-primary/50"
+              className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50"
               {...form.register("monthlyIncome", { valueAsNumber: true })}
             />
             {form.formState.errors.monthlyIncome && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.monthlyIncome.message}</p>}
@@ -309,11 +309,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
               <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Self-Declared CIBIL</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Self-Declared CIBIL</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`text-2xl font-black ${cibilUi.color}`}>{currentCibil || 750}</span>
-              <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
+              <span className={`text-2xl font-semibold ${cibilUi.color}`}>{currentCibil || 750}</span>
+              <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
                 {cibilUi.label}
               </span>
             </div>
@@ -324,7 +324,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             min={300} max={900} step={10}
             className="cursor-pointer mb-2"
           />
-          <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2">
+          <div className="flex justify-between text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-2">
             <span>300 (Poor)</span>
             <span>900 (Excellent)</span>
           </div>
@@ -336,7 +336,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         <Button 
           type="submit" 
           disabled={isSubmitting} 
-          className="w-full relative group overflow-hidden rounded-[1.5rem] bg-primary hover:bg-primary/90 text-primary-foreground py-8 text-xl font-black shadow-[0_0_40px_rgba(var(--primary),0.3)] hover:shadow-[0_0_60px_rgba(var(--primary),0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full relative group overflow-hidden rounded-[1.5rem] bg-[#2aac64] hover:bg-[#2aac64]/90 text-white py-8 text-xl font-semibold shadow-[0_0_40px_rgba(42,172,100,0.3)] hover:shadow-[0_0_60px_rgba(42,172,100,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
           {/* Apple-style Shimmer Effect */}
           <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
@@ -345,8 +345,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             {!isSubmitting && <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />}
           </span>
         </Button>
-        <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-6">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+        <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-slate-500 uppercase tracking-widest mt-6">
+          <ShieldCheck className="w-4 h-4 text-[#2aac64]" />
           <span>Data protected by AES-256 Encryption</span>
         </div>
       </motion.div>

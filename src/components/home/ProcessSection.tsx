@@ -101,10 +101,10 @@ const ProcessSection = () => {
           
           {/* Left Side: Sticky Copywriting Block */}
           <div className="lg:w-1/3 lg:sticky lg:top-32 self-start">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded border border-primary/30 bg-primary/10 text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-6 shadow-sm">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded border border-primary/30 bg-primary/10 text-[10px] font-medium text-primary uppercase tracking-[0.3em] mb-6 shadow-sm">
               The Process
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[1.1] tracking-tighter">
+            <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-white mb-6 leading-[1.1] tracking-tighter">
               Velocity is our <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-emerald-400 to-primary animate-gradient bg-[length:200%_auto]">
                 Currency.
@@ -122,7 +122,7 @@ const ProcessSection = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                 </div>
-                <span className="text-sm font-bold text-slate-200 tracking-wide uppercase">System Operational</span>
+                <span className="text-sm font-medium text-slate-200 tracking-wide uppercase">System Operational</span>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-mono">Current Server Load: <span className="text-emerald-400">12%</span></p>
@@ -156,7 +156,7 @@ const ProcessSection = () => {
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
                         <step.icon className={cn("w-6 h-6", step.color)} />
                       </div>
-                      <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
+                      <h3 className="text-xl md:text-2xl font-semibold text-white tracking-tight">
                         {step.title}
                       </h3>
                     </div>

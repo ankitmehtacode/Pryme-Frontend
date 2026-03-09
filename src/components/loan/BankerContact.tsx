@@ -37,7 +37,7 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
           <Phone className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Your RM Contact</h3>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Your RM Contact</h3>
           <p className="text-sm font-medium text-slate-500">VIP priority assistance</p>
         </div>
       </div>
@@ -53,7 +53,7 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
             {banker.photo ? (
               <img src={banker.photo} alt={banker.name} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-3xl font-black text-slate-900 dark:text-white">{banker.name.charAt(0)}</span>
+              <span className="text-xl font-semibold text-slate-900 dark:text-white">{banker.name.charAt(0)}</span>
             )}
           </div>
           
@@ -63,10 +63,10 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
           </div>
         </div>
         
-        <h4 className="font-black text-2xl text-slate-900 dark:text-white tracking-tight">{banker.name}</h4>
-        <p className="text-xs font-bold text-primary uppercase tracking-widest mt-1.5 mb-3">{banker.designation}</p>
+        <h4 className="font-semibold text-2xl text-slate-900 dark:text-white tracking-tight">{banker.name}</h4>
+        <p className="text-xs font-medium text-primary uppercase tracking-widest mt-1.5 mb-3">{banker.designation}</p>
         
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-600 dark:text-slate-400 shadow-sm">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-medium text-slate-600 dark:text-slate-400 shadow-sm">
           <ShieldCheck className="w-3 h-3 text-emerald-500" /> Secure Line Active
         </div>
       </div>
@@ -75,24 +75,24 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
       <div className="space-y-3 mb-8 relative z-10 flex-1">
         <div className="flex items-center gap-4 p-4 bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-primary/40 dark:hover:border-primary/40 transition-colors group cursor-pointer shadow-sm">
           <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
-          <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{banker.phone}</span>
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{banker.phone}</span>
         </div>
         <div className="flex items-center gap-4 p-4 bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-primary/40 dark:hover:border-primary/40 transition-colors group cursor-pointer shadow-sm">
           <Mail className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
-          <span className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{banker.email}</span>
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{banker.email}</span>
         </div>
         <div className="flex items-center gap-4 p-4 bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:border-primary/40 dark:hover:border-primary/40 transition-colors group cursor-default shadow-sm">
           <Clock className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wide">{banker.availability}</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 tracking-wide">{banker.availability}</span>
         </div>
       </div>
 
       {/* 🧠 CTA Action Grid */}
       <div className="grid grid-cols-2 gap-4 relative z-10 mt-auto">
-        <Button className="w-full py-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)] transition-all duration-300 hover:scale-[1.02]">
+        <Button className="w-full py-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)] transition-all duration-300 hover:scale-[1.02]">
           <Phone className="w-4 h-4 mr-2" /> Call Now
         </Button>
-        <Button variant="outline" className="w-full py-6 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold backdrop-blur-md transition-all duration-300 hover:scale-[1.02] shadow-sm">
+        <Button variant="outline" className="w-full py-6 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-medium backdrop-blur-md transition-all duration-300 hover:scale-[1.02] shadow-sm">
           <MessageSquare className="w-4 h-4 mr-2 text-emerald-500" /> WhatsApp
         </Button>
       </div>

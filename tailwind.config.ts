@@ -169,7 +169,7 @@ export default {
         "slide-out-right": "slide-out-right 0.3s ease-out",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
-        "marquee": "marquee 30s linear infinite",
+        "marquee": "marquee 15s linear infinite",
         "ribbon": "ribbon-slide 8s ease-in-out infinite",
         "shimmer": "shimmer 2s linear infinite",
       },

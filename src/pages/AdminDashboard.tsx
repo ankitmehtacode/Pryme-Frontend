@@ -240,7 +240,7 @@ const AdminDashboard = () => {
           <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-[#2aac64] rounded-lg flex items-center justify-center shadow-sm"><ShieldCheck className="w-5 h-5 text-white" /></div>
-              <span className="font-bold text-slate-900 dark:text-white tracking-tight">PRYME<span className="text-slate-400 dark:text-slate-500 font-normal ml-1">Admin</span></span>
+              <span className="font-medium text-slate-900 dark:text-white tracking-tight">PRYME<span className="text-slate-400 dark:text-slate-500 font-normal ml-1">Admin</span></span>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
           </div>
           <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
             <div className="flex items-center gap-3 px-3 py-2 mb-2">
-              <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm"><span className="text-xs font-bold text-[#2aac64]">AD</span></div>
+              <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm"><span className="text-xs font-medium text-[#2aac64]">AD</span></div>
               <div className="flex-1 text-left"><p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Super Admin</p></div>
             </div>
             <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors active:scale-[0.98]"><LogOut className="w-4 h-4" /> Sign Out</button>
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
               
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{sidebarItems.find(i => i.id === activeTab)?.label}</h1>
+                  <h1 className="text-xl font-medium text-slate-900 dark:text-white tracking-tight">{sidebarItems.find(i => i.id === activeTab)?.label}</h1>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Intelligent workflow and pipeline management.</p>
                 </div>
                 <div className="flex gap-2">
@@ -305,13 +305,13 @@ const AdminDashboard = () => {
                     {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2 }, { label: "User Base", value: stats.totalUsers, icon: Users }].map((metric, i) => (
                       <div key={i} className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-default">
                         <div className="flex justify-between items-start mb-4"><div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 group-hover:bg-[#2aac64]/10 transition-colors"><metric.icon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-[#2aac64]" /></div></div>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{metric.label}</p><p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{metric.value}</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{metric.label}</p><p className="text-2xl font-medium text-slate-900 dark:text-white mt-1">{metric.value}</p>
                       </div>
                     ))}
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"><h3 className="font-bold text-slate-900 dark:text-white mb-6">Disbursement Trend (Cr)</h3><div className="h-[300px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><defs><linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2aac64" stopOpacity={0.3}/><stop offset="95%" stopColor="#2aac64" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#334155' : '#e2e8f0'} /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} dy={10} /><YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} /><RechartsTooltip contentStyle={{ borderRadius: '8px', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`, backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', color: isDarkMode ? '#f8fafc' : '#0f172a' }} formatter={(value) => [`₹${value} Cr`, undefined]} /><Area type="monotone" dataKey="volume" stroke="#2aac64" strokeWidth={3} fillOpacity={1} fill="url(#colorVolume)" /></AreaChart></ResponsiveContainer></div></div>
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col"><h3 className="font-bold text-slate-900 dark:text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">{portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}</Pie><RechartsTooltip contentStyle={{backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`}} formatter={(value) => [`${value}%`, 'Share']} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: isDarkMode ? '#f8fafc' : '#0f172a' }}/></PieChart></ResponsiveContainer></div></div>
+                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"><h3 className="font-medium text-slate-900 dark:text-white mb-6">Disbursement Trend (Cr)</h3><div className="h-[300px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><defs><linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2aac64" stopOpacity={0.3}/><stop offset="95%" stopColor="#2aac64" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#334155' : '#e2e8f0'} /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} dy={10} /><YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} /><RechartsTooltip contentStyle={{ borderRadius: '8px', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`, backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', color: isDarkMode ? '#f8fafc' : '#0f172a' }} formatter={(value) => [`₹${value} Cr`, undefined]} /><Area type="monotone" dataKey="volume" stroke="#2aac64" strokeWidth={3} fillOpacity={1} fill="url(#colorVolume)" /></AreaChart></ResponsiveContainer></div></div>
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col"><h3 className="font-medium text-slate-900 dark:text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">{portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}</Pie><RechartsTooltip contentStyle={{backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`}} formatter={(value) => [`${value}%`, 'Share']} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: isDarkMode ? '#f8fafc' : '#0f172a' }}/></PieChart></ResponsiveContainer></div></div>
                   </div>
                 </div>
               )}
@@ -336,7 +336,7 @@ const AdminDashboard = () => {
                     <div className="flex-1 overflow-auto">
                       <table className="w-full text-left border-collapse">
                         <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-[0_1px_0_0_#e2e8f0] dark:shadow-[0_1px_0_0_#1e293b] z-10">
-                          <tr className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
+                          <tr className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-medium">
                             <th className="px-6 py-4">Application</th><th className="px-6 py-4">Client Profile</th>
                             <th className="px-6 py-4">CRM Assignment</th><th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4 text-right">Contact</th>
@@ -350,8 +350,8 @@ const AdminDashboard = () => {
                               <tr key={app.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer animate-in fade-in" style={{ animationDelay: `${idx * 50}ms` }} onClick={() => setSelectedApp(app)}>
                                 <td className="px-6 py-4 align-top">
                                   <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[#2aac64]/10 text-[#2aac64] flex items-center justify-center font-bold text-xs mt-1 border border-[#2aac64]/20 group-hover:bg-[#2aac64] group-hover:text-white transition-colors">{app.loanType?.substring(0, 2).toUpperCase() || "PL"}</div>
-                                    <div><p className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-[#2aac64] transition-colors">{app.applicationId}</p><p className="font-semibold text-slate-700 dark:text-slate-300 mt-1">{formatCurrency(app.requestedAmount)}</p></div>
+                                    <div className="w-8 h-8 rounded-lg bg-[#2aac64]/10 text-[#2aac64] flex items-center justify-center font-medium text-xs mt-1 border border-[#2aac64]/20 group-hover:bg-[#2aac64] group-hover:text-white transition-colors">{app.loanType?.substring(0, 2).toUpperCase() || "PL"}</div>
+                                    <div><p className="font-medium text-slate-900 dark:text-white text-sm group-hover:text-[#2aac64] transition-colors">{app.applicationId}</p><p className="font-semibold text-slate-700 dark:text-slate-300 mt-1">{formatCurrency(app.requestedAmount)}</p></div>
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 align-top">
@@ -366,7 +366,7 @@ const AdminDashboard = () => {
                                   </select>
                                 </td>
                                 <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
-                                  <select value={app.status} onChange={(e) => handleUpdateStatus(app.applicationId, e.target.value)} className={cn("text-xs font-bold px-3 py-1.5 rounded-full border outline-none cursor-pointer transition-all appearance-none text-center hover:shadow-sm", getStatusColor(app.status))}>
+                                  <select value={app.status} onChange={(e) => handleUpdateStatus(app.applicationId, e.target.value)} className={cn("text-xs font-medium px-3 py-1.5 rounded-full border outline-none cursor-pointer transition-all appearance-none text-center hover:shadow-sm", getStatusColor(app.status))}>
                                     {pipelineStages.map(stage => <option key={stage} value={stage}>{stage}</option>)}
                                   </select>
                                 </td>
@@ -391,7 +391,7 @@ const AdminDashboard = () => {
                         {pipelineStages.map((stage) => (
                           <div key={stage} className="w-80 flex flex-col max-h-full">
                             <div className="flex items-center justify-between mb-4 px-2">
-                              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">{stage}</h3>
+                              <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{stage}</h3>
                               <span className="text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full shadow-inner">
                                 {filteredApplications.filter(a => a.status === stage).length}
                               </span>
@@ -400,13 +400,13 @@ const AdminDashboard = () => {
                               {filteredApplications.filter(a => a.status === stage).map(app => (
                                 <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#2aac64' : '#cbd5e1' }}>
                                   <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{app.applicationId}</span>
+                                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{app.applicationId}</span>
                                     <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded font-medium">{app.loanType}</span>
                                   </div>
-                                  <p className="text-lg font-bold text-slate-900 dark:text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
+                                  <p className="text-lg font-medium text-slate-900 dark:text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
                                   <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
                                     <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-emerald-600 dark:text-emerald-400" : "")}><Activity className="w-3 h-3"/> {app.declaredCibilScore}</span>
-                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-medium text-slate-600 dark:text-slate-300 shadow-sm">
                                       {employees.find(e=>e.id===app.assignee)?.name.substring(0,2).toUpperCase()}
                                     </div>
                                   </div>
@@ -431,7 +431,7 @@ const AdminDashboard = () => {
                         <tr key={u.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+                              <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 shadow-sm">
                                 {u.full_name?.substring(0, 2).toUpperCase() || "US"}
                               </div>
                               <div><p className="font-semibold text-slate-900 dark:text-white">{u.full_name}</p><p className="text-xs text-slate-500 dark:text-slate-400">{u.email}</p></div>
@@ -459,7 +459,7 @@ const AdminDashboard = () => {
           <div className="w-[500px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col animate-in slide-in-from-right border-l border-slate-200 dark:border-slate-800">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-950">
               <div>
-                <div className="flex items-center gap-2 mb-1"><h2 className="text-xl font-bold text-slate-900 dark:text-white">{selectedApp.applicationId}</h2><StatusBadge status={selectedApp.status} /></div>
+                <div className="flex items-center gap-2 mb-1"><h2 className="text-xl font-medium text-slate-900 dark:text-white">{selectedApp.applicationId}</h2><StatusBadge status={selectedApp.status} /></div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Applied: {new Date(selectedApp.createdAt).toLocaleDateString()}</p>
               </div>
               <button onClick={() => setSelectedApp(null)} className="p-2 bg-white dark:bg-slate-800 rounded-full border dark:border-slate-700 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition-all"><X className="w-4 h-4 text-slate-900 dark:text-white"/></button>
@@ -482,7 +482,7 @@ const AdminDashboard = () => {
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                   <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 flex gap-3 items-start">
                     <Sparkles className="w-5 h-5 text-indigo-500 dark:text-indigo-400 mt-0.5" />
-                    <div><h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-300">AI Risk Insight</h4><p className="text-xs text-indigo-700 dark:text-indigo-400/80 mt-1">High probability of instant approval. Applicant's declared CIBIL is in the top 15% percentile for this product line.</p></div>
+                    <div><h4 className="text-sm font-medium text-indigo-900 dark:text-indigo-300">AI Risk Insight</h4><p className="text-xs text-indigo-700 dark:text-indigo-400/80 mt-1">High probability of instant approval. Applicant's declared CIBIL is in the top 15% percentile for this product line.</p></div>
                   </div>
                   <div className="p-5 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-2 gap-6">
                     <div><p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Requested Amount</p><p className="font-semibold text-slate-900 dark:text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
