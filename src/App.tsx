@@ -15,6 +15,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Apply from "./pages/Apply";
+import DocumentCheck from "./pages/DocumentCheck";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -101,6 +102,7 @@ const App = () => {
                   <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                     <Routes>
                       <Route path="/" element={<Index />} />
+                      <Route path="/document-check" element={<DocumentCheck />} />
                       <Route path="/apply" element={<Apply />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/dashboard" element={<Dashboard />} />

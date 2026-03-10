@@ -1,4 +1,5 @@
 import React from "react";
+import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Helmet } from "react-helmet-async";
 import { Building2, ShieldCheck } from "lucide-react";
 
@@ -67,7 +68,7 @@ const Index = () => {
 
       {/* Safe Smooth Scrolling wrapper */}
       <SmoothScroll>
-        <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary overflow-hidden">
           
           <Header />
           
@@ -79,12 +80,18 @@ const Index = () => {
             </div>
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Restored normal layout flow to prevent clipping) */}
-            <div id="products" className="relative z-20 pt-4 md:pt-8 bg-[#0a0a0a]">
+            <ScrollReveal direction="up" duration={0.8}>
+            <div id="products" className="relative z-20 pt-4 md:pt-8 bg-slate-50 dark:bg-[#0a0a0a]">
               <ProductSelectorGrid />
             </div>
+            </ScrollReveal>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
-            <section className="py-10 md:py-14 bg-[#050505] border-y border-white/5 relative z-10">
+            <section className="py-14 md:py-20 bg-white dark:bg-[#050505] relative z-10">
+              {/* Gradient section divider */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
+              <ScrollReveal direction="scale" duration={0.6}>
               <div className="container mx-auto px-4 text-center mb-8">
                 <p className="text-[10px] md:text-xs font-medium tracking-[0.3em] text-slate-500 uppercase flex items-center justify-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -92,23 +99,27 @@ const Index = () => {
                 </p>
               </div>
               <PartnerBankMarquee />
+              </ScrollReveal>
             </section>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
-            <section className="py-20 md:py-32 bg-slate-50 dark:bg-[#030303] relative z-10 border-b border-white/5">
+            <section className="py-24 md:py-36 bg-slate-50 dark:bg-[#030303] relative z-10">
+              {/* Gradient section divider */}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
+              <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
                 <div className="text-center mb-16 md:mb-20">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
                   </span>
-                  <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-tighter">
+                  <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-slate-900 dark:text-white mb-6 tracking-tighter">
                     Calculate & Evaluate
                   </h2>
-                  <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+                  <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">
                     Run the math before you apply. Check your EMIs and assess your approval probability instantly.
                   </p>
                 </div>
@@ -165,13 +176,18 @@ const Index = () => {
                   
                 </div>
               </div>
+              </ScrollReveal>
             </section>
 
             {/* 5. BOTTOM OF FUNNEL: Closing the deal (Process & Trust) */}
             <div className="relative z-10 bg-slate-50 dark:bg-[#030303]">
               <ProcessSection />
+              <ScrollReveal direction="up" duration={1}>
               <TrustMonologue />
+              </ScrollReveal>
+              <ScrollReveal direction="up" duration={0.8} delay={0.1}>
               <CustomerReviews />
+              </ScrollReveal>
             </div>
 
           </main>

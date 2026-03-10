@@ -11,7 +11,7 @@ const TestimonialsSlider = () => {
       role: "Business Owner",
       location: "Mumbai",
       rating: 5,
-      quote: "PRYME made my business loan application seamless. Got approval in just 24 hours with the best interest rate in the market. Highly recommend!",
+      quote: "PRYME made my business loan application easy. Got approval in 24 hours with the best rate I could find.",
       loanType: "Business Loan",
       amount: "₹25 Lakh",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&auto=format",

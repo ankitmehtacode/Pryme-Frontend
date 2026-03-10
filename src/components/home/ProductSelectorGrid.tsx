@@ -154,7 +154,7 @@ const ProductSelectorGrid = memo(() => {
                 </motion.div>
 
                 {/* Typography perfectly aligned below */}
-                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-medium text-slate-400 group-hover:text-white transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10">
+                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10">
                   {product.label}
                 </span>
               </Link>
@@ -172,13 +172,13 @@ const ProductSelectorGrid = memo(() => {
           transition={{ duration: 0.6 }}
         >
           <span className="inline-block text-[9px] font-medium text-[#2aac64] uppercase tracking-[0.3em] bg-[#2aac64]/10 border border-[#2aac64]/20 px-3 py-1 rounded-full mb-3">
-            Financial Arsenal
+            Our Products
           </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-white tracking-tighter mb-3 uppercase leading-none">
-            Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] to-emerald-400">Weapon.</span>
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-slate-900 dark:text-white tracking-tighter mb-3 uppercase leading-none">
+            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] to-emerald-400">Loan.</span>
           </h2>
-          <p className="text-xs md:text-sm text-slate-400 font-medium max-w-lg mx-auto">
-            Premium capital limits with the lowest industry interest rates. Select your product to instantly initiate the protocol.
+          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-lg mx-auto">
+            Competitive rates from 15+ banks. Select your product to get started in minutes.
           </p>
         </motion.div>
       </div>

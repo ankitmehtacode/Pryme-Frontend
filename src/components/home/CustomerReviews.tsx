@@ -6,37 +6,37 @@ const reviews = [
   {
     name: "Rahul Sharma",
     role: "Tech Entrepreneur",
-    text: "PRYME got me a 50L unsecured loan in 4 hours. The UI is flawless and the rates were 2% lower than my base bank.",
+    text: "Got a 50L loan approved in just 4 hours. The rates were actually 2% lower than what my bank offered directly. Very smooth experience.",
     rating: 5,
   },
   {
     name: "Priya Desai",
     role: "Doctor",
-    text: "Zero spam calls. My details were actually encrypted. I got 4 pre-approved offers instantly. Silicon Valley grade engineering indeed.",
+    text: "What surprised me was zero spam calls afterwards. I got 4 pre-approved offers instantly and my details were kept completely private.",
     rating: 5,
   },
   {
     name: "Amit Patel",
     role: "Retail Business Owner",
-    text: "The intelligent matchmaking saved me lakhs in processing fees. It directed me to the exact bank that favored my credit profile.",
+    text: "Saved over ₹80,000 in processing fees alone. The system matched me directly with the bank that best suited my credit profile.",
     rating: 5,
   },
   {
     name: "Sneha Reddy",
     role: "Software Engineer",
-    text: "Fastest personal loan journey I've ever experienced. No paperwork, just a seamless digital handshake.",
+    text: "Fastest loan process I've experienced. Everything was digital, no paperwork needed. Funds were in my account the next day.",
     rating: 5,
   },
   {
     name: "Vikram Singh",
     role: "Architect",
-    text: "The EMI calculator and the instant offer comparison table are game absolute changers. Highly recommended.",
+    text: "The EMI calculator and instant comparison table saved me hours of research. I could see exactly what each bank was offering.",
     rating: 5,
   },
   {
     name: "Neha Gupta",
     role: "Marketing Director",
-    text: "Finally, a lending platform that doesn't feel like a scammy aggregator. PRYME is incredibly premium and trustworthy.",
+    text: "Finally, a lending platform that actually feels trustworthy. No hidden charges, no pressure tactics. Just a clean, transparent process.",
     rating: 5,
   },
 ];
@@ -80,6 +80,16 @@ const CustomerReviews = () => {
       ref={containerRef}
       className="py-24 overflow-hidden relative bg-[#050505]"
     >
+      {/* Background Photo */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <img 
+          src="https://images.unsplash.com/photo-1560472355-536de3962603?w=1400&h=800&fit=crop&auto=format&q=80" 
+          alt="" 
+          className="w-full h-full object-cover opacity-[0.05]" 
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-[#050505]" />
+      </div>
       {/* Background Glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#2aac64]/5 blur-[120px] rounded-full pointer-events-none" />
 

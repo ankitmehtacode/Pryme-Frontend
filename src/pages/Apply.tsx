@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGate";
 import { Helmet } from "react-helmet-async";
 import { Shield, Clock, CheckCircle, Building2, ArrowRight, Star, TrendingUp, AlertCircle, Info, LockKeyhole, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +24,7 @@ const springConfig: any = { type: "spring", stiffness: 120, damping: 24, mass: 0
 
 const Apply = () => {
   const [loanAmount, setLoanAmount] = useState(500000);
+  const [hasAccess, setHasAccess] = useState(isLeadCaptured());
   const [tenure, setTenure] = useState(5);
   const [showComparison, setShowComparison] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,6 +109,9 @@ const Apply = () => {
         <title>Apply for Loans | PRYME Intelligent Aggregator</title>
         <meta name="description" content="Compare loan offers from top banks. Apply for personal, business, or home loans securely." />
       </Helmet>
+
+      {/* Lead Capture Gate — non-bypassable */}
+      {!hasAccess && <LeadCaptureGate onCaptured={() => setHasAccess(true)} />}
 
       <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
         
@@ -269,7 +274,7 @@ const Apply = () => {
                   <div className="pt-8">
                     <div className="text-center mb-8">
                       <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Exclusive PRYME Rewards</h3>
-                      <p className="text-slate-500 font-medium">Apply through us to unlock these benefits instantly.</p>
+                      <p className="text-slate-500 font-medium">Apply through us to get these benefits.</p>
                     </div>
                     <OffersRewards />
                   </div>

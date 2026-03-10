@@ -104,29 +104,30 @@ const ProcessSection = () => {
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded border border-primary/30 bg-primary/10 text-[10px] font-medium text-primary uppercase tracking-[0.3em] mb-6 shadow-sm">
               The Process
             </span>
-            <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-white mb-6 leading-[1.1] tracking-tighter">
-              Velocity is our <br />
+            <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-white mb-6 leading-[1.1] tracking-tighter">
+              Simple. Fast. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-emerald-400 to-primary animate-gradient bg-[length:200%_auto]">
-                Currency.
+                Transparent.
               </span>
             </h2>
-            <p className="text-slate-400 text-lg leading-relaxed mb-10 font-medium">
-              We've stripped away the bureaucracy of traditional banking. 
-              No branch visits, no waiting rooms, just pure algorithmic efficiency.
+            <p className="text-slate-400 text-lg leading-relaxed mb-10 font-normal">
+              We've removed the complexity of traditional banking. 
+              No branch visits, no waiting rooms, just a streamlined digital process.
             </p>
             
-            {/* Operational Status Card */}
-            <div className="hidden lg:block p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                </div>
-                <span className="text-sm font-medium text-slate-200 tracking-wide uppercase">System Operational</span>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-mono">Current Server Load: <span className="text-emerald-400">12%</span></p>
-                <p className="text-xs text-slate-500 font-mono">Avg. API Response: <span className="text-emerald-400">0.4s</span></p>
+            {/* Trust Image Card */}
+            <div className="hidden lg:block rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden relative">
+              <img 
+                src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop&auto=format&q=80" 
+                alt="Business professionals reviewing financial documents" 
+                className="w-full h-48 object-cover opacity-60"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-[#030303]/60 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <p className="text-sm text-slate-300 font-medium leading-relaxed">
+                  Join thousands of professionals who've secured better rates through PRYME.
+                </p>
               </div>
             </div>
           </div>
@@ -151,7 +152,7 @@ const ProcessSection = () => {
                   <div className="absolute -left-[9px] lg:-left-[41px] top-8 w-6 h-6 rounded-full border-4 border-[#030303] bg-slate-700 z-10 transition-all duration-700 group-hover:bg-primary group-hover:shadow-[0_0_20px_rgba(var(--primary),0.6)] group-hover:scale-125" />
                   
                   {/* Glassmorphic Content Card */}
-                  <div className="flex-1 w-full bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-2xl hover:border-primary/30 hover:bg-white/10 transition-all duration-500">
+                  <div className="flex-1 w-full bg-white dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-2xl hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-white/10 transition-all duration-500">
                     <div className="flex items-center gap-5 mb-4">
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
                         <step.icon className={cn("w-6 h-6", step.color)} />

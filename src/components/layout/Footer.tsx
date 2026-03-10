@@ -80,7 +80,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="col-span-2 lg:col-span-2 space-y-6">
             <Link to="/" className="inline-block">
-              <img src={prymeLogo} alt="PRYME" className="h-10 brightness-0 invert" />
+              <img src={prymeLogo} alt="PRYME" className="h-10" />
             </Link>
             <p className="text-sm text-background/70 leading-relaxed max-w-xs">
               Your trusted partner for transparent, secure, and efficient loan processing. Compare rates from 15+ banks and get the best deal.

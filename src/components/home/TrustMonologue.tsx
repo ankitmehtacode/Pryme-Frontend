@@ -114,7 +114,12 @@ const TrustMonologue = () => {
   ];
 
   return (
-    <section className="py-10 md:py-16 relative bg-[#030303] overflow-hidden">
+    <section className="py-20 md:py-28 relative bg-[#030303] overflow-hidden">
+      {/* Background Trust Image */}
+      <div className="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=800&fit=crop&auto=format&q=80" alt="" className="w-full h-full object-cover opacity-[0.08]" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#030303] via-[#030303]/80 to-[#030303]" />
+      </div>
       {/* Ambient Animated Glow */}
       <motion.div 
         animate={{ 
@@ -139,7 +144,7 @@ const TrustMonologue = () => {
               <Shield className="w-4 h-4" />
               Your Privacy Protected
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white tracking-tight mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-tight mb-8">
               Why Trust Us?
             </h2>
             <motion.div

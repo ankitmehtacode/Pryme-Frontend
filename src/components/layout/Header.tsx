@@ -39,7 +39,7 @@ const productLinks = [
   { href: "/apply?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs" },
   { href: "/apply?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth" },
   { href: "/apply?type=home", label: "Home Loan", icon: Home, description: "Make your dream home real" },
-  { href: "/apply?type=lap", label: "Loan Against Property", icon: Building2, description: "Unlock your property value" },
+  { href: "/apply?type=lap", label: "Loan Against Property", icon: Building2, description: "Borrow against your property" },
 ];
 
 const toolLinks = [
@@ -49,7 +49,7 @@ const toolLinks = [
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/apply", label: "Compare Loans" },
+  { href: "/document-check", label: "Compare Loans" },
   { href: "/dashboard", label: "Track Application" },
 ];
 
@@ -123,7 +123,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               </div>
             ) : (
               <div className="space-y-3 mt-4">
-                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/apply" onClick={onClose}>Apply Now</Link></Button>
+                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/document-check" onClick={onClose}>Apply Now</Link></Button>
                 <Button asChild variant="outline" className="w-full"><Link to="/auth" onClick={onClose}>Log In</Link></Button>
               </div>
             )}
@@ -192,7 +192,7 @@ const Header = memo(() => {
           
           {/* Logo - Adaptive Dark Mode */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img src={prymeLogo} alt="PRYME" className="h-10 w-auto object-contain transition-all duration-300 dark:brightness-0 dark:invert group-hover:scale-105" />
+            <img src={prymeLogo} alt="PRYME" className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
           </Link>
 
           {/* Desktop Nav */}
@@ -266,8 +266,8 @@ const Header = memo(() => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-5">
-                <Link to="/auth" className="text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-[#2aac64] transition-colors">Log In</Link>
-                <Link to="/apply" className="px-6 py-2.5 bg-[#2aac64] hover:bg-[#259b5a] text-white text-sm font-medium rounded-full shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:scale-105 active:scale-95">Apply Now</Link>
+                <Link to="/auth" className="text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-[#2aac64] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-full px-3 py-1">Log In</Link>
+                <Link to="/document-check" className="px-6 py-2.5 border border-[#2aac64] text-[#2aac64] hover:bg-[#2aac64] hover:text-white text-sm font-medium rounded-full transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Apply Now</Link>
               </div>
             )}
           </div>

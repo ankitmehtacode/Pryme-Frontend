@@ -341,7 +341,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* Apple-style Shimmer Effect */}
           <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
           <span className="relative flex items-center justify-center gap-3">
-            {isSubmitting ? "Processing Algorithms..." : "Unlock Financial Matches"}
+            {isSubmitting ? "Finding your best offers..." : "See My Loan Offers"}
             {!isSubmitting && <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />}
           </span>
         </Button>

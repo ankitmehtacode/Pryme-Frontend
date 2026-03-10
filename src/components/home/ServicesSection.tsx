@@ -34,7 +34,7 @@ const ServicesSection = () => {
     {
       icon: Building2,
       title: "Loan Against Property",
-      description: "Unlock the value of your property with high loan-to-value ratios.",
+      description: "Borrow against your property with competitive loan-to-value ratios.",
       rate: "9.5%",
       maxAmount: "₹3 Crore",
       href: "/apply?type=lap",

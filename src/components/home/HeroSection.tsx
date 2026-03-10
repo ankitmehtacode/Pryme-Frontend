@@ -84,15 +84,29 @@ const HeroSection = memo(() => {
       ref={containerRef} 
       // 🧠 1. BLANK SPACE REMOVED: pt-24 drops to pt-16/20. pb-6 dropped to pb-0!
       // 🧠 2. CLIPPING FIXED: "overflow-hidden" completely removed from this wrapper so the Product Grid can overlap it safely.
-      className="relative w-full flex items-center justify-center bg-[#0a0a0a] pt-16 md:pt-20 pb-0 border-b border-white/5 z-10"
+      className="relative w-full flex items-center justify-center bg-slate-50 dark:bg-[#0a0a0a] pt-16 md:pt-20 pb-0 border-b border-slate-200 dark:border-white/5 z-10"
     >
-      {/* Background Layers (Overflow hidden isolated here so the glow doesn't cause horizontal scrolling) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
+      {/* Background Layers */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Ambient Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.06] dark:opacity-[0.04]"
+        >
+          <source src="https://videos.pexels.com/video-files/3130284/3130284-sd_640_360_30fps.mp4" type="video/mp4" />
+        </video>
+        {/* Gradient overlay to preserve text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/90 via-slate-50/70 to-slate-50 dark:from-[#0a0a0a]/95 dark:via-[#0a0a0a]/80 dark:to-[#0a0a0a]" />
         {/* Subtle dynamic green glow */}
-        <div 
-          ref={glowRef}
-          className="absolute w-[25rem] h-[25rem] bg-[#2aac64]/10 rounded-full blur-[120px] mix-blend-screen will-change-transform"
-        />
+        <div className="flex items-center justify-center w-full h-full">
+          <div 
+            ref={glowRef}
+            className="absolute w-[25rem] h-[25rem] bg-[#2aac64]/10 rounded-full blur-[120px] mix-blend-screen will-change-transform"
+          />
+        </div>
       </div>
 
       {/* Tightly packed horizontal flex container with reduced vertical gap for mobile */}
@@ -102,15 +116,15 @@ const HeroSection = memo(() => {
         <div className="w-full xl:w-[50%] flex flex-col items-center xl:items-start text-center xl:text-left z-20">
           <div ref={headlineRef} className="w-full max-w-[550px]">
             
-            <p className="text-base md:text-xl lg:text-2xl font-medium text-slate-300 tracking-tight leading-none mb-2">
+            <p className="text-base md:text-xl lg:text-2xl font-normal text-slate-700 dark:text-slate-300 tracking-tight leading-none mb-2">
               Bypass the bureaucracy.
             </p>
             
-            <h1 className="text-[2.75rem] md:text-[4rem] lg:text-[4.5rem] font-semibold tracking-tighter leading-[0.95] mb-3">
-              <span className="block text-white">
+            <h1 className="text-[2.75rem] md:text-[4rem] lg:text-[4.5rem] font-light tracking-tighter leading-[0.95] mb-3">
+              <span className="block text-slate-900 dark:text-white">
                 <ShuffleText text="INSTANT" delay={100} duration={800} />
               </span>
-              <span className="block text-white">
+              <span className="block text-slate-900 dark:text-white">
                 <ShuffleText text="CAPITAL." delay={600} duration={800} />
               </span>
               <span className="block text-[#2aac64] drop-shadow-[0_0_15px_rgba(42,172,100,0.3)]">
@@ -118,9 +132,23 @@ const HeroSection = memo(() => {
               </span>
             </h1>
             
-            <p className="text-xs md:text-sm text-slate-400 font-medium leading-snug max-w-[90%] mx-auto xl:mx-0">
-              Compare premium rates from 15+ top-tier banks, calculate EMIs instantly, and unlock your financial trajectory today.
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-normal leading-snug max-w-[90%] mx-auto xl:mx-0">
+              Compare rates from 15+ banks, calculate your EMI, and apply in under 5 minutes.
             </p>
+            
+            {/* Social Proof Micro-copy (Zeigarnik + Social Proof) */}
+            <div className="flex items-center gap-2 mt-3 mx-auto xl:mx-0 w-max">
+              <div className="flex -space-x-2">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="w-6 h-6 rounded-full bg-emerald-500/20 border-2 border-slate-50 dark:border-[#0a0a0a] flex items-center justify-center">
+                    <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400">{String.fromCharCode(64 + i)}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">10,000+</span> applications processed this quarter
+              </p>
+            </div>
             
           </div>
         </div>
@@ -190,7 +218,7 @@ const HeroSection = memo(() => {
                       </div>
 
                       <div className="relative z-10 mt-auto pt-1 flex justify-between items-center">
-                        <Link to="/apply" onClick={(e) => e.stopPropagation()} className="bg-[#111] text-white px-4 py-1.5 rounded-full font-medium text-[10px] shadow-xl hover:bg-black transition-colors flex items-center gap-1.5 border border-white/10 w-max group z-50 outline-none focus:ring-2 focus:ring-[#2aac64]">
+                        <Link to="/document-check" onClick={(e) => e.stopPropagation()} className="bg-[#111] text-white px-5 py-2.5 rounded-full font-semibold text-[11px] shadow-xl hover:bg-black transition-colors flex items-center gap-1.5 border border-white/10 w-max group z-50 outline-none focus:ring-2 focus:ring-[#2aac64]" aria-label="Apply for this loan offer">
                           Apply Now <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                         </Link>
                         <div className="flex items-center gap-1 text-[8px] text-[#2aac64] font-medium tracking-widest uppercase opacity-80 backdrop-blur-sm bg-black/20 px-2 py-1 rounded border border-[#2aac64]/20 animate-pulse">

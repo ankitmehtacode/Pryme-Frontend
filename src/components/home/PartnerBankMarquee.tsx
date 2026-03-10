@@ -58,7 +58,7 @@ const PartnerBankMarquee = memo(() => {
               <img 
                 src={bank.logo} 
                 alt={bank.name} 
-                className="max-h-full max-w-full object-contain drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                className="max-h-full max-w-full object-contain drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
               />
             </div>
           ))}

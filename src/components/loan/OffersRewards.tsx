@@ -89,7 +89,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
         </div>
         <div>
           <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Offers & Rewards</h3>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Exclusive algorithms unlocked</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Offers matched to your profile</p>
         </div>
       </div>
 
