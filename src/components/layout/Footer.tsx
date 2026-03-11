@@ -45,7 +45,7 @@ const Footer = () => {
     { label: "EMI Calculator", href: "/apply#emi-calculator" },
     { label: "Eligibility Checker", href: "/apply" },
     { label: "Document Checklist", href: "/documents" },
-    { label: "Compare Loans", href: "/apply" },
+    { label: "Compare Loans", href: "/compare-loans" },
   ];
 
   return (

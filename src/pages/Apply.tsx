@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGate";
 import { Helmet } from "react-helmet-async";
-import { Shield, Clock, CheckCircle, Building2, ArrowRight, Star, TrendingUp, AlertCircle, Info, LockKeyhole, Sparkles } from "lucide-react";
+import { Shield, Clock, CheckCircle, CheckCircle2, Building2, ArrowRight, Star, TrendingUp, AlertCircle, Info, LockKeyhole, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { PrymeAPI } from "@/lib/api"; 
+import { PrymeAPI } from "@/lib/api";
 
 // Loan Components
 import LoanApplicationForm from "@/components/loan/LoanApplicationForm";
@@ -20,21 +22,22 @@ import OffersRewards from "@/components/loan/OffersRewards";
 import RequiredDocuments from "@/components/loan/RequiredDocuments";
 import BankerContact from "@/components/loan/BankerContact";
 
-const springConfig: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
+const spring: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
 
 const Apply = () => {
+  const navigate = useNavigate();
   const [loanAmount, setLoanAmount] = useState(500000);
   const [hasAccess, setHasAccess] = useState(isLeadCaptured());
   const [tenure, setTenure] = useState(5);
   const [showComparison, setShowComparison] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [applicationData, setApplicationData] = useState<{
     cibilScore: number;
     monthlyIncome: number;
     productType: string;
   } | null>(null);
 
-  // Bank offers data preserved exactly as requested
   const bankOffers = useMemo(() => {
     const offers = [
       { id: "hdfc", bankName: "HDFC Bank", maxLoanAmount: 5000000, roi: 10.5, processingFee: "1% + GST", emi: 10724, approvalProbability: 85, processingTime: "24-48 hours", featured: true },
@@ -55,11 +58,11 @@ const Apply = () => {
     });
     setLoanAmount(data.loanAmount);
     setTenure(data.loanTenure);
-    
+
     // Smooth transition state
     setShowComparison(true);
-    
-    // 🧠 Wait for AnimatePresence to mount the DOM, then scroll into the dashboard seamlessly
+
+    // Scroll into view after comparison renders
     setTimeout(() => {
       document.getElementById("comparison-dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 300);
@@ -77,9 +80,10 @@ const Apply = () => {
     setIsSubmitting(true);
     try {
       const response = await PrymeAPI.submitApplication(applicationData.productType, loanAmount, applicationData.cibilScore);
+      setIsSuccess(true);
       toast({
-        title: "Application Submitted! 🎉",
-        description: `Your Lead ID: ${response.applicationId}. A PRYME RM for ${bank?.bankName} will contact you shortly.`,
+        title: "Application Secured 🔒",
+        description: `Lead ID: ${response.applicationId}. A PRYME RM for ${bank?.bankName} will contact you shortly.`,
       });
     } catch (error) {
       toast({ title: "Submission Error", description: "Unable to reach the secure server.", variant: "destructive" });
@@ -103,6 +107,39 @@ const Apply = () => {
     { icon: CheckCircle, label: "Real-time Offers", color: "text-primary" },
   ];
 
+  // ── Success Screen ──────────────────────────────────────────────────
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] p-6 relative overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/15 blur-[120px] rounded-full pointer-events-none" />
+        <motion.div
+          initial={{ scale: 0.92, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          className="max-w-md w-full bg-[#111] p-8 rounded-[2rem] text-center border border-white/[0.06]"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+            className="w-20 h-20 bg-[#2aac64]/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#2aac64]/20"
+          >
+            <CheckCircle2 className="w-10 h-10 text-[#2aac64]" />
+          </motion.div>
+          <h2 className="text-2xl font-semibold text-white mb-2">Application Submitted</h2>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            We're comparing offers from our partner banks to find the best rates for your profile. You'll hear from us shortly.
+          </p>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Button onClick={() => navigate("/auth")} className="w-full bg-[#2aac64] hover:bg-[#239b57] text-white py-6 text-lg font-semibold rounded-xl transition-colors duration-200" size="lg">
+              Go to Dashboard <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -114,25 +151,25 @@ const Apply = () => {
       {!hasAccess && <LeadCaptureGate onCaptured={() => setHasAccess(true)} />}
 
       <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
-        
+
         {/* Ambient Glassmorphic Glows - Darkened for Bank Grade look */}
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-[#0f462b]/10 blur-[120px] rounded-full pointer-events-none" />
 
         <Header />
-        
+
         <main className="flex-1 w-full pt-20 relative z-10">
-          
+
           {/* 1. Header & Intake Area */}
           <section className="py-8 md:py-12">
             <div className="container mx-auto px-4 max-w-7xl">
-              
-              {/* 🧠 Split Screen: Text & Calculators (Left) vs Input Form (Right) */}
+
+              {/* Split layout: calculators (left) + form (right) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                
+
                 {/* Left Column: Hero Text & Sticky Calculators */}
                 <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-24">
-                  
+
                   {/* Hero Text */}
                   <div className="max-w-xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-[#2aac64]/20 shadow-sm mb-6 mt-2">
@@ -180,12 +217,12 @@ const Apply = () => {
                 <div className="lg:col-span-7 w-full space-y-8">
                   <div className="bg-[#111] border border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
-                    <LoanApplicationForm 
-                      onAmountChange={setLoanAmount} 
+                    <LoanApplicationForm
+                      onAmountChange={setLoanAmount}
                       onFormSubmit={handleFormSubmit}
                     />
                   </div>
-                  
+
                   {/* Mobile-only Calculator (shown below form on small screens) */}
                   <div className="space-y-6 lg:hidden">
                     <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
@@ -198,21 +235,20 @@ const Apply = () => {
             </div>
           </section>
 
-          {/* 🧠 2. The Dynamic Single-Page Dashboard Reveal */}
+          {/* Comparison dashboard reveal */}
           <AnimatePresence>
             {showComparison && (
               <motion.div
                 id="comparison-dashboard"
                 initial={{ opacity: 0, y: 60, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={springConfig}
+                transition={spring}
                 className="w-full relative z-20 pb-20"
               >
-                {/* Divider Line */}
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-16" />
 
                 <div className="container mx-auto px-4 max-w-7xl space-y-8">
-                  
+
                   {/* Dashboard Header */}
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/40 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 backdrop-blur-xl shadow-xl">
                     <div>
@@ -285,7 +321,7 @@ const Apply = () => {
           </AnimatePresence>
 
         </main>
-        
+
         <Footer />
       </div>
     </>

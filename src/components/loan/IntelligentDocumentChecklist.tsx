@@ -4,84 +4,40 @@ import { useNavigate } from "react-router-dom";
 import {
   CheckCircle2, ShieldCheck, ChevronLeft, Briefcase,
   Building2, Home, Landmark, User, FileCheck, Stethoscope, ArrowRight,
-  UploadCloud, X, Loader2, IndianRupee, CalendarDays
+  UploadCloud, X, Loader2, IndianRupee, CalendarDays, CreditCard, Wallet
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  type ProductType,
+  type EmploymentType,
+  type DocumentItem,
+  type DocumentGroup,
+  getDocumentsForLoanType,
+  groupDocumentsByCategory,
+} from "@/lib/documentData";
 
 /* ──────────────────────────────────────────────
-   Data Models
+   Occupation sub-types (unchanged)
    ────────────────────────────────────────────── */
 
-type ProductType = "Home Loan" | "LAP";
-type EmploymentType = "Salaried" | "SENP" | "SEP";
 type SpecificOccupation =
   | "Private Sector" | "Government Employee"
   | "CA" | "CS" | "Doctor" | "Lawyer" | "Architect"
   | "ITR Based (Normal Income)" | "GST Based" | "Banking Program" | "Cash Flow Program";
 
-interface DocumentItem {
-  id: string;
-  label: string;
-  category: "KYC" | "Income" | "Property";
-}
-
 /* ──────────────────────────────────────────────
-   Document Definitions
+   Icons per document category
    ────────────────────────────────────────────── */
 
-const getDocuments = (product: ProductType, empType: EmploymentType): DocumentItem[] => {
-  const docs: DocumentItem[] = [];
-
-  if (product === "Home Loan") {
-    docs.push(
-      { id: "pan", label: "PAN Card", category: "KYC" },
-      { id: "aadhar", label: "Aadhaar Card / Passport / Voter ID", category: "KYC" },
-      { id: "photo", label: "Passport size photographs", category: "KYC" }
-    );
-  } else if (product === "LAP") {
-    docs.push(
-      { id: "pan", label: "PAN Card", category: "KYC" },
-      { id: "aadhar_lap", label: "Aadhaar Card / Address Proof", category: "KYC" },
-      { id: "photo", label: "Passport size photographs", category: "KYC" }
-    );
-  }
-
-  if (product === "Home Loan") {
-    if (empType === "Salaried") {
-      docs.push(
-        { id: "salary_slips", label: "Last 3 months salary slips", category: "Income" },
-        { id: "bank_stmt_sal", label: "Last 6 months bank statement", category: "Income" },
-        { id: "form_16", label: "Form 16 (last 2 years)", category: "Income" },
-        { id: "itr_sal", label: "ITR (last 2 years)", category: "Income" }
-      );
-    } else {
-      docs.push(
-        { id: "itr_se", label: "ITR (last 2-3 years) with computation", category: "Income" },
-        { id: "bs_pl", label: "Balance Sheet & P&L (CA certified)", category: "Income" },
-        { id: "biz_proof", label: "Business proof (GST / Shop Act)", category: "Income" },
-        { id: "bank_stmt_se", label: "Last 12 months bank statements", category: "Income" }
-      );
-    }
-  } else if (product === "LAP") {
-    docs.push(
-      { id: "itr_lap", label: "ITR (last 3 years)", category: "Income" },
-      { id: "bs_pl_lap", label: "Balance Sheet & P&L", category: "Income" },
-      { id: "bank_stmt_lap", label: "Bank statements (12 months)", category: "Income" }
-    );
-  }
-
-  if (product === "Home Loan") {
-    docs.push(
-      { id: "ats", label: "Agreement to Sell", category: "Property" },
-      { id: "title_chain", label: "Title chain documents", category: "Property" },
-      { id: "bldg_plan", label: "Approved building plan", category: "Property" },
-      { id: "noc", label: "NOC from builder/society", category: "Property" }
-    );
-  }
-
-  return docs;
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  "Identity Documents": User,
+  "Income Documents": Landmark,
+  "Financial Documents": Wallet,
+  "Property Documents": Building2,
+  "Business Proof": Briefcase,
+  "Additional Documents": FileCheck,
 };
 
 /* ──────────────────────────────────────────────
@@ -98,7 +54,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: "spring", stiffness: 260, damping: 28 },
+    transition: { type: "spring" as const, stiffness: 260, damping: 28 },
   },
   exit: (direction: number) => ({
     opacity: 0,
@@ -219,7 +175,10 @@ const FileUploader = ({
               )} />
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-slate-200 text-[15px] leading-snug">{doc.label}</p>
+              <p className="font-medium text-slate-200 text-[15px] leading-snug">
+                {doc.label}
+                {doc.optional && <span className="text-slate-500 text-xs ml-1.5 font-normal">(optional)</span>}
+              </p>
               <p className="text-[13px] text-slate-500 mt-0.5">
                 Drop file or <span className="text-emerald-500 font-medium">browse</span>
               </p>
@@ -252,28 +211,30 @@ export default function IntelligentDocumentChecklist() {
   const [occupation, setOccupation] = useState<SpecificOccupation | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File | null>>({});
 
+  /* ── Compute documents from centralized data layer ── */
   const currentDocs = useMemo(() => {
-    if (!product || !empCategory) return [];
-    return getDocuments(product, empCategory);
+    if (!product) return [];
+    // Business Loan doesn't need employment type
+    if (product === "Business Loan") return getDocumentsForLoanType(product, "SENP");
+    if (!empCategory) return [];
+    return getDocumentsForLoanType(product, empCategory);
   }, [product, empCategory]);
 
-  const docCategories = useMemo(() => {
+  const docCategories: DocumentGroup[] = useMemo(() => {
     if (currentDocs.length === 0) return [];
-    const kyc = currentDocs.filter((d) => d.category === "KYC");
-    const income = currentDocs.filter((d) => d.category === "Income");
-    const property = currentDocs.filter((d) => d.category === "Property");
-
-    const cats: { name: string; docs: DocumentItem[]; icon: React.ElementType }[] = [];
-    if (kyc.length > 0) cats.push({ name: "Identity Documents", docs: kyc, icon: User });
-    if (income.length > 0) cats.push({ name: "Income Documents", docs: income, icon: Landmark });
-    if (property.length > 0) cats.push({ name: "Property Documents", docs: property, icon: Building2 });
-    return cats;
+    return groupDocumentsByCategory(currentDocs);
   }, [currentDocs]);
 
   const nextStep = () => {
     setDirection(1);
     if (step === 3 && docCategoryIndex < docCategories.length - 1) {
       setDocCategoryIndex((prev) => prev + 1);
+      return;
+    }
+    // Business Loan: skip employment step (step 2), jump to docs
+    if (step === 1 && product === "Business Loan") {
+      setStep(3);
+      setDocCategoryIndex(0);
       return;
     }
     setStep((prev) => prev + 1);
@@ -285,17 +246,27 @@ export default function IntelligentDocumentChecklist() {
       setDocCategoryIndex((prev) => prev - 1);
       return;
     }
+    // Business Loan: going back from docs → skip employment step
+    if (step === 3 && product === "Business Loan") {
+      setStep(1);
+      return;
+    }
     setStep((prev) => prev - 1);
   };
 
   const isProductValid = product !== null;
   const isLoanValid = loanAmount.replace(/\D/g, "").length > 4 && tenure !== "" && parseInt(tenure) > 0;
-  const isProfileValid = empCategory !== null && occupation !== null;
+  const isProfileValid = product === "Business Loan"
+    ? true
+    : empCategory !== null && occupation !== null;
 
   const isCurrentCategoryValid = useMemo(() => {
     if (step !== 3 || docCategories.length === 0) return false;
     const currentCatDocs = docCategories[docCategoryIndex].docs;
-    return currentCatDocs.every((d) => uploadedFiles[d.id] != null);
+    // Only required (non-optional) docs must be uploaded
+    return currentCatDocs
+      .filter((d) => !d.optional)
+      .every((d) => uploadedFiles[d.id] != null);
   }, [step, docCategories, docCategoryIndex, uploadedFiles]);
 
   const handleProceed = () => {
@@ -337,12 +308,18 @@ export default function IntelligentDocumentChecklist() {
   );
 
   /* ── Step labels for the progress tracker ── */
-  const stepLabels = ["Loan Type", "Amount", "Profile", "Documents"];
+  const stepLabels = product === "Business Loan"
+    ? ["Loan Type", "Amount", "Documents"]
+    : ["Loan Type", "Amount", "Profile", "Documents"];
+  const totalSteps = stepLabels.length;
+
+  /* Map current step to progress dot index */
+  const progressIndex = product === "Business Loan" && step === 3 ? 2 : step;
 
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col pt-4 pb-8 px-4 relative" style={{ minHeight: 'calc(100vh - 200px)' }}>
 
-      {/* Social Proof (Zeigarnik + Social Proof at decision point) */}
+      {/* Social Proof */}
       <div className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 mb-4">
         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
         <p className="text-[10px] text-slate-400 font-medium">
@@ -357,19 +334,19 @@ export default function IntelligentDocumentChecklist() {
             <div className="flex flex-col items-center gap-1.5">
               <div className={cn(
                 "w-2.5 h-2.5 rounded-full transition-all duration-500",
-                step >= s
+                progressIndex >= s
                   ? "bg-emerald-500 scale-125"
                   : "bg-white/10 border border-white/20"
               )} />
               <span className={cn(
                 "text-[10px] font-medium tracking-wide uppercase transition-colors duration-500 hidden sm:block",
-                step >= s ? "text-emerald-500" : "text-slate-600"
+                progressIndex >= s ? "text-emerald-500" : "text-slate-600"
               )}>{label}</span>
             </div>
-            {s < 3 && (
+            {s < totalSteps - 1 && (
               <div className={cn(
                 "h-px w-full mx-2 transition-colors duration-500 mb-5 sm:mb-0",
-                step > s ? "bg-emerald-500/60" : "bg-white/10"
+                progressIndex > s ? "bg-emerald-500/60" : "bg-white/10"
               )} />
             )}
           </div>
@@ -390,7 +367,7 @@ export default function IntelligentDocumentChecklist() {
             <div className="text-center mb-5 relative z-10">
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 1 of 4</span>
+                <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 1 of {totalSteps}</span>
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-2">What type of loan do you need?</h2>
               <p className="text-[15px] text-slate-400">Select the product that best fits your requirement.</p>
@@ -399,15 +376,27 @@ export default function IntelligentDocumentChecklist() {
             <div className="space-y-3 mb-5 relative z-10 flex-1 overflow-y-auto custom-scrollbar">
               <SelectionCard
                 active={product === "Home Loan"}
-                onClick={() => { setProduct("Home Loan"); setEmpCategory(null); setOccupation(null); setUploadedFiles({}); }}
+                onClick={() => { setProduct("Home Loan"); setEmpCategory(null); setOccupation(null); setUploadedFiles({}); setDocCategoryIndex(0); }}
                 icon={Home} title="Home Loan"
                 subtitle="Purchase, construction, extension, or balance transfer"
               />
               <SelectionCard
                 active={product === "LAP"}
-                onClick={() => { setProduct("LAP"); setEmpCategory(null); setOccupation(null); setUploadedFiles({}); }}
+                onClick={() => { setProduct("LAP"); setEmpCategory(null); setOccupation(null); setUploadedFiles({}); setDocCategoryIndex(0); }}
                 icon={Building2} title="Loan Against Property"
                 subtitle="Leverage your commercial or residential property"
+              />
+              <SelectionCard
+                active={product === "Business Loan"}
+                onClick={() => { setProduct("Business Loan"); setEmpCategory("SENP"); setOccupation(null); setUploadedFiles({}); setDocCategoryIndex(0); }}
+                icon={Briefcase} title="Business Loan"
+                subtitle="Working capital, expansion, equipment, or invoice financing"
+              />
+              <SelectionCard
+                active={product === "Personal Loan"}
+                onClick={() => { setProduct("Personal Loan"); setEmpCategory(null); setOccupation(null); setUploadedFiles({}); setDocCategoryIndex(0); }}
+                icon={CreditCard} title="Personal Loan"
+                subtitle="Medical, travel, wedding, or any personal requirement"
               />
             </div>
 
@@ -436,7 +425,7 @@ export default function IntelligentDocumentChecklist() {
               <div className="text-center flex-1">
                 <span className="inline-flex items-center gap-1.5 mb-2">
                   <IndianRupee className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 2 of 4</span>
+                  <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 2 of {totalSteps}</span>
                 </span>
                 <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">How much do you need?</h2>
               </div>
@@ -488,8 +477,8 @@ export default function IntelligentDocumentChecklist() {
           </motion.div>
         )}
 
-        {/* ── STEP 2 · Employment Profile ── */}
-        {step === 2 && (
+        {/* ── STEP 2 · Employment Profile (skipped for Business Loan) ── */}
+        {step === 2 && product !== "Business Loan" && (
           <motion.div
             key="step-2" custom={direction} variants={cardVariants}
             initial="initial" animate="animate" exit="exit"
@@ -502,7 +491,7 @@ export default function IntelligentDocumentChecklist() {
               <div className="text-center flex-1">
                 <span className="inline-flex items-center gap-1.5 mb-2">
                   <User className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 3 of 4</span>
+                  <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 3 of {totalSteps}</span>
                 </span>
                 <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Tell us about yourself</h2>
               </div>
@@ -577,7 +566,8 @@ export default function IntelligentDocumentChecklist() {
 
             <div className="flex justify-end relative z-10">
               <Button
-                onClick={nextStep} disabled={!isProfileValid}
+                onClick={() => { setDirection(1); setStep(3); setDocCategoryIndex(0); }}
+                disabled={!isProfileValid}
                 className="group px-8 py-6 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition-all font-semibold text-[15px] disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
               >
                 Continue <ArrowRight className="w-5 h-5 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
@@ -589,7 +579,7 @@ export default function IntelligentDocumentChecklist() {
         {/* ── STEP 3 · Document Upload ── */}
         {step === 3 && docCategories.length > 0 && (() => {
           const currentCategory = docCategories[docCategoryIndex];
-          const CategoryIcon = currentCategory.icon;
+          const CatIcon = CATEGORY_ICONS[currentCategory.displayName] || FileCheck;
           const isLastCategory = docCategoryIndex === docCategories.length - 1;
 
           return (
@@ -615,10 +605,10 @@ export default function IntelligentDocumentChecklist() {
                 </button>
                 <div className="text-center flex-1">
                   <span className="inline-flex items-center gap-1.5 mb-2">
-                    <CategoryIcon className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step 4 of 4</span>
+                    <CatIcon className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider">Step {totalSteps} of {totalSteps}</span>
                   </span>
-                  <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Upload {currentCategory.name}</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Upload {currentCategory.displayName}</h2>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-sm font-semibold text-emerald-500">
                   {docCategoryIndex + 1}/{docCategories.length}
@@ -676,7 +666,7 @@ export default function IntelligentDocumentChecklist() {
                         : "bg-white/[0.04] text-slate-500 border border-white/10"
                     )}
                   >
-                    Next: {docCategories[docCategoryIndex + 1]?.name} <ArrowRight className="w-5 h-5 ml-1.5 inline-block group-hover:translate-x-0.5 transition-transform" />
+                    Next: {docCategories[docCategoryIndex + 1]?.displayName} <ArrowRight className="w-5 h-5 ml-1.5 inline-block group-hover:translate-x-0.5 transition-transform" />
                   </Button>
                 )}
               </div>

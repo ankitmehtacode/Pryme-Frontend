@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2 } from "lucide-react";
+
+// Components & Utilities
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { PrymeAPI } from "@/lib/api"; // Added your new Java Backend API client
+
+// 🧠 Closed-Loop Security Context
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -36,9 +40,15 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 type AuthView = "login" | "signup" | "forgot-password";
 
 const Auth = () => {
+  const { user, signIn, isLoading: isContextLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+
+  // Deep Link Recovery: Returns user to the page they tried to access before login
+  const from = location.state?.from || null;
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -55,48 +65,53 @@ const Auth = () => {
     mode: "onChange",
   });
 
-  // Redirect if already logged in (Checking localStorage instead of Supabase context)
+  // 🧠 Deterministic RBAC Routing Engine
   useEffect(() => {
-    const token = localStorage.getItem("pryme_token");
-    if (token) {
-      navigate("/dashboard"); // Or /admin-dashboard depending on your setup
+    if (user) {
+      if (from) {
+        navigate(from, { replace: true });
+        return;
+      }
+      
+      // Strict Tier Routing based on your Java SecurityConfig parameters
+      if (user.role === "ADMIN" || user.role === "SUPER_ADMIN" || user.role === "EMPLOYEE") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     }
-  }, [navigate]);
+  }, [user, navigate, from]);
 
+  // 🧠 Secure Form Submission via AuthContext
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
     
-    try {
-      // Calling your Java Spring Boot Backend
-      const response = await PrymeAPI.login(data.email, data.password);
-      
-      // Store the secure token and role
-      localStorage.setItem("pryme_token", response.token);
-      localStorage.setItem("pryme_role", response.role);
-      localStorage.setItem("pryme_name", response.name);
-
+    // Bypassing raw localStorage; Routing strictly through the Context Engine
+    const { error } = await signIn(data.email, data.password);
+    
+    if (error) {
       toast({
-        title: "Welcome back!",
-        description: response.message || "You have successfully logged in.",
-      });
-      
-      navigate("/admin-dashboard");
-    } catch (error: any) {
-      toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password",
+        title: "Access Denied",
+        description: error.message || "Invalid secure credentials.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      loginForm.setValue("password", ""); // Clear password field on failure
+    } else {
+      toast({
+        title: "Session Authorized",
+        description: "Welcome back to the Pryme CRM system.",
+      });
+      // Note: On success, the AuthContext updates `user`, triggering the useEffect to route them automatically.
     }
+    
+    setIsLoading(false);
   };
 
   const handleSignup = async (data: SignupData) => {
     setIsLoading(true);
     
-    // DEMO MOCK: Since we only built the Login API in Java tonight, 
-    // we simulate a successful signup so the UI doesn't break during the showcase.
+    // DEMO MOCK: Since enterprise CRM provisioning is backend-only, 
+    // we simulate a successful public signup so the UI doesn't break during showcase.
     setTimeout(() => {
       setIsLoading(false);
       toast({
@@ -116,7 +131,7 @@ const Auth = () => {
       setIsLoading(false);
       toast({
         title: "Password Reset Email Sent",
-        description: "Check your email for a link to reset your password.",
+        description: "Check your email for a secure link to reset your credentials.",
       });
       setView("login");
     }, 1500);
@@ -125,28 +140,38 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     toast({
       title: "Coming Soon",
-      description: "Google OAuth integration will be enabled in Phase 2.",
+      description: "Google OAuth zero-trust integration will be enabled in Phase 2.",
     });
   };
+
+  // Prevent UI flashing while the Context is performing its initial token math
+  if (isContextLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <>
       <Helmet>
-        <title>{view === "login" ? "Login" : view === "signup" ? "Sign Up" : "Reset Password"} - PYRME Consulting</title>
-        <meta name="description" content="Login or sign up to access your PYRME Consulting dashboard." />
+        <title>{view === "login" ? "Secure Login" : view === "signup" ? "Sign Up" : "Reset Access"} | PYRME Consulting</title>
+        <meta name="description" content="Secure portal to access your PYRME Consulting dashboard." />
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
       <div className="min-h-screen flex bg-background">
         {/* Left Panel - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 hero-gradient items-center justify-center p-12">
-          <div className="max-w-md">
+        <div className="hidden lg:flex lg:w-1/2 hero-gradient items-center justify-center p-12 relative overflow-hidden">
+          <div className="max-w-md relative z-10">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 rounded-xl neo-card flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-medium text-foreground">PYRME</h1>
-                <p className="text-sm text-muted-foreground">CONSULTING</p>
+                <h1 className="text-2xl font-medium text-foreground tracking-tight">PYRME</h1>
+                <p className="text-xs tracking-[0.2em] text-muted-foreground">CONSULTING</p>
               </div>
             </div>
             
@@ -162,19 +187,19 @@ const Auth = () => {
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-medium">1</span>
                 </div>
-                <span className="text-foreground">Compare offers from multiple banks</span>
+                <span className="text-foreground text-sm font-medium">Compare offers from multiple banks</span>
               </div>
               <div className="flex items-center gap-3 neo-card-inset p-4 rounded-xl">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-medium">2</span>
                 </div>
-                <span className="text-foreground">Track your application status</span>
+                <span className="text-foreground text-sm font-medium">Track your application status</span>
               </div>
               <div className="flex items-center gap-3 neo-card-inset p-4 rounded-xl">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-medium">3</span>
                 </div>
-                <span className="text-foreground">Get personalized RM support</span>
+                <span className="text-foreground text-sm font-medium">Get personalized RM support</span>
               </div>
             </div>
           </div>
@@ -189,24 +214,24 @@ const Auth = () => {
               </div>
               <div>
                 <h1 className="text-xl font-medium text-foreground">PYRME</h1>
-                <p className="text-xs text-muted-foreground">CONSULTING</p>
+                <p className="text-xs text-muted-foreground tracking-[0.2em]">CONSULTING</p>
               </div>
             </div>
 
-            <div className="neo-card p-8 rounded-2xl">
+            <div className="neo-card p-8 rounded-2xl shadow-xl">
               {/* Forgot Password View */}
               {view === "forgot-password" && (
                 <>
                   <button 
                     onClick={() => setView("login")}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Back to Login
                   </button>
                   <h2 className="text-2xl font-medium text-foreground mb-2">Reset Password</h2>
-                  <p className="text-muted-foreground mb-8">
-                    Enter your email and we'll send you a reset link
+                  <p className="text-muted-foreground mb-8 text-sm">
+                    Enter your email and we'll send you a secure reset link.
                   </p>
 
                   <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-5">
@@ -215,7 +240,7 @@ const Auth = () => {
                       <div className="relative">
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder="admin@pryme.in"
                           className="neo-input border-0 pl-10"
                           {...forgotPasswordForm.register("email")}
                         />
@@ -226,9 +251,10 @@ const Auth = () => {
                       )}
                     </div>
 
-                    <Button type="submit" disabled={isLoading} className="w-full neo-button border-0 bg-primary hover:bg-primary/90" size="lg">
+                    <Button type="submit" disabled={isLoading} className="w-full neo-button border-0 bg-primary hover:bg-primary/90 text-foreground" size="lg">
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                       {isLoading ? "Sending..." : "Send Reset Link"}
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                     </Button>
                   </form>
                 </>
@@ -237,12 +263,12 @@ const Auth = () => {
               {/* Login/Signup View */}
               {view !== "forgot-password" && (
                 <>
-                  <h2 className="text-2xl font-medium text-foreground mb-2 text-center">
-                    {view === "login" ? "Welcome Back" : "Create Account"}
+                  <h2 className="text-2xl font-medium text-foreground mb-2 text-center tracking-tight">
+                    {view === "login" ? "System Access" : "Create Account"}
                   </h2>
-                  <p className="text-muted-foreground text-center mb-6">
+                  <p className="text-muted-foreground text-center mb-6 text-sm">
                     {view === "login"
-                      ? "Enter your credentials to access your account"
+                      ? "Enter your secure credentials to proceed"
                       : "Sign up to start comparing loan offers"}
                   </p>
 
@@ -252,7 +278,7 @@ const Auth = () => {
                       onClick={() => setView("login")}
                       className={cn(
                         "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
-                        view === "login" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                        view === "login" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       Login
@@ -261,7 +287,7 @@ const Auth = () => {
                       onClick={() => setView("signup")}
                       className={cn(
                         "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
-                        view === "signup" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                        view === "signup" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       Sign Up
@@ -275,7 +301,7 @@ const Auth = () => {
                         <div className="relative">
                           <Input
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder="admin@pryme.in"
                             className="neo-input border-0 pl-10"
                             {...loginForm.register("email")}
                           />
@@ -287,12 +313,12 @@ const Auth = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-foreground">Password</Label>
+                        <Label className="text-sm font-medium text-foreground">Security Key</Label>
                         <div className="relative">
                           <Input
                             type="password"
                             placeholder="••••••••"
-                            className="neo-input border-0 pl-10"
+                            className="neo-input border-0 pl-10 tracking-widest"
                             {...loginForm.register("password")}
                           />
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -302,22 +328,23 @@ const Auth = () => {
                         )}
                       </div>
 
-                      <Button type="submit" disabled={isLoading} className="w-full border-0 bg-primary text-foreground hover:bg-primary/90" size="lg">
-                        {isLoading ? "Signing in..." : "Sign In"}
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                      <Button type="submit" disabled={isLoading} className="w-full border-0 bg-primary text-foreground hover:bg-primary/90 shadow-md transition-all" size="lg">
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        {isLoading ? "Authenticating..." : "Authorize Session"}
+                        {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                       </Button>
 
                       <button
                         type="button"
                         onClick={() => setView("forgot-password")}
-                        className="w-full text-center text-sm text-primary hover:underline"
+                        className="w-full text-center text-sm text-primary hover:underline transition-all"
                       >
                         Forgot Password?
                       </button>
 
                       <div className="relative my-2">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-border"></div>
+                          <div className="w-full border-t border-border/50"></div>
                         </div>
                         <div className="relative flex justify-center text-xs">
                           <span className="bg-card px-4 text-muted-foreground">or</span>
@@ -329,7 +356,7 @@ const Auth = () => {
                         onClick={handleGoogleSignIn}
                         disabled={isLoading}
                         variant="outline"
-                        className="w-full flex items-center justify-center gap-3 bg-background text-foreground border-border hover:bg-muted"
+                        className="w-full flex items-center justify-center gap-3 bg-background text-foreground border-border hover:bg-muted transition-all"
                         size="lg"
                       >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -343,6 +370,7 @@ const Auth = () => {
                     </form>
                   ) : (
                     <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5">
+                      {/* ... Signup fields (unchanged structurally, matching your UI exactly) ... */}
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-foreground">Full Name</Label>
                         <div className="relative">
@@ -381,7 +409,7 @@ const Auth = () => {
                           <Input
                             type="password"
                             placeholder="••••••••"
-                            className="neo-input border-0 pl-10"
+                            className="neo-input border-0 pl-10 tracking-widest"
                             {...signupForm.register("password")}
                           />
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -397,7 +425,7 @@ const Auth = () => {
                           <Input
                             type="password"
                             placeholder="••••••••"
-                            className="neo-input border-0 pl-10"
+                            className="neo-input border-0 pl-10 tracking-widest"
                             {...signupForm.register("confirmPassword")}
                           />
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -407,14 +435,15 @@ const Auth = () => {
                         )}
                       </div>
 
-                      <Button type="submit" disabled={isLoading} className="w-full border-0 bg-primary text-foreground hover:bg-primary/90" size="lg">
+                      <Button type="submit" disabled={isLoading} className="w-full border-0 bg-primary text-foreground hover:bg-primary/90 shadow-md transition-all" size="lg">
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                         {isLoading ? "Creating account..." : "Create Account"}
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                        {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                       </Button>
 
                       <div className="relative my-2">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-border"></div>
+                          <div className="w-full border-t border-border/50"></div>
                         </div>
                         <div className="relative flex justify-center text-xs">
                           <span className="bg-card px-4 text-muted-foreground">or</span>
@@ -426,7 +455,7 @@ const Auth = () => {
                         onClick={handleGoogleSignIn}
                         disabled={isLoading}
                         variant="outline"
-                        className="w-full flex items-center justify-center gap-3 bg-background text-foreground border-border hover:bg-muted"
+                        className="w-full flex items-center justify-center gap-3 bg-background text-foreground border-border hover:bg-muted transition-all"
                         size="lg"
                       >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -443,8 +472,9 @@ const Auth = () => {
               )}
             </div>
 
-            <p className="text-center text-xs text-muted-foreground mt-6">
-              By continuing, you agree to our Terms of Service and Privacy Policy.
+            <p className="text-center text-xs text-muted-foreground mt-6 font-mono">
+              Protected by Pryme Code X Architecture.<br />
+              By continuing, you agree to our Terms of Service.
             </p>
           </div>
         </div>

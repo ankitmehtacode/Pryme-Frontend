@@ -1,7 +1,7 @@
 import React from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Helmet } from "react-helmet-async";
-import { Building2, ShieldCheck } from "lucide-react";
+import { Building2 } from "lucide-react";
 
 // Layout & Core Utilities
 import Header from "@/components/layout/Header";
@@ -92,12 +92,6 @@ const Index = () => {
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               <ScrollReveal direction="scale" duration={0.6}>
-              <div className="container mx-auto px-4 text-center mb-8">
-                <p className="text-[10px] md:text-xs font-medium tracking-[0.3em] text-slate-500 uppercase flex items-center justify-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  Trusted by over 15+ Premium Lending Partners
-                </p>
-              </div>
               <PartnerBankMarquee />
               </ScrollReveal>
             </section>

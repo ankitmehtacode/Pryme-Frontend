@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AnimatePresence } from "framer-motion";
 
@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 // Components & Pages
 import { SplashScreen } from "@/components/SplashScreen";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"; // 🧠 NEW: Closed-Loop Gatekeeper
 import Index from "./pages/Index";
 import Apply from "./pages/Apply";
 import DocumentCheck from "./pages/DocumentCheck";
@@ -24,7 +25,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // 🧠 1. NATIVE ERROR BOUNDARY: This completely eliminates silent "Blank Screens"
-class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
+class GlobalErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any, errorInfo: any }> {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
@@ -55,17 +56,6 @@ class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {
   }
 }
 
-// Native Route Protection for the Java Spring Boot Backend
-const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem("pryme_token");
-  const role = localStorage.getItem("pryme_role");
-  
-  if (!token || (role !== "SUPER_ADMIN" && role !== "ADMIN")) {
-    return <Navigate to="/auth" replace />;
-  }
-  return <>{children}</>;
-};
-
 const App = () => {
   const [isSplashVisible, setIsSplashVisible] = useState(true);
 
@@ -73,8 +63,8 @@ const App = () => {
   useEffect(() => {
     const failsafeTimer = setTimeout(() => {
       setIsSplashVisible(false);
-    }, 3000); 
-    
+    }, 3000);
+
     return () => clearTimeout(failsafeTimer);
   }, []);
 
@@ -82,12 +72,13 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="pryme_theme">
+
+          {/* 🧠 2. AuthProvider encompasses the router to provide unified state */}
           <AuthProvider>
             <TooltipProvider>
-              
-              {/* 🧠 2. App wrapped in Error Boundary */}
+
               <GlobalErrorBoundary>
-                
+
                 {/* 1. Splash Screen Overlay */}
                 <AnimatePresence>
                   {isSplashVisible && (
@@ -101,28 +92,40 @@ const App = () => {
                   <Sonner />
                   <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                     <Routes>
+                      {/* ==============================
+                          ZONE 1: PUBLIC ACQUISITION LAYER
+                          ============================== */}
                       <Route path="/" element={<Index />} />
-                      <Route path="/document-check" element={<DocumentCheck />} />
                       <Route path="/apply" element={<Apply />} />
                       <Route path="/auth" element={<Auth />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route 
-                        path="/admin" 
-                        element={
-                          <AdminProtectedRoute>
-                            <AdminDashboard />
-                          </AdminProtectedRoute>
-                        } 
-                      />
+
+                      {/* ==============================
+                          ZONE 2: STANDARD USER TIER
+                          Accessible by any valid session, backed by Spring Boot
+                          ============================== */}
+                      <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/document-check" element={<DocumentCheck />} />
+                      </Route>
+
+                      {/* ==============================
+                          ZONE 3: SILICON-GRADE ADMIN TIER
+                          Strict RBAC Enforcement mapping to Java Backend
+                          ============================== */}
+                      <Route element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]} />}>
+                        <Route path="/admin" element={<AdminDashboard />} />
+                      </Route>
+
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </BrowserRouter>
                 </div>
-                
+
               </GlobalErrorBoundary>
 
             </TooltipProvider>
           </AuthProvider>
+
         </ThemeProvider>
       </QueryClientProvider>
     </HelmetProvider>

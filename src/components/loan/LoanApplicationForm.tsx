@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { motion, Variants } from "framer-motion";
-import { User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight, MapPin, CreditCard, Building2, Zap, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight, CreditCard,
+  ChevronRight, ChevronLeft, IndianRupee, Loader2, AlertCircle
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +16,20 @@ import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
-// 🧠 Robust Zod Schema preserved for fail-proof validation
 const applicationSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters").max(100),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Must be a valid 10-digit Indian mobile number"),
+  panCard: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format (e.g. ABCDE1234F)"),
   dob: z.string().min(1, "Date of birth is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  monthlyIncome: z.number().min(15000, "Minimum income is ₹15,000"),
-  occupation: z.enum(["salaried", "business"], { required_error: "Select occupation type" }),
-  cibilScore: z.number().min(300).max(900),
-  loanAmount: z.number().min(100000, "Minimum loan is ₹1 Lakh").max(10000000, "Maximum loan is ₹1 Crore"),
-  loanTenure: z.number().min(1).max(30),
   productType: z.string().min(1, "Product type is required"),
+  loanAmount: z.number().min(50000, "Minimum loan is ₹50,000").max(100000000, "Maximum loan is ₹10 Crore"),
+  loanTenure: z.number().min(1).max(30),
+  occupation: z.enum(["salaried", "self_employed", "business_owner"], { required_error: "Select occupation type" }),
+  monthlyIncome: z.number().min(10000, "Minimum income is ₹10,000"),
+  cibilScore: z.number().min(300).max(900),
+  state: z.string().min(1, "State is required"),
+  city: z.string().min(1, "City is required"),
 });
 
 type ApplicationData = z.infer<typeof applicationSchema>;
@@ -35,9 +40,9 @@ interface LoanApplicationFormProps {
 }
 
 const states = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", 
-  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
-  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
+  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
   "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi"
 ];
 
@@ -49,18 +54,18 @@ const productTypes = [
   { value: "lap", label: "Loan Against Property" },
 ];
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
+const STEP_LABELS = ["Identity", "Requirements", "Financials"] as const;
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } }
+const STEP_FIELDS: Record<number, (keyof ApplicationData)[]> = {
+  1: ["fullName", "email", "phone", "panCard", "dob"],
+  2: ["productType", "loanAmount", "loanTenure"],
+  3: ["occupation", "monthlyIncome", "cibilScore", "state", "city"],
 };
 
 const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
 
   const form = useForm<ApplicationData>({
     resolver: zodResolver(applicationSchema),
@@ -70,11 +75,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       loanAmount: 500000,
       loanTenure: 5,
       cibilScore: 750,
-      productType: "personal"
+      productType: "personal",
+      occupation: "salaried",
     },
   });
 
-  // 🧠 160 IQ Sync: useWatch perfectly syncs the RHF state with the external EMI Calculator component
   const currentLoanAmount = useWatch({ control: form.control, name: "loanAmount" });
   const currentCibil = useWatch({ control: form.control, name: "cibilScore" });
 
@@ -84,17 +89,30 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     }
   }, [currentLoanAmount, onAmountChange]);
 
+  const nextStep = async () => {
+    const fields = STEP_FIELDS[step];
+    const isValid = await form.trigger(fields);
+    if (isValid) {
+      setDirection(1);
+      setStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
+
+  const prevStep = () => {
+    setDirection(-1);
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
   const handleSubmit = async (data: ApplicationData) => {
     setIsSubmitting(true);
-    // Simulate API delay for UX
     await new Promise((resolve) => setTimeout(resolve, 1200));
     setIsSubmitting(false);
-    
+
     toast({
-      title: "Data Encrypted & Processed 🔒",
-      description: "Matchmaking with top financial institutions...",
+      title: "Application submitted",
+      description: "Finding the best offers for your profile...",
     });
-    
+
     onFormSubmit?.(data);
   };
 
@@ -104,264 +122,414 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     if (score >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
     return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
   };
-
   const cibilUi = getCibilData(currentCibil || 750);
 
-  // 🧠 Premium Input Wrapper
-  const InputWithValidation = ({ label, error, isValid, isSecure, ...props }: any) => (
+  const ValidatedInput = ({ label, error, isValid, isSecure, ...props }: any) => (
     <div className="space-y-2 relative group">
       <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">{label}</Label>
       <div className="relative">
         <Input
           {...props}
           className={cn(
-            "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50",
-            error && "border-red-500/50 focus:ring-red-500",
-            isValid && !error && "border-[#2aac64]/50 focus:ring-[#2aac64]"
+            "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white outline-none transition-all duration-200 group-hover:border-white/20 focus:border-[#2aac64]/60 focus:ring-2 focus:ring-[#2aac64]/20",
+            error && "border-red-500/40 focus:ring-red-500/20 focus:border-red-500/60",
+            isValid && !error && "border-[#2aac64]/30"
           )}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          {isSecure && <LockKeyhole className="w-4 h-4 text-slate-400" />}
-          {error && <XCircle className="w-5 h-5 text-red-500 drop-shadow-md" />}
-          {isValid && !error && <CheckCircle2 className="w-5 h-5 text-[#2aac64] drop-shadow-md" />}
+          {isSecure && <LockKeyhole className="w-4 h-4 text-slate-500 transition-colors group-hover:text-slate-400" />}
+          {error && (
+            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+              <XCircle className="w-4 h-4 text-red-500" />
+            </motion.div>
+          )}
+          {isValid && !error && (
+            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+              <CheckCircle2 className="w-4 h-4 text-[#2aac64]" />
+            </motion.div>
+          )}
         </div>
       </div>
-      {error && <p className="text-xs text-red-500 font-medium ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-xs text-red-400 font-medium ml-1 flex items-center gap-1"
+        >
+          <AlertCircle className="w-3 h-3" /> {error}
+        </motion.p>
+      )}
     </div>
   );
 
+  // Shared card style
+  const cardCn = "bg-[#0a0a0a] border border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-white/[0.1]";
+
+  // Shared input container style
+  const inputCn = "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white outline-none transition-all duration-200 hover:border-white/20 focus:border-[#2aac64]/60 focus:ring-2 focus:ring-[#2aac64]/20";
+
   return (
-    <motion.form 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      onSubmit={form.handleSubmit(handleSubmit)} 
-      className="space-y-8 h-full w-full"
+    <motion.form
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      onSubmit={form.handleSubmit(handleSubmit)}
+      className="space-y-0 h-full w-full"
     >
-      {/* Dynamic Header */}
-      <motion.div variants={itemVariants} className="mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
-          <Zap className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] font-medium text-primary uppercase tracking-widest">
-            Fast-Track Application
-          </span>
-        </div>
-        <h2 className="text-2xl md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">
-          Initialize Your Match
+      {/* Header */}
+      <div className="mb-8">
+        <h2 className="text-2xl md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
+          Start Your Application
         </h2>
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-          Complete the parameters below to scan 15+ banking algorithms instantly.
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+          Complete the fields below to find your best loan match.
         </p>
-      </motion.div>
 
-      {/* 🧠 SECTION 1: CORE REQUIREMENTS */}
-      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden transition-all hover:border-[#2aac64]/40">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/10 blur-[40px] rounded-full pointer-events-none" />
-        
-        <div className="flex items-center gap-3 mb-6 relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-[#2aac64]" />
-          </div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">Capital Requirement</h3>
-        </div>
-
-        <div className="space-y-6 relative z-10">
-          {/* Product Type Grid (CRO Optimized compared to Select Dropdown) */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {productTypes.map((type) => {
-              const isSelected = form.watch("productType") === type.value;
-              return (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => form.setValue("productType", type.value, { shouldValidate: true })}
+        {/* Step Indicator */}
+        <div className="relative flex justify-between items-center mb-2">
+          {STEP_LABELS.map((label, i) => {
+            const stepNum = i + 1;
+            const isActive = step >= stepNum;
+            const isCurrent = step === stepNum;
+            return (
+              <div key={label} className="flex flex-col items-center z-10">
+                <motion.div
+                  animate={{
+                    scale: isCurrent ? 1.1 : 1,
+                    boxShadow: isCurrent ? "0 0 0 4px rgba(42,172,100,0.15)" : "0 0 0 0px rgba(42,172,100,0)",
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className={cn(
-                    "py-3 px-2 rounded-xl text-xs md:text-sm font-medium transition-all duration-300 border",
-                    isSelected 
-                      ? "bg-[#2aac64] text-white border-[#2aac64] shadow-[0_0_15px_rgba(42,172,100,0.3)]" 
-                      : "bg-[#111] text-slate-300 border-white/10 hover:border-[#2aac64]/50"
+                    "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300",
+                    isActive ? "bg-[#2aac64] text-white" : "bg-[#1a1a1a] text-slate-500 border border-white/10"
                   )}
                 >
-                  {type.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2 group">
-              <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Loan Amount (₹)</Label>
-              <Input
-                type="number"
-                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50"
-                {...form.register("loanAmount", { valueAsNumber: true })}
-              />
-              {form.formState.errors.loanAmount && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.loanAmount.message}</p>}
-            </div>
-
-            <div className="space-y-2 group">
-              <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Tenure (Years)</Label>
-              <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true })} defaultValue={form.getValues("loanTenure").toString()}>
-                <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
-                  <SelectValue placeholder="Select tenure" />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border rounded-xl">
-                  {[1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30].map((year) => (
-                    <SelectItem key={year} value={year.toString()} className="font-medium cursor-pointer">{year} {year === 1 ? 'Year' : 'Years'}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 🧠 SECTION 2: PERSONAL & LOCATION */}
-      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative transition-all hover:border-[#2aac64]/40">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
-            <User className="w-5 h-5 text-[#2aac64]" />
-          </div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">KYC Verification Data</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputWithValidation
-            label="Full Name (As per PAN)"
-            placeholder="e.g. Rahul Sharma"
-            isSecure
-            isValid={form.formState.dirtyFields.fullName && !form.formState.errors.fullName}
-            error={form.formState.errors.fullName?.message}
-            {...form.register("fullName")}
-          />
-          <InputWithValidation
-            label="Date of Birth"
-            type="date"
-            isSecure
-            isValid={form.formState.dirtyFields.dob && !form.formState.errors.dob}
-            error={form.formState.errors.dob?.message}
-            {...form.register("dob")}
-          />
-          
-          <div className="space-y-2 group">
-            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">State</Label>
-            <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true })}>
-              <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
-                <SelectValue placeholder="Select State" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border rounded-xl">
-                {states.map((state) => (
-                  <SelectItem key={state} value={state} className="cursor-pointer">{state}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.state && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.state.message}</p>}
-          </div>
-
-          <InputWithValidation
-            label="Current City"
-            placeholder="e.g. Mumbai"
-            isValid={form.formState.dirtyFields.city && !form.formState.errors.city}
-            error={form.formState.errors.city?.message}
-            {...form.register("city")}
-          />
-        </div>
-      </motion.div>
-
-      {/* 🧠 SECTION 3: FINANCIAL ALGORITHM DATA */}
-      <motion.div variants={itemVariants} className="bg-[#0a0a0a] border border-[#2aac64]/20 rounded-[2rem] p-6 md:p-8 shadow-2xl relative transition-all hover:border-[#2aac64]/40">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#111] border border-[#2aac64]/20 shadow-sm flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-[#2aac64]" />
-          </div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">Risk & Income Profile</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="space-y-2 group">
-            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Occupation Type</Label>
-            <Select onValueChange={(v) => form.setValue("occupation", v as "salaried" | "business", { shouldValidate: true })}>
-              <SelectTrigger className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50">
-                <SelectValue placeholder="Select occupation" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border rounded-xl">
-                <SelectItem value="salaried" className="cursor-pointer">Salaried Professional</SelectItem>
-                <SelectItem value="business" className="cursor-pointer">Self-Employed / Business</SelectItem>
-              </SelectContent>
-            </Select>
-            {form.formState.errors.occupation && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.occupation.message}</p>}
-          </div>
-
-          <div className="space-y-2 group relative">
-            <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Monthly Income (₹)</Label>
-            <Input
-              type="number"
-              placeholder="85000"
-              className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white focus:ring-2 focus:ring-[#2aac64] outline-none transition-all shadow-inner group-hover:border-[#2aac64]/50"
-              {...form.register("monthlyIncome", { valueAsNumber: true })}
+                  {isActive && stepNum < step ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    stepNum
+                  )}
+                </motion.div>
+                <span className={cn("text-[10px] mt-2 font-medium uppercase tracking-widest transition-colors duration-300", isActive ? "text-[#2aac64]" : "text-slate-500")}>
+                  {label}
+                </span>
+              </div>
+            );
+          })}
+          {/* Connector */}
+          <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#1a1a1a] -z-0">
+            <motion.div
+              className="h-full bg-[#2aac64]"
+              animate={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
             />
-            {form.formState.errors.monthlyIncome && <p className="text-xs text-red-500 font-medium ml-1">{form.formState.errors.monthlyIncome.message}</p>}
           </div>
         </div>
+      </div>
 
-        {/* Premium CIBIL Slider Widget */}
-        <div className={`p-6 rounded-[1.5rem] border backdrop-blur-md transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2">
-              <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Self-Declared CIBIL</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-2xl font-semibold ${cibilUi.color}`}>{currentCibil || 750}</span>
-              <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
-                {cibilUi.label}
-              </span>
-            </div>
-          </div>
-          <Slider
-            value={[currentCibil || 750]}
-            onValueChange={(v) => form.setValue("cibilScore", v[0], { shouldValidate: true })}
-            min={300} max={900} step={10}
-            className="cursor-pointer mb-2"
-          />
-          <div className="flex justify-between text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-2">
-            <span>300 (Poor)</span>
-            <span>900 (Excellent)</span>
-          </div>
-        </div>
-      </motion.div>
+      {/* Step Content */}
+      <AnimatePresence mode="wait" custom={direction}>
 
-      {/* 🧠 SUBMIT ACTION */}
-      <motion.div variants={itemVariants} className="pt-4">
-        <Button 
-          type="submit" 
-          disabled={isSubmitting} 
-          className="w-full relative group overflow-hidden rounded-[1.5rem] bg-[#2aac64] hover:bg-[#2aac64]/90 text-white py-8 text-xl font-semibold shadow-[0_0_40px_rgba(42,172,100,0.3)] hover:shadow-[0_0_60px_rgba(42,172,100,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {/* Apple-style Shimmer Effect */}
-          <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
-          <span className="relative flex items-center justify-center gap-3">
-            {isSubmitting ? "Finding your best offers..." : "See My Loan Offers"}
-            {!isSubmitting && <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />}
-          </span>
-        </Button>
-        <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-slate-500 uppercase tracking-widest mt-6">
-          <ShieldCheck className="w-4 h-4 text-[#2aac64]" />
-          <span>Data protected by AES-256 Encryption</span>
-        </div>
-      </motion.div>
+        {/* Step 1: Identity */}
+        {step === 1 && (
+          <motion.div
+            key="step1"
+            custom={direction}
+            initial={{ x: direction * 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+            exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
+            className={cardCn}
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+
+            <div className="flex items-center gap-3 mb-6 relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
+                <User className="w-5 h-5 text-[#2aac64]" />
+              </div>
+              <h3 className="text-lg font-semibold text-white tracking-tight">Verify Identity</h3>
+            </div>
+
+            <div className="space-y-5 relative z-10">
+              <ValidatedInput
+                label="Full Name (As per PAN)"
+                placeholder="Rahul Sharma"
+                isSecure
+                isValid={form.formState.dirtyFields.fullName && !form.formState.errors.fullName}
+                error={form.formState.errors.fullName?.message}
+                {...form.register("fullName")}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <ValidatedInput
+                  label="Email Address"
+                  type="email"
+                  placeholder="rahul@company.com"
+                  isSecure
+                  isValid={form.formState.dirtyFields.email && !form.formState.errors.email}
+                  error={form.formState.errors.email?.message}
+                  {...form.register("email")}
+                />
+                <ValidatedInput
+                  label="Mobile Number"
+                  placeholder="9876543210"
+                  isValid={form.formState.dirtyFields.phone && !form.formState.errors.phone}
+                  error={form.formState.errors.phone?.message}
+                  {...form.register("phone")}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <ValidatedInput
+                  label="PAN Card Number"
+                  placeholder="ABCDE1234F"
+                  isSecure
+                  isValid={form.formState.dirtyFields.panCard && !form.formState.errors.panCard}
+                  error={form.formState.errors.panCard?.message}
+                  style={{ textTransform: "uppercase", letterSpacing: "0.15em" }}
+                  {...form.register("panCard")}
+                />
+                <ValidatedInput
+                  label="Date of Birth"
+                  type="date"
+                  isSecure
+                  isValid={form.formState.dirtyFields.dob && !form.formState.errors.dob}
+                  error={form.formState.errors.dob?.message}
+                  {...form.register("dob")}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Step 2: Loan Parameters */}
+        {step === 2 && (
+          <motion.div
+            key="step2"
+            custom={direction}
+            initial={{ x: direction * 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+            exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
+            className={cardCn}
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+
+            <div className="flex items-center gap-3 mb-6 relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
+                <IndianRupee className="w-5 h-5 text-[#2aac64]" />
+              </div>
+              <h3 className="text-lg font-semibold text-white tracking-tight">Loan Details</h3>
+            </div>
+
+            <div className="space-y-6 relative z-10">
+              <div>
+                <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1 mb-3 block">Select Product</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+                  {productTypes.map((type) => {
+                    const isSelected = form.watch("productType") === type.value;
+                    return (
+                      <motion.button
+                        key={type.value}
+                        type="button"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => form.setValue("productType", type.value, { shouldValidate: true })}
+                        className={cn(
+                          "py-3 px-2 rounded-xl text-xs md:text-sm font-medium transition-colors duration-200 border",
+                          isSelected
+                            ? "bg-[#2aac64] text-white border-[#2aac64]"
+                            : "bg-[#111] text-slate-400 border-white/[0.06] hover:text-slate-200 hover:border-white/15"
+                        )}
+                      >
+                        {type.label}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-2 group">
+                  <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Loan Amount (₹)</Label>
+                  <Input
+                    type="number"
+                    placeholder="500000"
+                    className={cn(inputCn, "text-lg tracking-wide")}
+                    {...form.register("loanAmount", { valueAsNumber: true })}
+                  />
+                  {form.formState.errors.loanAmount && <p className="text-xs text-red-400 font-medium ml-1">{form.formState.errors.loanAmount.message}</p>}
+                </div>
+
+                <div className="space-y-2 group">
+                  <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Tenure (Years)</Label>
+                  <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true })} defaultValue={form.getValues("loanTenure").toString()}>
+                    <SelectTrigger className={inputCn}>
+                      <SelectValue placeholder="Select tenure" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border rounded-xl">
+                      {[1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30].map((year) => (
+                        <SelectItem key={year} value={year.toString()} className="font-medium cursor-pointer">{year} {year === 1 ? 'Year' : 'Years'}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Step 3: Financial Profile */}
+        {step === 3 && (
+          <motion.div
+            key="step3"
+            custom={direction}
+            initial={{ x: direction * 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+            exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
+            className="space-y-5"
+          >
+            <div className={cardCn}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-[#2aac64]" />
+                </div>
+                <h3 className="text-lg font-semibold text-white tracking-tight">Income & Employment</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div className="space-y-2 group">
+                  <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Employment Type</Label>
+                  <Select onValueChange={(v) => form.setValue("occupation", v as any, { shouldValidate: true })} defaultValue={form.getValues("occupation")}>
+                    <SelectTrigger className={inputCn}>
+                      <SelectValue placeholder="Select employment" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border rounded-xl">
+                      <SelectItem value="salaried" className="cursor-pointer">Salaried Employee</SelectItem>
+                      <SelectItem value="self_employed" className="cursor-pointer">Self Employed Professional</SelectItem>
+                      <SelectItem value="business_owner" className="cursor-pointer">Business Owner</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.occupation && <p className="text-xs text-red-400 font-medium ml-1">{form.formState.errors.occupation.message}</p>}
+                </div>
+
+                <div className="space-y-2 group">
+                  <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Net Monthly Income (₹)</Label>
+                  <Input
+                    type="number"
+                    placeholder="85000"
+                    className={inputCn}
+                    {...form.register("monthlyIncome", { valueAsNumber: true })}
+                  />
+                  {form.formState.errors.monthlyIncome && <p className="text-xs text-red-400 font-medium ml-1">{form.formState.errors.monthlyIncome.message}</p>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div className="space-y-2 group">
+                  <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">State</Label>
+                  <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true })}>
+                    <SelectTrigger className={inputCn}>
+                      <SelectValue placeholder="Select State" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border rounded-xl">
+                      {states.map((state) => (
+                        <SelectItem key={state} value={state} className="cursor-pointer">{state}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.state && <p className="text-xs text-red-400 font-medium ml-1">{form.formState.errors.state.message}</p>}
+                </div>
+
+                <ValidatedInput
+                  label="City"
+                  placeholder="Mumbai"
+                  isValid={form.formState.dirtyFields.city && !form.formState.errors.city}
+                  error={form.formState.errors.city?.message}
+                  {...form.register("city")}
+                />
+              </div>
+
+              {/* CIBIL Slider */}
+              <div className={`p-5 rounded-2xl border backdrop-blur-sm transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
+                <div className="flex justify-between items-center mb-5">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">CIBIL Score</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <motion.span
+                      key={currentCibil}
+                      initial={{ y: -8, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className={`text-2xl font-semibold tabular-nums ${cibilUi.color}`}
+                    >
+                      {currentCibil || 750}
+                    </motion.span>
+                    <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
+                      {cibilUi.label}
+                    </span>
+                  </div>
+                </div>
+                <Slider
+                  value={[currentCibil || 750]}
+                  onValueChange={(v) => form.setValue("cibilScore", v[0], { shouldValidate: true })}
+                  min={300} max={900} step={10}
+                  className="cursor-pointer mb-2"
+                />
+                <div className="flex justify-between text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-2">
+                  <span>300</span>
+                  <span>900</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Navigation */}
+      <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
+        <motion.div whileHover={step > 1 ? { x: -2 } : {}} whileTap={step > 1 ? { scale: 0.96 } : {}}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={prevStep}
+            disabled={step === 1 || isSubmitting}
+            className={cn(
+              "bg-transparent border-white/10 text-slate-400 hover:bg-white/5 hover:border-white/20 rounded-xl transition-all duration-200",
+              step === 1 && "opacity-0 pointer-events-none"
+            )}
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" /> Back
+          </Button>
+        </motion.div>
+
+        {step < 3 ? (
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              type="button"
+              onClick={nextStep}
+              className="bg-[#2aac64] hover:bg-[#239b57] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
+            >
+              Continue <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-xl bg-[#2aac64] hover:bg-[#239b57] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</span>
+              ) : (
+                <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
+              )}
+            </Button>
+          </motion.div>
+        )}
+      </div>
 
     </motion.form>
   );
 };
-
-// Simple AlertCircle icon for validation errors
-function AlertCircle(props: any) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-  );
-}
 
 export default LoanApplicationForm;

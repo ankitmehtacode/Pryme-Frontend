@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { 
-  Menu, X, Phone, User, LogOut, Settings, ChevronDown, 
-  Calculator, Home, Briefcase, Building2, Wallet, Gift, Sun, Moon 
+import {
+  Menu, X, Phone, User, LogOut, Settings, ChevronDown,
+  Calculator, Home, Briefcase, Building2, Wallet, Gift, Sun, Moon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -113,8 +113,8 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           </div>
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="flex items-center gap-3 p-3 w-full rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Toggle Theme</span>
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Toggle Theme</span>
             </button>
             {user ? (
               <div className="space-y-2 mt-2">
@@ -189,7 +189,7 @@ const Header = memo(() => {
     <>
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none">
         <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
-          
+
           {/* Logo - Adaptive Dark Mode */}
           <Link to="/" className="flex items-center gap-3 group">
             <img src={prymeLogo} alt="PRYME" className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />

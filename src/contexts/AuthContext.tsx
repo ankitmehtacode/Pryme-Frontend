@@ -1,18 +1,24 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { PrymeAPI } from "@/lib/api";
 
-type AppRole = "admin" | "user";
+// Strictly mapping to the com.pryme.Backend.iam.Role enum
+export type AppRole = "USER" | "EMPLOYEE" | "ADMIN" | "SUPER_ADMIN";
+
+// Eradicating Supabase dependencies; Defining our deterministic User payload
+export interface AuthUser {
+  name: string;
+  role: AppRole;
+  expiresAt: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  role: AppRole | null;
+  user: AuthUser | null;
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  // Note: signUp is removed as the closed-loop CRM provisions users internally 
+  // via the Backend Admin controllers, preventing public actor pollution.
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,106 +26,123 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("Critical Fault: useAuth must be executed within an AuthProvider spatial boundary.");
   }
   return context;
 };
 
+/**
+ * Generates and persists a localized cryptographic footprint.
+ * Feeds the backend's ConcurrentHashMap for active session tracking per device.
+ */
+const getSecureDeviceId = (): string => {
+  let deviceId = localStorage.getItem("pryme_device_fingerprint");
+  if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem("pryme_device_fingerprint", deviceId);
+  }
+  return deviceId;
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const fetchUserRole = (userId: string) => {
-    setTimeout(async () => {
+  // Core verification engine: Validates token presence and mathematical expiry
+  const verifyState = useCallback(() => {
+    const token = localStorage.getItem("pryme_session_token");
+    const rawData = localStorage.getItem("pryme_user_data");
+
+    if (token && rawData) {
       try {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", userId)
-          .maybeSingle();
-
-        if (!error && data) {
-          setRole(data.role as AppRole);
+        const parsedUser: AuthUser = JSON.parse(rawData);
+        const expiryTime = new Date(parsedUser.expiresAt).getTime();
+        
+        // Mathematical eviction if TTL is breached before backend request
+        if (expiryTime > Date.now()) {
+          setUser(parsedUser);
+        } else {
+          nukeSession();
         }
-      } catch (err) {
-        console.error("Error fetching role:", err);
+      } catch (e) {
+        nukeSession(); // Corrupt payload protocol
       }
-    }, 0);
+    } else {
+      setUser(null);
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Total local memory wipe protocol
+  const nukeSession = () => {
+    localStorage.removeItem("pryme_session_token");
+    localStorage.removeItem("pryme_user_data");
+    setUser(null);
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          fetchUserRole(session.user.id);
-        } else {
-          setRole(null);
-        }
-        
-        setIsLoading(false);
-      }
-    );
+    // Initial boot sequence validation
+    verifyState();
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
-      
+    // Event Listener for the Interceptor Fallback (from api.ts)
+    // Automatically catches 401/403 responses and syncs UI state instantly
+    const handleForceEviction = () => {
+      nukeSession();
       setIsLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
-  }, []);
+    window.addEventListener("pryme_auth_expired", handleForceEviction);
+    return () => window.removeEventListener("pryme_auth_expired", handleForceEviction);
+  }, [verifyState]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error: error as Error | null };
-  };
-
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName || "",
-        },
-      },
-    });
-    return { error: error as Error | null };
+    try {
+      setIsLoading(true);
+      const deviceId = getSecureDeviceId();
+      
+      // Routing directly to Code X Backend: AuthController.java -> login
+      const response = await PrymeAPI.login(email, password, deviceId);
+      
+      // Base64Url Token issued via SecureRandom
+      localStorage.setItem("pryme_session_token", response.token);
+      
+      const userData: AuthUser = {
+        name: response.name,
+        role: response.role as AppRole,
+        expiresAt: response.expiresAt,
+      };
+      
+      localStorage.setItem("pryme_user_data", JSON.stringify(userData));
+      setUser(userData);
+      
+      return { error: null };
+    } catch (err) {
+      nukeSession();
+      return { error: err as Error };
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setRole(null);
+    setIsLoading(true);
+    try {
+      // Graceful server-side invalidation
+      await PrymeAPI.logout();
+    } catch (error) {
+      console.warn("Backend session already ghosted or network unreachable. Executing local wipe.");
+    } finally {
+      nukeSession();
+      setIsLoading(false);
+    }
   };
 
   const value: AuthContextType = {
     user,
-    session,
-    role,
     isLoading,
-    isAdmin: role === "admin",
+    // Granting admin UI privileges strictly to Top-Tier roles
+    isAdmin: user?.role === "ADMIN" || user?.role === "SUPER_ADMIN",
     signIn,
-    signUp,
     signOut,
   };
 
