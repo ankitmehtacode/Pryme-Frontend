@@ -199,16 +199,16 @@ const AdminDashboard = () => {
 
   const getStatusColor = (status: string) => {
     const map: Record<string, string> = {
-      SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800", 
-      PROCESSING: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800", 
-      VERIFIED: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800", 
-      APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800", 
-      DISBURSED: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800", 
-      REJECTED: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800", 
-      Active: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800", 
-      Maintenance: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800"
+      SUBMITTED: "bg-blue-500/15 text-blue-400 border-blue-500/25", 
+      PROCESSING: "bg-purple-500/15 text-purple-400 border-purple-500/25", 
+      VERIFIED: "bg-indigo-500/15 text-indigo-400 border-indigo-500/25", 
+      APPROVED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25", 
+      DISBURSED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25", 
+      REJECTED: "bg-red-500/15 text-red-400 border-red-500/25", 
+      Active: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25", 
+      Maintenance: "bg-amber-500/15 text-amber-400 border-amber-500/25"
     };
-    return map[status] || "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+    return map[status] || "bg-white/[0.06] text-slate-300 border-white/[0.08]";
   };
 
   const StatusBadge = ({ status }: { status: string }) => (
@@ -217,8 +217,12 @@ const AdminDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="flex flex-col items-center gap-4"><Loader2 className="w-8 h-8 text-[#2aac64] animate-spin" /><p className="text-slate-500 font-medium text-sm">Booting CRM Workspace...</p></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#050508] relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-emerald-500/10 blur-[100px] animate-pulse" />
+        <div className="flex flex-col items-center gap-5 relative z-10">
+          <div className="relative"><Loader2 className="w-10 h-10 text-emerald-500 animate-spin" /><div className="absolute inset-0 w-10 h-10 rounded-full bg-emerald-500/20 animate-ping" /></div>
+          <p className="text-slate-400 font-medium text-sm tracking-widest uppercase">Initializing CRM</p>
+        </div>
       </div>
     );
   }
@@ -231,65 +235,65 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <Helmet><title>PRYME Admin - Ultimate CRM</title></Helmet>
+      <Helmet><title>PRYME Admin — Command Center</title></Helmet>
 
-      <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
+      <div className="min-h-screen flex bg-[#050508] font-sans text-slate-100 transition-colors duration-300">
         
         {/* Sidebar */}
-        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col hidden lg:flex fixed h-full z-20 transition-colors duration-300">
-          <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
+        <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed h-full z-20">
+          <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-[#2aac64] rounded-lg flex items-center justify-center shadow-sm"><ShieldCheck className="w-5 h-5 text-white" /></div>
-              <span className="font-medium text-slate-900 dark:text-white tracking-tight">PRYME<span className="text-slate-400 dark:text-slate-500 font-normal ml-1">Admin</span></span>
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/25"><ShieldCheck className="w-5 h-5 text-white" /></div>
+              <span className="font-semibold text-white tracking-tight">PRYME<span className="text-slate-500 font-normal ml-1">CRM</span></span>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-            <p className="px-2 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Workspace</p>
+          <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            <p className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mb-4">Workspace</p>
             {sidebarItems.map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group active:scale-[0.98]", activeTab === item.id ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-700" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white border border-transparent")}>
-                <item.icon className={cn("w-4 h-4 transition-colors", activeTab === item.id ? "text-[#2aac64]" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300")} />{item.label}
+              <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group active:scale-[0.97] relative", activeTab === item.id ? "bg-white/[0.08] text-white shadow-lg shadow-black/20 border border-white/[0.08]" : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-200 border border-transparent")}>
+                {activeTab === item.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-emerald-500 rounded-r-full shadow-[0_0_8px_rgba(42,172,100,0.6)]" />}
+                <item.icon className={cn("w-4 h-4 transition-colors", activeTab === item.id ? "text-emerald-400" : "text-slate-600 group-hover:text-slate-400")} />{item.label}
               </button>
             ))}
           </div>
-          <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
+          <div className="p-4 border-t border-white/[0.06]">
             <div className="flex items-center gap-3 px-3 py-2 mb-2">
-              <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm"><span className="text-xs font-medium text-[#2aac64]">AD</span></div>
-              <div className="flex-1 text-left"><p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Super Admin</p></div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center border border-emerald-500/30"><span className="text-xs font-semibold text-emerald-400">AD</span></div>
+              <div className="flex-1 text-left"><p className="text-sm font-semibold text-white truncate">Super Admin</p></div>
             </div>
-            <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors active:scale-[0.98]"><LogOut className="w-4 h-4" /> Sign Out</button>
+            <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors active:scale-[0.97]"><LogOut className="w-4 h-4" /> Sign Out</button>
           </div>
         </aside>
 
         {/* Main Canvas */}
         <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden">
-          <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10 transition-colors duration-300">
-            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 font-medium"><span>{sidebarItems.find(i => i.id === activeTab)?.label}</span></div>
-            <div className="flex items-center gap-3">
+          <header className="h-16 bg-[#0a0a10]/80 backdrop-blur-2xl border-b border-white/[0.06] flex items-center justify-between px-8 sticky top-0 z-10">
+            <div className="flex items-center gap-3 text-sm font-medium"><span className="text-white">{sidebarItems.find(i => i.id === activeTab)?.label}</span><span className="text-[10px] text-emerald-500/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Live</span></div>
+            <div className="flex items-center gap-2">
               <div className="relative hidden md:block group">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-[#2aac64] transition-colors" />
+                <Search className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
                 <input 
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search PRY-ID or Type..." 
-                  className="pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-lg text-sm focus:bg-white dark:focus:bg-slate-900 focus:border-[#2aac64]/30 focus:ring-4 focus:ring-[#2aac64]/10 outline-none transition-all w-72 text-slate-900 dark:text-white placeholder:text-slate-400" 
+                  className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all w-64 text-white placeholder:text-slate-600" 
                 />
               </div>
-              {/* 🧠 Dark Mode Toggle */}
-              <button onClick={toggleTheme} className="p-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+              <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]">
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
-              <button onClick={() => toast({title: "Notifications", description: "No new alerts at this time."})} className="relative p-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><Bell className="w-4 h-4" /></button>
+              <button onClick={() => toast({title: "Notifications", description: "No new alerts at this time."})} className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]"><Bell className="w-4 h-4" /><div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_6px_rgba(42,172,100,0.8)]" /></button>
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-8">
+          <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-b from-[#050508] to-[#08080e]">
             <div className="max-w-7xl mx-auto space-y-6">
               
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <h1 className="text-xl font-medium text-slate-900 dark:text-white tracking-tight">{sidebarItems.find(i => i.id === activeTab)?.label}</h1>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Intelligent workflow and pipeline management.</p>
+                  <h1 className="text-xl font-semibold text-white tracking-tight">{sidebarItems.find(i => i.id === activeTab)?.label}</h1>
+                  <p className="text-sm text-slate-500 mt-1.5">Intelligent workflow and pipeline management.</p>
                 </div>
                 <div className="flex gap-2">
                   {activeTab === "applications" && <Button onClick={handleExportCSV} className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-sm transition-transform active:scale-95">Export CSV</Button>}
@@ -302,32 +306,33 @@ const AdminDashboard = () => {
               {activeTab === "overview" && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2 }, { label: "User Base", value: stats.totalUsers, icon: Users }].map((metric, i) => (
-                      <div key={i} className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 group cursor-default">
-                        <div className="flex justify-between items-start mb-4"><div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 group-hover:bg-[#2aac64]/10 transition-colors"><metric.icon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-[#2aac64]" /></div></div>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{metric.label}</p><p className="text-2xl font-medium text-slate-900 dark:text-white mt-1">{metric.value}</p>
+                    {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-emerald-500/20 to-emerald-500/0" }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0" }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-purple-500/20 to-purple-500/0" }, { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0" }].map((metric, i) => (
+                      <div key={i} className="relative bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group cursor-default overflow-hidden">
+                        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${metric.glow} rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                        <div className="flex justify-between items-start mb-4 relative z-10"><div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 transition-colors" /></div></div>
+                        <p className="text-sm font-medium text-slate-500 relative z-10">{metric.label}</p><p className="text-2xl font-semibold text-white mt-1 relative z-10">{metric.value}</p>
                       </div>
                     ))}
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"><h3 className="font-medium text-slate-900 dark:text-white mb-6">Disbursement Trend (Cr)</h3><div className="h-[300px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><defs><linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2aac64" stopOpacity={0.3}/><stop offset="95%" stopColor="#2aac64" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#334155' : '#e2e8f0'} /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} dy={10} /><YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: isDarkMode ? '#94a3b8' : '#64748b'}} /><RechartsTooltip contentStyle={{ borderRadius: '8px', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`, backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', color: isDarkMode ? '#f8fafc' : '#0f172a' }} formatter={(value) => [`₹${value} Cr`, undefined]} /><Area type="monotone" dataKey="volume" stroke="#2aac64" strokeWidth={3} fillOpacity={1} fill="url(#colorVolume)" /></AreaChart></ResponsiveContainer></div></div>
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col"><h3 className="font-medium text-slate-900 dark:text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">{portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}</Pie><RechartsTooltip contentStyle={{backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`}} formatter={(value) => [`${value}%`, 'Share']} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: isDarkMode ? '#f8fafc' : '#0f172a' }}/></PieChart></ResponsiveContainer></div></div>
+                    <div className="lg:col-span-2 bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06]"><h3 className="font-semibold text-white mb-6">Disbursement Trend (Cr)</h3><div className="h-[300px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><defs><linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2aac64" stopOpacity={0.4}/><stop offset="95%" stopColor="#2aac64" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1a1a2e" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dy={10} /><YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} /><RechartsTooltip contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', backgroundColor: '#0d0d14', color: '#f8fafc', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }} formatter={(value) => [`₹${value} Cr`, undefined]} /><Area type="monotone" dataKey="volume" stroke="#2aac64" strokeWidth={3} fillOpacity={1} fill="url(#colorVolume)" /></AreaChart></ResponsiveContainer></div></div>
+                    <div className="bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06] flex flex-col"><h3 className="font-semibold text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">{portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}</Pie><RechartsTooltip contentStyle={{backgroundColor: '#0d0d14', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)'}} formatter={(value) => [`${value}%`, 'Share']} /><Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }}/></PieChart></ResponsiveContainer></div></div>
                   </div>
                 </div>
               )}
 
               {/* 🧠 THE MASTER CRM: APPLICATIONS TAB */}
               {activeTab === "applications" && (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-[calc(100vh-180px)] relative animate-in fade-in slide-in-from-bottom-2">
-                  
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 rounded-t-2xl">
+                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col h-[calc(100vh-180px)] relative animate-in fade-in slide-in-from-bottom-2">
+                   
+                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
                     <div className="flex gap-2">
-                      <Button onClick={() => setLeadFilter("all")} variant={leadFilter === "all" ? "default" : "outline"} size="sm" className={cn("h-8 text-xs font-medium shadow-sm transition-all", leadFilter === "all" && "bg-slate-900 dark:bg-white text-white dark:text-slate-900", leadFilter !== "all" && "dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800")}>All Leads</Button>
-                      <Button onClick={() => setLeadFilter("queue")} variant={leadFilter === "queue" ? "default" : "ghost"} size="sm" className={cn("h-8 text-xs font-medium transition-all", leadFilter === "queue" && "bg-slate-900 dark:bg-white text-white dark:text-slate-900", leadFilter !== "queue" && "dark:text-slate-400 dark:hover:text-slate-200")}>Active Queue</Button>
+                      <Button onClick={() => setLeadFilter("all")} variant={leadFilter === "all" ? "default" : "outline"} size="sm" className={cn("h-8 text-xs font-medium shadow-sm transition-all", leadFilter === "all" && "bg-white text-black", leadFilter !== "all" && "border-white/[0.08] text-slate-400 hover:bg-white/[0.06] bg-transparent")}>All Leads</Button>
+                      <Button onClick={() => setLeadFilter("queue")} variant={leadFilter === "queue" ? "default" : "ghost"} size="sm" className={cn("h-8 text-xs font-medium transition-all", leadFilter === "queue" && "bg-white text-black", leadFilter !== "queue" && "text-slate-500 hover:text-slate-200")}>Active Queue</Button>
                     </div>
-                    <div className="flex bg-slate-200/50 dark:bg-slate-950 p-1 rounded-lg">
-                      <button onClick={() => setCrmView("list")} className={cn("p-1.5 rounded-md transition-all", crmView === "list" ? "bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white scale-105" : "text-slate-500 hover:text-slate-900 dark:hover:text-white")}><LayoutList className="w-4 h-4" /></button>
-                      <button onClick={() => setCrmView("kanban")} className={cn("p-1.5 rounded-md transition-all", crmView === "kanban" ? "bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white scale-105" : "text-slate-500 hover:text-slate-900 dark:hover:text-white")}><LayoutGrid className="w-4 h-4" /></button>
+                    <div className="flex bg-white/[0.04] p-1 rounded-lg border border-white/[0.06]">
+                      <button onClick={() => setCrmView("list")} className={cn("p-1.5 rounded-md transition-all", crmView === "list" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutList className="w-4 h-4" /></button>
+                      <button onClick={() => setCrmView("kanban")} className={cn("p-1.5 rounded-md transition-all", crmView === "kanban" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutGrid className="w-4 h-4" /></button>
                     </div>
                   </div>
                   
@@ -335,33 +340,33 @@ const AdminDashboard = () => {
                   {crmView === "list" && (
                     <div className="flex-1 overflow-auto">
                       <table className="w-full text-left border-collapse">
-                        <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-[0_1px_0_0_#e2e8f0] dark:shadow-[0_1px_0_0_#1e293b] z-10">
-                          <tr className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-medium">
+                        <thead className="sticky top-0 bg-[#0d0d14] shadow-[0_1px_0_0_rgba(255,255,255,0.04)] z-10">
+                          <tr className="text-[11px] uppercase tracking-wider text-slate-500 font-medium">
                             <th className="px-6 py-4">Application</th><th className="px-6 py-4">Client Profile</th>
                             <th className="px-6 py-4">CRM Assignment</th><th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4 text-right">Contact</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                        <tbody className="divide-y divide-white/[0.04] text-sm">
                           {filteredApplications.length === 0 ? (
-                            <tr><td colSpan={5} className="p-12 text-center"><div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 flex items-center justify-center mx-auto mb-3"><LayoutGrid className="w-5 h-5 text-slate-300 dark:text-slate-500" /></div><p className="text-slate-500 dark:text-slate-400">No applications match your filter.</p></td></tr>
+                            <tr><td colSpan={5} className="p-12 text-center"><div className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-3"><LayoutGrid className="w-5 h-5 text-slate-600" /></div><p className="text-slate-500">No applications match your filter.</p></td></tr>
                           ) : (
                             filteredApplications.map((app, idx) => (
-                              <tr key={app.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer animate-in fade-in" style={{ animationDelay: `${idx * 50}ms` }} onClick={() => setSelectedApp(app)}>
+                              <tr key={app.id} className="hover:bg-white/[0.03] transition-colors group cursor-pointer animate-in fade-in" style={{ animationDelay: `${idx * 50}ms` }} onClick={() => setSelectedApp(app)}>
                                 <td className="px-6 py-4 align-top">
                                   <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[#2aac64]/10 text-[#2aac64] flex items-center justify-center font-medium text-xs mt-1 border border-[#2aac64]/20 group-hover:bg-[#2aac64] group-hover:text-white transition-colors">{app.loanType?.substring(0, 2).toUpperCase() || "PL"}</div>
-                                    <div><p className="font-medium text-slate-900 dark:text-white text-sm group-hover:text-[#2aac64] transition-colors">{app.applicationId}</p><p className="font-semibold text-slate-700 dark:text-slate-300 mt-1">{formatCurrency(app.requestedAmount)}</p></div>
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-medium text-xs mt-1 border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-colors">{app.loanType?.substring(0, 2).toUpperCase() || "PL"}</div>
+                                    <div><p className="font-medium text-white text-sm group-hover:text-emerald-400 transition-colors">{app.applicationId}</p><p className="font-semibold text-slate-300 mt-1">{formatCurrency(app.requestedAmount)}</p></div>
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 align-top">
                                   <div className="space-y-2 text-xs">
-                                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400"><Activity className="w-3.5 h-3.5" /><span>CIBIL: <strong className={app.declaredCibilScore >= 750 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}>{app.declaredCibilScore}</strong></span></div>
-                                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400"><Calendar className="w-3.5 h-3.5" /><span>{new Date(app.createdAt || Date.now()).toLocaleDateString()}</span></div>
+                                    <div className="flex items-center gap-2 text-slate-400"><Activity className="w-3.5 h-3.5" /><span>CIBIL: <strong className={app.declaredCibilScore >= 750 ? "text-emerald-400" : "text-amber-400"}>{app.declaredCibilScore}</strong></span></div>
+                                    <div className="flex items-center gap-2 text-slate-400"><Calendar className="w-3.5 h-3.5" /><span>{new Date(app.createdAt || Date.now()).toLocaleDateString()}</span></div>
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
-                                  <select value={app.assignee} onChange={(e) => handleAssignLead(app.applicationId, e.target.value)} className={cn("text-xs font-medium px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition-all w-40 hover:shadow-sm dark:bg-slate-800", app.assignee === "UNASSIGNED" ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-white dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700")}>
+                                  <select value={app.assignee} onChange={(e) => handleAssignLead(app.applicationId, e.target.value)} className={cn("text-xs font-medium px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition-all w-40 hover:shadow-sm bg-[#0d0d14]", app.assignee === "UNASSIGNED" ? "text-red-400 border-red-500/30 bg-red-500/10" : "text-slate-300 border-white/[0.08] hover:border-white/[0.15]")}>
                                     {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
                                   </select>
                                 </td>
@@ -371,9 +376,9 @@ const AdminDashboard = () => {
                                   </select>
                                 </td>
                                 <td className="px-6 py-4 align-top text-right" onClick={(e) => e.stopPropagation()}>
-                                  <div className="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={handleWhatsApp} className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-100 hover:scale-110 transition-all"><MessageCircle className="w-4 h-4" /></button>
-                                    <button onClick={handleEmail} className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all"><Mail className="w-4 h-4" /></button>
+                                  <div className="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={handleWhatsApp} className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/20 hover:scale-110 transition-all"><MessageCircle className="w-4 h-4" /></button>
+                                    <button onClick={handleEmail} className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center hover:bg-blue-500/20 hover:scale-110 transition-all"><Mail className="w-4 h-4" /></button>
                                   </div>
                                 </td>
                               </tr>
@@ -386,27 +391,27 @@ const AdminDashboard = () => {
 
                   {/* VIEW 2: Kanban Board */}
                   {crmView === "kanban" && (
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden p-6 bg-slate-50/50 dark:bg-slate-950/50">
+                    <div className="flex-1 overflow-x-auto overflow-y-hidden p-6 bg-[#050508]/50">
                       <div className="flex gap-6 h-full items-start w-max">
                         {pipelineStages.map((stage) => (
                           <div key={stage} className="w-80 flex flex-col max-h-full">
                             <div className="flex items-center justify-between mb-4 px-2">
-                              <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{stage}</h3>
-                              <span className="text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full shadow-inner">
+                              <h3 className="text-sm font-medium text-slate-300">{stage}</h3>
+                              <span className="text-xs font-semibold bg-white/[0.06] text-slate-400 px-2 py-0.5 rounded-full border border-white/[0.06]">
                                 {filteredApplications.filter(a => a.status === stage).length}
                               </span>
                             </div>
                             <div className="flex-1 overflow-y-auto space-y-3 p-2">
                               {filteredApplications.filter(a => a.status === stage).map(app => (
-                                <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#2aac64' : '#cbd5e1' }}>
+                                <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' || stage === 'DISBURSED' ? '#2aac64' : 'rgba(255,255,255,0.08)' }}>
                                   <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{app.applicationId}</span>
-                                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded font-medium">{app.loanType}</span>
+                                    <span className="text-xs font-medium text-slate-500">{app.applicationId}</span>
+                                    <span className="text-[10px] bg-white/[0.06] text-slate-300 px-1.5 py-0.5 rounded font-medium border border-white/[0.06]">{app.loanType}</span>
                                   </div>
-                                  <p className="text-lg font-medium text-slate-900 dark:text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
-                                  <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
-                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-emerald-600 dark:text-emerald-400" : "")}><Activity className="w-3 h-3"/> {app.declaredCibilScore}</span>
-                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-medium text-slate-600 dark:text-slate-300 shadow-sm">
+                                  <p className="text-lg font-semibold text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
+                                  <div className="flex justify-between items-center text-xs text-slate-500">
+                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-emerald-400" : "")}><Activity className="w-3 h-3"/> {app.declaredCibilScore}</span>
+                                    <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-[10px] font-medium text-slate-300">
                                       {employees.find(e=>e.id===app.assignee)?.name.substring(0,2).toUpperCase()}
                                     </div>
                                   </div>
@@ -423,24 +428,24 @@ const AdminDashboard = () => {
 
               {/* USERS TAB */}
               {activeTab === "users" && (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700"><tr className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold"><th className="px-6 py-4">User</th><th className="px-6 py-4">Access Role</th><th className="px-6 py-4">Joined</th></tr></thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">User</th><th className="px-6 py-4">Access Role</th><th className="px-6 py-4">Joined</th></tr></thead>
+                    <tbody className="divide-y divide-white/[0.04] text-sm">
                       {users.map((u) => (
-                        <tr key={u.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr key={u.id} className="hover:bg-white/[0.03] transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 shadow-sm">
+                              <div className="w-9 h-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-xs font-medium text-slate-300">
                                 {u.full_name?.substring(0, 2).toUpperCase() || "US"}
                               </div>
-                              <div><p className="font-semibold text-slate-900 dark:text-white">{u.full_name}</p><p className="text-xs text-slate-500 dark:text-slate-400">{u.email}</p></div>
+                              <div><p className="font-semibold text-white">{u.full_name}</p><p className="text-xs text-slate-500">{u.email}</p></div>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 border dark:border-slate-700">{u.role}</span>
+                            <span className="inline-flex items-center rounded-md bg-white/[0.06] px-2 py-1 text-xs font-medium text-slate-300 border border-white/[0.06]">{u.role}</span>
                           </td>
-                          <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{new Date(u.created_at).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 text-slate-500">{new Date(u.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -455,48 +460,48 @@ const AdminDashboard = () => {
 
       {/* 🧠 SALESFORCE-TIER 360 PROFILE DRAWER */}
       {selectedApp && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-sm transition-all">
-          <div className="w-[500px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col animate-in slide-in-from-right border-l border-slate-200 dark:border-slate-800">
-            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-950">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-all">
+          <div className="w-[500px] bg-[#0a0a10] h-full shadow-2xl flex flex-col animate-in slide-in-from-right border-l border-white/[0.06]">
+            <div className="p-6 border-b border-white/[0.06] flex items-start justify-between bg-[#0d0d14]">
               <div>
-                <div className="flex items-center gap-2 mb-1"><h2 className="text-xl font-medium text-slate-900 dark:text-white">{selectedApp.applicationId}</h2><StatusBadge status={selectedApp.status} /></div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Applied: {new Date(selectedApp.createdAt).toLocaleDateString()}</p>
+                <div className="flex items-center gap-2 mb-1"><h2 className="text-xl font-semibold text-white">{selectedApp.applicationId}</h2><StatusBadge status={selectedApp.status} /></div>
+                <p className="text-sm text-slate-500">Applied: {new Date(selectedApp.createdAt).toLocaleDateString()}</p>
               </div>
-              <button onClick={() => setSelectedApp(null)} className="p-2 bg-white dark:bg-slate-800 rounded-full border dark:border-slate-700 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition-all"><X className="w-4 h-4 text-slate-900 dark:text-white"/></button>
+              <button onClick={() => setSelectedApp(null)} className="p-2 bg-white/[0.06] rounded-full border border-white/[0.08] hover:bg-white/[0.1] active:scale-95 transition-all"><X className="w-4 h-4 text-white"/></button>
             </div>
 
-            <div className="flex border-b border-slate-200 dark:border-slate-800 px-6 pt-4 gap-6 bg-slate-50 dark:bg-slate-950">
+            <div className="flex border-b border-white/[0.06] px-6 pt-4 gap-6 bg-[#0d0d14]">
               {[
                 { id: "details", label: "Details", icon: FileText },
                 { id: "documents", label: "KYC & Docs", icon: FileCheck },
                 { id: "timeline", label: "Timeline", icon: History },
               ].map(tab => (
-                <button key={tab.id} onClick={() => setActiveDrawerTab(tab.id as any)} className={cn("pb-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all", activeDrawerTab === tab.id ? "border-[#2aac64] text-[#2aac64]" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300")}>
+                <button key={tab.id} onClick={() => setActiveDrawerTab(tab.id as any)} className={cn("pb-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all", activeDrawerTab === tab.id ? "border-emerald-500 text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-300")}>
                   <tab.icon className="w-4 h-4" /> {tab.label}
                 </button>
               ))}
             </div>
             
-            <div className="p-6 flex-1 overflow-y-auto bg-white dark:bg-slate-900">
+            <div className="p-6 flex-1 overflow-y-auto bg-[#0a0a10]">
               {activeDrawerTab === "details" && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 flex gap-3 items-start">
-                    <Sparkles className="w-5 h-5 text-indigo-500 dark:text-indigo-400 mt-0.5" />
-                    <div><h4 className="text-sm font-medium text-indigo-900 dark:text-indigo-300">AI Risk Insight</h4><p className="text-xs text-indigo-700 dark:text-indigo-400/80 mt-1">High probability of instant approval. Applicant's declared CIBIL is in the top 15% percentile for this product line.</p></div>
+                  <div className="p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex gap-3 items-start">
+                    <Sparkles className="w-5 h-5 text-indigo-400 mt-0.5" />
+                    <div><h4 className="text-sm font-medium text-indigo-300">AI Risk Insight</h4><p className="text-xs text-indigo-400/80 mt-1">High probability of instant approval. Applicant's declared CIBIL is in the top 15% percentile for this product line.</p></div>
                   </div>
-                  <div className="p-5 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-2 gap-6">
-                    <div><p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Requested Amount</p><p className="font-semibold text-slate-900 dark:text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
-                    <div><p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Product Line</p><p className="font-semibold text-slate-900 dark:text-white">{selectedApp.loanType}</p></div>
-                    <div><p className="text-xs text-slate-500 dark:text-slate-400 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore >= 750 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400")}>{selectedApp.declaredCibilScore}</p></div>
-                    <div><p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Applicant Name</p><p className="font-semibold text-slate-900 dark:text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
+                  <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
+                    <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
+                    <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white">{selectedApp.loanType}</p></div>
+                    <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore >= 750 ? "text-emerald-400" : "text-amber-400")}>{selectedApp.declaredCibilScore}</p></div>
+                    <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
                   </div>
                 </div>
               )}
             </div>
             
-            <div className="p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 grid grid-cols-2 gap-3">
-              <Button variant="outline" onClick={handleEmail} className="w-full text-slate-600 dark:text-slate-300 shadow-sm hover:bg-white dark:hover:bg-slate-800 active:scale-95 transition-all dark:border-slate-700"><Mail className="w-4 h-4 mr-2"/> Email Client</Button>
-              <Button onClick={() => { handleUpdateStatus(selectedApp.applicationId, "VERIFIED"); setSelectedApp(null); }} className="w-full bg-[#2aac64] hover:bg-emerald-600 text-white shadow-sm active:scale-95 transition-all">Mark Verified</Button>
+            <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] grid grid-cols-2 gap-3">
+              <Button variant="outline" onClick={handleEmail} className="w-full text-slate-300 shadow-sm hover:bg-white/[0.06] active:scale-95 transition-all border-white/[0.08] bg-transparent"><Mail className="w-4 h-4 mr-2"/> Email Client</Button>
+              <Button onClick={() => { handleUpdateStatus(selectedApp.applicationId, "VERIFIED"); setSelectedApp(null); }} className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 active:scale-95 transition-all">Mark Verified</Button>
             </div>
           </div>
         </div>

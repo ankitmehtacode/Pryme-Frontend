@@ -16,6 +16,9 @@ import ProcessSection from "@/components/home/ProcessSection";
 import TrustMonologue from "@/components/home/TrustMonologue";
 import TestimonialsSlider from "@/components/home/TestimonialsSlider";
 import CustomerReviews from "@/components/home/CustomerReviews";
+import { BookOpen, ArrowRight, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 // Loan Utility Components (Paisabazaar Dashboards)
 import EMICalculator from "@/components/loan/EMICalculator";
@@ -81,7 +84,7 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Restored normal layout flow to prevent clipping) */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="relative z-20 pt-4 md:pt-8 bg-slate-50 dark:bg-[#0a0a0a]">
+            <div id="products" className="relative z-20 pt-12 md:pt-20 bg-slate-50 dark:bg-[#0a0a0a]">
               <ProductSelectorGrid />
             </div>
             </ScrollReveal>
@@ -182,6 +185,42 @@ const Index = () => {
               <ScrollReveal direction="up" duration={0.8} delay={0.1}>
               <CustomerReviews />
               </ScrollReveal>
+
+              {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
+              <section className="py-24 container mx-auto px-4">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                  <div>
+                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+                      <BookOpen className="w-4 h-4" />
+                      Pryme Insights
+                    </span>
+                    <h2 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Financial Intelligence</h2>
+                  </div>
+                  <Button asChild variant="ghost" className="text-primary hover:text-primary/80 gap-2">
+                    <Link to="/blogs">View All Articles <ArrowRight className="w-4 h-4" /></Link>
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {[
+                    { title: "Building a 800+ CIBIL Score", date: "Mar 10, 2024", img: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=400&auto=format&fit=crop" },
+                    { title: "Home Loans: Resale vs New Construction", date: "Mar 08, 2024", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=400&auto=format&fit=crop" },
+                    { title: "MSME Loans for Digital Businesses", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=400&auto=format&fit=crop" }
+                  ].map((blog, i) => (
+                    <ScrollReveal key={i} direction="up" delay={i * 0.1}>
+                      <Link to="/blogs" className="group block">
+                        <div className="rounded-3xl overflow-hidden mb-6 aspect-video relative">
+                          <img src={blog.img} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                          <Clock className="w-3.5 h-3.5" /> {blog.date}
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
+                      </Link>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </section>
             </div>
 
           </main>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Menu, X, Phone, User, LogOut, Settings, ChevronDown,
-  Calculator, Home, Briefcase, Building2, Wallet, Gift, Sun, Moon
+  Calculator, Home, Briefcase, Building2, Wallet, Gift, Sun, Moon, Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,14 +43,15 @@ const productLinks = [
 ];
 
 const toolLinks = [
-  { href: "/apply#emi-calculator", label: "EMI Calculator", icon: Calculator, description: "Calculate your monthly EMI" },
-  { href: "/apply#rewards", label: "Rewards Calculator", icon: Gift, description: "Discover your reward tier" },
+  { href: "/emi-calculator", label: "EMI Calculator", icon: Calculator, description: "Calculate your monthly EMI with precision" },
+  { href: "/rewards-calculator", label: "Rewards Calculator", icon: Gift, description: "Discover your exclusive reward tier" },
 ];
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/document-check", label: "Compare Loans" },
-  { href: "/dashboard", label: "Track Application" },
+  { href: "/services", label: "Compare Loans" },
+  { href: "/about", label: "About" },
+  { href: "/blogs", label: "Insights" },
 ];
 
 // --- Mobile Menu Component ---
@@ -254,11 +255,13 @@ const Header = memo(() => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="rounded-full pl-2 pr-4 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 h-10">
                     <div className="w-6 h-6 rounded-full bg-[#2aac64]/10 flex items-center justify-center mr-2"><User className="w-3 h-3 text-[#2aac64]" /></div>
-                    <span className="text-sm font-medium">{user.email?.split('@')[0]}</span><ChevronDown className="w-3 h-3 ml-2 text-slate-400" />
+                    <span className="text-sm font-medium">{user.name.split(' ')[0]}</span><ChevronDown className="w-3 h-3 ml-2 text-slate-400" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 dark:bg-slate-950 dark:border-slate-800">
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")}><User className="w-4 h-4 mr-2" /> Dashboard</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}><Briefcase className="w-4 h-4 mr-2" /> Application Tracker</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}><User className="w-4 h-4 mr-2" /> My Profile</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/notifications")}><Bell className="w-4 h-4 mr-2" /> Notifications</DropdownMenuItem>
                   {isAdmin && <DropdownMenuItem onClick={() => navigate("/admin")}><Settings className="w-4 h-4 mr-2" /> Admin Console</DropdownMenuItem>}
                   <DropdownMenuSeparator className="dark:bg-slate-800" />
                   <DropdownMenuItem onClick={async () => { await signOut(); navigate("/"); }} className="text-red-500"><LogOut className="w-4 h-4 mr-2" /> Sign Out</DropdownMenuItem>

@@ -35,17 +35,17 @@ const Footer = () => {
   ];
 
   const legalLinks = [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Grievance Redressal", href: "/grievance" },
-    { label: "RBI Guidelines", href: "/rbi-guidelines" },
+    { label: "Privacy Policy", href: "/services" },
+    { label: "Terms of Service", href: "/services" },
+    { label: "Grievance Redressal", href: "/services" },
+    { label: "RBI Guidelines", href: "/services" },
   ];
 
   const toolLinks = [
-    { label: "EMI Calculator", href: "/apply#emi-calculator" },
+    { label: "EMI Calculator", href: "/emi-calculator" },
     { label: "Eligibility Checker", href: "/apply" },
-    { label: "Document Checklist", href: "/documents" },
-    { label: "Compare Loans", href: "/compare-loans" },
+    { label: "Document Checklist", href: "/document-check" },
+    { label: "Compare Loans", href: "/services" },
   ];
 
   return (

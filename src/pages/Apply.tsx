@@ -21,6 +21,7 @@ import CibilTips from "@/components/loan/CibilTips";
 import OffersRewards from "@/components/loan/OffersRewards";
 import RequiredDocuments from "@/components/loan/RequiredDocuments";
 import BankerContact from "@/components/loan/BankerContact";
+import AnalysisLoader from "@/components/loan/AnalysisLoader";
 
 const spring: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
 
@@ -30,6 +31,7 @@ const Apply = () => {
   const [hasAccess, setHasAccess] = useState(isLeadCaptured());
   const [tenure, setTenure] = useState(5);
   const [showComparison, setShowComparison] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [applicationData, setApplicationData] = useState<{
@@ -59,13 +61,18 @@ const Apply = () => {
     setLoanAmount(data.loanAmount);
     setTenure(data.loanTenure);
 
-    // Smooth transition state
+    // 🧠 The "V-Flow" Transition: Open analysis window directly
+    setIsAnalyzing(true);
+  };
+
+  const handleAnalysisComplete = () => {
+    setIsAnalyzing(false);
     setShowComparison(true);
 
     // Scroll into view after comparison renders
     setTimeout(() => {
       document.getElementById("comparison-dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 300);
+    }, 100);
   };
 
   const handleApplyDirect = (bankId: string) => {
@@ -149,6 +156,13 @@ const Apply = () => {
 
       {/* Lead Capture Gate — non-bypassable */}
       {!hasAccess && <LeadCaptureGate onCaptured={() => setHasAccess(true)} />}
+
+      {/* 🧠 Analysis Window Overlay */}
+      <AnalysisLoader 
+        isVisible={isAnalyzing} 
+        onComplete={handleAnalysisComplete}
+        data={applicationData}
+      />
 
       <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
 

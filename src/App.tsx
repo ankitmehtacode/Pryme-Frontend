@@ -20,6 +20,15 @@ import DocumentCheck from "./pages/DocumentCheck";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
+import About from "./pages/About";
+import Services from "./pages/Services";
+import Contact from "./pages/Contact";
+import Blogs from "./pages/Blogs";
+import Offers from "./pages/Offers";
+import EMICalculatorPage from "./pages/tools/EMICalculatorPage";
+import RewardsCalculatorPage from "./pages/tools/RewardsCalculatorPage";
+import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -98,6 +107,13 @@ const App = () => {
                       <Route path="/" element={<Index />} />
                       <Route path="/apply" element={<Apply />} />
                       <Route path="/auth" element={<Auth />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/services" element={<Services />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/offers" element={<Offers />} />
+                      <Route path="/emi-calculator" element={<EMICalculatorPage />} />
+                      <Route path="/rewards-calculator" element={<RewardsCalculatorPage />} />
 
                       {/* ==============================
                           ZONE 2: STANDARD USER TIER
@@ -106,6 +122,8 @@ const App = () => {
                       <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/document-check" element={<DocumentCheck />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/notifications" element={<Notifications />} />
                       </Route>
 
                       {/* ==============================

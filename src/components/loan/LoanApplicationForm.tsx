@@ -15,12 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import React from "react";
 
 const applicationSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters").max(100),
   email: z.string().email("Invalid email address"),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Must be a valid 10-digit Indian mobile number"),
-  panCard: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format (e.g. ABCDE1234F)"),
+  panCard: z.string().transform((v) => v.toUpperCase()).pipe(z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format (e.g. ABCDE1234F)")),
   dob: z.string().min(1, "Date of birth is required"),
   productType: z.string().min(1, "Product type is required"),
   loanAmount: z.number().min(50000, "Minimum loan is ₹50,000").max(100000000, "Maximum loan is ₹10 Crore"),
@@ -56,79 +57,14 @@ const productTypes = [
 
 const STEP_LABELS = ["Identity", "Requirements", "Financials"] as const;
 
-const STEP_FIELDS: Record<number, (keyof ApplicationData)[]> = {
-  1: ["fullName", "email", "phone", "panCard", "dob"],
-  2: ["productType", "loanAmount", "loanTenure"],
-  3: ["occupation", "monthlyIncome", "cibilScore", "state", "city"],
-};
-
-const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
-  const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
-
-  const form = useForm<ApplicationData>({
-    resolver: zodResolver(applicationSchema),
-    mode: "onChange",
-    defaultValues: {
-      monthlyIncome: 85000,
-      loanAmount: 500000,
-      loanTenure: 5,
-      cibilScore: 750,
-      productType: "personal",
-      occupation: "salaried",
-    },
-  });
-
-  const currentLoanAmount = useWatch({ control: form.control, name: "loanAmount" });
-  const currentCibil = useWatch({ control: form.control, name: "cibilScore" });
-
-  useEffect(() => {
-    if (onAmountChange && currentLoanAmount) {
-      onAmountChange(currentLoanAmount);
-    }
-  }, [currentLoanAmount, onAmountChange]);
-
-  const nextStep = async () => {
-    const fields = STEP_FIELDS[step];
-    const isValid = await form.trigger(fields);
-    if (isValid) {
-      setDirection(1);
-      setStep((prev) => Math.min(prev + 1, 3));
-    }
-  };
-
-  const prevStep = () => {
-    setDirection(-1);
-    setStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleSubmit = async (data: ApplicationData) => {
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsSubmitting(false);
-
-    toast({
-      title: "Application submitted",
-      description: "Finding the best offers for your profile...",
-    });
-
-    onFormSubmit?.(data);
-  };
-
-  const getCibilData = (score: number) => {
-    if (score >= 750) return { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Excellent" };
-    if (score >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
-    if (score >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
-    return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
-  };
-  const cibilUi = getCibilData(currentCibil || 750);
-
-  const ValidatedInput = ({ label, error, isValid, isSecure, ...props }: any) => (
+/* ── Stable ValidatedInput (outside component to avoid remount on re-render) ── */
+const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
+  ({ label, error, isValid, isSecure, className: _className, ...props }, ref) => (
     <div className="space-y-2 relative group">
       <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">{label}</Label>
       <div className="relative">
         <Input
+          ref={ref}
           {...props}
           className={cn(
             "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white outline-none transition-all duration-200 group-hover:border-white/20 focus:border-[#2aac64]/60 focus:ring-2 focus:ring-[#2aac64]/20",
@@ -160,7 +96,87 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </motion.p>
       )}
     </div>
-  );
+  )
+);
+ValidatedInput.displayName = "ValidatedInput";
+
+const STEP_FIELDS: Record<number, (keyof ApplicationData)[]> = {
+  1: ["fullName", "email", "phone", "panCard", "dob"],
+  2: ["productType", "loanAmount", "loanTenure"],
+  3: ["occupation", "monthlyIncome", "cibilScore", "state", "city"],
+};
+
+const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+
+  const form = useForm<ApplicationData>({
+    resolver: zodResolver(applicationSchema),
+    mode: "onChange",
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      panCard: "",
+      dob: "",
+      monthlyIncome: 85000,
+      loanAmount: 500000,
+      loanTenure: 5,
+      cibilScore: 750,
+      productType: "personal",
+      occupation: "salaried",
+      state: "",
+      city: "",
+    },
+  });
+
+  /** Returns true when a field has a truthy value AND no validation error */
+  const isFieldValid = (name: keyof ApplicationData): boolean => {
+    const value = form.watch(name);
+    const error = form.formState.errors[name];
+    // For numbers, 0 is invalid anyway; for strings, empty = not filled
+    return value !== undefined && value !== "" && value !== 0 && !error;
+  };
+
+  const currentLoanAmount = useWatch({ control: form.control, name: "loanAmount" });
+  const currentCibil = useWatch({ control: form.control, name: "cibilScore" });
+
+  useEffect(() => {
+    if (onAmountChange && currentLoanAmount) {
+      onAmountChange(currentLoanAmount);
+    }
+  }, [currentLoanAmount, onAmountChange]);
+
+  const nextStep = async () => {
+    const fields = STEP_FIELDS[step];
+    const isValid = await form.trigger(fields);
+    if (isValid) {
+      setDirection(1);
+      setStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
+
+  const prevStep = () => {
+    setDirection(-1);
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleSubmit = async (data: ApplicationData) => {
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setIsSubmitting(false);
+
+    onFormSubmit?.(data);
+  };
+
+  const getCibilData = (score: number) => {
+    if (score >= 750) return { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Excellent" };
+    if (score >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
+    if (score >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
+    return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
+  };
+  const cibilUi = getCibilData(currentCibil || 750);
 
   // Shared card style
   const cardCn = "bg-[#0a0a0a] border border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-white/[0.1]";
@@ -253,7 +269,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 label="Full Name (As per PAN)"
                 placeholder="Rahul Sharma"
                 isSecure
-                isValid={form.formState.dirtyFields.fullName && !form.formState.errors.fullName}
+                isValid={isFieldValid("fullName")}
                 error={form.formState.errors.fullName?.message}
                 {...form.register("fullName")}
               />
@@ -264,14 +280,14 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   type="email"
                   placeholder="rahul@company.com"
                   isSecure
-                  isValid={form.formState.dirtyFields.email && !form.formState.errors.email}
+                  isValid={isFieldValid("email")}
                   error={form.formState.errors.email?.message}
                   {...form.register("email")}
                 />
                 <ValidatedInput
                   label="Mobile Number"
                   placeholder="9876543210"
-                  isValid={form.formState.dirtyFields.phone && !form.formState.errors.phone}
+                  isValid={isFieldValid("phone")}
                   error={form.formState.errors.phone?.message}
                   {...form.register("phone")}
                 />
@@ -282,7 +298,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   label="PAN Card Number"
                   placeholder="ABCDE1234F"
                   isSecure
-                  isValid={form.formState.dirtyFields.panCard && !form.formState.errors.panCard}
+                  isValid={isFieldValid("panCard")}
                   error={form.formState.errors.panCard?.message}
                   style={{ textTransform: "uppercase", letterSpacing: "0.15em" }}
                   {...form.register("panCard")}
@@ -291,7 +307,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   label="Date of Birth"
                   type="date"
                   isSecure
-                  isValid={form.formState.dirtyFields.dob && !form.formState.errors.dob}
+                  isValid={isFieldValid("dob")}
                   error={form.formState.errors.dob?.message}
                   {...form.register("dob")}
                 />
@@ -331,7 +347,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                         type="button"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
-                        onClick={() => form.setValue("productType", type.value, { shouldValidate: true })}
+                        onClick={() => form.setValue("productType", type.value, { shouldValidate: true, shouldDirty: true })}
                         className={cn(
                           "py-3 px-2 rounded-xl text-xs md:text-sm font-medium transition-colors duration-200 border",
                           isSelected
@@ -360,7 +376,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
                 <div className="space-y-2 group">
                   <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Tenure (Years)</Label>
-                  <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true })} defaultValue={form.getValues("loanTenure").toString()}>
+                  <Select onValueChange={(v) => form.setValue("loanTenure", parseInt(v), { shouldValidate: true, shouldDirty: true })} defaultValue={form.getValues("loanTenure").toString()}>
                     <SelectTrigger className={inputCn}>
                       <SelectValue placeholder="Select tenure" />
                     </SelectTrigger>
@@ -397,7 +413,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                 <div className="space-y-2 group">
                   <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">Employment Type</Label>
-                  <Select onValueChange={(v) => form.setValue("occupation", v as any, { shouldValidate: true })} defaultValue={form.getValues("occupation")}>
+                  <Select onValueChange={(v) => form.setValue("occupation", v as any, { shouldValidate: true, shouldDirty: true })} defaultValue={form.getValues("occupation")}>
                     <SelectTrigger className={inputCn}>
                       <SelectValue placeholder="Select employment" />
                     </SelectTrigger>
@@ -425,7 +441,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                 <div className="space-y-2 group">
                   <Label className="text-[10px] font-medium uppercase tracking-widest text-[#2aac64] ml-1">State</Label>
-                  <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true })}>
+                  <Select onValueChange={(v) => form.setValue("state", v, { shouldValidate: true, shouldDirty: true })}>
                     <SelectTrigger className={inputCn}>
                       <SelectValue placeholder="Select State" />
                     </SelectTrigger>
@@ -441,7 +457,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 <ValidatedInput
                   label="City"
                   placeholder="Mumbai"
-                  isValid={form.formState.dirtyFields.city && !form.formState.errors.city}
+                  isValid={isFieldValid("city")}
                   error={form.formState.errors.city?.message}
                   {...form.register("city")}
                 />
@@ -470,7 +486,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 </div>
                 <Slider
                   value={[currentCibil || 750]}
-                  onValueChange={(v) => form.setValue("cibilScore", v[0], { shouldValidate: true })}
+                  onValueChange={(v) => form.setValue("cibilScore", v[0], { shouldValidate: true, shouldDirty: true })}
                   min={300} max={900} step={10}
                   className="cursor-pointer mb-2"
                 />
