@@ -79,6 +79,7 @@ const EMICalculator = ({
     { term: "MCLR (Marginal Cost of Funds based Lending Rate)", definition: "A methodology used by banks in India to determine interest rates for loans. It's the minimum interest rate below which a bank cannot lend." },
     { term: "Repo Rate", definition: "The rate at which RBI lends money to commercial banks. Changes in repo rate affect your loan interest rates." },
     { term: "Processing Fee", definition: "A one-time fee charged by lenders for processing your loan application, typically 0.5% to 2% of the loan amount." },
+    { term: "Processing Fee", definition: "A one-time fee charged by lenders for processing your loan application, typically 0.5% to 2% of the loan amount." },
   ];
 
   // Calculate SVG arc for pie chart
@@ -234,4 +235,4 @@ const EMICalculator = ({
   );
 };
 
-export default EMICalculator;
+export default EMICalculator;

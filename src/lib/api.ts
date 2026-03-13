@@ -1,11 +1,11 @@
 // src/lib/api.ts
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
 
 /**
  * Authenticated fetch wrapper.
- * Injects Bearer token from localStorage, handles session expiry,
- * and supports both JSON and FormData payloads.
+ * Injects Bearer token from localStorage, handles session expiry evictions,
+ * and natively supports both JSON and Multipart FormData payloads.
  */
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem("pryme_session_token");
@@ -16,7 +16,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     ...(options.headers as Record<string, string>),
   };
 
-  // Let the browser set Content-Type (with boundary) for multipart uploads
+  // 🧠 CRITICAL: Let the browser set Content-Type (with strict boundary) for file uploads
   if (!isFormData && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
@@ -24,6 +24,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
 
   if (response.status === 401 || response.status === 403) {
+    // Zero-Trust Eviction Protocol
     localStorage.removeItem("pryme_session_token");
     localStorage.removeItem("pryme_user_data");
     window.dispatchEvent(new Event("pryme_auth_expired"));
@@ -32,16 +33,18 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Request failed (${response.status})`);
+    throw new Error(errorData.message || `API Request failed (${response.status})`);
   }
 
-  if (response.status === 204) return null;
+  if (response.status === 204) return null; // Handle empty responses gracefully
   return response.json();
 };
 
 export const PrymeAPI = {
 
-  // Auth
+  // ==========================================
+  // IDENTITY & ACCESS MANAGEMENT (IAM)
+  // ==========================================
   login: async (email: string, password: string, deviceId: string = "web") => {
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
@@ -60,7 +63,61 @@ export const PrymeAPI = {
     return fetchWithAuth("/auth/logout", { method: "POST" });
   },
 
-  // Admin CRM
+  // ==========================================
+  // PUBLIC LEAD ACQUISITION
+  // ==========================================
+  submitLead: async (formData: any) => {
+    // 🧠 PAYLOAD TRANSLATOR: Maps rich frontend form to strict backend DTO
+    const payload = {
+      userName: formData.fullName,
+      phone: formData.phone,
+      loanAmount: formData.loanAmount,
+      loanType: formData.productType,
+      metadata: {
+        email: formData.email,
+        panCard: formData.panCard,
+        cibilScore: formData.cibilScore,
+        monthlyIncome: formData.monthlyIncome,
+        occupation: formData.occupation,
+        city: formData.city,
+        state: formData.state
+      }
+    };
+
+    const res = await fetch(`${API_BASE_URL}/public/leads`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 🧠 IDEMPOTENCY LOCK: Prevents duplicate insertions on network retries
+        "Idempotency-Key": crypto.randomUUID(),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to submit application to the server.");
+    }
+    return res.json();
+  },
+
+  // ==========================================
+  // PIPELINE ELEVATION (THE MISSING LINK)
+  // ==========================================
+  /**
+   * 🧠 ELEVATION ENGINE
+   * Fuses a public Lead UUID to a secure User UUID, generating a formal LoanApplication
+   */
+  elevateLead: async (leadId: string, userId: string) => {
+    return fetchWithAuth("/applications/elevate", {
+      method: "POST",
+      body: JSON.stringify({ leadId, userId }),
+    });
+  },
+
+  // ==========================================
+  // SILICON-GRADE ADMIN CRM
+  // ==========================================
   getApplications: async () => {
     return fetchWithAuth("/admin/applications", { method: "GET" });
   },
@@ -73,28 +130,16 @@ export const PrymeAPI = {
   },
 
   assignLead: async (applicationId: string, assigneeId: string) => {
+    // 🧠 assigneeId is now an official User UUID mapped to the PostgreSQL/H2 Database
     return fetchWithAuth(`/admin/applications/${applicationId}/assign`, {
       method: "PATCH",
       body: JSON.stringify({ assigneeId }),
     });
   },
 
-  // Public lead capture
-  submitApplication: async (loanType: string, requestedAmount: number, cibilScore: number) => {
-    const res = await fetch(`${API_BASE_URL}/apply`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ loanType, requestedAmount, cibilScore }),
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to submit application");
-    }
-    return res.json();
-  },
-
-  // Document verification
+  // ==========================================
+  // SMART VAULT (DOCUMENT ENGINE)
+  // ==========================================
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => {
     return fetchWithAuth("/documents/verify-id", {
       method: "POST",
@@ -110,11 +155,13 @@ export const PrymeAPI = {
 
     return fetchWithAuth("/documents/upload", {
       method: "POST",
-      body: formData,
+      body: formData, // fetchWithAuth will correctly handle the multipart boundary
     });
   },
 
-  // User portal
+  // ==========================================
+  // CLIENT PORTAL
+  // ==========================================
   getMyApplications: async () => {
     return fetchWithAuth("/applications/me", { method: "GET" });
   },
