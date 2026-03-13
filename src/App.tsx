@@ -13,7 +13,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 // Components & Pages
 import { SplashScreen } from "@/components/SplashScreen";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"; // 🧠 NEW: Closed-Loop Gatekeeper
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"; // 🧠 Closed-Loop Gatekeeper
 import Index from "./pages/Index";
 import Apply from "./pages/Apply";
 import DocumentCheck from "./pages/DocumentCheck";
@@ -33,7 +33,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// 🧠 1. NATIVE ERROR BOUNDARY: This completely eliminates silent "Blank Screens"
+// 🧠 1. NATIVE ERROR BOUNDARY
 class GlobalErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any, errorInfo: any }> {
   constructor(props: any) {
     super(props);
@@ -81,25 +81,25 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="pryme_theme">
+          
+          {/* 🧠 FIX: The BrowserRouter MUST wrap the AuthProvider so the AuthContext can use routing hooks */}
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AuthProvider>
+              <TooltipProvider>
+                <GlobalErrorBoundary>
 
-          {/* 🧠 2. AuthProvider encompasses the router to provide unified state */}
-          <AuthProvider>
-            <TooltipProvider>
+                  {/* 1. Splash Screen Overlay */}
+                  <AnimatePresence>
+                    {isSplashVisible && (
+                      <SplashScreen key="splash" onComplete={() => setIsSplashVisible(false)} />
+                    )}
+                  </AnimatePresence>
 
-              <GlobalErrorBoundary>
-
-                {/* 1. Splash Screen Overlay */}
-                <AnimatePresence>
-                  {isSplashVisible && (
-                    <SplashScreen key="splash" onComplete={() => setIsSplashVisible(false)} />
-                  )}
-                </AnimatePresence>
-
-                {/* 2. Main Application Router */}
-                <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  {/* 2. Main Application Router */}
+                  <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+                    <Toaster />
+                    <Sonner />
+                    
                     <Routes>
                       {/* ==============================
                           ZONE 1: PUBLIC ACQUISITION LAYER
@@ -136,13 +136,12 @@ const App = () => {
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
-                  </BrowserRouter>
-                </div>
+                  </div>
 
-              </GlobalErrorBoundary>
-
-            </TooltipProvider>
-          </AuthProvider>
+                </GlobalErrorBoundary>
+              </TooltipProvider>
+            </AuthProvider>
+          </BrowserRouter>
 
         </ThemeProvider>
       </QueryClientProvider>
