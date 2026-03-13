@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2 } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2, Code2 } from "lucide-react";
 
 // Components & Utilities
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-// 🧠 Closed-Loop Security Context
+// 🧠 Closed-Loop Security Context & API
 import { useAuth } from "@/contexts/AuthContext";
+import { PrymeAPI } from "@/lib/api";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -47,6 +48,8 @@ const Auth = () => {
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
 
+  // 🧠 THE INTERCEPT: Grab the hidden leadId passed from the Offers Matrix
+  const pendingLeadId = location.state?.leadId || null;
   // Deep Link Recovery: Returns user to the page they tried to access before login
   const from = location.state?.from || null;
 
@@ -65,7 +68,7 @@ const Auth = () => {
     mode: "onChange",
   });
 
-  // 🧠 Deterministic RBAC Routing Engine
+  // 🧠 DETERMINISTIC RBAC ROUTING ENGINE
   useEffect(() => {
     if (user) {
       if (from) {
@@ -73,8 +76,10 @@ const Auth = () => {
         return;
       }
       
-      // Strict Tier Routing based on your Java SecurityConfig parameters
-      if (user.role === "ADMIN" || user.role === "SUPER_ADMIN" || user.role === "EMPLOYEE") {
+      // 🧠 PRODUCTION FIX: Normalize role string to prevent case-sensitive routing bugs
+      const role = (user.role || "USER").toUpperCase();
+
+      if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
         navigate("/admin", { replace: true });
       } else {
         navigate("/dashboard", { replace: true });
@@ -82,12 +87,12 @@ const Auth = () => {
     }
   }, [user, navigate, from]);
 
-  // 🧠 Secure Form Submission via AuthContext
+  // 🧠 SECURE FORM SUBMISSION (WITH ELEVATION ENGINE)
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
     
-    // Bypassing raw localStorage; Routing strictly through the Context Engine
-    const { error } = await signIn(data.email, data.password);
+    // Routing strictly through the Context Engine to keep UI state synced
+    const { data: authData, error } = await signIn(data.email, data.password);
     
     if (error) {
       toast({
@@ -95,12 +100,33 @@ const Auth = () => {
         description: error.message || "Invalid secure credentials.",
         variant: "destructive",
       });
-      loginForm.setValue("password", ""); // Clear password field on failure
+      loginForm.setValue("password", ""); 
     } else {
-      toast({
-        title: "Session Authorized",
-        description: "Welcome back to the Pryme CRM system.",
-      });
+      
+      // 🧠 THE ELEVATION ENGINE TRIGGER
+      // If they came from the application matrix, lock the lead to their new identity!
+      if (pendingLeadId && authData?.user?.id) {
+        try {
+          await PrymeAPI.elevateLead(pendingLeadId, authData.user.id);
+          toast({
+            title: "Application Secured",
+            description: "Your loan application has been successfully locked to your identity.",
+          });
+        } catch (elevationError) {
+          console.error("Lead Elevation failed during login:", elevationError);
+          toast({
+            title: "Warning",
+            description: "Session authorized, but could not link your pending application.",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Session Authorized",
+          description: "Welcome back to the Pryme CRM system.",
+        });
+      }
+      
       // Note: On success, the AuthContext updates `user`, triggering the useEffect to route them automatically.
     }
     
@@ -125,8 +151,6 @@ const Auth = () => {
 
   const handleForgotPassword = async (data: ForgotPasswordData) => {
     setIsLoading(true);
-    
-    // DEMO MOCK: Simulating the password reset email
     setTimeout(() => {
       setIsLoading(false);
       toast({
@@ -142,6 +166,11 @@ const Auth = () => {
       title: "Coming Soon",
       description: "Google OAuth zero-trust integration will be enabled in Phase 2.",
     });
+  };
+
+  const fillAdminCredentials = () => {
+    loginForm.setValue("email", "admin@pryme.com");
+    loginForm.setValue("password", "admin123");
   };
 
   // Prevent UI flashing while the Context is performing its initial token math
@@ -165,7 +194,7 @@ const Auth = () => {
         {/* Left Panel - Branding */}
         <div className="hidden lg:flex lg:w-1/2 hero-gradient items-center justify-center p-12 relative overflow-hidden">
           <div className="max-w-md relative z-10">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-8 cursor-pointer" onClick={() => navigate("/")}>
               <div className="w-12 h-12 rounded-xl neo-card flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-primary" />
               </div>
@@ -208,7 +237,7 @@ const Auth = () => {
         {/* Right Panel - Auth Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
           <div className="w-full max-w-md">
-            <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
+            <div className="lg:hidden flex items-center gap-3 mb-8 justify-center cursor-pointer" onClick={() => navigate("/")}>
               <div className="w-10 h-10 rounded-xl neo-card flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary" />
               </div>
@@ -301,7 +330,7 @@ const Auth = () => {
                         <div className="relative">
                           <Input
                             type="email"
-                            placeholder="admin@pryme.in"
+                            placeholder="admin@pryme.com"
                             className="neo-input border-0 pl-10"
                             {...loginForm.register("email")}
                           />
@@ -333,6 +362,12 @@ const Auth = () => {
                         {isLoading ? "Authenticating..." : "Authorize Session"}
                         {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                       </Button>
+                      
+                      <div className="flex justify-center pt-2">
+                         <Button type="button" variant="ghost" onClick={fillAdminCredentials} className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground h-7 px-3 rounded-lg border border-border/40">
+                           <Code2 className="w-3 h-3 mr-2"/> Fill Admin Demo
+                         </Button>
+                      </div>
 
                       <button
                         type="button"
@@ -370,7 +405,6 @@ const Auth = () => {
                     </form>
                   ) : (
                     <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5">
-                      {/* ... Signup fields (unchanged structurally, matching your UI exactly) ... */}
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-foreground">Full Name</Label>
                         <div className="relative">
