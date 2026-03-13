@@ -76,7 +76,6 @@ const Auth = () => {
         return;
       }
       
-      // 🧠 PRODUCTION FIX: Normalize role string to prevent case-sensitive routing bugs
       const role = (user.role || "USER").toUpperCase();
 
       if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
@@ -87,11 +86,10 @@ const Auth = () => {
     }
   }, [user, navigate, from]);
 
-  // 🧠 SECURE FORM SUBMISSION (WITH ELEVATION ENGINE)
+  // 🧠 SECURE LOGIN (WITH ELEVATION ENGINE)
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
     
-    // Routing strictly through the Context Engine to keep UI state synced
     const { data: authData, error } = await signIn(data.email, data.password);
     
     if (error) {
@@ -102,9 +100,7 @@ const Auth = () => {
       });
       loginForm.setValue("password", ""); 
     } else {
-      
       // 🧠 THE ELEVATION ENGINE TRIGGER
-      // If they came from the application matrix, lock the lead to their new identity!
       if (pendingLeadId && authData?.user?.id) {
         try {
           await PrymeAPI.elevateLead(pendingLeadId, authData.user.id);
@@ -126,27 +122,38 @@ const Auth = () => {
           description: "Welcome back to the Pryme CRM system.",
         });
       }
-      
-      // Note: On success, the AuthContext updates `user`, triggering the useEffect to route them automatically.
     }
     
     setIsLoading(false);
   };
 
+  // 🧠 SECURE DATABASE REGISTRATION ENGINE
   const handleSignup = async (data: SignupData) => {
     setIsLoading(true);
     
-    // DEMO MOCK: Since enterprise CRM provisioning is backend-only, 
-    // we simulate a successful public signup so the UI doesn't break during showcase.
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Physically write the user identity to the PostgreSQL/H2 backend
+      await PrymeAPI.signup(data.fullName, data.email, data.password);
+      
       toast({
-        title: "Account Created!",
-        description: "Welcome to PRYME Consulting. Please login with your new credentials.",
+        title: "Identity Established",
+        description: "Welcome to PRYME. Please authorize your session to continue.",
       });
+      
+      // UX Optmization: Route to login tab and pre-fill the email they just used
       setView("login");
       loginForm.setValue("email", data.email);
-    }, 1500);
+      loginForm.setValue("password", ""); // Keep password blank for security
+
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "Could not create account. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = async (data: ForgotPasswordData) => {
@@ -173,7 +180,6 @@ const Auth = () => {
     loginForm.setValue("password", "admin123");
   };
 
-  // Prevent UI flashing while the Context is performing its initial token math
   if (isContextLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -248,7 +254,6 @@ const Auth = () => {
             </div>
 
             <div className="neo-card p-8 rounded-2xl shadow-xl">
-              {/* Forgot Password View */}
               {view === "forgot-password" && (
                 <>
                   <button 
@@ -289,7 +294,6 @@ const Auth = () => {
                 </>
               )}
 
-              {/* Login/Signup View */}
               {view !== "forgot-password" && (
                 <>
                   <h2 className="text-2xl font-medium text-foreground mb-2 text-center tracking-tight">
@@ -301,7 +305,6 @@ const Auth = () => {
                       : "Sign up to start comparing loan offers"}
                   </p>
 
-                  {/* Toggle */}
                   <div className="flex neo-card-inset rounded-xl p-1 mb-6">
                     <button
                       onClick={() => setView("login")}
