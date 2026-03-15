@@ -2,15 +2,16 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGate";
 import { Helmet } from "react-helmet-async";
-import { Shield, Clock, CheckCircle, CheckCircle2, Building2, ArrowRight, Star, TrendingUp, AlertCircle, Info, LockKeyhole, Sparkles, ChevronRight } from "lucide-react";
+import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext"; // 🧠 NEW: We need Auth Context for the Gatekeeper
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { PrymeAPI } from "@/lib/api";
+import api from "@/lib/api"; // 🧠 NEW: Direct API access for Lead Salvage
 
 // Loan Components
 import LoanApplicationForm from "@/components/loan/LoanApplicationForm";
@@ -27,6 +28,7 @@ const spring: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
 
 const Apply = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // 🧠 Access the Auth Context
   const [loanAmount, setLoanAmount] = useState(500000);
   const [hasAccess, setHasAccess] = useState(isLeadCaptured());
   const [tenure, setTenure] = useState(5);
@@ -34,10 +36,14 @@ const Apply = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  
+  // 🧠 Extended to capture phone number for the Silent Lead Salvage
   const [applicationData, setApplicationData] = useState<{
     cibilScore: number;
     monthlyIncome: number;
     productType: string;
+    phone?: string; // Captured from LeadCaptureGate
+    name?: string;  // Captured from LeadCaptureGate
   } | null>(null);
 
   const bankOffers = useMemo(() => {
@@ -52,16 +58,38 @@ const Apply = () => {
     return sorted.map((offer, index) => ({ ...offer, recommended: index === 0 }));
   }, []);
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = async (data: any) => {
     setApplicationData({
       cibilScore: data.cibilScore,
       monthlyIncome: data.monthlyIncome,
       productType: data.productType,
+      phone: localStorage.getItem("pryme_lead_phone") || "", // Assuming LeadCaptureGate saves this
+      name: localStorage.getItem("pryme_lead_name") || "Guest"
     });
     setLoanAmount(data.loanAmount);
     setTenure(data.loanTenure);
 
-    // 🧠 The "V-Flow" Transition: Open analysis window directly
+    // 🧠 SILENT STATE PERSISTENCE: Save to local storage for the dashboard handoff
+    localStorage.setItem("pryme_pending_application", JSON.stringify({
+        loanType: data.productType,
+        employmentType: data.employmentType || "SALARIED", // Assuming your form has this
+        loanAmount: data.loanAmount
+    }));
+
+    // 🧠 IMMEDIATE LEAD SALVAGE: Push to CRM *before* they even see the comparison table
+    try {
+        await api.post("/leads", {
+          userName: localStorage.getItem("pryme_lead_name") || "Anonymous Prospect",
+          phone: localStorage.getItem("pryme_lead_phone") || "0000000000",
+          loanType: data.productType,
+          loanAmount: data.loanAmount,
+          cibilScore: data.cibilScore
+        });
+    } catch (error) {
+        console.warn("Silent lead capture failed, but continuing UX flow.", error);
+    }
+
+    // Trigger the V-Flow Analysis Animation
     setIsAnalyzing(true);
   };
 
@@ -69,7 +97,6 @@ const Apply = () => {
     setIsAnalyzing(false);
     setShowComparison(true);
 
-    // Scroll into view after comparison renders
     setTimeout(() => {
       document.getElementById("comparison-dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -84,13 +111,29 @@ const Apply = () => {
     const bank = bankOffers.find(b => b.id === bankId);
     if (!applicationData) return;
 
+    // 🧠 THE GATEKEEPER ROUTING
+    // If they aren't logged in, intercept the application process and send them to Auth.
+    // The Dashboard will pick up the saved local storage state when they arrive.
+    if (!user) {
+        toast({ title: "Authentication Required", description: "Securing your session before final submission..." });
+        navigate("/auth?redirect=/dashboard");
+        return;
+    }
+
+    // If they ARE logged in, proceed with the actual API submission
     setIsSubmitting(true);
     try {
-      const response = await PrymeAPI.submitApplication(applicationData.productType, loanAmount, applicationData.cibilScore);
+      // Assuming your backend expects this exact payload structure
+      const response = await api.post("/applications/submit", {
+          loanType: applicationData.productType,
+          requestedAmount: loanAmount,
+          declaredCibilScore: applicationData.cibilScore
+      });
+      
       setIsSuccess(true);
       toast({
         title: "Application Secured 🔒",
-        description: `Lead ID: ${response.applicationId}. A PRYME RM for ${bank?.bankName} will contact you shortly.`,
+        description: `Lead ID: ${response.data.applicationId}. A PRYME RM for ${bank?.bankName} will contact you shortly.`,
       });
     } catch (error) {
       toast({ title: "Submission Error", description: "Unable to reach the secure server.", variant: "destructive" });
@@ -138,7 +181,7 @@ const Apply = () => {
             We're comparing offers from our partner banks to find the best rates for your profile. You'll hear from us shortly.
           </p>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-            <Button onClick={() => navigate("/auth")} className="w-full bg-[#2aac64] hover:bg-[#239b57] text-white py-6 text-lg font-semibold rounded-xl transition-colors duration-200" size="lg">
+            <Button onClick={() => navigate("/dashboard")} className="w-full bg-[#2aac64] hover:bg-[#239b57] text-white py-6 text-lg font-semibold rounded-xl transition-colors duration-200" size="lg">
               Go to Dashboard <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           </motion.div>
