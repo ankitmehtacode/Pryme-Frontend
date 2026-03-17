@@ -1,39 +1,57 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PYRME Consulting - Secure Loan Solutions | RBI Compliant</title>
-    <meta name="description" content="Experience transparent loan processing with bank-grade security. Personal loans, business loans, home loans with competitive rates. RBI compliant and ISO 27001 certified." />
-    <meta name="author" content="PYRME Consulting" />
-    <meta name="keywords" content="personal loan, business loan, home loan, loan against property, RBI compliant, secure loan, PYRME" />
-    
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' http://localhost:8080 ws://localhost:*; img-src 'self' data: https: http: blob:; font-src 'self' https://fonts.gstatic.com data:;">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="PYRME Consulting - Secure Loan Solutions" />
-    <meta property="og:description" content="Experience transparent loan processing with bank-grade security. RBI compliant and ISO 27001 certified." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    <meta property="og:site_name" content="PYRME Consulting" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#0a0a0a" />
 
-    <!-- Twitter Card -->
+    <title>PRYME | Bank-Grade Intelligent Loan Matchmaking</title>
+    <meta name="description" content="Experience transparent loan processing with 256-bit bank-grade security. Instant pre-approved limits from top-tier RBI compliant banks." />
+    <meta name="author" content="PRYME Intelligence" />
+    <meta name="keywords" content="personal loan, business loan, home loan, loan aggregator, RBI compliant, secure loan, PRYME" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com data:;
+      img-src 'self' data: https: http: blob:;
+      media-src 'self' https://videos.pexels.com blob: data:;
+      connect-src 'self' http://localhost:8080 ws://localhost:* wss://* https://api.pryme.in;
+      worker-src 'self' blob:;
+    ">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://videos.pexels.com" />
+    <link rel="dns-prefetch" href="http://localhost:8080" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="canonical" href="https://pryme.in" />
+
+    <meta property="og:title" content="PRYME - Secure Loan Matchmaking" />
+    <meta property="og:description" content="Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pryme.in" />
+    <meta property="og:site_name" content="PRYME" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" /> 
+
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PYRME Consulting - Secure Loan Solutions" />
-    <meta name="twitter:description" content="Bank-grade security for your financial future. Apply for loans online." />
+    <meta name="twitter:title" content="PRYME - Secure Loan Matchmaking" />
+    <meta name="twitter:description" content="Bank-grade security for your financial future. Apply online instantly." />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://pyrme.in" />
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
 
-  <body>
+  <body class="bg-[#0a0a0a] text-white overflow-x-hidden">
+    
+    <noscript>
+      <div style="padding: 2rem; text-align: center; background: #111; color: #fff; font-family: sans-serif; border-bottom: 2px solid #ef4444;">
+        ⚠️ <strong>JavaScript is required.</strong> Please enable JavaScript to access the PRYME secure portal.
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

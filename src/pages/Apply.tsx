@@ -4,14 +4,14 @@ import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGa
 import { Helmet } from "react-helmet-async";
 import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext"; // 🧠 NEW: We need Auth Context for the Gatekeeper
+import { useAuth } from "@/contexts/AuthContext";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import api from "@/lib/api"; // 🧠 NEW: Direct API access for Lead Salvage
+import { PrymeAPI } from "@/lib/api"; // 🧠 ARCHITECTURE FIX: Import explicit gateway engine
 
 // Loan Components
 import LoanApplicationForm from "@/components/loan/LoanApplicationForm";
@@ -28,22 +28,21 @@ const spring: any = { type: "spring", stiffness: 120, damping: 24, mass: 0.8 };
 
 const Apply = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // 🧠 Access the Auth Context
+  const { user } = useAuth();
   const [loanAmount, setLoanAmount] = useState(500000);
   const [hasAccess, setHasAccess] = useState(isLeadCaptured());
   const [tenure, setTenure] = useState(5);
   const [showComparison, setShowComparison] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   
-  // 🧠 Extended to capture phone number for the Silent Lead Salvage
+  // 🧠 State Persistence Matrix
   const [applicationData, setApplicationData] = useState<{
     cibilScore: number;
     monthlyIncome: number;
     productType: string;
-    phone?: string; // Captured from LeadCaptureGate
-    name?: string;  // Captured from LeadCaptureGate
+    phone?: string; 
+    name?: string; 
   } | null>(null);
 
   const bankOffers = useMemo(() => {
@@ -59,37 +58,45 @@ const Apply = () => {
   }, []);
 
   const handleFormSubmit = async (data: any) => {
+    const leadName = localStorage.getItem("pryme_lead_name") || "Guest";
+    const leadPhone = localStorage.getItem("pryme_lead_phone") || "";
+
     setApplicationData({
       cibilScore: data.cibilScore,
       monthlyIncome: data.monthlyIncome,
       productType: data.productType,
-      phone: localStorage.getItem("pryme_lead_phone") || "", // Assuming LeadCaptureGate saves this
-      name: localStorage.getItem("pryme_lead_name") || "Guest"
+      phone: leadPhone,
+      name: leadName
     });
     setLoanAmount(data.loanAmount);
     setTenure(data.loanTenure);
 
-    // 🧠 SILENT STATE PERSISTENCE: Save to local storage for the dashboard handoff
+    // 1. Silent Local Cache (Picked up by Dashboard 25% stage)
     localStorage.setItem("pryme_pending_application", JSON.stringify({
         loanType: data.productType,
-        employmentType: data.employmentType || "SALARIED", // Assuming your form has this
+        employmentType: data.employmentType || "SALARIED", 
         loanAmount: data.loanAmount
     }));
 
-    // 🧠 IMMEDIATE LEAD SALVAGE: Push to CRM *before* they even see the comparison table
+    // 2. 🧠 SILENT DATABASE INGESTION: Hit Java PublicLeadController BEFORE comparison
     try {
-        await api.post("/leads", {
-          userName: localStorage.getItem("pryme_lead_name") || "Anonymous Prospect",
-          phone: localStorage.getItem("pryme_lead_phone") || "0000000000",
-          loanType: data.productType,
+        const leadRes = await PrymeAPI.submitLead({
+          fullName: leadName,
+          phone: leadPhone,
+          productType: data.productType,
           loanAmount: data.loanAmount,
-          cibilScore: data.cibilScore
+          cibilScore: data.cibilScore,
+          monthlyIncome: data.monthlyIncome
         });
+        
+        // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION
+        if (leadRes?.lead?.id) {
+            localStorage.setItem("pryme_pending_lead_id", leadRes.lead.id);
+        }
     } catch (error) {
-        console.warn("Silent lead capture failed, but continuing UX flow.", error);
+        console.warn("Silent lead capture sync failed.", error);
     }
 
-    // Trigger the V-Flow Analysis Animation
     setIsAnalyzing(true);
   };
 
@@ -107,36 +114,44 @@ const Apply = () => {
     toast({ title: "Redirecting to Bank", description: `Opening ${bank?.bankName} application page...` });
   };
 
+  // 🧠 THE CORE GATEWAY: Pushes intent -> Auth -> Dashboard Progressive Profile
   const handleApplyWithPyrme = async (bankId: string) => {
     const bank = bankOffers.find(b => b.id === bankId);
-    if (!applicationData) return;
+    
+    // Cache exact target to resolve in Dashboard Stage 3
+    localStorage.setItem("pryme_target_bank", bank?.bankName || "Pryme Aggregator");
 
-    // 🧠 THE GATEKEEPER ROUTING
-    // If they aren't logged in, intercept the application process and send them to Auth.
-    // The Dashboard will pick up the saved local storage state when they arrive.
     if (!user) {
-        toast({ title: "Authentication Required", description: "Securing your session before final submission..." });
-        navigate("/auth?redirect=/dashboard");
+        // 🧠 The Toggle Notification (Google / Auth Switch)
+        toast({ 
+          title: "Save Your Progress 🔒", 
+          description: "Sign in with Google or Email to secure your limits and continue your application.",
+          action: (
+            <Button onClick={() => navigate("/auth?redirect=/dashboard")} className="bg-blue-600 text-white hover:bg-blue-700">
+               Sign In & Continue
+            </Button>
+          ),
+          duration: 10000,
+        });
+        
+        // Auto-eject to auth if they don't click manually
+        setTimeout(() => navigate("/auth?redirect=/dashboard"), 3000);
         return;
     }
 
-    // If they ARE logged in, proceed with the actual API submission
+    // If logged in, execute Elevation Protocol immediately and drop them into the Dashboard Matrix
     setIsSubmitting(true);
     try {
-      // Assuming your backend expects this exact payload structure
-      const response = await api.post("/applications/submit", {
-          loanType: applicationData.productType,
-          requestedAmount: loanAmount,
-          declaredCibilScore: applicationData.cibilScore
-      });
-      
-      setIsSuccess(true);
-      toast({
-        title: "Application Secured 🔒",
-        description: `Lead ID: ${response.data.applicationId}. A PRYME RM for ${bank?.bankName} will contact you shortly.`,
-      });
+      const leadId = localStorage.getItem("pryme_pending_lead_id");
+      if (leadId) {
+         await PrymeAPI.elevateLead(leadId, user.id);
+         localStorage.removeItem("pryme_pending_lead_id");
+      }
+      toast({ title: "Pipeline Secured", description: "Redirecting to your application portal..." });
+      navigate("/dashboard");
     } catch (error) {
-      toast({ title: "Submission Error", description: "Unable to reach the secure server.", variant: "destructive" });
+      toast({ title: "Routing Handshake", description: "Loading Client Portal..." });
+      navigate("/dashboard");
     } finally {
       setIsSubmitting(false);
     }
@@ -157,39 +172,6 @@ const Apply = () => {
     { icon: CheckCircle, label: "Real-time Offers", color: "text-primary" },
   ];
 
-  // ── Success Screen ──────────────────────────────────────────────────
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] p-6 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/15 blur-[120px] rounded-full pointer-events-none" />
-        <motion.div
-          initial={{ scale: 0.92, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="max-w-md w-full bg-[#111] p-8 rounded-[2rem] text-center border border-white/[0.06]"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-            className="w-20 h-20 bg-[#2aac64]/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#2aac64]/20"
-          >
-            <CheckCircle2 className="w-10 h-10 text-[#2aac64]" />
-          </motion.div>
-          <h2 className="text-2xl font-semibold text-white mb-2">Application Submitted</h2>
-          <p className="text-slate-400 mb-8 leading-relaxed">
-            We're comparing offers from our partner banks to find the best rates for your profile. You'll hear from us shortly.
-          </p>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-            <Button onClick={() => navigate("/dashboard")} className="w-full bg-[#2aac64] hover:bg-[#239b57] text-white py-6 text-lg font-semibold rounded-xl transition-colors duration-200" size="lg">
-              Go to Dashboard <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          </motion.div>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <>
       <Helmet>
@@ -197,10 +179,8 @@ const Apply = () => {
         <meta name="description" content="Compare loan offers from top banks. Apply for personal, business, or home loans securely." />
       </Helmet>
 
-      {/* Lead Capture Gate — non-bypassable */}
       {!hasAccess && <LeadCaptureGate onCaptured={() => setHasAccess(true)} />}
 
-      {/* 🧠 Analysis Window Overlay */}
       <AnalysisLoader 
         isVisible={isAnalyzing} 
         onComplete={handleAnalysisComplete}
@@ -208,26 +188,17 @@ const Apply = () => {
       />
 
       <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
-
-        {/* Ambient Glassmorphic Glows - Darkened for Bank Grade look */}
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-[#0f462b]/10 blur-[120px] rounded-full pointer-events-none" />
 
         <Header />
 
         <main className="flex-1 w-full pt-20 relative z-10">
-
-          {/* 1. Header & Intake Area */}
           <section className="py-8 md:py-12">
             <div className="container mx-auto px-4 max-w-7xl">
-
-              {/* Split layout: calculators (left) + form (right) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-                {/* Left Column: Hero Text & Sticky Calculators */}
                 <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-24">
-
-                  {/* Hero Text */}
                   <div className="max-w-xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-[#2aac64]/20 shadow-sm mb-6 mt-2">
                       <LockKeyhole className="w-3.5 h-3.5 text-[#2aac64]" />
@@ -251,7 +222,6 @@ const Apply = () => {
                     </div>
                   </div>
 
-                  {/* EMIs & Tips (Hidden on Mobile, shown Below Text on Desktop) */}
                   <div className="space-y-6 hidden lg:block">
                     <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
                       <EMICalculator loanAmount={loanAmount} showTerminology={false} />
@@ -270,7 +240,6 @@ const Apply = () => {
                   </div>
                 </div>
 
-                {/* Right Column: The Input Form */}
                 <div className="lg:col-span-7 w-full space-y-8">
                   <div className="bg-[#111] border border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
@@ -280,7 +249,6 @@ const Apply = () => {
                     />
                   </div>
 
-                  {/* Mobile-only Calculator (shown below form on small screens) */}
                   <div className="space-y-6 lg:hidden">
                     <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
                       <EMICalculator loanAmount={loanAmount} showTerminology={false} />
@@ -292,7 +260,6 @@ const Apply = () => {
             </div>
           </section>
 
-          {/* Comparison dashboard reveal */}
           <AnimatePresence>
             {showComparison && (
               <motion.div
@@ -305,8 +272,6 @@ const Apply = () => {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-16" />
 
                 <div className="container mx-auto px-4 max-w-7xl space-y-8">
-
-                  {/* Dashboard Header */}
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/40 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 backdrop-blur-xl shadow-xl">
                     <div>
                       <div className="inline-flex items-center gap-2 mb-3">
@@ -326,7 +291,6 @@ const Apply = () => {
                     </div>
                   </div>
 
-                  {/* The Preserved Comparison Table Component */}
                   <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
                     <BankComparisonTable
                       offers={bankOffers}
@@ -343,7 +307,6 @@ const Apply = () => {
                     </div>
                   </div>
 
-                  {/* Supporting Analytics Grid */}
                   {applicationData && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                       <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] p-6 shadow-xl h-full">
@@ -363,7 +326,6 @@ const Apply = () => {
                     </div>
                   )}
 
-                  {/* Rewards Section */}
                   <div className="pt-8">
                     <div className="text-center mb-8">
                       <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Exclusive PRYME Rewards</h3>
