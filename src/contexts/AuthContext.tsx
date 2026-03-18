@@ -16,9 +16,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (userData: any) => Promise<{ error: Error | null }>; // 🧠 RESTORED: Now handles the Auto-Login Chain
   signOut: () => Promise<void>;
-  // Note: signUp is removed as the closed-loop CRM provisions users internally 
-  // via the Backend Admin controllers, preventing public actor pollution.
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,6 +47,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // 🧠 MEMORY LEAK FIX: Wrapped in useCallback to prevent infinite useEffect loops
+  const nukeSession = useCallback(() => {
+    localStorage.removeItem("pryme_session_token");
+    localStorage.removeItem("pryme_user_data");
+    setUser(null);
+  }, []);
+
   // Core verification engine: Validates token presence and mathematical expiry
   const verifyState = useCallback(() => {
     const token = localStorage.getItem("pryme_session_token");
@@ -71,14 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     }
     setIsLoading(false);
-  }, []);
-
-  // Total local memory wipe protocol
-  const nukeSession = () => {
-    localStorage.removeItem("pryme_session_token");
-    localStorage.removeItem("pryme_user_data");
-    setUser(null);
-  };
+  }, [nukeSession]);
 
   useEffect(() => {
     // Initial boot sequence validation
@@ -93,22 +92,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     window.addEventListener("pryme_auth_expired", handleForceEviction);
     return () => window.removeEventListener("pryme_auth_expired", handleForceEviction);
-  }, [verifyState]);
+  }, [verifyState, nukeSession]);
 
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       const deviceId = getSecureDeviceId();
       
-      // Routing directly to Code X Backend: AuthController.java -> login
-      const response = await PrymeAPI.login(email, password, deviceId);
+      // 🧠 POLYMORPHIC COMPATIBILITY: Passing as a strict object to match the API parser
+      const response = await PrymeAPI.login({ email, password, deviceId });
       
       // Base64Url Token issued via SecureRandom
       localStorage.setItem("pryme_session_token", response.token);
       
       const userData: AuthUser = {
-        name: response.name,
-        role: response.role as AppRole,
+        name: response.name || "Pryme Client",
+        // 🧠 UPPERCASE NORMALIZATION: Prevents case-sensitive RBAC routing failures
+        role: (response.role?.toUpperCase() || "USER") as AppRole,
         expiresAt: response.expiresAt,
       };
       
@@ -118,6 +118,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { error: null };
     } catch (err) {
       nukeSession();
+      return { error: err as Error };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 🧠 THE AUTO-LOGIN CHAIN
+  // Registers the user and immediately logs them in to fetch the JWT token
+  const signUp = async (userData: any) => {
+    try {
+      setIsLoading(true);
+      
+      // 1. Provision the user in the database
+      await PrymeAPI.signup(userData);
+      
+      // 2. Extract credentials regardless of UI variable names
+      const email = userData.email || userData.username;
+      const password = userData.password || userData.securityKey || userData.key;
+      
+      // 3. Immediately exchange credentials for a JWT Session Token
+      return await signIn(email, password);
+      
+    } catch (err) {
       return { error: err as Error };
     } finally {
       setIsLoading(false);
@@ -143,6 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Granting admin UI privileges strictly to Top-Tier roles
     isAdmin: user?.role === "ADMIN" || user?.role === "SUPER_ADMIN",
     signIn,
+    signUp,
     signOut,
   };
 

@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 
 // 🧠 Closed-Loop Security Context & API
 import { useAuth } from "@/contexts/AuthContext";
-import { PrymeAPI } from "@/lib/api";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -41,16 +40,16 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 type AuthView = "login" | "signup" | "forgot-password";
 
 const Auth = () => {
-  const { user, signIn, isLoading: isContextLoading } = useAuth();
+  // 🧠 INTEGRATION FIX: Destructured the newly minted signUp method
+  const { user, signIn, signUp, isLoading: isContextLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 🧠 THE INTERCEPT: Grab the hidden leadId passed from the Offers Matrix
+  // Deep Link Recovery & Lead Matrix Capture
   const pendingLeadId = location.state?.leadId || null;
-  // Deep Link Recovery: Returns user to the page they tried to access before login
   const from = location.state?.from || null;
 
   const loginForm = useForm<LoginData>({
@@ -69,6 +68,8 @@ const Auth = () => {
   });
 
   // 🧠 DETERMINISTIC RBAC ROUTING ENGINE
+  // This listens for context hydration. The moment a user successfully signs in OR signs up,
+  // it fires automatically and ejects them from the auth screen.
   useEffect(() => {
     if (user) {
       if (from) {
@@ -86,11 +87,12 @@ const Auth = () => {
     }
   }, [user, navigate, from]);
 
-  // 🧠 SECURE LOGIN (WITH ELEVATION ENGINE)
+  // 🧠 SECURE LOGIN
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
     
-    const { data: authData, error } = await signIn(data.email, data.password);
+    // Eradicated Supabase artifacts. Only expecting an error object back.
+    const { error } = await signIn(data.email, data.password);
     
     if (error) {
       toast({
@@ -100,60 +102,43 @@ const Auth = () => {
       });
       loginForm.setValue("password", ""); 
     } else {
-      // 🧠 THE ELEVATION ENGINE TRIGGER
-      if (pendingLeadId && authData?.user?.id) {
-        try {
-          await PrymeAPI.elevateLead(pendingLeadId, authData.user.id);
-          toast({
-            title: "Application Secured",
-            description: "Your loan application has been successfully locked to your identity.",
-          });
-        } catch (elevationError) {
-          console.error("Lead Elevation failed during login:", elevationError);
-          toast({
-            title: "Warning",
-            description: "Session authorized, but could not link your pending application.",
-            variant: "destructive"
-          });
-        }
-      } else {
-        toast({
-          title: "Session Authorized",
-          description: "Welcome back to the Pryme CRM system.",
-        });
-      }
+      toast({
+        title: "Session Authorized",
+        description: "Welcome back to the Pryme CRM system. Booting matrix...",
+      });
+      // Routing is handled automatically by the useEffect Hook!
     }
     
     setIsLoading(false);
   };
 
-  // 🧠 SECURE DATABASE REGISTRATION ENGINE
+  // 🧠 SECURE REGISTRATION & AUTO-LOGIN CHAIN
   const handleSignup = async (data: SignupData) => {
     setIsLoading(true);
     
-    try {
-      // Physically write the user identity to the PostgreSQL/H2 backend
-      await PrymeAPI.signup(data.fullName, data.email, data.password);
-      
-      toast({
-        title: "Identity Established",
-        description: "Welcome to PRYME. Please authorize your session to continue.",
-      });
-      
-      // UX Optmization: Route to login tab and pre-fill the email they just used
-      setView("login");
-      loginForm.setValue("email", data.email);
-      loginForm.setValue("password", ""); // Keep password blank for security
-
-    } catch (error: any) {
+    // We now route the payload directly through the AuthContext Auto-Login Chain
+    const { error } = await signUp({
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password
+    });
+    
+    if (error) {
       toast({
         title: "Registration Failed",
         description: error.message || "Could not create account. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast({
+        title: "Identity Established",
+        description: "Session securely authorized. Warping to Dashboard...",
+      });
+      // No manual redirects or setViews here. The Auto-Login Chain hydrated the state, 
+      // so the useEffect RBAC Router will instantly take over!
     }
+    
+    setIsLoading(false);
   };
 
   const handleForgotPassword = async (data: ForgotPasswordData) => {
