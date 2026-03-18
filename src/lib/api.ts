@@ -197,6 +197,20 @@ export const PrymeAPI = {
     return fetchWithAuth(`/documents/upload/${applicationId}`, { method: "POST", body: formData });
   },
 
+  uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("docType", docType);
+      formData.append("file", file);
+      
+      const response = await api.post(`/applications/${applicationId}/documents`, formData);
+      return { data: response.data, error: null };
+    } catch (error: any) {
+      console.error("Document upload failed:", error);
+      return { data: null, error: error.message || "Failed to upload document" };
+    }
+  },
+
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
 };
 
