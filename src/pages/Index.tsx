@@ -1,7 +1,38 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Helmet } from "react-helmet-async";
 import { Building2 } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+
+// 🧠 Animated Counter Hook — drives the number-tick animation
+const useAnimatedCounter = (target: number, duration: number = 2000, startOnView: boolean = false, isInView: boolean = true) => {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!isInView || hasAnimated.current) return;
+    if (startOnView) hasAnimated.current = true;
+
+    let startTime: number | null = null;
+    let animationId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // Ease-out cubic for a satisfying deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) {
+        animationId = requestAnimationFrame(step);
+      }
+    };
+
+    animationId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationId);
+  }, [target, duration, isInView, startOnView]);
+
+  return count;
+};
 
 // Layout & Core Utilities
 import Header from "@/components/layout/Header";
@@ -24,6 +55,7 @@ import { Link } from "react-router-dom";
 import EMICalculator from "@/components/loan/EMICalculator";
 import EligibilityScore from "@/components/loan/EligibilityScore";
 import PrepaymentCalculator from "@/components/loan/PrepaymentCalculator";
+import CibilTips from "@/components/loan/CibilTips";
 
 // 🧠 1. NATIVE ERROR BOUNDARY: Localized crash protection. 
 class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
@@ -52,6 +84,45 @@ class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {h
     return this.props.children;
   }
 }
+
+// 🧠 ANIMATED STATS BLOCK: Numbers tick up on scroll-into-view
+const statsData = [
+  { label: "Capital Disbursed", target: 500, suffix: "Cr+", prefix: "₹" },
+  { label: "Avg Approval", target: 24, suffix: "h", prefix: "" },
+  { label: "Success Rate", target: 98, suffix: "%", prefix: "" },
+];
+
+const AnimatedStatsBlock = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+
+  const count0 = useAnimatedCounter(statsData[0].target, 2200, true, isInView);
+  const count1 = useAnimatedCounter(statsData[1].target, 1800, true, isInView);
+  const count2 = useAnimatedCounter(statsData[2].target, 2000, true, isInView);
+  const counts = [count0, count1, count2];
+
+  return (
+    <div
+      ref={ref}
+      className="flex flex-col gap-5 bg-card dark:bg-secondary/20 backdrop-blur-md rounded-[2rem] p-7 md:p-8 border border-border dark:border-white/5 shadow-lg transition-all hover:border-primary/30"
+    >
+      {statsData.map((stat, i) => (
+        <motion.div
+          key={stat.label}
+          initial={{ opacity: 0, x: 20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: i * 0.15 }}
+          className={`flex items-center justify-between ${i < statsData.length - 1 ? "border-b border-border dark:border-white/5 pb-5" : ""}`}
+        >
+          <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+          <p className="text-2xl md:text-3xl font-bold text-foreground tracking-tighter tabular-nums">
+            {stat.prefix}{counts[i]}<span className="text-primary text-xl">{stat.suffix}</span>
+          </p>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 const Index = () => {
   return (
@@ -121,54 +192,42 @@ const Index = () => {
                   </p>
                 </div>
 
-                {/* 60/40 CRO Data Grid Split */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                {/* 60/40 CRO Data Grid Split Rebalanced */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
                   
-                  {/* Left: The Calculator + MIGRATED STATS */}
-                  <div className="lg:col-span-7 w-full flex flex-col gap-8">
+                  {/* Left: The Calculators (EMI + Prepayment) */}
+                  <div className="lg:col-span-7 w-full flex flex-col gap-6 lg:gap-8">
                     
-                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-4 transition-all duration-500">
+                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-3 transition-all duration-500">
                       <EMICalculator loanAmount={500000} showTerminology={true} />
                     </div>
 
-                    {/* 🧠 THE STATS BLOCK (Moved perfectly under the EMI Calculator) */}
-                    <div className="grid grid-cols-3 gap-4 bg-secondary/50 backdrop-blur-md rounded-[2rem] p-6 border border-border shadow-xl">
-                      <div className="text-center border-r border-border">
-                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
-                          ₹500<span className="text-primary">Cr+</span>
-                        </p>
-                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Capital Disbursed</p>
-                      </div>
-                      <div className="text-center border-r border-border">
-                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
-                          24<span className="text-primary">h</span>
-                        </p>
-                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Avg Approval</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
-                          98<span className="text-primary">%</span>
-                        </p>
-                        <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Success Rate</p>
-                      </div>
+                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-3 transition-all duration-500">
+                       <PrepaymentCalculator />
                     </div>
 
                   </div>
                   
-                  {/* Right: The Data Context */}
-                  <div className="lg:col-span-5 w-full space-y-6">
+                  {/* Right: The Data Context & Trust Elements */}
+                  <div className="lg:col-span-5 w-full flex flex-col gap-6 lg:gap-8">
                     <EligibilityScore score={82} cibilScore={750} monthlyIncome={85000} loanAmount={500000} />
-                    <PrepaymentCalculator />
                     
-                    {/* Trust Mini-Card under Eligibility */}
-                    <div className="bg-primary/5 border border-primary/20 rounded-[2rem] p-6 backdrop-blur-md shadow-inner">
-                      <h4 className="text-primary font-semibold text-lg mb-2 flex items-center gap-2">
+                    {/* 🧠 ANIMATED STATS BLOCK: Numbers tick up on scroll */}
+                    <AnimatedStatsBlock />
+                    
+                    
+                    {/* Trust Mini-Card under Analytics */}
+                    <div className="bg-primary/5 dark:bg-[#2aac64]/5 border border-primary/20 dark:border-[#2aac64]/20 rounded-[2rem] p-6 lg:p-8 backdrop-blur-md shadow-inner">
+                      <h4 className="text-primary dark:text-[#2aac64] font-bold text-lg mb-3 flex items-center gap-2.5">
                         <Building2 className="w-5 h-5" /> Real-Time Analytics
                       </h4>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                      <p className="text-xs lg:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">
                         These metrics are calculated using the exact proprietary algorithms deployed by top-tier Indian banks to assess creditworthiness.
                       </p>
                     </div>
+
+                    {/* 🧠 CIBIL Score Improvement Tips — Interactive Insider Knowledge */}
+                    <CibilTips />
                   </div>
                   
                 </div>

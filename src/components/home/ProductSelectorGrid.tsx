@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Silk from "@/components/ui/Silk";
+import { BackgroundBeams } from "@/components/ui/BackgroundBeams";
 
 // Assets safely imported from local directory
 import cardPersonal from "@/assets/card-personal.png";
@@ -58,30 +58,10 @@ const ProductSelectorGrid = memo(() => {
   return (
     <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-10 pt-0 overflow-x-clip">
       
-      {/* 🧠 Silk Background Animation (PRO UI/UX Blending) */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none mix-blend-screen opacity-80"
-        style={{ 
-          width: '1400px', 
-          height: '1000px',
-          maskImage: 'radial-gradient(circle at center, black 20%, transparent 60%)',
-          WebkitMaskImage: 'radial-gradient(circle at center, black 20%, transparent 60%)'
-        }}
-      >
-        <Silk
-          speed={2.3}
-          scale={0.7}
-          color="#0f462b"
-          noiseIntensity={1.5}
-          rotation={0}
-        />
-      </div>
+      {/* 🧠 4K React Bits Style Beams Background */}
+      <BackgroundBeams />
 
-      {/* 🧠 Tightly nested against the Hero */}
       <div className="container mx-auto px-4 max-w-[1300px] relative z-20">
-        
-        {/* Ambient glow centered behind the products */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[150px] bg-[#2aac64]/10 blur-[100px] rounded-full pointer-events-none" />
 
         {/* 🧠 CLIPPING ERADICATED: 
             Changed to flex-wrap. NO overflow classes anywhere. 
@@ -153,8 +133,7 @@ const ProductSelectorGrid = memo(() => {
                   />
                 </motion.div>
 
-                {/* Typography perfectly aligned below */}
-                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10">
+                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-bold text-foreground/90 group-hover:text-primary transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10 drop-shadow-sm">
                   {product.label}
                 </span>
               </Link>

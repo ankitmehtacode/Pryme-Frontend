@@ -1,5 +1,4 @@
 import { memo } from "react";
-import hdfcLogo from "@/assets/card-personal.png"; // Fallback as requested earlier
 import iciciLogo from "@/assets/icici.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
@@ -9,8 +8,7 @@ import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 
-const banks = [
-  { name: "HDFC Bank", logo: hdfcLogo },
+export const banks = [
   { name: "ICICI Bank", logo: iciciLogo },
   { name: "Axis Bank", logo: axisLogo },
   { name: "IDBI Bank", logo: idbiLogo },
@@ -19,9 +17,8 @@ const banks = [
   { name: "Yes Bank", logo: yesLogo },
   { name: "Punjab National", logo: pnbLogo },
   { name: "Tata Capital", logo: tataLogo },
-  // Adding 6 more to reach 15 Premium Partners using available assets
+  // Adding more to reach Premium Partners using available assets
   { name: "Standard Chartered", logo: idbiLogo }, // Re-using existing premium svgs to ensure no broken images
-  { name: "Bajaj Finserv", logo: hdfcLogo }, 
   { name: "Citi Bank", logo: iciciLogo },
   { name: "IndusInd Bank", logo: axisLogo },
   { name: "HSBC", logo: kotakLogo },
@@ -58,7 +55,7 @@ const PartnerBankMarquee = memo(() => {
               <img 
                 src={bank.logo} 
                 alt={bank.name} 
-                className="max-h-full max-w-full object-contain drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                className="max-h-full max-w-full object-contain drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] opacity-80 hover:opacity-100 transition-all duration-500"
               />
             </div>
           ))}

@@ -71,7 +71,7 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           ref={ref}
           {...props}
           className={cn(
-            "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white outline-none transition-all duration-200 group-hover:border-white/20 focus:border-[#2aac64]/60 focus:ring-2 focus:ring-[#2aac64]/20",
+            "w-full bg-secondary/50 dark:bg-[#111] border border-border dark:border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/20 focus:border-primary/60 dark:focus:border-[#2aac64]/60 focus:ring-2 focus:ring-primary/20 dark:focus:ring-[#2aac64]/20",
             error && "border-red-500/40 focus:ring-red-500/20 focus:border-red-500/60",
             isValid && !error && "border-[#2aac64]/30"
           )}
@@ -215,8 +215,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   };
   const cibilUi = getCibilData(currentCibil || 750);
 
-  const cardCn = "bg-[#0a0a0a] border border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-white/[0.1]";
-  const inputCn = "w-full bg-[#111] border border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-white outline-none transition-all duration-200 hover:border-white/20 focus:border-[#2aac64]/60 focus:ring-2 focus:ring-[#2aac64]/20";
+  const cardCn = "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-primary/20 dark:hover:border-white/[0.1]";
+  const inputCn = "w-full bg-secondary/50 dark:bg-[#111] border border-border dark:border-white/10 rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 hover:border-primary/20 dark:hover:border-white/20 focus:border-primary/60 dark:focus:border-[#2aac64]/60 focus:ring-2 focus:ring-primary/20 dark:focus:ring-[#2aac64]/20";
 
   return (
     <>
@@ -261,7 +261,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300",
-                      isActive ? "bg-[#2aac64] text-white" : "bg-[#1a1a1a] text-slate-500 border border-white/10"
+                      isActive ? "bg-primary dark:bg-[#2aac64] text-primary-foreground dark:text-white" : "bg-secondary dark:bg-[#1a1a1a] text-muted-foreground dark:text-slate-500 border border-border dark:border-white/10"
                     )}
                   >
                     {isActive && stepNum < step ? (
@@ -302,10 +302,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               <div className="absolute top-0 right-0 w-40 h-40 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
-                  <User className="w-5 h-5 text-[#2aac64]" />
+                <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary dark:text-[#2aac64]" />
                 </div>
-                <h3 className="text-lg font-semibold text-white tracking-tight">Verify Identity</h3>
+                <h3 className="text-lg font-bold text-foreground tracking-tight">Verify Identity</h3>
               </div>
 
               <div className="space-y-5 relative z-10">
@@ -373,10 +373,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               <div className="absolute top-0 right-0 w-40 h-40 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
-                  <IndianRupee className="w-5 h-5 text-[#2aac64]" />
+                <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                  <IndianRupee className="w-5 h-5 text-primary dark:text-[#2aac64]" />
                 </div>
-                <h3 className="text-lg font-semibold text-white tracking-tight">Loan Details</h3>
+                <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
               </div>
 
               <div className="space-y-6 relative z-10">
@@ -395,8 +395,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                           className={cn(
                             "py-3 px-2 rounded-xl text-xs md:text-sm font-medium transition-colors duration-200 border",
                             isSelected
-                              ? "bg-[#2aac64] text-white border-[#2aac64]"
-                              : "bg-[#111] text-slate-400 border-white/[0.06] hover:text-slate-200 hover:border-white/15"
+                              ? "bg-primary dark:bg-[#2aac64] text-primary-foreground dark:text-white border-primary dark:border-[#2aac64]"
+                              : "bg-secondary dark:bg-[#111] text-muted-foreground dark:text-slate-400 border-border dark:border-white/[0.06] hover:text-foreground hover:border-border dark:hover:border-white/15"
                           )}
                         >
                           {type.label}
@@ -448,10 +448,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             >
               <div className={cardCn}>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#111] border border-white/[0.06] flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-[#2aac64]" />
+                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-primary dark:text-[#2aac64]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white tracking-tight">Income & Employment</h3>
+                  <h3 className="text-lg font-bold text-foreground tracking-tight">Income & Employment</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
@@ -553,7 +553,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               onClick={prevStep}
               disabled={step === 1 || isSubmitting || isAnalyzing}
               className={cn(
-                "bg-transparent border-white/10 text-slate-400 hover:bg-white/5 hover:border-white/20 rounded-xl transition-all duration-200",
+                "bg-transparent border-border dark:border-white/10 text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-white/5 hover:border-primary/20 dark:hover:border-white/20 rounded-xl transition-all duration-200",
                 step === 1 && "opacity-0 pointer-events-none"
               )}
             >

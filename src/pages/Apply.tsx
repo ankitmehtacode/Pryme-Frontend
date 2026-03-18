@@ -144,7 +144,7 @@ const Apply = () => {
     try {
       const leadId = localStorage.getItem("pryme_pending_lead_id");
       if (leadId) {
-         await PrymeAPI.elevateLead(leadId, user.id);
+         await PrymeAPI.elevateLead(leadId, (user as any).id || user.name);
          localStorage.removeItem("pryme_pending_lead_id");
       }
       toast({ title: "Pipeline Secured", description: "Redirecting to your application portal..." });
@@ -169,7 +169,7 @@ const Apply = () => {
   const features = [
     { icon: Shield, label: "256-bit Encrypted", color: "text-emerald-500" },
     { icon: Clock, label: "2 Min Process", color: "text-blue-500" },
-    { icon: CheckCircle, label: "Real-time Offers", color: "text-primary" },
+    { icon: CheckCircle, label: "Real-time Offers", color: "text-primary dark:text-[#2aac64]" },
   ];
 
   return (
@@ -187,9 +187,10 @@ const Apply = () => {
         data={applicationData}
       />
 
-      <div className="min-h-screen flex flex-col bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#0f462b]/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-[#0f462b]/10 blur-[120px] rounded-full pointer-events-none" />
+      {/* 🧠 UI FIX: Changed hardcoded black `#0a0a0a` to semantic adaptive `bg-slate-50 dark:bg-[#0a0a0a]` */}
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-emerald-500/5 dark:bg-[#0f462b]/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-emerald-500/5 dark:bg-[#0f462b]/10 blur-[120px] rounded-full pointer-events-none" />
 
         <Header />
 
@@ -200,30 +201,33 @@ const Apply = () => {
 
                 <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-24">
                   <div className="max-w-xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-[#2aac64]/20 shadow-sm mb-6 mt-2">
-                      <LockKeyhole className="w-3.5 h-3.5 text-[#2aac64]" />
-                      <span className="text-[10px] font-medium text-slate-300 uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card dark:bg-[#0a0a0a] border border-border dark:border-[#2aac64]/20 shadow-sm mb-6 mt-2">
+                      <LockKeyhole className="w-3.5 h-3.5 text-primary dark:text-[#2aac64]" />
+                      <span className="text-[10px] font-bold text-muted-foreground dark:text-slate-300 uppercase tracking-widest">
                         Bank-Grade Security Protocol Active
                       </span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight">
-                      Intelligent Loan <span className="text-[#2aac64]">Matchmaking.</span>
+                    {/* 🧠 UI FIX: text-white -> text-foreground */}
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-6 tracking-tight leading-tight">
+                      Intelligent Loan <span className="text-primary dark:text-[#2aac64]">Matchmaking.</span>
                     </h1>
-                    <p className="text-base text-slate-400 mb-8 font-medium max-w-md leading-relaxed">
+                    {/* 🧠 UI FIX: text-slate-400 -> text-muted-foreground */}
+                    <p className="text-base text-muted-foreground mb-8 font-medium max-w-md leading-relaxed">
                       Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits and lowest interest rates instantly.
                     </p>
                     <div className="flex flex-wrap gap-3">
                       {features.map((feature) => (
-                        <div key={feature.label} className="flex items-center gap-2 text-[10px] text-white bg-transparent border border-white/10 px-3 py-2 rounded-full shadow-sm">
+                        <div key={feature.label} className="flex items-center gap-2 text-[10px] font-bold text-foreground bg-card dark:bg-transparent border border-border dark:border-white/10 px-3 py-2 rounded-full shadow-sm">
                           <feature.icon className={`w-3.5 h-3.5 ${feature.color}`} />
-                          <span className="font-medium tracking-widest uppercase">{feature.label}</span>
+                          <span className="tracking-widest uppercase">{feature.label}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-6 hidden lg:block">
-                    <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
+                    {/* 🧠 UI FIX: bg-[#111] -> bg-card dark:bg-[#111] */}
+                    <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
                       <EMICalculator loanAmount={loanAmount} showTerminology={false} />
                     </div>
                     <AnimatePresence>
@@ -241,8 +245,9 @@ const Apply = () => {
                 </div>
 
                 <div className="lg:col-span-7 w-full space-y-8">
-                  <div className="bg-[#111] border border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+                  {/* 🧠 UI FIX: bg-[#111] -> bg-card dark:bg-[#111] */}
+                  <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
                     <LoanApplicationForm
                       onAmountChange={setLoanAmount}
                       onFormSubmit={handleFormSubmit}
@@ -250,7 +255,7 @@ const Apply = () => {
                   </div>
 
                   <div className="space-y-6 lg:hidden">
-                    <div className="bg-[#111] border border-white/5 p-6 rounded-[2rem] shadow-xl">
+                    <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
                       <EMICalculator loanAmount={loanAmount} showTerminology={false} />
                     </div>
                   </div>
@@ -269,24 +274,24 @@ const Apply = () => {
                 transition={spring}
                 className="w-full relative z-20 pb-20"
               >
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-16" />
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 dark:via-[#2aac64]/30 to-transparent mb-16" />
 
                 <div className="container mx-auto px-4 max-w-7xl space-y-8">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/40 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-border backdrop-blur-xl shadow-xl">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-card/60 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-border backdrop-blur-xl shadow-xl">
                     <div>
                       <div className="inline-flex items-center gap-2 mb-3">
-                        <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-                        <span className="text-sm font-medium text-primary uppercase tracking-widest">Analysis Complete</span>
+                        <Sparkles className="w-5 h-5 text-primary dark:text-[#2aac64] animate-pulse" />
+                        <span className="text-sm font-bold text-primary dark:text-[#2aac64] uppercase tracking-widest">Analysis Complete</span>
                       </div>
-                      <h2 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
                         Your Custom Loan Offers
                       </h2>
                     </div>
                     <div className="flex items-center gap-3 px-5 py-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl">
                       <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                       <div>
-                        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-500 uppercase tracking-wider">Matches Found</p>
-                        <p className="text-xl font-semibold text-emerald-800 dark:text-emerald-400 leading-none">{bankOffers.length} Banks</p>
+                        <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-500 uppercase tracking-widest">Matches Found</p>
+                        <p className="text-xl font-bold text-emerald-800 dark:text-emerald-400 leading-none">{bankOffers.length} Banks</p>
                       </div>
                     </div>
                   </div>
@@ -299,9 +304,9 @@ const Apply = () => {
                       onApplyDirect={handleApplyDirect}
                       onApplyWithPyrme={handleApplyWithPyrme}
                     />
-                    <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-border flex items-start gap-3">
-                      <Info className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
-                      <p className="text-sm font-medium text-slate-500">
+                    <div className="p-4 bg-secondary/50 dark:bg-slate-900 border-t border-border flex items-start gap-3">
+                      <Info className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                      <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide leading-relaxed">
                         Offers are sorted by interest rate. The "Recommended" badge indicates the mathematically best rate available based on your entered parameters. Final rates are subject to physical document verification.
                       </p>
                     </div>
@@ -328,8 +333,8 @@ const Apply = () => {
 
                   <div className="pt-8">
                     <div className="text-center mb-8">
-                      <h3 className="text-2xl font-semibold text-foreground tracking-tight">Exclusive PRYME Rewards</h3>
-                      <p className="text-slate-500 font-medium">Apply through us to get these benefits.</p>
+                      <h3 className="text-2xl font-bold text-foreground tracking-tight">Exclusive PRYME Rewards</h3>
+                      <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Apply through us to get these benefits.</p>
                     </div>
                     <OffersRewards />
                   </div>

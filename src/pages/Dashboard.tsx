@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -22,6 +22,49 @@ import { toast } from "@/hooks/use-toast";
 import api, { PrymeAPI } from "@/lib/api";
 import { getDocumentsForLoanType, ProductType, EmploymentType } from "@/lib/documentData";
 
+// --- Types & Interfaces ---
+interface ApplicationDoc {
+  docType: string;
+  url?: string;
+  name?: string;
+  id?: string;
+}
+
+interface Application {
+  applicationId: string;
+  status: string;
+  loanType: string;
+  requestedAmount: number;
+  completionPercentage: number;
+  createdAt: string;
+  assignee?: string;
+  documents?: ApplicationDoc[];
+  metadata?: Record<string, any>;
+}
+
+interface DashboardFormData {
+  panNumber: string;
+  dob: string;
+  currentCity: string;
+  pinCode: string;
+  companyName: string;
+  designation: string;
+  workExperience: string;
+  officeEmail: string;
+  monthlyEMI: string;
+  existingBank: string;
+  coApplicant: string;
+  loanPurpose: string;
+}
+
+const initialFormData: DashboardFormData = {
+  panNumber: "", dob: "", currentCity: "", pinCode: "", 
+  companyName: "", designation: "", workExperience: "", officeEmail: "", 
+  monthlyEMI: "", existingBank: "", coApplicant: "No", loanPurpose: "", 
+};
+
+type ViewState = "LOADING" | "FUNNEL" | "DASHBOARD" | "EMPTY";
+
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
 const getStatusConfig = (status: string) => {
@@ -41,37 +84,35 @@ const getStatusConfig = (status: string) => {
   }
 };
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [viewState, setViewState] = useState<"LOADING" | "FUNNEL" | "DASHBOARD" | "EMPTY">("LOADING");
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [viewState, setViewState] = useState<ViewState>("LOADING");
   
-  const [myApplications, setMyApplications] = useState<any[]>([]);
-  const [activeApplication, setActiveApplication] = useState<any>(null);
+  const [myApplications, setMyApplications] = useState<Application[]>([]);
+  const [activeApplication, setActiveApplication] = useState<Application | null>(null);
   
-  const [currentStage, setCurrentStage] = useState(1);
-  
-  // 🧠 TITANIUM STATE: Pre-filled keys prevent React "uncontrolled input" warnings
-  const [formData, setFormData] = useState({
-    panNumber: "", dob: "", currentCity: "", pinCode: "", 
-    companyName: "", designation: "", workExperience: "", officeEmail: "", 
-    monthlyEMI: "", existingBank: "", coApplicant: "No", loanPurpose: "", 
-  });
+  const [uploadingDocs, setUploadingDocs] = useState<Record<string, boolean>>({});
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
 
+  const [currentStage, setCurrentStage] = useState<number>(1);
+  const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
+
+  // Use AbortController for clean component unmounting
   useEffect(() => {
-    let isMounted = true;
-
+    const abortController = new AbortController();
+    
     const bootDashboard = async () => {
       if (authLoading) return;
       if (!user) {
-        if (isMounted) navigate("/auth?redirect=/dashboard", { replace: true });
+        navigate("/auth?redirect=/dashboard", { replace: true });
         return;
       }
       if (isAdmin) {
-        if (isMounted) navigate("/admin", { replace: true });
+        navigate("/admin", { replace: true });
         return;
       }
 
@@ -79,87 +120,99 @@ const Dashboard = () => {
         const pendingLead = localStorage.getItem("pryme_pending_lead_id");
         if (pendingLead) {
           try {
-            await PrymeAPI.elevateLead(pendingLead, user.id);
+            await PrymeAPI.elevateLead(pendingLead, (user as any).id || (user as any).name);
             localStorage.removeItem("pryme_pending_lead_id");
           } catch (e) {
-            console.warn("Lead elevation skipped.");
+            console.warn("Lead elevation skipped or failed.", e);
           }
         }
 
-        const response = await api.get("/applications/me");
-        const apps = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
+        // Fetch user applications
+        const response = await api.get("/applications/me", { signal: abortController.signal });
+        const apps: Application[] = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
         
-        if (isMounted) {
-          setMyApplications(apps);
+        setMyApplications(apps);
 
-          if (apps.length > 0) {
-            const primaryApp = apps[0]; 
-            setActiveApplication(primaryApp);
-            const progress = primaryApp.completionPercentage || 0;
+        if (apps.length > 0) {
+          const primaryApp = apps[0]; 
+          setActiveApplication(primaryApp);
+          const progress = primaryApp.completionPercentage || 0;
+          
+          if (primaryApp.documents && primaryApp.documents.length > 0) {
+            const loadedDocs: Record<string, boolean> = {};
+            primaryApp.documents.forEach((d) => {
+              if (d.docType) loadedDocs[d.docType] = true;
+              if (d.name) loadedDocs[d.name] = true;
+            });
+            setUploadedDocs(loadedDocs);
+          }
+
+          if (progress < 100) {
+            setViewState("FUNNEL");
+            if (progress < 25) setCurrentStage(1);
+            else if (progress < 50) setCurrentStage(2);
+            else if (progress < 75) setCurrentStage(3);
+            else setCurrentStage(4); 
             
-            if (progress < 100) {
-              setViewState("FUNNEL");
-              if (progress < 25) setCurrentStage(1);
-              else if (progress < 50) setCurrentStage(2);
-              else if (progress < 75) setCurrentStage(3);
-              else setCurrentStage(4); 
-              
-              // 🧠 THE TITANIUM PARSER
-              // Safely handles H2/PostgreSQL JSON String serialization artifacts
-              if (primaryApp.metadata) {
-                let parsedMeta = {};
-                if (typeof primaryApp.metadata === "string") {
-                  try {
-                    parsedMeta = JSON.parse(primaryApp.metadata);
-                  } catch (e) {
-                    console.error("Failed to parse backend metadata string.", e);
-                  }
-                } else if (typeof primaryApp.metadata === "object") {
-                  parsedMeta = primaryApp.metadata;
+            if (primaryApp.metadata) {
+              let parsedMeta: Partial<DashboardFormData> = {};
+              if (typeof primaryApp.metadata === "string") {
+                try {
+                  parsedMeta = JSON.parse(primaryApp.metadata);
+                } catch (e) {
+                  console.error("Failed to parse metadata", e);
                 }
-                
-                setFormData(prev => ({ ...prev, ...parsedMeta }));
+              } else if (typeof primaryApp.metadata === "object") {
+                parsedMeta = primaryApp.metadata;
               }
-            } else {
-              setViewState("DASHBOARD");
+              setFormData(prev => ({ ...prev, ...parsedMeta }));
             }
           } else {
-            setViewState("EMPTY");
+            setViewState("DASHBOARD");
           }
+        } else {
+          setViewState("EMPTY");
         }
       } catch (error: any) {
+        if (error.name === "CanceledError" || error.message === "canceled") return;
         console.error("Dashboard Sync Error:", error);
-        if (isMounted) setViewState("EMPTY");
+        setViewState("EMPTY");
       } finally {
-        if (isMounted) setIsDataLoading(false);
+        setIsDataLoading(false);
       }
     };
 
     bootDashboard();
 
+    // Safety timeout to unlock loading state if network stalls
     const unlockTimer = setTimeout(() => {
-      if (isMounted && isDataLoading) {
-        setIsDataLoading(false);
-        if (viewState === "LOADING") setViewState("EMPTY");
-      }
-    }, 3000);
+      setIsDataLoading(prev => {
+        if (prev) {
+          setViewState(prevViewState => prevViewState === "LOADING" ? "EMPTY" : prevViewState);
+          return false;
+        }
+        return prev;
+      });
+    }, 5000);
 
     return () => {
-      isMounted = false;
+      abortController.abort();
       clearTimeout(unlockTimer);
     };
   }, [user, authLoading, isAdmin, navigate]);
-
+  
   const { incomeDocs, propertyDocs } = useMemo(() => {
     if (!activeApplication && viewState !== "FUNNEL") return { incomeDocs: [], propertyDocs: [] };
     
-    let parsed: any = {};
+    let parsed: Record<string, any> = {};
     try {
       const savedApp = localStorage.getItem("pryme_pending_application");
       if (savedApp && savedApp !== "undefined") {
         parsed = JSON.parse(savedApp);
       }
-    } catch(e) {}
+    } catch(e) {
+      console.error("Failed to parse pending application", e);
+    }
     
     const rawLoan = activeApplication?.loanType || parsed?.loanType || "Personal Loan";
     const rawEmp = activeApplication?.metadata?.employmentType || parsed?.employmentType || "Salaried";
@@ -183,12 +236,56 @@ const Dashboard = () => {
     };
   }, [activeApplication, viewState]);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = useCallback((field: keyof DashboardFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
+
+  const validateCurrentStage = useCallback((): boolean => {
+    switch (currentStage) {
+      case 1:
+        if (!formData.panNumber || !formData.dob || !formData.currentCity || !formData.pinCode) {
+          toast({ title: "Incomplete Identity Data", description: "Please complete all fields in this section.", variant: "destructive" });
+          return false;
+        }
+        if (formData.panNumber.length !== 10) {
+          toast({ title: "Invalid PAN", description: "PAN Number must be exactly 10 characters.", variant: "destructive" });
+          return false;
+        }
+        if (formData.pinCode.length < 6) {
+          toast({ title: "Invalid PIN Code", description: "Please enter a valid 6-digit PIN code.", variant: "destructive" });
+          return false;
+        }
+        break;
+      case 2:
+        if (!formData.companyName || !formData.designation || !formData.workExperience || !formData.officeEmail) {
+          toast({ title: "Incomplete Professional Data", description: "Please complete all fields in this section.", variant: "destructive" });
+          return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.officeEmail)) {
+          toast({ title: "Invalid Email", description: "Please provide a valid official email address.", variant: "destructive" });
+          return false;
+        }
+        break;
+      case 3:
+        if (!formData.monthlyEMI || !formData.existingBank || !formData.coApplicant || !formData.loanPurpose) {
+          toast({ title: "Incomplete Financial Data", description: "Please complete all fields in this section.", variant: "destructive" });
+          return false;
+        }
+        if (isNaN(Number(formData.monthlyEMI)) || Number(formData.monthlyEMI) < 0) {
+          toast({ title: "Invalid EMI Amount", description: "Monthly EMI must be a valid number.", variant: "destructive" });
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+    return true;
+  }, [currentStage, formData]);
 
   const handleNextStage = async () => {
+    if (!validateCurrentStage()) return;
     if (!activeApplication) return;
+    
     setIsSaving(true);
     
     const newStage = currentStage + 1;
@@ -199,36 +296,113 @@ const Dashboard = () => {
          metadata: formData,
          completionPercentage: newProgress
       });
-      toast({ title: "Session Saved", description: `Progress synchronized at ${newProgress}%` });
-    } catch (error) {
-      console.warn("Backend sync bypassed. Executing Optimistic UI progression.");
-    } finally {
+      toast({ title: "Progress Saved", description: "Your data has been securely saved." });
       setCurrentStage(newStage);
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error: any) {
+      console.error("Sync Error:", error);
+      toast({ 
+        title: "Sync Error", 
+        description: error.response?.data?.message || "Failed to synchronise progress. Please check connection.", 
+        variant: "destructive" 
+      });
+      // Important: Do not advance stage if network save fails in a strict production environment
+    } finally {
       setIsSaving(false);
     }
   };
 
   const handleFinalSubmit = async () => {
     if (!activeApplication) return;
+    
+    // Strict Validation: Ensure required documents are uploaded before submission
+    const requiredIncomeDocs = incomeDocs.filter(d => d.required);
+    const missingIncomeDocs = requiredIncomeDocs.some(d => !uploadedDocs[d.name] && !uploadedDocs[d.id]);
+    
+    const requiredPropertyDocs = propertyDocs.filter(d => d.required);
+    const missingPropertyDocs = requiredPropertyDocs.some(d => !uploadedDocs[d.name] && !uploadedDocs[d.id]);
+
+    if (missingIncomeDocs || missingPropertyDocs) {
+      toast({ 
+        title: "Missing Documents", 
+        description: "Please upload all mandatory documents before submission.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      await api.patch(`/applications/${activeApplication.applicationId}/status`, {
-         status: "PROCESSING"
-      });
-    } catch (error) {
-      console.warn("Backend status update bypassed. Executing Optimistic UI completion.");
-    } finally {
-      toast({ title: "Underwriting Initiated", description: "All documents secured. Routing to Tracker." });
+      await api.patch(`/applications/${activeApplication.applicationId}/status`, { status: "PROCESSING" });
+      await api.patch(`/applications/${activeApplication.applicationId}`, { completionPercentage: 100 });
       
-      const updatedApps = [...myApplications];
-      updatedApps[0].completionPercentage = 100;
-      updatedApps[0].status = "PROCESSING";
-      setMyApplications(updatedApps);
+      toast({ title: "Underwriting Initiated", description: "All documents secured. Routing to your portfolio tracker." });
+      
+      setMyApplications(prev => {
+        const updated = [...prev];
+        if (updated.length > 0) {
+          updated[0].completionPercentage = 100;
+          updated[0].status = "PROCESSING";
+        }
+        return updated;
+      });
       setViewState("DASHBOARD");
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error: any) {
+      console.error("Submission Error:", error);
+      toast({ 
+        title: "Submission Failed", 
+        description: error.response?.data?.message || "Failed to submit application. Please try again.", 
+        variant: "destructive" 
+      });
+    } finally {
       setIsSaving(false);
+    }
+  };
+
+  // 🧠 TOP 1% FIX: Pre-Flight Validation Engine & React Event Reset
+  const handleFileUpload = async (doc: { id: string; name: string; required: boolean }, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // React Bug Fix: Clear the input value so the same file can be re-selected if an error occurs
+    event.target.value = '';
+
+    if (!activeApplication?.applicationId) {
+      toast({ title: "Matrix Fault", description: "Application footprint missing. Please refresh.", variant: "destructive" });
+      return;
+    }
+
+    // Pre-Flight Client-Side Validation (Saves server bandwidth)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({ title: "Payload Too Large", description: "File must be under 10MB.", variant: "destructive" });
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Invalid Format", description: "Only PDF, JPG, and PNG are supported.", variant: "destructive" });
+      return;
+    }
+
+    setUploadingDocs(prev => ({ ...prev, [doc.id]: true }));
+
+    try {
+      const { error } = await PrymeAPI.uploadApplicationDocument(activeApplication.applicationId, doc.name, file);
+      
+      if (error) {
+        toast({ title: "Vault Rejected", description: error.message || "Failed to encrypt file.", variant: "destructive" });
+      } else {
+        toast({ title: "Document Secured", description: `${doc.name} successfully encrypted in vault.` });
+        setUploadedDocs(prev => ({ ...prev, [doc.name]: true }));
+      }
+    } catch (err: any) {
+      console.error("Upload stream disrupted:", err);
+      toast({ title: "Upload Error", description: "Network stream disrupted.", variant: "destructive" });
+    } finally {
+      setUploadingDocs(prev => ({ ...prev, [doc.id]: false }));
     }
   };
 
@@ -260,10 +434,15 @@ const Dashboard = () => {
         <Header />
 
         <main className="flex-1 pb-24">
-          {viewState === "FUNNEL" && (
-            <div className="pt-24 px-4 md:px-8 max-w-6xl mx-auto">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
-                
+          <AnimatePresence mode="wait">
+            {viewState === "FUNNEL" && (
+              <motion.div 
+                key="funnel"
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                className="pt-24 px-4 md:px-8 max-w-6xl mx-auto"
+              >
                 <div className="bg-slate-900 text-white rounded-3xl p-8 mb-8 shadow-2xl relative overflow-hidden border border-slate-800">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
                   <div className="flex justify-between items-end mb-4 relative z-10">
@@ -309,15 +488,26 @@ const Dashboard = () => {
                     <motion.div key={currentStage} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-card rounded-2xl shadow-sm border border-border p-8 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] rounded-full pointer-events-none" />
                       
-                      {/* 🧠 TITANIUM BINDINGS: Safe fallbacks (formData?.field || "") everywhere */}
                       {currentStage === 1 && (
                         <div className="space-y-6 relative z-10">
                           <h2 className="text-xl font-bold border-b border-border pb-4">1. Identity & Location</h2>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2"><Label>PAN Number</Label><Input value={formData?.panNumber || ""} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Date of Birth</Label><Input type="date" value={formData?.dob || ""} onChange={(e) => handleInputChange("dob", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Current City</Label><Input value={formData?.currentCity || ""} onChange={(e) => handleInputChange("currentCity", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Pin Code</Label><Input value={formData?.pinCode || ""} onChange={(e) => handleInputChange("pinCode", e.target.value)} className="bg-background" /></div>
+                            <div className="space-y-2">
+                              <Label htmlFor="panNumber">PAN Number *</Label>
+                              <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="bg-background uppercase" maxLength={10} />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="dob">Date of Birth *</Label>
+                              <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="currentCity">Current City *</Label>
+                              <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="pinCode">Pin Code *</Label>
+                              <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\D/g, ''))} maxLength={6} className="bg-background" />
+                            </div>
                           </div>
                         </div>
                       )}
@@ -326,10 +516,22 @@ const Dashboard = () => {
                         <div className="space-y-6 relative z-10">
                           <h2 className="text-xl font-bold border-b border-border pb-4">2. Professional Matrix</h2>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2"><Label>Company Name</Label><Input value={formData?.companyName || ""} onChange={(e) => handleInputChange("companyName", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Designation</Label><Input value={formData?.designation || ""} onChange={(e) => handleInputChange("designation", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Work Experience (Yrs)</Label><Input type="number" value={formData?.workExperience || ""} onChange={(e) => handleInputChange("workExperience", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Official Email ID</Label><Input type="email" value={formData?.officeEmail || ""} onChange={(e) => handleInputChange("officeEmail", e.target.value)} className="bg-background" /></div>
+                            <div className="space-y-2">
+                              <Label htmlFor="companyName">Company Name *</Label>
+                              <Input id="companyName" value={formData.companyName} onChange={(e) => handleInputChange("companyName", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="designation">Designation *</Label>
+                              <Input id="designation" value={formData.designation} onChange={(e) => handleInputChange("designation", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="workExperience">Work Experience (Yrs) *</Label>
+                              <Input id="workExperience" type="number" min="0" step="0.5" value={formData.workExperience} onChange={(e) => handleInputChange("workExperience", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="officeEmail">Official Email ID *</Label>
+                              <Input id="officeEmail" type="email" value={formData.officeEmail} onChange={(e) => handleInputChange("officeEmail", e.target.value)} className="bg-background" />
+                            </div>
                           </div>
                         </div>
                       )}
@@ -338,10 +540,22 @@ const Dashboard = () => {
                         <div className="space-y-6 relative z-10">
                           <h2 className="text-xl font-bold border-b border-border pb-4">3. Financial Footprint</h2>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2"><Label>Total Existing EMIs (Monthly)</Label><Input type="number" value={formData?.monthlyEMI || ""} onChange={(e) => handleInputChange("monthlyEMI", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Primary Salary Bank</Label><Input value={formData?.existingBank || ""} onChange={(e) => handleInputChange("existingBank", e.target.value)} className="bg-background" /></div>
-                            <div className="space-y-2"><Label>Co-Applicant Added?</Label><Input value={formData?.coApplicant || ""} onChange={(e) => handleInputChange("coApplicant", e.target.value)} placeholder="Yes / No" className="bg-background" /></div>
-                            <div className="space-y-2"><Label>End Purpose</Label><Input value={formData?.loanPurpose || ""} onChange={(e) => handleInputChange("loanPurpose", e.target.value)} className="bg-background" /></div>
+                            <div className="space-y-2">
+                              <Label htmlFor="monthlyEMI">Total Existing EMIs (Monthly) *</Label>
+                              <Input id="monthlyEMI" type="number" min="0" value={formData.monthlyEMI} onChange={(e) => handleInputChange("monthlyEMI", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="existingBank">Primary Salary Bank *</Label>
+                              <Input id="existingBank" value={formData.existingBank} onChange={(e) => handleInputChange("existingBank", e.target.value)} className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="coApplicant">Co-Applicant Added? *</Label>
+                              <Input id="coApplicant" value={formData.coApplicant} onChange={(e) => handleInputChange("coApplicant", e.target.value)} placeholder="Yes / No" className="bg-background" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="loanPurpose">End Purpose *</Label>
+                              <Input id="loanPurpose" value={formData.loanPurpose} onChange={(e) => handleInputChange("loanPurpose", e.target.value)} className="bg-background" />
+                            </div>
                           </div>
                         </div>
                       )}
@@ -360,19 +574,42 @@ const Dashboard = () => {
                             <div>
                               <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">Financial & Income</h4>
                               <div className="space-y-3">
-                                {incomeDocs.map((doc: any) => (
-                                  <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 hover:bg-blue-500/5 transition-all">
-                                    <div className="flex flex-col">
-                                      <span className="font-medium text-foreground text-sm">
-                                        {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
-                                      </span>
-                                      <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (Max 5MB)</span>
+                                {incomeDocs.map((doc) => {
+                                  const isUploading = uploadingDocs[doc.id];
+                                  const isUploaded = uploadedDocs[doc.name] || uploadedDocs[doc.id];
+
+                                  return (
+                                    <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
+                                      <div className="flex flex-col">
+                                        <span className="font-medium text-foreground text-sm">
+                                          {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (Max 10MB)</span>
+                                      </div>
+                                      <div>
+                                        <input 
+                                          title={`Upload ${doc.name}`}
+                                          type="file" 
+                                          id={`upload-${doc.id}`} 
+                                          className="hidden" 
+                                          accept=".pdf,.jpg,.jpeg,.png"
+                                          onChange={(e) => handleFileUpload(doc, e)}
+                                          disabled={isUploading}
+                                        />
+                                        {isUploaded ? (
+                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default">
+                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
+                                          </Button>
+                                        ) : (
+                                          <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
+                                            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                                            {isUploading ? "Encrypting..." : "Upload"}
+                                          </Label>
+                                        )}
+                                      </div>
                                     </div>
-                                    <Button variant="outline" size="sm" className="group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
-                                      <UploadCloud className="w-4 h-4 mr-2" /> Upload
-                                    </Button>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
@@ -381,18 +618,41 @@ const Dashboard = () => {
                             <div className="pt-4">
                               <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">Property Records</h4>
                               <div className="space-y-3">
-                                {propertyDocs.map((doc: any) => (
-                                  <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 hover:bg-blue-500/5 transition-all">
-                                    <div className="flex flex-col">
-                                      <span className="font-medium text-foreground text-sm">
-                                        {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
-                                      </span>
+                                {propertyDocs.map((doc) => {
+                                  const isUploading = uploadingDocs[doc.id];
+                                  const isUploaded = uploadedDocs[doc.name] || uploadedDocs[doc.id];
+
+                                  return (
+                                    <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
+                                      <div className="flex flex-col">
+                                        <span className="font-medium text-foreground text-sm">
+                                          {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <input 
+                                          title={`Upload ${doc.name}`}
+                                          type="file" 
+                                          id={`upload-${doc.id}`} 
+                                          className="hidden" 
+                                          accept=".pdf,.jpg,.jpeg,.png"
+                                          onChange={(e) => handleFileUpload(doc, e)}
+                                          disabled={isUploading}
+                                        />
+                                        {isUploaded ? (
+                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default">
+                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
+                                          </Button>
+                                        ) : (
+                                          <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
+                                            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                                            {isUploading ? "Encrypting..." : "Upload"}
+                                          </Label>
+                                        )}
+                                      </div>
                                     </div>
-                                    <Button variant="outline" size="sm" className="group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                      <UploadCloud className="w-4 h-4 mr-2" /> Upload
-                                    </Button>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
@@ -406,7 +666,7 @@ const Dashboard = () => {
                           className="h-12 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 disabled:opacity-70 transition-all"
                         >
                           {isSaving ? (
-                            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Securing Data...</>
+                            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {currentStage === 4 ? "Securing Data..." : "Saving..."}</>
                           ) : (
                             <>{currentStage === 4 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-5 h-5 ml-2" /></>
                           )}
@@ -416,96 +676,103 @@ const Dashboard = () => {
                   </div>
                 </div>
               </motion.div>
-            </div>
-          )}
+            )}
+          </AnimatePresence>
 
           {(viewState === "DASHBOARD" || viewState === "EMPTY") && (
-            <>
-              <section className="aurora-gradient pt-24 pb-12">
-                <div className="container mx-auto px-4 max-w-6xl">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
-                      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 tracking-tight">Client Portfolio</h1>
-                      <p className="text-muted-foreground text-lg">Real-time tracking for your active financial instruments.</p>
-                    </motion.div>
-                    <div className="flex items-center gap-3">
-                      {isAdmin && (
-                        <Button onClick={() => navigate("/admin")} variant="outline" className="border-border">
-                          <Building2 className="w-4 h-4 mr-2" /> Admin Core
-                        </Button>
-                      )}
-                      <Link to="/apply">
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
-                          New Application <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      </Link>
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key="dashboard"
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+              >
+                <section className="aurora-gradient pt-24 pb-12">
+                  <div className="container mx-auto px-4 max-w-6xl">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
+                        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 tracking-tight">Client Portfolio</h1>
+                        <p className="text-muted-foreground text-lg">Real-time tracking for your active financial instruments.</p>
+                      </motion.div>
+                      <div className="flex items-center gap-3">
+                        {isAdmin && (
+                          <Button onClick={() => navigate("/admin")} variant="outline" className="border-border">
+                            <Building2 className="w-4 h-4 mr-2" /> Admin Core
+                          </Button>
+                        )}
+                        <Link to="/apply">
+                          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+                            New Application <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
+                </section>
 
-              <section className="py-12">
-                <div className="container mx-auto px-4 max-w-6xl">
-                  {viewState === "EMPTY" ? (
-                    <div className="bg-card rounded-3xl border border-border p-16 text-center shadow-sm">
-                      <div className="w-20 h-20 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-border/50">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
+                <section className="py-12">
+                  <div className="container mx-auto px-4 max-w-6xl">
+                    {viewState === "EMPTY" ? (
+                      <div className="bg-card rounded-3xl border border-border p-16 text-center shadow-sm">
+                        <div className="w-20 h-20 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-border/50">
+                          <FileText className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-xl font-bold text-foreground mb-2">No Active Instruments</h3>
+                        <p className="text-muted-foreground mb-8 max-w-md mx-auto">Your portfolio is empty. Click below to initiate a new loan application and explore our banking partners.</p>
+                        <Link to="/apply"><Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700 text-white">Initialize Application</Button></Link>
                       </div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">No Active Instruments</h3>
-                      <p className="text-muted-foreground mb-8 max-w-md mx-auto">Your portfolio is empty. Click below to initiate a new loan application and explore our banking partners.</p>
-                      <Link to="/apply"><Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700 text-white">Initialize Application</Button></Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {myApplications.map((app, index) => {
-                        const config = getStatusConfig(app.status);
-                        const StatusIcon = config.icon;
-                        return (
-                          <motion.div key={app.applicationId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", ...spring, delay: index * 0.1 }} className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/20 transition-all shadow-sm">
-                            <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-12 justify-between">
-                              <div className="space-y-4 flex-1">
-                                <div className="flex items-center gap-3">
-                                  <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border", config.color)}>
-                                    <StatusIcon className="w-3.5 h-3.5" /> {config.label}
-                                  </span>
-                                  <span className="text-sm font-mono font-medium text-muted-foreground">{app.applicationId}</span>
-                                </div>
-                                <div>
-                                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{app.loanType?.replace(/_/g, " ") || "PERSONAL LOAN"}</p>
-                                  <h3 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                                    <Wallet className="w-6 h-6 text-muted-foreground" />
-                                    ₹{app.requestedAmount?.toLocaleString("en-IN") || "0"}
-                                  </h3>
-                                </div>
-                              </div>
-                              <div className="flex-1 max-w-sm space-y-6">
-                                <div>
-                                  <div className="flex justify-between text-sm mb-3 font-medium">
-                                    <span className="text-foreground">Processing Matrix</span>
-                                    <span className="text-primary tabular-nums">{app.completionPercentage || config.progress}%</span>
-                                  </div>
-                                  <Progress value={app.completionPercentage || config.progress} className="h-2 bg-muted [&>div]:bg-primary" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                                  <div>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Initiated</p>
-                                    <p className="text-sm font-medium text-foreground">{app.createdAt ? new Date(app.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
+                    ) : (
+                      <div className="space-y-6">
+                        {myApplications.map((app, index) => {
+                          const config = getStatusConfig(app.status);
+                          const StatusIcon = config.icon;
+                          return (
+                            <motion.div key={app.applicationId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", ...spring, delay: index * 0.1 }} className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/20 transition-all shadow-sm">
+                              <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-12 justify-between">
+                                <div className="space-y-4 flex-1">
+                                  <div className="flex items-center gap-3">
+                                    <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border", config.color)}>
+                                      <StatusIcon className="w-3.5 h-3.5" /> {config.label}
+                                    </span>
+                                    <span className="text-sm font-mono font-medium text-muted-foreground">{app.applicationId}</span>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Assignee</p>
-                                    <p className="text-sm font-medium text-foreground">{app.assignee || "Evaluating"}</p>
+                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{app.loanType?.replace(/_/g, " ") || "PERSONAL LOAN"}</p>
+                                    <h3 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                                      <Wallet className="w-6 h-6 text-muted-foreground" />
+                                      ₹{app.requestedAmount?.toLocaleString("en-IN") || "0"}
+                                    </h3>
+                                  </div>
+                                </div>
+                                <div className="flex-1 max-w-sm space-y-6">
+                                  <div>
+                                    <div className="flex justify-between text-sm mb-3 font-medium">
+                                      <span className="text-foreground">Processing Matrix</span>
+                                      <span className="text-primary tabular-nums">{app.completionPercentage || config.progress}%</span>
+                                    </div>
+                                    <Progress value={app.completionPercentage || config.progress} className="h-2 bg-muted [&>div]:bg-primary" />
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                                    <div>
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Initiated</p>
+                                      <p className="text-sm font-medium text-foreground">{app.createdAt ? new Date(app.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Assignee</p>
+                                      <p className="text-sm font-medium text-foreground">{app.assignee || "Evaluating"}</p>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </section>
-            </>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </section>
+              </motion.div>
+            </AnimatePresence>
           )}
         </main>
         <Footer />
