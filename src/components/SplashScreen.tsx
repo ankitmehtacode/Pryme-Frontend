@@ -52,7 +52,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         filter: "blur(12px)",
         transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } 
       }}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#030712] overflow-hidden cursor-wait selection:bg-transparent"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background overflow-hidden cursor-wait selection:bg-transparent"
     >
       {/* Ambient Aurora Background */}
       <motion.div 
@@ -97,7 +97,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", damping: 20, delay: 0.3 }}
-            className="text-xl font-semibold text-white tracking-tight"
+            className="text-xl font-semibold text-foreground tracking-tight"
           >
             Go Pryme
           </motion.h1>
@@ -129,7 +129,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       </div>
 
       {/* Cyberpunk Progress Line */}
-      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-slate-900 overflow-hidden">
+      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary/20 overflow-hidden">
         {/* 🧠 160 IQ Fix: Pure GPU animation for the width. Zero JavaScript overhead! */}
         <motion.div 
           initial={{ width: "0%" }}

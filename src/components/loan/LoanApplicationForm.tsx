@@ -238,7 +238,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       >
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
+          <h2 className="text-2xl md:text-xl font-semibold text-foreground tracking-tight mb-1">
             Start Your Application
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
@@ -512,7 +512,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   <div className="flex justify-between items-center mb-5">
                     <div className="flex items-center gap-2">
                        <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
-                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300">CIBIL Score</span>
+                       <span className="text-sm font-medium text-muted-foreground">CIBIL Score</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <motion.span

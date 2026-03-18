@@ -76,19 +76,19 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
   };
 
   return (
-    <div className="bg-white/5 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full">
+    <div className="bg-white/5 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border border-border rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full">
       
       {/* Ambient Inner Glow */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 relative z-10">
-        <div className="w-12 h-12 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-inner flex items-center justify-center relative overflow-hidden">
+        <div className="w-12 h-12 rounded-2xl bg-secondary/50 border border-border shadow-inner flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-amber-500/20 animate-pulse mix-blend-overlay" />
           <Gift className="w-6 h-6 text-amber-500 relative z-10" />
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Offers & Rewards</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight">Offers & Rewards</h3>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Offers matched to your profile</p>
         </div>
       </div>
@@ -109,7 +109,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
             <motion.div 
               variants={itemVariants}
               key={offer.id} 
-              className="bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[1.5rem] p-5 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer group flex flex-col h-full"
+              className="bg-white/40 dark:bg-white/5 border border-border rounded-[1.5rem] p-5 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer group flex flex-col h-full"
             >
               {/* Icon Top */}
               <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-5 border transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3", styling)}>
@@ -117,7 +117,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
               </div>
               
               {/* Content */}
-              <h4 className="font-semibold text-base md:text-lg text-slate-900 dark:text-white mb-2 leading-tight tracking-tight">
+              <h4 className="font-semibold text-base md:text-lg text-foreground mb-2 leading-tight tracking-tight">
                 {offer.title}
               </h4>
               <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-1">
@@ -125,7 +125,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
               </p>
               
               {/* Footer Meta */}
-              <div className="mt-auto pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
+              <div className="mt-auto pt-4 border-t border-border flex flex-wrap items-center justify-between gap-2">
                 {offer.bank && (
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
                     {offer.bank}

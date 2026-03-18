@@ -25,13 +25,13 @@ const Blogs = () => {
                   <BookOpen className="w-4 h-4" />
                   Pryme Insights
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
                   Financial <span className="text-primary italic">Intelligence</span>
                 </h1>
                 
                 <div className="relative max-w-2xl mx-auto mt-12">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                  <input type="text" placeholder="Search guides, tips, and news..." className="w-full h-14 pl-14 pr-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-lg" />
+                  <input type="text" placeholder="Search guides, tips, and news..." className="w-full h-14 pl-14 pr-6 rounded-2xl bg-white dark:bg-white/5 border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-lg" />
                 </div>
               </div>
             </ScrollReveal>
@@ -43,7 +43,7 @@ const Blogs = () => {
                 { title: "MSME Loans for Digital Businesses", cat: "Business", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" }
               ].map((blog, i) => (
                 <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                  <div className="group rounded-[2rem] bg-white dark:bg-[#050505] border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl hover:-translate-y-2 transition-all duration-300">
+                  <div className="group rounded-[2rem] bg-card text-card-foreground border border-border overflow-hidden shadow-xl hover:-translate-y-2 transition-all duration-300">
                     <div className="h-56 overflow-hidden relative">
                       <img src={blog.img} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                       <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 dark:bg-black/80 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest text-primary border border-primary/20">{blog.cat}</div>
@@ -52,7 +52,7 @@ const Blogs = () => {
                       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 uppercase tracking-widest font-medium">
                         <Clock className="w-3 h-3" /> {blog.date}
                       </div>
-                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-6 group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
+                      <h3 className="text-xl font-semibold text-foreground mb-6 group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
                       <button className="flex items-center gap-2 text-sm font-bold text-primary italic">
                         Read Analytics <ArrowRight className="w-4 h-4" />
                       </button>

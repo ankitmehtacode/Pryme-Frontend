@@ -70,7 +70,7 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           </motion.div>
           
           <motion.div style={{ translateZ: 30 }}>
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 text-base">{feature.title}</h3>
+            <h3 className="font-semibold text-foreground mb-2 text-base">{feature.title}</h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
               {feature.description}
             </p>

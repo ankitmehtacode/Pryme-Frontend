@@ -72,7 +72,7 @@ const BankComparisonTable = ({
               "relative overflow-hidden rounded-[2rem] border backdrop-blur-xl transition-all duration-300 hover:shadow-2xl",
               offer.recommended 
                 ? "bg-white/90 dark:bg-[#0a0a0a]/90 border-primary shadow-[0_0_30px_rgba(var(--primary),0.15)]" 
-                : "bg-white/60 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-primary/40"
+                : "bg-white/60 dark:bg-white/5 border-border hover:border-primary/40"
             )}
           >
             {/* 🧠 Premium Ambient Glow for Recommended Card */}
@@ -96,7 +96,7 @@ const BankComparisonTable = ({
                       <Star className="w-3 h-3 fill-primary" /> Top Match
                     </div>
                   )}
-                  <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight">{offer.bankName}</h4>
+                  <h4 className="text-lg md:text-xl font-semibold text-foreground tracking-tight">{offer.bankName}</h4>
                   <div className="flex items-center gap-1 mt-0.5 text-xs font-medium text-slate-500">
                     <ShieldCheck className="w-3.5 h-3.5" /> 
                     <span>Max {formatCurrency(offer.maxLoanAmount)}</span>
@@ -105,20 +105,20 @@ const BankComparisonTable = ({
               </div>
 
               {/* 2. Core Financial Metrics (The 3-Column Split) */}
-              <div className="w-full xl:w-[45%] grid grid-cols-3 gap-4 xl:gap-8 border-y xl:border-y-0 xl:border-x border-slate-200 dark:border-white/10 py-5 xl:py-0 xl:px-8 relative z-10">
+              <div className="w-full xl:w-[45%] grid grid-cols-3 gap-4 xl:gap-8 border-y xl:border-y-0 xl:border-x border-border py-5 xl:py-0 xl:px-8 relative z-10">
                 <div className="flex flex-col justify-center">
                   <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Interest Rate</p>
-                  <p className={cn("text-xl md:text-2xl font-semibold", offer.recommended ? "text-primary" : "text-slate-900 dark:text-white")}>
+                  <p className={cn("text-xl md:text-2xl font-semibold", offer.recommended ? "text-primary" : "text-foreground")}>
                     {offer.roi}% <span className="text-xs font-medium text-slate-500">p.a.</span>
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</p>
-                  <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">{formatCurrency(offer.emi)}</p>
+                  <p className="text-xl md:text-2xl font-semibold text-foreground">{formatCurrency(offer.emi)}</p>
                 </div>
                 <div className="flex flex-col justify-center">
                   <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Processing</p>
-                  <p className="text-sm md:text-base font-medium text-slate-700 dark:text-slate-300">{offer.processingFee}</p>
+                  <p className="text-sm md:text-base font-medium text-muted-foreground">{offer.processingFee}</p>
                 </div>
               </div>
 
@@ -168,7 +168,7 @@ const BankComparisonTable = ({
                   <Button
                     variant="outline"
                     onClick={() => onApplyDirect(offer.id)}
-                    className="flex-none px-4 py-6 rounded-xl border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"
+                    className="flex-none px-4 py-6 rounded-xl border-border bg-secondary/50 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"
                     title="Apply directly on bank website"
                   >
                     <ExternalLink className="w-5 h-5" />

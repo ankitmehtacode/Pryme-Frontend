@@ -113,7 +113,7 @@ export default function Offers() {
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
                     <Gift className="w-4 h-4" /> Member Perks
                   </span>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
                     Premium <span className="text-primary italic">Incentives</span>
                   </h1>
                   <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed font-light">
@@ -122,7 +122,7 @@ export default function Offers() {
                 </div>
               </ScrollReveal>
 
-              <div className="py-12 bg-white/50 dark:bg-white/5 backdrop-blur-md border-y border-slate-200 dark:border-white/10 mb-20">
+              <div className="py-12 bg-secondary/50 backdrop-blur-md border-y border-border mb-20">
                 <OffersMarquee />
               </div>
 
@@ -135,13 +135,13 @@ export default function Offers() {
                     { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "Apply for a premium card and get 2x points on all digital spends for 90 days.", color: "from-purple-500/10 to-purple-600/10" }
                   ].map((offer, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                      <div className={`p-8 rounded-[2.5rem] bg-gradient-to-br ${offer.color} border border-slate-200 dark:border-white/10 flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02]`}>
-                        <div className="w-24 h-24 rounded-3xl bg-white dark:bg-black/50 flex items-center justify-center shrink-0 shadow-lg border border-white/20">
+                      <div className={`p-8 rounded-[2.5rem] bg-gradient-to-br ${offer.color} border border-border flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02]`}>
+                        <div className="w-24 h-24 rounded-3xl bg-card text-card-foreground/50 flex items-center justify-center shrink-0 shadow-lg border border-white/20">
                           <offer.icon className="w-10 h-10 text-primary" />
                         </div>
                         <div className="text-center md:text-left flex-1">
                           <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 mb-2 block">{offer.bank}</span>
-                          <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-3">{offer.title}</h3>
+                          <h3 className="text-2xl font-semibold text-foreground mb-3">{offer.title}</h3>
                           <p className="text-slate-600 dark:text-slate-400 mb-6">{offer.text}</p>
                           <Button onClick={() => navigate('/apply')} className="rounded-xl h-12 px-8 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20">Claim Deal</Button>
                         </div>

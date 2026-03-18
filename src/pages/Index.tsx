@@ -90,7 +90,7 @@ const Index = () => {
             </ScrollReveal>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
-            <section className="py-14 md:py-20 bg-white dark:bg-[#050505] relative z-10">
+            <section className="py-14 md:py-20 bg-card text-card-foreground relative z-10">
               {/* Gradient section divider */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
@@ -113,7 +113,7 @@ const Index = () => {
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
                   </span>
-                  <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-slate-900 dark:text-white mb-6 tracking-tighter">
+                  <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tighter">
                     Calculate & Evaluate
                   </h2>
                   <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">
@@ -127,26 +127,26 @@ const Index = () => {
                   {/* Left: The Calculator + MIGRATED STATS */}
                   <div className="lg:col-span-7 w-full flex flex-col gap-8">
                     
-                    <div className="bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 p-2 md:p-4 transition-all duration-500">
+                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-4 transition-all duration-500">
                       <EMICalculator loanAmount={500000} showTerminology={true} />
                     </div>
 
                     {/* 🧠 THE STATS BLOCK (Moved perfectly under the EMI Calculator) */}
-                    <div className="grid grid-cols-3 gap-4 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-[2rem] p-6 border border-slate-200 dark:border-white/10 shadow-xl">
-                      <div className="text-center border-r border-slate-200 dark:border-white/10">
-                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
+                    <div className="grid grid-cols-3 gap-4 bg-secondary/50 backdrop-blur-md rounded-[2rem] p-6 border border-border shadow-xl">
+                      <div className="text-center border-r border-border">
+                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
                           ₹500<span className="text-primary">Cr+</span>
                         </p>
                         <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Capital Disbursed</p>
                       </div>
-                      <div className="text-center border-r border-slate-200 dark:border-white/10">
-                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
+                      <div className="text-center border-r border-border">
+                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
                           24<span className="text-primary">h</span>
                         </p>
                         <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Avg Approval</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tighter">
+                        <p className="text-xl md:text-2xl font-semibold text-foreground tracking-tighter">
                           98<span className="text-primary">%</span>
                         </p>
                         <p className="text-[10px] md:text-xs font-medium text-slate-500 uppercase mt-2 tracking-widest">Success Rate</p>
@@ -194,7 +194,7 @@ const Index = () => {
                       <BookOpen className="w-4 h-4" />
                       Pryme Insights
                     </span>
-                    <h2 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Financial Intelligence</h2>
+                    <h2 className="text-3xl font-semibold text-foreground tracking-tight">Financial Intelligence</h2>
                   </div>
                   <Button asChild variant="ghost" className="text-primary hover:text-primary/80 gap-2">
                     <Link to="/blogs">View All Articles <ArrowRight className="w-4 h-4" /></Link>
@@ -215,7 +215,7 @@ const Index = () => {
                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                           <Clock className="w-3.5 h-3.5" /> {blog.date}
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
+                        <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
                       </Link>
                     </ScrollReveal>
                   ))}

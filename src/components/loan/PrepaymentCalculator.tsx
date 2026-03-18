@@ -59,7 +59,7 @@ const PrepaymentCalculator = () => {
   }, [prepaymentAmount]);
 
   return (
-    <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] p-6 shadow-xl relative overflow-hidden">
+    <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl relative overflow-hidden">
       {/* Decorative Glow */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-[#2aac64]/10 blur-[50px] rounded-full pointer-events-none" />
 
@@ -69,7 +69,7 @@ const PrepaymentCalculator = () => {
             <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white tracking-tight">Prepayment ROI</h3>
+            <h3 className="text-lg font-semibold text-foreground tracking-tight">Prepayment ROI</h3>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Reduce your interest burden</p>
           </div>
         </div>
@@ -133,7 +133,7 @@ const PrepaymentCalculator = () => {
                 
                 <div className="flex-1 pr-6">
                   <h4 className={`text-sm font-semibold transition-colors ${
-                    isActive ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
+                    isActive ? "text-foreground" : "text-muted-foreground"
                   }`}>
                     {strategy.name}
                   </h4>
@@ -158,7 +158,7 @@ const PrepaymentCalculator = () => {
                           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700" />
                           <div>
                             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Time Trimmed</p>
-                            <p className="text-lg font-bold text-slate-900 dark:text-white">{strategy.displayTimeSaved}</p>
+                            <p className="text-lg font-bold text-foreground">{strategy.displayTimeSaved}</p>
                           </div>
                         </div>
                       </motion.div>

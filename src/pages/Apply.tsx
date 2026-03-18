@@ -272,13 +272,13 @@ const Apply = () => {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-16" />
 
                 <div className="container mx-auto px-4 max-w-7xl space-y-8">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/40 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 backdrop-blur-xl shadow-xl">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/40 dark:bg-slate-900/40 p-6 md:p-8 rounded-[2rem] border border-border backdrop-blur-xl shadow-xl">
                     <div>
                       <div className="inline-flex items-center gap-2 mb-3">
                         <Sparkles className="w-5 h-5 text-primary animate-pulse" />
                         <span className="text-sm font-medium text-primary uppercase tracking-widest">Analysis Complete</span>
                       </div>
-                      <h2 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight">
                         Your Custom Loan Offers
                       </h2>
                     </div>
@@ -291,7 +291,7 @@ const Apply = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+                  <div className="bg-card text-card-foreground rounded-[2rem] border border-border shadow-2xl overflow-hidden">
                     <BankComparisonTable
                       offers={bankOffers}
                       loanAmount={loanAmount}
@@ -299,7 +299,7 @@ const Apply = () => {
                       onApplyDirect={handleApplyDirect}
                       onApplyWithPyrme={handleApplyWithPyrme}
                     />
-                    <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-start gap-3">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-border flex items-start gap-3">
                       <Info className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
                       <p className="text-sm font-medium text-slate-500">
                         Offers are sorted by interest rate. The "Recommended" badge indicates the mathematically best rate available based on your entered parameters. Final rates are subject to physical document verification.
@@ -309,7 +309,7 @@ const Apply = () => {
 
                   {applicationData && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                      <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] p-6 shadow-xl h-full">
+                      <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl h-full">
                         <EligibilityScore
                           score={calculateEligibilityScore()}
                           cibilScore={applicationData.cibilScore}
@@ -317,10 +317,10 @@ const Apply = () => {
                           loanAmount={loanAmount}
                         />
                       </div>
-                      <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] p-6 shadow-xl h-full">
+                      <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl h-full">
                         <RequiredDocuments productType={applicationData.productType} />
                       </div>
-                      <div className="bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] p-6 shadow-xl h-full flex flex-col justify-center">
+                      <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl h-full flex flex-col justify-center">
                         <BankerContact />
                       </div>
                     </div>
@@ -328,7 +328,7 @@ const Apply = () => {
 
                   <div className="pt-8">
                     <div className="text-center mb-8">
-                      <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Exclusive PRYME Rewards</h3>
+                      <h3 className="text-2xl font-semibold text-foreground tracking-tight">Exclusive PRYME Rewards</h3>
                       <p className="text-slate-500 font-medium">Apply through us to get these benefits.</p>
                     </div>
                     <OffersRewards />

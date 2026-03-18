@@ -116,15 +116,15 @@ const HeroSection = memo(() => {
         <div className="w-full xl:w-[50%] flex flex-col items-center xl:items-start text-center xl:text-left z-20">
           <div ref={headlineRef} className="w-full max-w-[550px]">
             
-            <p className="text-base md:text-xl lg:text-2xl font-normal text-slate-700 dark:text-slate-300 tracking-tight leading-none mb-2">
+            <p className="text-base md:text-xl lg:text-2xl font-normal text-muted-foreground tracking-tight leading-none mb-2">
               Bypass the bureaucracy.
             </p>
             
             <h1 className="text-[2.75rem] md:text-[4rem] lg:text-[4.5rem] font-light tracking-tighter leading-[0.95] mb-3">
-              <span className="block text-slate-900 dark:text-white">
+              <span className="block text-foreground">
                 <ShuffleText text="INSTANT" delay={100} duration={800} />
               </span>
-              <span className="block text-slate-900 dark:text-white">
+              <span className="block text-foreground">
                 <ShuffleText text="CAPITAL." delay={600} duration={800} />
               </span>
               <span className="block text-[#2aac64] drop-shadow-[0_0_15px_rgba(42,172,100,0.3)]">

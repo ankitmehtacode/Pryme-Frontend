@@ -174,7 +174,7 @@ const ProductSelectorGrid = memo(() => {
           <span className="inline-block text-[9px] font-medium text-[#2aac64] uppercase tracking-[0.3em] bg-[#2aac64]/10 border border-[#2aac64]/20 px-3 py-1 rounded-full mb-3">
             Our Products
           </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-slate-900 dark:text-white tracking-tighter mb-3 uppercase leading-none">
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-3 uppercase leading-none">
             Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2aac64] to-emerald-400">Loan.</span>
           </h2>
           <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-lg mx-auto">

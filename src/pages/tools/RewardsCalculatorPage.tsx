@@ -26,14 +26,14 @@ const RewardsCalculatorPage = () => {
                   <Gift className="w-4 h-4" />
                   Privilege Engine
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
                   Reward <span className="text-primary italic">Tier</span> Analytics
                 </h1>
               </div>
             </ScrollReveal>
 
             <div className="max-w-5xl mx-auto">
-              <div className="bg-white dark:bg-[#050505] rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-8 shadow-2xl relative overflow-hidden">
+              <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
                 <OffersRewards />
               </div>
@@ -49,7 +49,7 @@ const RewardsCalculatorPage = () => {
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 border border-primary/20">
                         <item.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{item.title}</h4>
+                      <h4 className="font-semibold text-foreground mb-2">{item.title}</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">{item.text}</p>
                     </div>
                   </ScrollReveal>

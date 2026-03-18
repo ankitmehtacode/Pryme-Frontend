@@ -538,7 +538,7 @@ export default function IntelligentDocumentChecklist() {
                         <button key={occ} onClick={() => setOccupation(occ as SpecificOccupation)} className={cn(
                           "px-5 py-3 rounded-lg border text-sm font-medium transition-all",
                           occupation === occ
-                            ? "bg-white text-black border-white"
+                            ? "bg-primary text-primary-foreground border-white"
                             : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.06]"
                         )}>{occ}</button>
                       ))}
@@ -546,7 +546,7 @@ export default function IntelligentDocumentChecklist() {
                         <button key={occ} onClick={() => setOccupation(occ as SpecificOccupation)} className={cn(
                           "px-5 py-3 rounded-lg border text-sm font-medium transition-all",
                           occupation === occ
-                            ? "bg-white text-black border-white"
+                            ? "bg-primary text-primary-foreground border-white"
                             : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.06]"
                         )}>{occ}</button>
                       ))}
@@ -554,7 +554,7 @@ export default function IntelligentDocumentChecklist() {
                         <button key={occ} onClick={() => setOccupation(occ as SpecificOccupation)} className={cn(
                           "px-5 py-3 rounded-lg border text-sm font-medium transition-all",
                           occupation === occ
-                            ? "bg-white text-black border-white"
+                            ? "bg-primary text-primary-foreground border-white"
                             : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.06]"
                         )}>{occ}</button>
                       ))}

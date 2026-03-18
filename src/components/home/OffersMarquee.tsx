@@ -22,7 +22,7 @@ const offers = [
 
 const OffersMarquee = () => {
   return (
-    <div className="w-full bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 py-6 shadow-xl relative overflow-hidden">
+    <div className="w-full bg-white dark:bg-slate-900 border-y border-border py-6 shadow-xl relative overflow-hidden">
       {/* Edge Gradients for Smooth In/Out */}
       <div className="absolute top-0 left-0 w-16 md:w-32 h-full bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none" />
       <div className="absolute top-0 right-0 w-16 md:w-32 h-full bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none" />
@@ -50,7 +50,7 @@ const OffersMarquee = () => {
                   )}
                 </div>
                 
-                <span className="text-sm md:text-base font-bold text-slate-700 dark:text-slate-300 tracking-wide uppercase group-hover:text-primary transition-colors">
+                <span className="text-sm md:text-base font-bold text-muted-foreground tracking-wide uppercase group-hover:text-primary transition-colors">
                   {offer.text}
                 </span>
                 <span className="mx-6 text-slate-300 dark:text-slate-700 font-bold">•</span>

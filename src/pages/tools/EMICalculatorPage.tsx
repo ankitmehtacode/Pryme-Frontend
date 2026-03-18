@@ -26,7 +26,7 @@ const EMICalculatorPage = () => {
                   <Calculator className="w-4 h-4" />
                   Financial Engine
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
                   Loan <span className="text-primary italic">Precision</span> Tool
                 </h1>
               </div>
@@ -34,7 +34,7 @@ const EMICalculatorPage = () => {
 
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               <div className="lg:col-span-8">
-                <div className="bg-white dark:bg-[#050505] rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-4 md:p-8 shadow-2xl">
+                <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-4 md:p-8 shadow-2xl">
                   <EMICalculator loanAmount={500000} showTerminology={true} />
                 </div>
               </div>
@@ -46,11 +46,11 @@ const EMICalculatorPage = () => {
                   { icon: Calendar, title: "Tenure Impact", text: "Small changes in years can save lakhs in total interest." }
                 ].map((item, i) => (
                   <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                    <div className="p-6 rounded-3xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md transition-all hover:bg-white dark:hover:bg-white/10">
+                    <div className="p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-md transition-all hover:bg-white dark:hover:bg-white/10">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                         <item.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white mb-1">{item.title}</h4>
+                      <h4 className="font-semibold text-foreground mb-1">{item.title}</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">{item.text}</p>
                     </div>
                   </ScrollReveal>

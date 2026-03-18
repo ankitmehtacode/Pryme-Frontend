@@ -26,7 +26,7 @@ const Contact = () => {
                   <Mail className="w-4 h-4" />
                   Support Desk
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
                   How Can We <span className="text-primary italic">Help?</span>
                 </h1>
               </div>
@@ -34,21 +34,21 @@ const Contact = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
               <ScrollReveal direction="up">
-                <div className="bg-white dark:bg-[#050505] rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-2xl">
+                <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 md:p-12 shadow-2xl">
                   <form className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
-                        <input type="text" placeholder="John Doe" className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        <label className="text-sm font-medium text-muted-foreground ml-1">Full Name</label>
+                        <input type="text" placeholder="John Doe" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
-                        <input type="email" placeholder="john@example.com" className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        <label className="text-sm font-medium text-muted-foreground ml-1">Email Address</label>
+                        <input type="email" placeholder="john@example.com" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Message</label>
-                      <textarea rows={5} placeholder="How can our experts assist you?" className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
+                      <label className="text-sm font-medium text-muted-foreground ml-1">Message</label>
+                      <textarea rows={5} placeholder="How can our experts assist you?" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
                     </div>
                     <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-semibold text-lg gap-2">
                       Send Message <Send className="w-5 h-5" />
@@ -64,12 +64,12 @@ const Contact = () => {
                     { icon: Mail, title: "Email Support", detail: "info@pryme.in", sub: "24/7 Priority Response" },
                     { icon: MapPin, title: "Headquarters", detail: "Digital Hub, Phase-IV", sub: "Gurajat, India" }
                   ].map((item, i) => (
-                    <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-sm">
+                    <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-sm">
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
                         <item.icon className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{item.title}</h4>
+                        <h4 className="text-lg font-semibold text-foreground mb-1">{item.title}</h4>
                         <p className="text-xl text-primary font-medium">{item.detail}</p>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{item.sub}</p>
                       </div>

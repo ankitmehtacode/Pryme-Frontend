@@ -78,7 +78,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   return (
     <div className={cn("lg:hidden fixed inset-0 z-[100] transition-all duration-300", isOpen ? "visible" : "invisible")}>
       <div className={cn("absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "opacity-0")} onClick={onClose} />
-      <div className={cn("absolute right-0 top-0 h-full w-[300px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-2xl transition-transform duration-300", isOpen ? "translate-x-0" : "translate-x-full")}>
+      <div className={cn("absolute right-0 top-0 h-full w-[300px] bg-white dark:bg-slate-950 border-l border-border shadow-2xl transition-transform duration-300", isOpen ? "translate-x-0" : "translate-x-full")}>
         <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
           <span className="font-medium text-lg dark:text-white">Menu</span>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><X className="w-5 h-5 dark:text-white" /></button>
@@ -86,8 +86,8 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         <div className="p-5 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
           <div>
             <Link to="/" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center shadow-sm"><Home className="w-4 h-4 text-slate-700 dark:text-slate-300" /></div>
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Home</span>
+              <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center shadow-sm"><Home className="w-4 h-4 text-muted-foreground" /></div>
+              <span className="text-sm font-semibold text-foreground">Home</span>
             </Link>
           </div>
           <div>
@@ -249,7 +249,7 @@ const Header = memo(() => {
               <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
-            <a href={CONTACT_PHONE_LINK} className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-[#2aac64] dark:hover:text-[#2aac64] transition-colors"><Phone className="w-4 h-4" /><span>{CONTACT_PHONE}</span></a>
+            <a href={CONTACT_PHONE_LINK} className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-[#2aac64] dark:hover:text-[#2aac64] transition-colors"><Phone className="w-4 h-4" /><span>{CONTACT_PHONE}</span></a>
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -269,7 +269,7 @@ const Header = memo(() => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-5">
-                <Link to="/auth" className="text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-[#2aac64] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-full px-3 py-1">Log In</Link>
+                <Link to="/auth" className="text-sm font-semibold text-muted-foreground hover:text-[#2aac64] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-full px-3 py-1">Log In</Link>
                 <Link to="/document-check" className="px-6 py-2.5 border border-[#2aac64] text-[#2aac64] hover:bg-[#2aac64] hover:text-white text-sm font-medium rounded-full transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Apply Now</Link>
               </div>
             )}

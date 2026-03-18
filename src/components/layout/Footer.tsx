@@ -49,26 +49,26 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-slate-950 text-zinc-200 dark:bg-background dark:border-t border-border">
       {/* Trust Badges */}
-      <div className="border-b border-background/10">
+      <div className="border-b border-white/10 dark:border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
             <div className="flex items-center gap-2 text-sm">
               <Shield className="w-5 h-5 text-success" />
-              <span className="text-background/80">RBI Compliant</span>
+              <span className="text-zinc-400 dark:text-muted-foreground">RBI Compliant</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Lock className="w-5 h-5 text-trust" />
-              <span className="text-background/80">ISO 27001 Certified</span>
+              <span className="text-zinc-400 dark:text-muted-foreground">ISO 27001 Certified</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <CheckCircle className="w-5 h-5 text-success" />
-              <span className="text-background/80">256-bit SSL Encryption</span>
+              <span className="text-zinc-400 dark:text-muted-foreground">256-bit SSL Encryption</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <CheckCircle className="w-5 h-5 text-success" />
-              <span className="text-background/80">GDPR Ready</span>
+              <span className="text-zinc-400 dark:text-muted-foreground">GDPR Ready</span>
             </div>
           </div>
         </div>
@@ -82,18 +82,18 @@ const Footer = () => {
             <Link to="/" className="inline-block">
               <img src={prymeLogo} alt="PRYME" className="h-10" />
             </Link>
-            <p className="text-sm text-background/70 leading-relaxed max-w-xs">
+            <p className="text-sm text-zinc-400 dark:text-muted-foreground leading-relaxed max-w-xs">
               Your trusted partner for transparent, secure, and efficient loan processing. Compare rates from 15+ banks and get the best deal.
             </p>
             
             {/* Newsletter */}
             <div className="space-y-3">
-              <p className="text-sm font-medium text-background">Stay Updated</p>
+              <p className="text-sm font-medium text-white dark:text-foreground">Stay Updated</p>
               <div className="flex gap-2">
                 <Input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="h-10 bg-transparent border-background/30 text-background placeholder:text-background/40 focus:border-background focus:ring-background/20 backdrop-blur-sm"
+                  className="h-10 bg-transparent border-white/20 dark:border-border text-white dark:text-foreground placeholder:text-zinc-500 focus:border-white focus:ring-white/20 dark:focus:border-primary backdrop-blur-sm"
                 />
                 <Button size="sm" className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground px-4">
                   <ArrowRight className="w-4 h-4" />
@@ -112,7 +112,7 @@ const Footer = () => {
                         href={url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-background/10 border border-background/20 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                        className="w-10 h-10 rounded-full bg-white/5 dark:bg-secondary border border-white/10 dark:border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                         aria-label={`Follow us on ${name.charAt(0).toUpperCase() + name.slice(1)}`}
                       >
                         <Icon className="w-4 h-4" />
@@ -126,11 +126,11 @@ const Footer = () => {
 
           {/* Products */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-background">Products</h4>
+            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Products</h4>
             <ul className="space-y-3">
               {productLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-background/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -140,11 +140,11 @@ const Footer = () => {
 
           {/* Tools */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-background">Tools</h4>
+            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Tools</h4>
             <ul className="space-y-3">
               {toolLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-background/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -154,11 +154,11 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-background">Company</h4>
+            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-background/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -168,26 +168,26 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-background">Contact</h4>
+            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <a href={CONTACT_PHONE_LINK} className="text-sm text-background/70 hover:text-primary transition-colors block">
+                  <a href={CONTACT_PHONE_LINK} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors block">
                     {CONTACT_PHONE}
                   </a>
-                  <span className="text-xs text-background/50">Toll-free, 9 AM - 9 PM</span>
+                  <span className="text-xs text-zinc-500 dark:text-muted-foreground/50">Toll-free, 9 AM - 9 PM</span>
                 </div>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-background/70 hover:text-primary transition-colors">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
                   {CONTACT_EMAIL}
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <span className="text-sm text-background/70">
+                <span className="text-sm text-zinc-400 dark:text-muted-foreground">
                   {COMPANY_ADDRESS}
                 </span>
               </li>
@@ -197,11 +197,11 @@ const Footer = () => {
       </div>
 
       {/* Legal Footer */}
-      <div className="border-t border-background/10">
+      <div className="border-t border-white/10 dark:border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <p className="text-xs text-background/50">
+              <p className="text-xs text-zinc-500 dark:text-muted-foreground">
                 © {currentYear} PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456
               </p>
               <div className="flex flex-wrap gap-4">
@@ -209,7 +209,7 @@ const Footer = () => {
                   <Link
                     key={link.label}
                     to={link.href}
-                    className="text-xs text-background/50 hover:text-primary transition-colors"
+                    className="text-xs text-zinc-500 dark:text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -219,9 +219,9 @@ const Footer = () => {
           </div>
 
           {/* RBI Disclaimer */}
-          <div className="mt-6 pt-6 border-t border-background/10">
-            <p className="text-xs text-background/40 leading-relaxed max-w-5xl">
-              <strong className="text-background/60">Disclaimer:</strong> PRYME is a loan comparison and facilitation platform and not a lender. 
+          <div className="mt-6 pt-6 border-t border-white/10 dark:border-border">
+            <p className="text-xs text-zinc-500 dark:text-muted-foreground/80 leading-relaxed max-w-5xl">
+              <strong className="text-zinc-400 dark:text-muted-foreground">Disclaimer:</strong> PRYME is a loan comparison and facilitation platform and not a lender. 
               We partner with RBI-regulated banks and NBFCs to provide loan services. All loans are subject to 
               credit approval and terms & conditions of the respective lending partners. Interest rates, processing 
               fees, and other charges vary based on the loan type and borrower profile. The information provided 

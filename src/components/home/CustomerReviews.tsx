@@ -51,11 +51,11 @@ const ReviewCard = ({ review }: { review: typeof reviews[0] }) => (
         <Star key={i} className="w-4 h-4 fill-[#2aac64] text-[#2aac64]" />
       ))}
     </div>
-    <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base leading-relaxed italic">
+    <p className="text-muted-foreground text-sm md:text-base leading-relaxed italic">
       "{review.text}"
     </p>
     <div className="mt-auto pt-4 border-t border-slate-200/10 dark:border-slate-700/50">
-      <p className="font-semibold text-slate-900 dark:text-white">{review.name}</p>
+      <p className="font-semibold text-foreground">{review.name}</p>
       <p className="text-xs text-[#2aac64] uppercase tracking-wider mt-1">{review.role}</p>
     </div>
   </div>

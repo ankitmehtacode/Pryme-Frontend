@@ -152,7 +152,7 @@ const ProcessSection = () => {
                   <div className="absolute -left-[9px] lg:-left-[41px] top-8 w-6 h-6 rounded-full border-4 border-[#030303] bg-slate-700 z-10 transition-all duration-700 group-hover:bg-primary group-hover:shadow-[0_0_20px_rgba(var(--primary),0.6)] group-hover:scale-125" />
                   
                   {/* Glassmorphic Content Card */}
-                  <div className="flex-1 w-full bg-white dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-2xl hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-white/10 transition-all duration-500">
+                  <div className="flex-1 w-full bg-white dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-border shadow-2xl hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-white/10 transition-all duration-500">
                     <div className="flex items-center gap-5 mb-4">
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
                         <step.icon className={cn("w-6 h-6", step.color)} />

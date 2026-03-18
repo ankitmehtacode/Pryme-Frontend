@@ -43,7 +43,7 @@ const Profile = () => {
 
               {/* Main Content */}
               <div className="flex-1 space-y-8">
-                <div className="bg-white dark:bg-[#050505] rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-8 shadow-xl">
+                <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-xl">
                   <div className="flex items-center gap-6 mb-10">
                     <div className="relative group">
                       <div className="w-24 h-24 rounded-3xl bg-slate-200 dark:bg-white/10 flex items-center justify-center border-2 border-primary overflow-hidden">
@@ -54,7 +54,7 @@ const Profile = () => {
                       </button>
                     </div>
                     <div>
-                      <h2 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase tracking-tight">{user?.name || "Member"}</h2>
+                      <h2 className="text-2xl font-semibold text-foreground uppercase tracking-tight">{user?.name || "Member"}</h2>
                       <p className="text-slate-500 dark:text-slate-400">Verified User Session</p>
                       <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">
                          <Shield className="w-3 h-3" /> VERIFIED ACCOUNT
@@ -65,24 +65,24 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Identity Details</p>
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                      <div className="p-4 rounded-2xl bg-secondary border border-border">
                         <p className="text-xs text-slate-500 mb-1">Phone Number</p>
-                        <p className="font-medium text-slate-900 dark:text-white">+91 98XXX XXX01</p>
+                        <p className="font-medium text-foreground">+91 98XXX XXX01</p>
                       </div>
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                      <div className="p-4 rounded-2xl bg-secondary border border-border">
                         <p className="text-xs text-slate-500 mb-1">PAN Card</p>
-                        <p className="font-medium text-slate-900 dark:text-white">ABCDEXXXXF</p>
+                        <p className="font-medium text-foreground">ABCDEXXXXF</p>
                       </div>
                     </div>
                     <div className="space-y-4">
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Professional Status</p>
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                      <div className="p-4 rounded-2xl bg-secondary border border-border">
                         <p className="text-xs text-slate-500 mb-1">Employment</p>
-                        <p className="font-medium text-slate-900 dark:text-white uppercase tracking-widest text-xs">Salaried Information</p>
+                        <p className="font-medium text-foreground uppercase tracking-widest text-xs">Salaried Information</p>
                       </div>
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                      <div className="p-4 rounded-2xl bg-secondary border border-border">
                         <p className="text-xs text-slate-500 mb-1">Monthly Income</p>
-                        <p className="font-medium text-slate-900 dark:text-white">₹85,000</p>
+                        <p className="font-medium text-foreground">₹85,000</p>
                       </div>
                     </div>
                   </div>
