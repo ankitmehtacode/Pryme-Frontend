@@ -5,6 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/
 
 /**
  * 🧠 SECURE FETCH ENGINE (PRODUCTION GRADE)
+ * Strictly handles standard JSON-based REST calls.
  */
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem("pryme_session_token") || localStorage.getItem("pryme_token");
@@ -31,7 +32,6 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     }
 
     if (!response.ok) {
-      // 🧠 DIAGNOSTIC ENGINE: Rips the exact Java Exception out of the Spring Boot 500 response
       let errorMessage = `API Request failed (${response.status})`;
       try {
         const errorData = await response.json();
@@ -66,7 +66,6 @@ export const PrymeAPI = {
     let fullName = "Pryme Client";
     let email, password;
 
-    // 🧠 UNIVERSAL POLYMORPHIC PARSER
     if (args.length >= 2 && typeof args[0] === 'string') {
       if (args.length === 3) {
         fullName = args[0]; email = args[1]; password = args[2];
@@ -82,7 +81,6 @@ export const PrymeAPI = {
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
 
-    // 🧠 STRICT DTO: Bare minimum to prevent Unknown Property Exceptions, plus the DB role failsafe.
     const payload = { 
       fullName: fullName,
       email: email, 
@@ -121,7 +119,6 @@ export const PrymeAPI = {
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
 
-    // 🧠 STRICT DTO: Stripped back to standard credentials
     const payload = { 
       email: email,
       password: password
@@ -189,35 +186,52 @@ export const PrymeAPI = {
   assignLead: async (applicationId: string, assigneeId: string) => fetchWithAuth(`/admin/applications/${applicationId}/assign`, { method: "PATCH", body: JSON.stringify({ assigneeId }) }),
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   
-  uploadDocument: async (applicationId: string, docType: string, file: File) => {
-    const formData = new FormData();
-    formData.append("applicationId", applicationId);
-    formData.append("docType", docType);
-    formData.append("file", file);
-    return fetchWithAuth(`/documents/upload/${applicationId}`, { method: "POST", body: formData });
-  },
-
+  // 🧠 THE TITANIUM BYPASS: Direct fetch stream for binary uploads
   uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
     try {
       const formData = new FormData();
       formData.append("docType", docType);
       formData.append("file", file);
       
-      const response = await api.post(`/applications/${applicationId}/documents`, formData);
-      return { data: response.data, error: null };
+      const token = localStorage.getItem("pryme_session_token") || localStorage.getItem("pryme_token");
+
+      // By invoking `fetch` directly and explicitly NOT passing Content-Type, 
+      // the browser guarantees the multipart boundary generation.
+      const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/documents`, {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          // DO NOT ADD CONTENT-TYPE HERE!
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+         let errorMsg = "Document encryption failed.";
+         try {
+            const errData = await response.json();
+            errorMsg = errData.message || errorMsg;
+         } catch(e) {}
+         throw new Error(errorMsg);
+      }
+
+      const data = await response.json();
+      return { data, error: null };
+
     } catch (error: any) {
-      console.error("Document upload failed:", error);
-      return { data: null, error: error.message || "Failed to upload document" };
+      console.error("Document vault encryption failed:", error);
+      return { data: null, error: { message: error.message || "Network stream disrupted." } };
     }
   },
 
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
 };
 
+// Standard REST Export Map
 const api = {
-  get: async (url: string) => ({ data: await fetchWithAuth(url, { method: "GET" }) }),
-  post: async (url: string, body?: any) => ({ data: await fetchWithAuth(url, { method: "POST", body: body instanceof FormData ? body : JSON.stringify(body) }) }),
-  patch: async (url: string, body?: any) => ({ data: await fetchWithAuth(url, { method: "PATCH", body: body instanceof FormData ? body : JSON.stringify(body) }) }),
+  get: async (url: string, config?: any) => ({ data: await fetchWithAuth(url, { method: "GET", signal: config?.signal }) }),
+  post: async (url: string, body?: any) => ({ data: await fetchWithAuth(url, { method: "POST", body: JSON.stringify(body) }) }),
+  patch: async (url: string, body?: any) => ({ data: await fetchWithAuth(url, { method: "PATCH", body: JSON.stringify(body) }) }),
   delete: async (url: string) => ({ data: await fetchWithAuth(url, { method: "DELETE" }) })
 };
 
