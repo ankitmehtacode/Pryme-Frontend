@@ -17,8 +17,7 @@ export const banks = [
   { name: "Yes Bank", logo: yesLogo },
   { name: "Punjab National", logo: pnbLogo },
   { name: "Tata Capital", logo: tataLogo },
-  // Adding more to reach Premium Partners using available assets
-  { name: "Standard Chartered", logo: idbiLogo }, // Re-using existing premium svgs to ensure no broken images
+  { name: "Standard Chartered", logo: idbiLogo },
   { name: "Citi Bank", logo: iciciLogo },
   { name: "IndusInd Bank", logo: axisLogo },
   { name: "HSBC", logo: kotakLogo },
@@ -27,41 +26,57 @@ export const banks = [
 
 const PartnerBankMarquee = memo(() => {
   return (
-    <section className="w-full bg-white dark:bg-[#030303] border-y border-slate-100 dark:border-white/5 py-12 overflow-hidden relative z-10">
-      
-      {/* Label */}
-      <div className="container mx-auto px-4 mb-10 text-center">
-        <p className="text-[10px] sm:text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">
-          TRUSTED BY OVER 15+ PREMIUM LENDING PARTNERS
+    <div className="w-full overflow-hidden relative">
+
+      {/* Section Header */}
+      <div className="container mx-auto px-4 mb-12 text-center">
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          Lending Partners
+        </span>
+        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
+          TRUSTED BY OVER 15+ PREMIUM BANKS & NBFCs
         </p>
       </div>
-      
-      {/* Infinite Loop Container */}
-      <div className="relative flex w-full max-w-[100vw] overflow-hidden">
-        
-        {/* CSS Gradients to create the "fading into nothingness" effect on the edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 bg-gradient-to-r from-white dark:from-[#030303] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-40 bg-gradient-to-l from-white dark:from-[#030303] to-transparent z-10 pointer-events-none" />
 
-        {/* 🧠 FIX: Ensure the track is min-w-full, duplicates handle the fill, and flex behavior is predictable */}
+      {/* Marquee — Free‐floating logos, original brand colours */}
+      <div className="relative flex w-full max-w-[100vw] overflow-hidden py-4">
+
+        {/* Wide luminous edge fades */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-r from-slate-50 via-slate-50/80 dark:from-[#030303] dark:via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-l from-slate-50 via-slate-50/80 dark:from-[#030303] dark:via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+
+        {/* Ambient glow behind the track */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[60%] h-[80px] bg-primary/[0.03] dark:bg-primary/[0.05] blur-[80px] rounded-full" />
+        </div>
+
+        {/* Marquee Track */}
         <div className="flex whitespace-nowrap animate-marquee hover:[animation-play-state:paused] items-center min-w-[200%]">
-          {/* Repeat list 4x to ensure seamless looping without glitching back to start */}
           {[...banks, ...banks, ...banks, ...banks].map((bank, index) => (
-            <div 
-              key={index} 
-              className="mx-6 sm:mx-10 flex-shrink-0 flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer w-[140px] h-[50px] sm:w-[180px] sm:h-[60px]"
+            <div
+              key={index}
+              className="mx-8 sm:mx-12 flex-shrink-0 group cursor-pointer relative py-3"
             >
-              {/* Force uniform sizing across all SVG aspect ratios using max-constraints and object-contain */}
-              <img 
-                src={bank.logo} 
-                alt={bank.name} 
-                className="max-h-full max-w-full object-contain drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] opacity-80 hover:opacity-100 transition-all duration-500"
+              {/* Hover bloom — soft green radial glow */}
+              <div className="absolute inset-0 -inset-x-6 -inset-y-3 rounded-full bg-primary/0 group-hover:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
+
+              {/* Logo — Full original brand colours, no filters */}
+              <img
+                src={bank.logo}
+                alt={bank.name}
+                className="relative h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px] object-contain select-none
+                  opacity-70 group-hover:opacity-100
+                  group-hover:scale-110
+                  group-hover:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)]
+                  transition-all duration-500 ease-out"
               />
+
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 });
 

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Cpu, Search, CheckCircle2, CreditCard, IndianRupee, Star, Sparkles } from "lucide-react";
+import { Shield, Cpu, Search, CheckCircle2, CreditCard, IndianRupee, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AnalysisLoaderProps {
@@ -21,6 +21,160 @@ const steps = [
   { id: "optimize", label: "Locking lowest ROI tiers", icon: Search, duration: 1400 },
 ];
 
+// ─── FLOATING SVG SHAPES ─────────────────────────────────────────────────────
+
+const FloatingSVGs = () => {
+  const shapes = useMemo(() =>
+    Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: 16 + Math.random() * 40,
+      duration: 15 + Math.random() * 20,
+      delay: Math.random() * 5,
+      drift: 20 + Math.random() * 40,
+      rotation: Math.random() * 360,
+      variant: i % 6,
+    })),
+    []
+  );
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {shapes.map((s) => (
+        <motion.div
+          key={s.id}
+          className="absolute"
+          style={{ left: `${s.x}%`, top: `${s.y}%` }}
+          initial={{ opacity: 0, y: 0, rotate: s.rotation }}
+          animate={{
+            opacity: [0, 0.12, 0.08, 0.12, 0],
+            y: [-s.drift, s.drift, -s.drift],
+            x: [-s.drift * 0.5, s.drift * 0.5, -s.drift * 0.5],
+            rotate: [s.rotation, s.rotation + 180, s.rotation + 360],
+          }}
+          transition={{
+            duration: s.duration,
+            repeat: Infinity,
+            delay: s.delay,
+            ease: "easeInOut",
+          }}
+        >
+          <svg
+            width={s.size}
+            height={s.size}
+            viewBox="0 0 48 48"
+            fill="none"
+            className="text-primary dark:text-[#2aac64]"
+          >
+            {s.variant === 0 && (
+              /* Hexagon */
+              <polygon
+                points="24,2 44,14 44,34 24,46 4,34 4,14"
+                stroke="currentColor"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.5"
+              />
+            )}
+            {s.variant === 1 && (
+              /* Circle with center dot */
+              <>
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.4" />
+                <circle cx="24" cy="24" r="3" fill="currentColor" opacity="0.3" />
+              </>
+            )}
+            {s.variant === 2 && (
+              /* Diamond */
+              <polygon
+                points="24,4 44,24 24,44 4,24"
+                stroke="currentColor"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.4"
+              />
+            )}
+            {s.variant === 3 && (
+              /* Triangle */
+              <polygon
+                points="24,4 44,40 4,40"
+                stroke="currentColor"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.35"
+              />
+            )}
+            {s.variant === 4 && (
+              /* Cross / Plus */
+              <path
+                d="M24 8v32M8 24h32"
+                stroke="currentColor"
+                strokeWidth="1"
+                opacity="0.3"
+              />
+            )}
+            {s.variant === 5 && (
+              /* Concentric Circles */
+              <>
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.3" />
+                <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.25" />
+                <circle cx="24" cy="24" r="5" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.2" />
+              </>
+            )}
+          </svg>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// ─── SANDY LOADER (CSS-only Lottie-inspired) ─────────────────────────────────
+
+const SandyLoader = () => (
+  <div className="relative w-28 h-28 flex items-center justify-center">
+    {/* Outer ring — slow pulse */}
+    <motion.div
+      className="absolute inset-0 rounded-full border border-primary/20 dark:border-[#2aac64]/20"
+      animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.2, 0.5] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+    />
+    {/* Middle ring — counter-rotate */}
+    <motion.div
+      className="absolute inset-3 rounded-full border border-dashed border-primary/30 dark:border-[#2aac64]/30"
+      animate={{ rotate: -360 }}
+      transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+    />
+    {/* Inner ring — rotate */}
+    <motion.div
+      className="absolute inset-6 rounded-full border-2 border-primary/40 dark:border-[#2aac64]/40"
+      style={{ borderTopColor: "transparent", borderLeftColor: "transparent" }}
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+    />
+    {/* Dot trail — three orbiting dots */}
+    {[0, 120, 240].map((offset) => (
+      <motion.div
+        key={offset}
+        className="absolute inset-0"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: offset / 360 }}
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary dark:bg-[#2aac64] shadow-[0_0_8px_rgba(42,172,100,0.6)]" />
+      </motion.div>
+    ))}
+    {/* Core icon */}
+    <motion.div
+      animate={{ scale: [1, 1.08, 1], opacity: [0.9, 1, 0.9] }}
+      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      className="relative z-10 bg-primary/10 dark:bg-[#2aac64]/10 p-3 rounded-full border border-primary/20 dark:border-[#2aac64]/20"
+    >
+      <Sparkles className="w-6 h-6 text-primary dark:text-[#2aac64]" />
+    </motion.div>
+  </div>
+);
+
+// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
+
 const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -30,14 +184,12 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
     if (isVisible) {
       let totalTime = 0;
 
-      // Clear any existing timeouts to prevent memory leaks if re-mounted
       timeoutsRef.current.forEach(clearTimeout);
       timeoutsRef.current = [];
 
       steps.forEach((step, index) => {
         const timeout = setTimeout(() => {
           setCurrentStep(index);
-
           if (index > 0) {
             setCompletedSteps(prev => [...new Set([...prev, steps[index - 1].id])]);
           }
@@ -75,64 +227,24 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#030303]/95 backdrop-blur-2xl px-6 overflow-hidden"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 backdrop-blur-2xl px-6 overflow-hidden"
         >
-          {/* Deep Ambient Core Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+          {/* Floating SVG Background */}
+          <FloatingSVGs />
 
-          <div className="max-w-xl w-full relative flex flex-col items-center">
+          {/* Ambient glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/8 dark:bg-[#2aac64]/8 blur-[120px] rounded-full pointer-events-none" />
 
-            {/* Cinematic Orbital Stars (Replacing the static Scan icon) */}
+          <div className="max-w-xl w-full relative z-10 flex flex-col items-center">
+
+            {/* Sandy Loader */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="relative w-48 h-48 mb-12 flex items-center justify-center"
+              className="mb-12"
             >
-              {/* Outer Dashed Orbit */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-[1px] border-dashed border-primary/30"
-              />
-
-              {/* Inner Solid Orbit */}
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-6 rounded-full border-[1px] border-white/10"
-              />
-
-              {/* Floating Star 1 (Outer Track) */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0"
-              >
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-primary drop-shadow-[0_0_10px_rgba(var(--primary),0.8)]">
-                  <Star className="w-5 h-5 fill-primary" />
-                </div>
-              </motion.div>
-
-              {/* Floating Star 2 (Inner Track) */}
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-6"
-              >
-                <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 text-white/80">
-                  <Star className="w-3 h-3 fill-white/80" />
-                </div>
-              </motion.div>
-
-              {/* Pulsing Core */}
-              <motion.div
-                animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="bg-primary/10 p-4 rounded-full border border-primary/20 shadow-[0_0_30px_rgba(var(--primary),0.15)]"
-              >
-                <Sparkles className="w-8 h-8 text-primary" />
-              </motion.div>
+              <SandyLoader />
             </motion.div>
 
             {/* Main Processing List */}
@@ -156,12 +268,12 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                     <div className="relative flex items-center justify-center w-6 h-6">
                       <div className={cn(
                         "w-1.5 h-1.5 rounded-full transition-all duration-500",
-                        isActive ? "bg-primary shadow-[0_0_10px_rgba(var(--primary),0.8)] scale-150" :
-                          isCompleted ? "bg-primary/50" : "bg-white/10"
+                        isActive ? "bg-primary dark:bg-[#2aac64] shadow-[0_0_10px_rgba(42,172,100,0.8)] scale-150" :
+                          isCompleted ? "bg-primary/50 dark:bg-[#2aac64]/50" : "bg-muted-foreground/20"
                       )} />
                       {isActive && (
                         <motion.div
-                          className="absolute inset-0 border border-primary/40 rounded-full"
+                          className="absolute inset-0 border border-primary/40 dark:border-[#2aac64]/40 rounded-full"
                           animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
                           transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
                         />
@@ -171,7 +283,7 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                     <div className="flex-1">
                       <p className={cn(
                         "text-sm md:text-base tracking-wide transition-colors duration-500",
-                        isActive ? "text-white font-medium" : isCompleted ? "text-white/40 font-light" : "text-white/20 font-light"
+                        isActive ? "text-foreground font-medium" : isCompleted ? "text-muted-foreground font-light" : "text-muted-foreground/30 font-light"
                       )}>
                         {step.label}
                       </p>
@@ -180,7 +292,7 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                     <div className="w-8 flex justify-end">
                       {isCompleted && (
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                          <CheckCircle2 className="w-5 h-5 text-primary/60 stroke-[1.5px]" />
+                          <CheckCircle2 className="w-5 h-5 text-primary/60 dark:text-[#2aac64]/60 stroke-[1.5px]" />
                         </motion.div>
                       )}
                     </div>
@@ -194,7 +306,7 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 1 }}
-              className="w-full mt-16 pt-6 border-t border-white/5 flex items-center justify-between px-4"
+              className="w-full mt-16 pt-6 border-t border-border flex items-center justify-between px-4"
             >
               {[
                 { label: "CREDIT SCORE", value: data?.cibilScore || "AWAITING" },
@@ -202,8 +314,8 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                 { label: "CONNECTION", value: "ENCRYPTED" }
               ].map((stat, i) => (
                 <div key={i} className="flex flex-col items-start">
-                  <p className="text-[9px] font-medium text-white/30 tracking-[0.2em] mb-1">{stat.label}</p>
-                  <p className="text-xs font-medium text-white/80 tabular-nums">{stat.value}</p>
+                  <p className="text-[9px] font-medium text-muted-foreground/40 tracking-[0.2em] mb-1">{stat.label}</p>
+                  <p className="text-xs font-medium text-foreground/80 tabular-nums">{stat.value}</p>
                 </div>
               ))}
             </motion.div>

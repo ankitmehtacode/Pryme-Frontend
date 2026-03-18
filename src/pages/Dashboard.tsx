@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -101,7 +101,9 @@ const Dashboard: React.FC = () => {
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
 
-  // Use AbortController for clean component unmounting
+  // 🧠 SMART NORMALIZER: Aligns React frontend names with Java Backend Sanitized Names
+  const normalizeDocName = (name: string) => name.trim().toUpperCase().replace(/\s+/g, '_');
+
   useEffect(() => {
     const abortController = new AbortController();
     
@@ -127,7 +129,6 @@ const Dashboard: React.FC = () => {
           }
         }
 
-        // Fetch user applications
         const response = await api.get("/applications/me", { signal: abortController.signal });
         const apps: Application[] = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
         
@@ -138,11 +139,11 @@ const Dashboard: React.FC = () => {
           setActiveApplication(primaryApp);
           const progress = primaryApp.completionPercentage || 0;
           
+          // 🧠 TITANIUM HYDRATION: Safe checking for uploaded documents
           if (primaryApp.documents && primaryApp.documents.length > 0) {
             const loadedDocs: Record<string, boolean> = {};
             primaryApp.documents.forEach((d) => {
               if (d.docType) loadedDocs[d.docType] = true;
-              if (d.name) loadedDocs[d.name] = true;
             });
             setUploadedDocs(loadedDocs);
           }
@@ -184,7 +185,6 @@ const Dashboard: React.FC = () => {
 
     bootDashboard();
 
-    // Safety timeout to unlock loading state if network stalls
     const unlockTimer = setTimeout(() => {
       setIsDataLoading(prev => {
         if (prev) {
@@ -306,7 +306,6 @@ const Dashboard: React.FC = () => {
         description: error.response?.data?.message || "Failed to synchronise progress. Please check connection.", 
         variant: "destructive" 
       });
-      // Important: Do not advance stage if network save fails in a strict production environment
     } finally {
       setIsSaving(false);
     }
@@ -315,12 +314,13 @@ const Dashboard: React.FC = () => {
   const handleFinalSubmit = async () => {
     if (!activeApplication) return;
     
-    // Strict Validation: Ensure required documents are uploaded before submission
+    // 🧠 STRICT SUBMISSION CHECK: Ensure all mandatory documents are marked as uploaded 
+    // Checks against both local ID and backend sanitized DocType format
     const requiredIncomeDocs = incomeDocs.filter(d => d.required);
-    const missingIncomeDocs = requiredIncomeDocs.some(d => !uploadedDocs[d.name] && !uploadedDocs[d.id]);
+    const missingIncomeDocs = requiredIncomeDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
     
     const requiredPropertyDocs = propertyDocs.filter(d => d.required);
-    const missingPropertyDocs = requiredPropertyDocs.some(d => !uploadedDocs[d.name] && !uploadedDocs[d.id]);
+    const missingPropertyDocs = requiredPropertyDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
 
     if (missingIncomeDocs || missingPropertyDocs) {
       toast({ 
@@ -361,12 +361,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // 🧠 TOP 1% FIX: Pre-Flight Validation Engine & React Event Reset
   const handleFileUpload = async (doc: { id: string; name: string; required: boolean }, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // React Bug Fix: Clear the input value so the same file can be re-selected if an error occurs
     event.target.value = '';
 
     if (!activeApplication?.applicationId) {
@@ -374,7 +372,6 @@ const Dashboard: React.FC = () => {
       return;
     }
 
-    // Pre-Flight Client-Side Validation (Saves server bandwidth)
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 
@@ -396,7 +393,12 @@ const Dashboard: React.FC = () => {
         toast({ title: "Vault Rejected", description: error.message || "Failed to encrypt file.", variant: "destructive" });
       } else {
         toast({ title: "Document Secured", description: `${doc.name} successfully encrypted in vault.` });
-        setUploadedDocs(prev => ({ ...prev, [doc.name]: true }));
+        // 🧠 DETERMINISTIC STATE MUTATION: Use both local ID and backend format to guarantee sync
+        setUploadedDocs(prev => ({ 
+          ...prev, 
+          [doc.id]: true,
+          [normalizeDocName(doc.name)]: true 
+        }));
       }
     } catch (err: any) {
       console.error("Upload stream disrupted:", err);
@@ -576,7 +578,8 @@ const Dashboard: React.FC = () => {
                               <div className="space-y-3">
                                 {incomeDocs.map((doc) => {
                                   const isUploading = uploadingDocs[doc.id];
-                                  const isUploaded = uploadedDocs[doc.name] || uploadedDocs[doc.id];
+                                  // 🧠 CHECK BOTH KEYS: Local React ID OR Backend Sanitized DocType
+                                  const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
 
                                   return (
                                     <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
@@ -597,7 +600,7 @@ const Dashboard: React.FC = () => {
                                           disabled={isUploading}
                                         />
                                         {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default">
+                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default pointer-events-none">
                                             <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
                                           </Button>
                                         ) : (
@@ -620,7 +623,7 @@ const Dashboard: React.FC = () => {
                               <div className="space-y-3">
                                 {propertyDocs.map((doc) => {
                                   const isUploading = uploadingDocs[doc.id];
-                                  const isUploaded = uploadedDocs[doc.name] || uploadedDocs[doc.id];
+                                  const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
 
                                   return (
                                     <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
@@ -640,7 +643,7 @@ const Dashboard: React.FC = () => {
                                           disabled={isUploading}
                                         />
                                         {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default">
+                                          <Button variant="outline" size="sm" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 cursor-default pointer-events-none">
                                             <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
                                           </Button>
                                         ) : (

@@ -38,6 +38,7 @@ const useAnimatedCounter = (target: number, duration: number = 2000, startOnView
 import Header from "@/components/layout/Header";
 import SmoothScroll from "@/components/SmoothScroll";
 import Footer from "@/components/layout/Footer";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 
 // Home Components
 import HeroSection from "@/components/home/HeroSection";
@@ -161,9 +162,8 @@ const Index = () => {
             </ScrollReveal>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
-            <section className="py-14 md:py-20 bg-card text-card-foreground relative z-10">
-              {/* Gradient section divider */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
+            <section className="py-14 md:py-20 bg-slate-50 dark:bg-[#030303] relative z-10">
+              {/* Bottom gradient section divider */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               <ScrollReveal direction="scale" duration={0.6}>
               <PartnerBankMarquee />
@@ -285,6 +285,7 @@ const Index = () => {
           </main>
           
           <Footer />
+          <ScrollToTop />
         </div>
       </SmoothScroll>
     </LocalErrorBoundary>
