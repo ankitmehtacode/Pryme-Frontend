@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   User, Briefcase, CheckCircle2, XCircle, LockKeyhole, ArrowRight,
   ChevronRight, ChevronLeft, IndianRupee, Loader2, AlertCircle,
@@ -658,7 +658,32 @@ interface LoanApplicationFormProps {
 
 const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const store = useApplicationStore();
+
+  // ── Sync URL query parameter to store ─────────────────────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const typeParam = params.get("type");
+    
+    if (typeParam) {
+      const typeMap: Record<string, typeof store.loanRequirements.loanType> = {
+        personal: "PERSONAL_LOAN",
+        business: "BUSINESS_LOAN",
+        home: "HOME_LOAN",
+        lap: "LAP",
+        education: "EDUCATIONAL_LOAN",
+      };
+      
+      const resolvedType = typeMap[typeParam.toLowerCase()];
+      
+      // We read the current state directly to avoid reactivity loops on `store` object
+      const currentState = useApplicationStore.getState();
+      if (resolvedType && currentState.loanRequirements.loanType !== resolvedType) {
+        currentState.updateLoanRequirements({ loanType: resolvedType });
+      }
+    }
+  }, [location.search]);
 
   const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<ValidationErrors>({});

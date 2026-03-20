@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, AlertCircle, CheckCircle, Activity } from "lucide-react";
+import { TrendingUp, AlertCircle, CheckCircle, Activity, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 
@@ -12,15 +12,24 @@ interface EligibilityScoreProps {
 
 const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loanAmount }: EligibilityScoreProps) => {
   const [localCibil, setLocalCibil] = useState(cibilScore);
+  const [localIncome, setLocalIncome] = useState(monthlyIncome);
+  const [editingIncome, setEditingIncome] = useState(false);
+  const [incomeInputValue, setIncomeInputValue] = useState(monthlyIncome.toString());
 
   useEffect(() => {
     setLocalCibil(cibilScore);
   }, [cibilScore]);
 
-  // Dynamically recalculate the score if the user plays with the CIBIL slider
+  useEffect(() => {
+    setLocalIncome(monthlyIncome);
+    setIncomeInputValue(monthlyIncome.toString());
+  }, [monthlyIncome]);
+
+  // Dynamically recalculate the score if the user plays with the CIBIL slider or Income
   const displayScore = (() => {
     let base = ((localCibil - 300) / 600) * 40;
-    const ratio = loanAmount / (monthlyIncome * 12);
+    const effectiveIncome = Math.max(localIncome, 1);
+    const ratio = loanAmount / (effectiveIncome * 12);
     base += Math.max(0, (1 - ratio / 10) * 40);
     base += 20;
     return Math.min(100, Math.round(base));
@@ -90,10 +99,22 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
     }).format(value);
   };
 
+  const handleIncomeSubmit = () => {
+    const val = parseInt(incomeInputValue.replace(/\D/g, ''), 10);
+    if (!isNaN(val) && val > 0) {
+      setLocalIncome(val);
+      setIncomeInputValue(val.toString());
+    } else {
+      setIncomeInputValue(localIncome.toString());
+    }
+    setEditingIncome(false);
+  };
+
+  const effectiveIncome = Math.max(localIncome, 1);
   const factors = [
-    { label: "CIBIL Score", value: localCibil.toString(), status: localCibil >= 750 ? "good" : localCibil >= 650 ? "fair" : "poor" },
-    { label: "Income", value: formatCurrency(monthlyIncome), status: "good" },
-    { label: "Loan/Income Ratio", value: `${((loanAmount / (monthlyIncome * 12)) * 100).toFixed(1)}%`, status: loanAmount <= monthlyIncome * 36 ? "good" : "fair" },
+    { id: "cibil", label: "CIBIL Score", value: localCibil.toString(), status: localCibil >= 750 ? "good" : localCibil >= 650 ? "fair" : "poor" },
+    { id: "income", label: "Income", value: formatCurrency(localIncome), status: "good", isEditable: true },
+    { id: "ratio", label: "Loan/Income Ratio", value: `${((loanAmount / (effectiveIncome * 12)) * 100).toFixed(1)}%`, status: loanAmount <= effectiveIncome * 36 ? "good" : "fair" },
   ];
 
   return (
@@ -165,10 +186,42 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
           Contributing Factors
         </p>
         {factors.map((factor) => (
-          <div key={factor.label} className="flex items-center justify-between p-3 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+          <div key={factor.id} className="flex items-center justify-between p-3 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
             <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">{factor.label}</span>
             <div className="flex items-center gap-2.5">
-              <span className="text-xs md:text-sm font-bold text-foreground leading-none">{factor.value}</span>
+              
+              {factor.id === "income" ? (
+                editingIncome ? (
+                  <div className="flex items-center">
+                    <span className="text-xs md:text-sm font-bold text-foreground mr-1">₹</span>
+                    <input
+                      autoFocus
+                      type="text"
+                      className="w-20 bg-transparent text-right text-xs md:text-sm font-bold text-foreground outline-none border-b-2 border-primary/50 focus:border-primary transition-colors py-0.5 rounded-none m-0"
+                      value={incomeInputValue}
+                      onChange={(e) => setIncomeInputValue(e.target.value.replace(/\D/g, ''))}
+                      onBlur={handleIncomeSubmit}
+                      onKeyDown={(e) => e.key === "Enter" && handleIncomeSubmit()}
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer group"
+                    onClick={() => {
+                      setIncomeInputValue(localIncome.toString());
+                      setEditingIncome(true);
+                    }}
+                  >
+                    <span className="text-xs md:text-sm font-bold text-foreground leading-none border-b border-dashed border-muted-foreground/50 group-hover:border-primary transition-colors pb-0.5">
+                      {factor.value}
+                    </span>
+                    <Edit2 className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                )
+              ) : (
+                <span className="text-xs md:text-sm font-bold text-foreground leading-none">{factor.value}</span>
+              )}
+
               <div className={cn(
                 "w-2 h-2 rounded-full shadow-sm",
                 factor.status === "good" ? "bg-[#2aac64] shadow-[0_0_6px_rgba(42,172,100,0.5)]" : factor.status === "fair" ? "bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)]" : "bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]"
@@ -182,3 +235,4 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
 };
 
 export default EligibilityScore;
+

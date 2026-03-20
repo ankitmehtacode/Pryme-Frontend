@@ -123,8 +123,8 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 <button onClick={handleSignOut} className="flex items-center gap-3 p-3 rounded-lg text-red-600 hover:bg-red-50 w-full"><LogOut className="w-4 h-4" /><span className="text-sm font-medium">Sign Out</span></button>
               </div>
             ) : (
-              <div className="space-y-3 mt-4">
-                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/document-check" onClick={onClose}>Apply Now</Link></Button>
+              <div className="pt-4 mt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
+                <Button asChild className="w-full bg-[#2aac64] hover:bg-[#259b5a] text-white"><Link to="/apply" onClick={onClose}>Apply Now</Link></Button>
                 <Button asChild variant="outline" className="w-full"><Link to="/auth" onClick={onClose}>Log In</Link></Button>
               </div>
             )}
@@ -269,8 +269,8 @@ const Header = memo(() => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-5">
-                <Link to="/auth" className="text-sm font-semibold text-muted-foreground hover:text-[#2aac64] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-full px-3 py-1">Log In</Link>
-                <Link to="/document-check" className="px-6 py-2.5 border border-[#2aac64] text-[#2aac64] hover:bg-[#2aac64] hover:text-white text-sm font-medium rounded-full transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Apply Now</Link>
+                <Link to="/auth" className="text-sm font-semibold text-muted-foreground hover:text-[#2aac64] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Log In</Link>
+                <Link to="/apply" className="px-6 py-2.5 border border-[#2aac64] text-[#2aac64] hover:bg-[#2aac64] hover:text-white text-sm font-medium rounded-full transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Apply Now</Link>
               </div>
             )}
           </div>

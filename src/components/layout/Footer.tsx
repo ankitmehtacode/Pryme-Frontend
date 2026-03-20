@@ -7,7 +7,7 @@ import prymeLogo from "@/assets/pryme-logo.png";
 const CONTACT_PHONE = "1800-309-4001";
 const CONTACT_PHONE_LINK = "tel:18003094001";
 const CONTACT_EMAIL = "hello@pryme.in";
-const COMPANY_ADDRESS = "WeWork, Bandra Kurla Complex, Mumbai 400051";
+const COMPANY_ADDRESS = "INDORE, INDIA";
 
 const SOCIAL_LINKS = {
   linkedin: "https://linkedin.com/company/prymefinance",

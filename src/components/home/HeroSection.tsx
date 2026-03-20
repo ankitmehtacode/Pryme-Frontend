@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import { motion } from "framer-motion";
 import CardSwap, { Card } from "@/components/ui/CardSwap";
 import { ShuffleText } from "@/components/ui/ShuffleText";
+import { Button } from "@/components/ui/button";
 
 // Connect the available bank logos
 import iciciLogo from "@/assets/icici.svg";
@@ -220,9 +221,8 @@ const HeroSection = memo(() => {
                         </p>
                       </div>
 
-                      {/* Cleaned up button section - Removed 'Live' pill */}
-                      <div className="relative z-10 mt-auto pt-4 flex justify-between items-center">
-                        <Link to="/document-check" onClick={(e) => e.stopPropagation()} className="bg-black/50 backdrop-blur-md text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-black/70 transition-all flex items-center gap-2 border border-white/20 hover:border-white/40 shadow-lg w-max group z-50 outline-none focus:ring-2 focus:ring-[#facc15]" aria-label="Apply for this loan offer">
+                      <div className="relative z-10 mt-auto pt-4 flex justify-end items-center">
+                        <Link to="/apply" onClick={(e) => e.stopPropagation()} className="bg-black/50 backdrop-blur-md text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-black/70 transition-all flex items-center gap-2 border border-white/20 hover:border-white/40 shadow-lg w-max group z-50 outline-none focus:ring-2 focus:ring-[#facc15]" aria-label="Apply for this loan offer">
                           Apply Now <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
                         </Link>
                       </div>

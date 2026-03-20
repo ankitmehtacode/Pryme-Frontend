@@ -8,6 +8,7 @@ import cardPersonal from "@/assets/card-personal.png";
 import cardBusiness from "@/assets/card-business.png";
 import cardHome from "@/assets/card-home.png";
 import cardEducation from "@/assets/card-education.png";
+import cardLap from "@/assets/card-lap.png";
 
 const products = [
   {
@@ -33,6 +34,14 @@ const products = [
     tag: "PRE-APPROVED",
     href: "/apply?type=home",
     accent: "48, 100%, 50%", 
+  },
+  {
+    id: "lap",
+    label: "LOAN AGAINST PROPERTY",
+    image: cardLap,
+    tag: "HIGH VALUE",
+    href: "/apply?type=lap",
+    accent: "190, 90%, 50%", 
   },
   {
     id: "education",

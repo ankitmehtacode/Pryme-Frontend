@@ -31,7 +31,6 @@ const RewardsCalculatorPage = lazy(() => import("./pages/tools/RewardsCalculator
 
 // Authenticated Client Portal
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const DocumentCheck = lazy(() => import("./pages/DocumentCheck"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 
@@ -136,7 +135,6 @@ const App = () => {
                             ============================== */}
                         <Route element={<ProtectedRoute />}>
                           <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/document-check" element={<DocumentCheck />} />
                           <Route path="/profile" element={<Profile />} />
                           <Route path="/notifications" element={<Notifications />} />
                         </Route>

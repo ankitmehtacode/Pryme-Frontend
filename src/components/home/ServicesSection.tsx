@@ -103,12 +103,11 @@ const ServicesSection = () => {
                 </div>
 
                 {/* CTA */}
-                <Button asChild variant="ghost" className="p-0 h-auto font-medium text-primary hover:text-primary/80 group/btn">
-                  <Link to={service.href} className="flex items-center gap-2">
-                    Apply Now
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
-                </Button>
+                  <Button className="w-full mt-8 bg-transparent hover:bg-white/5 border border-white/20 text-white rounded-xl h-12 font-medium transition-all group-hover:border-primary/40 group-hover:bg-primary/10">
+                    <Link to="/apply" className="w-full h-full flex items-center justify-center gap-2">
+                      Apply Now
+                    </Link>
+                  </Button>
               </div>
             </motion.div>
           ))}
