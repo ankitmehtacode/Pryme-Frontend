@@ -18,8 +18,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <React.StrictMode>
-    {/* 2. PROVIDER FIX: Using attribute="class" to connect with Tailwind's dark mode */}
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    {/* Theme locked to light mode only */}
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
       <App />
     </ThemeProvider>
   </React.StrictMode>

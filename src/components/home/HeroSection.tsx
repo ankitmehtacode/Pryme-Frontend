@@ -1,240 +1,247 @@
-import { useRef, useEffect, memo, useCallback } from "react";
+import { useRef, useEffect, memo, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Percent, Zap, Sparkles, Activity } from "lucide-react";
+import { ArrowRight, Zap, Sparkles, Percent, ChevronRight } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { motion } from "framer-motion";
-import CardSwap, { Card } from "@/components/ui/CardSwap";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShuffleText } from "@/components/ui/ShuffleText";
-import { Button } from "@/components/ui/button";
 
-// Connect the available bank logos
 import iciciLogo from "@/assets/icici.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 
-// 🧠 Dynamic Offers using elegant semantic variables for Light/Dark themes
 const initialOffers = [
   { 
-    id: "axis-pre", 
-    bank: "AXIS BANK",
-    logo: axisLogo, 
-    title: "Pre-Approved Limit\nup to ₹50,00,000", 
+    id: "axis-pre", bank: "AXIS BANK", logo: axisLogo, 
+    title: "Pre-Approved Limit up to ₹50,00,000", 
     desc: "• Zero documentation for salary accounts\n• Funds disbursed within 3 hours", 
-    tag: "FAST TRACK APPROVAL",
-    icon: Sparkles,
-    bgClass: "from-[#4c1d95] to-[#3b0764]", // Deep purple
+    tag: "FAST TRACK APPROVAL", icon: Sparkles,
+    bgClass: "from-[#97144d] via-[#6b0f38] to-[#3d0920]",
+    bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400&auto=format&fit=crop",
   },
   { 
-    id: "icici-cashback", 
-    bank: "ICICI BANK", 
-    logo: iciciLogo,
-    title: "Get ₹5,000 Instant\nCashback on Approval", 
+    id: "icici-cashback", bank: "ICICI BANK", logo: iciciLogo,
+    title: "Get ₹5,000 Instant Cashback on Approval", 
     desc: "• Direct credit to your account on 1st EMI\n• 100% Digital Process & Fast Approval", 
-    tag: "EXCLUSIVE PRYME OFFER",
-    icon: Zap,
-    bgClass: "from-[#1e3a8a] to-[#172554]", // Deep blue
+    tag: "EXCLUSIVE PRYME OFFER", icon: Zap,
+    bgClass: "from-[#1e3a8a] via-[#172554] to-[#0c1a3d]",
+    bgImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1400&auto=format&fit=crop",
   },
   { 
-    id: "hdfc-holi", 
-    bank: "HDFC BANK", 
-    logo: null,
-    title: "Holi Special Sale: 25% Off\nProcessing Fees", 
-    desc: "• Lowest Interest Rates starting at 10.25%*\n• Zero pre-closure charges after 12 months", 
-    tag: "NEED URGENT FUNDS THIS MONTH?",
-    icon: Percent,
-    bgClass: "from-[#0f462b] to-[#022c22]", // Exact dark green
+    id: "hdfc-holi", bank: "HDFC BANK", logo: null,
+    title: "25% Off Processing Fees + Lowest Rates", 
+    desc: "• Interest Rates starting at 10.25%*\n• Zero pre-closure charges after 12 months", 
+    tag: "LIMITED TIME OFFER", icon: Percent,
+    bgClass: "from-[#004b87] via-[#003560] to-[#001b30]",
+    bgImage: "https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1400&auto=format&fit=crop",
   }
+];
+
+const marqueeOffers = [
+  { text: "25% off on HDFC", color: "#004b87" },
+  { text: "₹5,000 Cashback ICICI", color: "#f58220" },
+  { text: "Pre-Approved ₹50L Axis", color: "#97144d" },
+  { text: "10.25%* Interest Rate", color: "#2aac64" },
+  { text: "Zero Documentation", color: "#8b5cf6" },
+  { text: "3hr Disbursal", color: "#06b6d4" },
+  { text: "No Pre-closure Fee", color: "#f59e0b" },
+  { text: "Salary A/C Special", color: "#ec4899" },
 ];
 
 const HeroSection = memo(() => {
   const containerRef = useRef<HTMLElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  // Track Mouse for ambient glow
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    mouseRef.current = { x: e.clientX, y: e.clientY };
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [handleMouseMove]);
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % initialOffers.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleNext = useCallback(() => setActiveIndex((p) => (p + 1) % initialOffers.length), []);
 
   useGSAP(() => {
-    // 1. Mouse Follow Glow
     const glow = glowRef.current;
-    if (glow) {
-      const xTo = gsap.quickTo(glow, "x", { duration: 0.8, ease: "power3" });
-      const yTo = gsap.quickTo(glow, "y", { duration: 0.8, ease: "power3" });
-
-      const tick = () => {
-        xTo(mouseRef.current.x - window.innerWidth / 2);
-        yTo(mouseRef.current.y - window.innerHeight / 2);
-      };
-      gsap.ticker.add(tick);
-    }
-
-    // 2. Pure Typography Entrance Animation (Removed to let ShuffleText handle visibility)
-    // Left empty so other timeline items can still be added if needed
+    if (!glow) return;
+    const xTo = gsap.quickTo(glow, "x", { duration: 0.8, ease: "power3" });
+    const yTo = gsap.quickTo(glow, "y", { duration: 0.8, ease: "power3" });
+    const tick = () => {
+      xTo(mouseRef.current.x - window.innerWidth / 2);
+      yTo(mouseRef.current.y - window.innerHeight / 2);
+    };
+    gsap.ticker.add(tick);
   }, { scope: containerRef });
 
-  return (
-    <section 
-      ref={containerRef} 
-      // 🧠 1. BLANK SPACE REMOVED: pt-24 drops to pt-16/20. pb-6 dropped to pb-0!
-      // 🧠 2. CLIPPING FIXED: "overflow-hidden" completely removed from this wrapper so the Product Grid can overlap it safely.
-      className="relative w-full flex items-center justify-center bg-slate-50 dark:bg-[#0a0a0a] pt-16 md:pt-20 pb-0 border-b border-slate-200 dark:border-white/5 z-10"
-    >
-      {/* Background Layers */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Ambient Video Background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.06] dark:opacity-[0.04]"
-        >
-          <source src="https://videos.pexels.com/video-files/3130284/3130284-sd_640_360_30fps.mp4" type="video/mp4" />
-        </video>
-        {/* Gradient overlay to preserve text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/90 via-slate-50/70 to-slate-50 dark:from-[#0a0a0a]/95 dark:via-[#0a0a0a]/80 dark:to-[#0a0a0a]" />
-        {/* Subtle dynamic green glow */}
-        <div className="flex items-center justify-center w-full h-full">
-          <div 
-            ref={glowRef}
-            className="absolute w-[25rem] h-[25rem] bg-[#2aac64]/10 rounded-full blur-[120px] mix-blend-screen will-change-transform"
-          />
-        </div>
-      </div>
+  const offer = initialOffers[activeIndex];
 
-      {/* Tightly packed horizontal flex container with reduced vertical gap for mobile */}
-      <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 relative z-10 flex flex-col xl:flex-row items-center justify-between gap-6 xl:gap-4 mb-4 md:mb-8">
-        
-        {/* 🧠 LEFT COLUMN: Ultra-Compressed Typography */}
-        <div className="w-full xl:w-[50%] flex flex-col items-center xl:items-start text-center xl:text-left z-20">
-          <div ref={headlineRef} className="w-full max-w-[550px]">
-            
-            <p className="text-base md:text-xl lg:text-2xl font-normal text-muted-foreground tracking-tight leading-none mb-2">
-              Bypass the bureaucracy.
-            </p>
-            
-            <h1 className="text-[2.75rem] md:text-[4rem] lg:text-[4.5rem] font-light tracking-tighter leading-[0.95] mb-3">
-              <span className="block text-foreground">
-                <ShuffleText text="INSTANT" delay={100} duration={800} />
-              </span>
-              <span className="block text-foreground">
-                <ShuffleText text="CAPITAL." delay={600} duration={800} />
-              </span>
-              <span className="block text-[#2aac64] drop-shadow-[0_0_15px_rgba(42,172,100,0.3)]">
-                <ShuffleText text="ZERO FRICTION." delay={1200} duration={1200} />
-              </span>
-            </h1>
-            
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-normal leading-snug max-w-[90%] mx-auto xl:mx-0">
-              Compare rates from 15+ banks, calculate your EMI, and apply in under 5 minutes.
-            </p>
-            
-            {/* Social Proof Micro-copy (Zeigarnik + Social Proof) */}
-            <div className="flex items-center gap-2 mt-3 mx-auto xl:mx-0 w-max">
-              <div className="flex -space-x-2">
+  return (
+    <section ref={containerRef} className="hero-banner-section relative w-full z-10 overflow-hidden">
+      <div className="hero-banner-inner relative w-full">
+
+        {/* Background slider */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={offer.id}
+            initial={{ opacity: 0, scale: 1.02 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
+            className={`absolute inset-0 z-0 bg-gradient-to-br ${offer.bgClass}`}
+          >
+            <img src={offer.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-[0.16] mix-blend-overlay pointer-events-none" />
+            <div className="absolute right-8 md:right-16 bottom-12 md:bottom-20 w-32 md:w-52 h-32 md:h-52 opacity-[0.04] text-white pointer-events-none -rotate-12">
+              <offer.icon className="w-full h-full" />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Readability overlays */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/70 via-black/40 to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
+
+        {/* Mouse glow (desktop) */}
+        <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none hidden md:block">
+          <div className="flex items-center justify-center w-full h-full">
+            <div ref={glowRef} className="absolute w-[22rem] h-[22rem] bg-[#2aac64]/8 rounded-full blur-[100px] mix-blend-screen will-change-transform" />
+          </div>
+        </div>
+
+        {/* Content: Left text + Right offer card */}
+        <div className="relative z-10 w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-6 sm:py-8 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5 md:gap-8">
+          
+          {/* LEFT: Text */}
+          <div className="flex-1 max-w-xl flex flex-col justify-center">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="flex -space-x-1.5">
                 {[1,2,3,4].map(i => (
-                  <div key={i} className="w-6 h-6 rounded-full bg-emerald-500/20 border-2 border-slate-50 dark:border-[#0a0a0a] flex items-center justify-center">
-                    <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400">{String.fromCharCode(64 + i)}</span>
+                  <div key={i} className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] rounded-full bg-white/10 border-[1.5px] border-white/20 flex items-center justify-center">
+                    <span className="text-[5px] sm:text-[6px] font-bold text-emerald-400">{String.fromCharCode(64 + i)}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium">
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">10,000+</span> applications processed this quarter
+              <p className="text-[8px] sm:text-[9px] md:text-[10px] text-white/60 font-medium">
+                <span className="text-emerald-400 font-semibold">10,000+</span> applications processed
               </p>
             </div>
+
+            <p className="text-[9px] sm:text-[10px] md:text-[11px] font-normal text-white/50 tracking-[0.15em] uppercase mb-1 sm:mb-1.5">
+              Bypass the bureaucracy.
+            </p>
             
-          </div>
-        </div>
+            <h1 className="text-[1.75rem] sm:text-[2.25rem] md:text-[3rem] lg:text-[3.5rem] font-light tracking-tighter leading-[0.92] mb-2 sm:mb-3 text-white">
+              <span className="inline"><ShuffleText text="INSTANT CAPITAL." delay={100} duration={800} /></span>{" "}
+              <span className="text-[#2aac64] drop-shadow-[0_0_12px_rgba(42,172,100,0.25)] inline"><ShuffleText text="ZERO FRICTION." delay={800} duration={1200} /></span>
+            </h1>
+            
+            <p className="text-[9px] sm:text-[10px] md:text-xs text-white/50 font-normal leading-relaxed max-w-sm md:max-w-md mb-3 sm:mb-4">
+              Compare rates from 15+ banks, calculate your EMI, and apply in under 5 minutes.
+            </p>
 
-        {/* 🧠 RIGHT COLUMN: Compact Card Swap Engine */}
-        <div className="w-full xl:w-[50%] h-[200px] md:h-[220px] shrink-0 relative z-20 flex items-center justify-center perspective-[1200px] mt-2 xl:mt-0">
-          
-          {/* Aligned tightly to the top to save space */}
-          <div className="absolute top-0 right-4 flex flex-col items-end z-30 pointer-events-none">
-            <span className="text-[9px] font-medium text-[#2aac64] uppercase tracking-widest animate-pulse">LIVE BANK OFFERS</span>
-            <span className="text-[9px] text-slate-500">Tap card to cycle</span>
-          </div>
-
-          {/* Wrapper height massively reduced to force the next section up */}
-          <motion.div 
-            className="relative w-full max-w-[460px] lg:max-w-[500px] h-[160px] md:h-[190px] mt-4 z-40"
-            animate={{ 
-              y: [0, -10, 0],
-              rotate: [0, -1, 0]
-            }}
-            transition={{ 
-              duration: 8, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-          >
-            <CardSwap
-              width={460}
-              height={190}
-              cardDistance={16}
-              verticalDistance={16}
-              delay={4000}
-              pauseOnHover={true}
-              easing="elastic"
+            <Link 
+              to="/apply" 
+              className="inline-flex items-center gap-2 bg-[#2aac64] hover:bg-[#239b57] text-white px-5 py-2 sm:px-6 sm:py-2.5 rounded-full font-semibold text-[10px] sm:text-[11px] md:text-xs tracking-wide transition-all hover:scale-[1.03] active:scale-[0.98] group w-max"
             >
-              {initialOffers.map((offer) => {
-                const Icon = offer.icon;
-                return (
-                  <Card key={offer.id} className="p-0 border-0 rounded-[1.25rem] overflow-hidden cursor-pointer shadow-2xl">
-                    <div className={`relative w-full h-full bg-gradient-to-br ${offer.bgClass} flex flex-col p-5 overflow-hidden border border-white/10 ring-1 ring-inset ring-white/5`}>
-                      
-                      {/* Subtle elegant pattern */}
-                      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 mix-blend-overlay pointer-events-none" />
-                      
-                      {/* Icon watermark */}
-                      <div className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 text-white pointer-events-none transform -rotate-12 blur-[1px]">
-                        <Icon className="w-full h-full" />
-                      </div>
+              Apply Now <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
 
-                      <div className="relative z-10 flex justify-between items-start mb-4">
-                        <div className="bg-[#facc15] text-[#422006] text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center gap-1.5 ring-1 ring-[#facc15]/50">
-                          <Zap className="w-3.5 h-3.5 fill-current" /> {offer.tag}
-                        </div>
-                        <span className="bg-black/40 text-white/90 text-[9px] font-bold px-3.5 py-1.5 rounded-full uppercase tracking-widest border border-white/10 backdrop-blur-md flex items-center justify-center min-w-[80px] shadow-sm">
-                          {offer.logo ? (
-                            <img src={offer.logo} alt={offer.bank} className="h-3.5 w-auto object-contain drop-shadow-md brightness-0 invert" />
-                          ) : (
-                            offer.bank
-                          )}
-                        </span>
-                      </div>
+          {/* RIGHT: Offer Card with left/right arrows on edges */}
+          <div className="w-full md:w-[44%] lg:w-[40%] xl:w-[38%] flex items-center justify-center relative">
+            
 
-                      <div className="relative z-10 flex-1 flex flex-col justify-center">
-                        <h3 className="text-lg md:text-xl lg:text-[22px] font-bold text-[#fde047] leading-tight tracking-tight mb-2 drop-shadow-md">
-                          {offer.title}
-                        </h3>
-                        <p className="text-[10px] md:text-xs font-semibold text-blue-50/90 whitespace-pre-line leading-relaxed drop-shadow-sm">
-                          {offer.desc}
-                        </p>
-                      </div>
 
-                      <div className="relative z-10 mt-auto pt-4 flex justify-end items-center">
-                        <Link to="/apply" onClick={(e) => e.stopPropagation()} className="bg-black/50 backdrop-blur-md text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-black/70 transition-all flex items-center gap-2 border border-white/20 hover:border-white/40 shadow-lg w-max group z-50 outline-none focus:ring-2 focus:ring-[#facc15]" aria-label="Apply for this loan offer">
-                          Apply Now <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
-                        </Link>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </CardSwap>
-          </motion.div>
+            {/* Offer card */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={offer.id + "-card"}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full max-w-[420px] mr-12 sm:mr-14 bg-black/25 backdrop-blur-md rounded-2xl border border-white/[0.1] p-4 sm:p-5 md:p-6 shadow-2xl"
+              >
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="bg-[#facc15] text-[#422006] text-[7px] sm:text-[8px] font-bold uppercase tracking-widest px-2 sm:px-2.5 py-1 rounded shadow-[0_0_10px_rgba(250,204,21,0.3)] flex items-center gap-1 ring-1 ring-[#facc15]/50">
+                    <Zap className="w-2.5 h-2.5 fill-current" /> {offer.tag}
+                  </div>
+                  <span className="bg-black/30 text-white/90 text-[7px] sm:text-[8px] font-bold px-2.5 sm:px-3 py-1 rounded-full uppercase tracking-widest border border-white/10 backdrop-blur-md flex items-center justify-center min-w-[55px] flex-shrink-0">
+                    {offer.logo ? (
+                      <img src={offer.logo} alt={offer.bank} className="h-3 sm:h-3.5 w-auto object-contain brightness-0 invert" />
+                    ) : (
+                      offer.bank
+                    )}
+                  </span>
+                </div>
+                
+                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#fde047] leading-tight tracking-tight mb-2 drop-shadow-md">
+                  {offer.title}
+                </h3>
+                
+                <p className="text-[8px] sm:text-[9px] md:text-[10px] font-medium text-white/60 whitespace-pre-line leading-relaxed mb-3">
+                  {offer.desc}
+                </p>
+
+                {/* Card footer: dots + CTA */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                  <div className="flex gap-1.5">
+                    {initialOffers.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveIndex(i)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          i === activeIndex 
+                            ? "bg-[#facc15] w-5 shadow-[0_0_6px_rgba(250,204,21,0.5)]" 
+                            : "bg-white/20 w-1.5 hover:bg-white/40"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Link 
+                    to="/apply" 
+                    className="bg-black/40 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold text-[8px] sm:text-[9px] md:text-[10px] hover:bg-black/60 transition-all flex items-center gap-1.5 border border-white/15 hover:border-white/30 shadow-lg group active:scale-95"
+                  >
+                    Apply Now <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-70 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                  </Link>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Next arrow — transparent glass */}
+            <button onClick={handleNext} className="absolute right-0 md:-right-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/[0.15] text-white/70 hover:text-white hover:bg-white/[0.18] hover:border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 group shadow-lg">
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform duration-200" />
+            </button>
+          </div>
         </div>
 
+        {/* Marquee bar */}
+        <div className="relative z-10 w-full bg-black/50 backdrop-blur-md border-t border-white/[0.06]">
+          <div className="hero-marquee-track flex items-center py-2.5 sm:py-3 md:py-3.5 gap-4 sm:gap-5">
+            {[...marqueeOffers, ...marqueeOffers].map((o, i) => (
+              <div key={i} className="flex-shrink-0 flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] transition-colors cursor-default">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: o.color, boxShadow: `0 0 6px ${o.color}60` }} />
+                <span className="text-[9px] sm:text-[10px] md:text-[11px] font-semibold text-white/70 whitespace-nowrap tracking-wide">{o.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <style>{`
+        .hero-banner-inner { min-height: 320px; }
+        @media (min-width: 768px) { .hero-banner-inner { height: 52vh; max-height: 480px; min-height: 360px; } }
+        @media (min-width: 1024px) { .hero-banner-inner { height: 50vh; max-height: 460px; } }
+        .hero-marquee-track { animation: heroMarqueeScroll 25s linear infinite; width: max-content; }
+        .hero-marquee-track:hover { animation-play-state: paused; }
+        @keyframes heroMarqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+      `}</style>
     </section>
   );
 });
