@@ -7,7 +7,7 @@ import {
   Building2, Stethoscope, Scale, GraduationCap, CreditCard, MapPin,
   Phone, Mail, Calendar, Hash, Landmark, BriefcaseBusiness,
   Home, HandCoins, FileSearch, UserPlus, ToggleLeft,
-  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload
+  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload, Sparkles
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -34,8 +34,8 @@ import {
 
 const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
   ({ label, error, isValid, isSecure, icon: Icon, className: _className, ...props }, ref) => (
-    <div className="space-y-2 relative group">
-      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#2aac64]/80 ml-1">{label}</Label>
+    <div className="relative group w-full">
+      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-1 block">{label}</Label>
       <div className="relative">
         {Icon && (
           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
@@ -46,10 +46,10 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           ref={ref}
           {...props}
           className={cn(
-            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#2aac64]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#2aac64]/10",
+            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#7c3aed]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#7c3aed]/10",
             Icon && "pl-11",
             error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
-            isValid && !error && "border-primary/20 dark:border-[#2aac64]/20"
+            isValid && !error && "border-primary/20 dark:border-[#7c3aed]/20"
           )}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -61,7 +61,7 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           )}
           {isValid && !error && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
-              <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#2aac64]" />
+              <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
             </motion.div>
           )}
         </div>
@@ -84,11 +84,11 @@ const StyledSelect = ({
   label: string; icon?: any; value?: string; onValueChange: (v: string) => void;
   placeholder: string; children: React.ReactNode; error?: string;
 }) => (
-  <div className="space-y-2 group">
-    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#2aac64]/80 ml-1">{label}</Label>
+  <div className="group w-full">
+    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-1 block">{label}</Label>
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn(
-        "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#2aac64]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#2aac64]/10",
+        "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#7c3aed]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#7c3aed]/10",
         Icon && "pl-11",
         error && "border-red-500/30"
       )}>
@@ -119,8 +119,8 @@ const PillSelector = <T extends string>({
   label: string; options: { value: T; label: string; icon?: any }[];
   value: T | null; onChange: (v: T) => void; icon?: any;
 }) => (
-  <div className="space-y-3">
-    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#2aac64]/80 ml-1 flex items-center gap-2">
+  <div className="w-full">
+    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-2 flex items-center gap-2">
       {Icon && <Icon className="w-3.5 h-3.5" />}
       {label}
     </Label>
@@ -138,7 +138,7 @@ const PillSelector = <T extends string>({
             className={cn(
               "py-3.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 border flex items-center justify-center gap-2",
               isSelected
-                ? "bg-primary dark:bg-[#2aac64] text-white border-primary dark:border-[#2aac64] shadow-lg shadow-primary/20 dark:shadow-[#2aac64]/20"
+                ? "bg-primary dark:bg-[#7c3aed] text-white border-primary dark:border-[#7c3aed] shadow-lg shadow-primary/20 dark:shadow-[#7c3aed]/20"
                 : "bg-secondary/50 dark:bg-white/[0.03] text-muted-foreground border-border dark:border-white/[0.06] hover:text-foreground hover:border-primary/20 dark:hover:border-white/15"
             )}
           >
@@ -166,7 +166,7 @@ const ToggleSwitch = ({
     className={cn(
       "w-full flex items-center justify-between gap-4 p-4 rounded-xl border transition-all duration-300",
       checked
-        ? "bg-primary/5 dark:bg-[#2aac64]/5 border-primary/20 dark:border-[#2aac64]/20"
+        ? "bg-primary/5 dark:bg-[#7c3aed]/5 border-primary/20 dark:border-[#7c3aed]/20"
         : "bg-secondary/30 dark:bg-white/[0.02] border-border dark:border-white/[0.06] hover:border-primary/10 dark:hover:border-white/[0.1]"
     )}
   >
@@ -174,11 +174,11 @@ const ToggleSwitch = ({
       {Icon && (
         <div className={cn(
           "w-9 h-9 rounded-lg flex items-center justify-center transition-colors",
-          checked ? "bg-primary/10 dark:bg-[#2aac64]/10" : "bg-secondary dark:bg-white/[0.05]"
+          checked ? "bg-primary/10 dark:bg-[#7c3aed]/10" : "bg-secondary dark:bg-white/[0.05]"
         )}>
           <Icon className={cn(
             "w-4 h-4 transition-colors",
-            checked ? "text-primary dark:text-[#2aac64]" : "text-muted-foreground/50"
+            checked ? "text-primary dark:text-[#7c3aed]" : "text-muted-foreground/50"
           )} />
         </div>
       )}
@@ -194,7 +194,7 @@ const ToggleSwitch = ({
     </div>
     <div className={cn(
       "w-11 h-6 rounded-full relative transition-colors duration-300",
-      checked ? "bg-primary dark:bg-[#2aac64]" : "bg-border dark:bg-white/[0.1]"
+      checked ? "bg-primary dark:bg-[#7c3aed]" : "bg-border dark:bg-white/[0.1]"
     )}>
       <motion.div
         className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
@@ -239,17 +239,17 @@ const DocumentCard = ({
       className={cn(
         "group relative p-4 rounded-xl border transition-all duration-300",
         file
-          ? "bg-primary/[0.03] dark:bg-[#2aac64]/[0.03] border-primary/20 dark:border-[#2aac64]/20"
+          ? "bg-primary/[0.03] dark:bg-[#7c3aed]/[0.03] border-primary/20 dark:border-[#7c3aed]/20"
           : "bg-secondary/30 dark:bg-white/[0.02] border-border dark:border-white/[0.06] hover:border-primary/15 dark:hover:border-white/[0.1]"
       )}
     >
       <div className="flex items-start gap-3">
         <div className={cn(
           "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-          file ? "bg-primary/10 dark:bg-[#2aac64]/10" : "bg-secondary dark:bg-white/[0.05]"
+          file ? "bg-primary/10 dark:bg-[#7c3aed]/10" : "bg-secondary dark:bg-white/[0.05]"
         )}>
           {file ? (
-            <Check className="w-4 h-4 text-primary dark:text-[#2aac64]" />
+            <Check className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
           ) : (
             <FileText className={cn(
               "w-4 h-4 transition-colors",
@@ -271,8 +271,8 @@ const DocumentCard = ({
 
           {file ? (
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/5 dark:bg-[#2aac64]/5 border border-primary/10 dark:border-[#2aac64]/10">
-                <FileText className="w-3 h-3 text-primary dark:text-[#2aac64]" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/5 dark:bg-[#7c3aed]/5 border border-primary/10 dark:border-[#7c3aed]/10">
+                <FileText className="w-3 h-3 text-primary dark:text-[#7c3aed]" />
                 <span className="text-[11px] font-medium text-foreground truncate max-w-[150px]">{file.name}</span>
                 <span className="text-[10px] text-muted-foreground/50">
                   {(file.size / 1024).toFixed(0)}KB
@@ -381,7 +381,7 @@ function resolveDocuments(store: ReturnType<typeof useApplicationStore.getState>
 }
 
 const CATEGORY_META: Record<DocEntry['category'], { label: string; icon: any; color: string }> = {
-  identity: { label: 'Identity & KYC', icon: ShieldCheck, color: 'text-emerald-500' },
+  identity: { label: 'Identity & KYC', icon: ShieldCheck, color: 'text-violet-500' },
   income: { label: 'Income Proof', icon: IndianRupee, color: 'text-blue-500' },
   property: { label: 'Property Documents', icon: Home, color: 'text-amber-500' },
   business: { label: 'Business Documents', icon: BriefcaseBusiness, color: 'text-violet-500' },
@@ -432,6 +432,25 @@ const DocumentVaultStage = ({
     return groups;
   }, [requiredDocs]);
 
+  // Progressive Disclosure State
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const activeGroup = groupedDocs[activeCategoryIndex];
+
+  // Auto-advance logic (500ms dopamine delay)
+  useEffect(() => {
+    if (!activeGroup) return;
+    
+    // Check if all required docs in the CURRENT group are uploaded
+    const allRequiredUploaded = activeGroup.docs.every(doc => !doc.required || uploadedFiles[doc.id]);
+    
+    if (allRequiredUploaded && activeCategoryIndex < groupedDocs.length - 1) {
+      const timer = setTimeout(() => {
+        setActiveCategoryIndex(prev => prev + 1);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadedFiles, activeGroup, activeCategoryIndex, groupedDocs.length]);
+
   const totalRequired = requiredDocs.filter(d => d.required).length;
   const uploadedRequired = requiredDocs.filter(d => d.required && uploadedFiles[d.id]).length;
   const progress = totalRequired > 0 ? Math.round((uploadedRequired / totalRequired) * 100) : 0;
@@ -447,12 +466,12 @@ const DocumentVaultStage = ({
     >
       {/* Header Card */}
       <div className={cardCn}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
 
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-              <FolderOpen className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+              <FolderOpen className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground tracking-tight">Document Vault</h3>
@@ -465,7 +484,7 @@ const DocumentVaultStage = ({
             <div className="text-right">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Uploaded</p>
               <p className="text-lg font-bold tabular-nums text-foreground">
-                <span className="text-primary dark:text-[#2aac64]">{uploadedRequired}</span>
+                <span className="text-primary dark:text-[#7c3aed]">{uploadedRequired}</span>
                 <span className="text-muted-foreground/30"> / {totalRequired}</span>
               </p>
             </div>
@@ -475,7 +494,7 @@ const DocumentVaultStage = ({
                 <motion.circle
                   cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeWidth="2.5"
                   strokeLinecap="round"
-                  className="text-primary dark:text-[#2aac64]"
+                  className="text-primary dark:text-[#7c3aed]"
                   strokeDasharray={`${2 * Math.PI * 15.5}`}
                   animate={{ strokeDashoffset: 2 * Math.PI * 15.5 * (1 - progress / 100) }}
                   transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
@@ -498,42 +517,62 @@ const DocumentVaultStage = ({
         </div>
       </div>
 
-      {/* Document Sections */}
-      {groupedDocs.map((group, gi) => {
-        const meta = CATEGORY_META[group.category];
-        const SectionIcon = meta.icon;
-        return (
-          <motion.div
-            key={group.category}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: gi * 0.08 }}
-            className={cardCn}
-          >
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", `bg-${meta.color.replace('text-', '')}/10`)}>
-                <SectionIcon className={cn("w-3.5 h-3.5", meta.color)} />
+      {/* Document Sections - Progressive Disclosure */}
+      <AnimatePresence mode="wait">
+        {activeGroup && (() => {
+          const meta = CATEGORY_META[activeGroup.category];
+          const SectionIcon = meta.icon;
+          return (
+            <motion.div
+              key={activeGroup.category}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className={cardCn}
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", `bg-${meta.color.replace('text-', '')}/10`)}>
+                  <SectionIcon className={cn("w-3.5 h-3.5", meta.color)} />
+                </div>
+                <h4 className="text-sm font-bold text-foreground">{meta.label}</h4>
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-[10px] font-medium text-muted-foreground/40">
+                    Step {activeCategoryIndex + 1} of {groupedDocs.length}
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground font-semibold">
+                    {activeGroup.docs.filter(d => uploadedFiles[d.id]).length}/{activeGroup.docs.length}
+                  </span>
+                </div>
               </div>
-              <h4 className="text-sm font-bold text-foreground">{meta.label}</h4>
-              <span className="text-[10px] font-medium text-muted-foreground/40 ml-auto">
-                {group.docs.filter(d => uploadedFiles[d.id]).length}/{group.docs.length}
-              </span>
-            </div>
 
-            <div className="space-y-3">
-              {group.docs.map((doc) => (
-                <DocumentCard
-                  key={doc.id}
-                  doc={doc}
-                  file={uploadedFiles[doc.id] || null}
-                  onFileSelect={handleFileSelect}
-                  onRemove={handleRemove}
-                />
-              ))}
-            </div>
-          </motion.div>
-        );
-      })}
+              <div className="space-y-3">
+                {activeGroup.docs.map((doc) => (
+                  <DocumentCard
+                    key={doc.id}
+                    doc={doc}
+                    file={uploadedFiles[doc.id] || null}
+                    onFileSelect={handleFileSelect}
+                    onRemove={handleRemove}
+                  />
+                ))}
+              </div>
+              
+              {/* Manual navigation fallback if they want to go back */}
+              {activeCategoryIndex > 0 && (
+                <div className="mt-4 pt-4 border-t border-border/50 flex justify-start">
+                  <button 
+                    onClick={() => setActiveCategoryIndex(prev => prev - 1)}
+                    className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <ChevronLeft className="w-3 h-3" /> Previous Step
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -566,9 +605,7 @@ const PRODUCT_OPTIONS: { value: LoanType; label: string }[] = [
 const STEP_META = [
   { stage: 1 as StageNumber, label: "Identity", icon: User },
   { stage: 2 as StageNumber, label: "Employment", icon: Briefcase },
-  { stage: 3 as StageNumber, label: "Loan", icon: IndianRupee },
-  { stage: 4 as StageNumber, label: "Footprint", icon: FileSearch },
-  { stage: 5 as StageNumber, label: "Documents", icon: FolderOpen },
+  { stage: 3 as StageNumber, label: "Loan Details", icon: IndianRupee },
 ];
 
 // ─── VALIDATION ─────────────────────────────────────────────────────────────
@@ -729,6 +766,16 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // ── Submit ────────────────────────────────────────────────────────────────
 
   const handleSubmit = useCallback(() => {
+    // Validate Stage 3 before allowing submission
+    const validationErrors = validateStage3(useApplicationStore.getState());
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast({ title: "Incomplete Details", description: "Please complete your loan requirements.", variant: "destructive" });
+      return;
+    }
+    setErrors({});
+    store.completeStage(3 as StageNumber);
+
     setIsSubmitting(true);
 
     // Bridge to the old Apply.tsx interface
@@ -775,7 +822,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   const cibilScore = store.loanRequirements.cibilScore;
   const cibilUi = useMemo(() => {
-    if (cibilScore >= 750) return { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Excellent" };
+    if (cibilScore >= 750) return { color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20", label: "Excellent" };
     if (cibilScore >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
     if (cibilScore >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
     return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
@@ -789,14 +836,16 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // RENDER
   // ═════════════════════════════════════════════════════════════════════════════
 
+  const getIncomeOrFallback = () => {
+    const fin = store.financialDetails;
+    if (fin.path === "SALARIED") return fin.data.netMonthlySalary || 50000;
+    if (fin.path === "PROFESSIONAL") return fin.data.netMonthlyIncome || 50000;
+    if (fin.path === "SELF_EMPLOYED") return fin.data.netMonthlyIncome || 50000;
+    return 50000;
+  };
+
   return (
     <>
-      <AnalysisLoader
-        isVisible={isAnalyzing}
-        onComplete={handleAnalysisComplete}
-        data={{ cibilScore, productType: store.loanRequirements.loanType }}
-      />
-
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-0 h-full w-full relative">
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
@@ -818,13 +867,13 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   <motion.div
                     animate={{
                       scale: isCurrent ? 1.1 : 1,
-                      boxShadow: isCurrent ? "0 0 0 4px rgba(42,172,100,0.15)" : "0 0 0 0px rgba(42,172,100,0)",
+                      boxShadow: isCurrent ? "0 0 0 4px rgba(124,58,237,0.15)" : "0 0 0 0px rgba(124,58,237,0)",
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300",
                       isActive
-                        ? "bg-primary dark:bg-[#2aac64] text-white"
+                        ? "bg-primary dark:bg-[#7c3aed] text-white"
                         : "bg-secondary dark:bg-[#1a1a1a] text-muted-foreground border border-border dark:border-white/10"
                     )}
                   >
@@ -836,7 +885,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   </motion.div>
                   <span className={cn(
                     "text-[10px] mt-2 font-semibold uppercase tracking-widest transition-colors duration-300",
-                    isActive ? "text-primary dark:text-[#2aac64]" : "text-muted-foreground/50"
+                    isActive ? "text-primary dark:text-[#7c3aed]" : "text-muted-foreground/50"
                   )}>
                     {meta.label}
                   </span>
@@ -846,7 +895,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             {/* Connector line */}
             <div className="absolute top-4 left-8 right-8 h-[2px] bg-border dark:bg-white/[0.06] -z-0">
               <motion.div
-                className="h-full bg-primary dark:bg-[#2aac64]"
+                className="h-full bg-primary dark:bg-[#7c3aed]"
                 animate={{ width: `${((displayStep - 1) / (STEP_META.length - 1)) * 100}%` }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               />
@@ -869,11 +918,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
               className={cardCn}
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+                  <User className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground tracking-tight">Verify Identity</h3>
               </div>
@@ -980,11 +1029,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             >
               {/* Employment Category Selector */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+                    <Briefcase className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Employment & Income</h3>
                 </div>
@@ -1212,11 +1261,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               className="space-y-5"
             >
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
                 </div>
@@ -1305,11 +1354,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             >
               {/* ── Universal Financial Footprint Card ──────────────────────── */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#2aac64]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <FileSearch className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+                    <FileSearch className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Financial Footprint</h3>
                 </div>
@@ -1464,8 +1513,33 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           )}
         </AnimatePresence>
 
+        {/* ── Real-Time Signal Injection ──────────────────────────────────────── */}
+        <div className="mt-6 p-4 rounded-xl bg-primary/5 dark:bg-[#7c3aed]/5 border border-primary/10 dark:border-[#7c3aed]/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-[#7c3aed]/10 flex items-center justify-center animate-pulse">
+              <Sparkles className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-foreground">
+                {store.currentStage > 1 
+                  ? `Preliminary match: ${getIncomeOrFallback() * 12} to ${getIncomeOrFallback() * 24} limit`
+                  : 'Analyzing your profile in real-time...'}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {store.currentStage > 2 ? '4+ lenders currently matched' : 'Connecting to lending partners'}
+              </p>
+            </div>
+          </div>
+          <div className="text-right hidden sm:block">
+            <p className="text-[10px] font-medium text-slate-500 flex items-center justify-end gap-1.5">
+              <ShieldCheck className="w-3 h-3 text-emerald-500" /> Bank-grade encryption
+            </p>
+          </div>
+        </div>
+
         {/* ── Navigation ──────────────────────────────────────────────────── */}
-        <div className="mt-8 pt-6 border-t border-border dark:border-white/[0.04] flex items-center justify-between">
+        <div className="mt-4 pt-6 flex flex-col items-center gap-4">
+          <div className="w-full flex items-center justify-between">
           <motion.div whileHover={store.currentStage > 1 ? { x: -2 } : {}} whileTap={store.currentStage > 1 ? { scale: 0.96 } : {}}>
             <Button
               type="button"
@@ -1481,12 +1555,12 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             </Button>
           </motion.div>
 
-          {store.currentStage < 5 ? (
+          {store.currentStage < 3 ? (
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
               <Button
                 type="button"
                 onClick={nextStep}
-                className="bg-primary dark:bg-[#2aac64] hover:bg-primary/90 dark:hover:bg-[#239b57] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
+                className="bg-primary dark:bg-[#7c3aed] hover:bg-primary/90 dark:hover:bg-[#6d28d9] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
               >
                 Continue <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -1497,7 +1571,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || isAnalyzing}
-                className="rounded-xl bg-primary dark:bg-[#2aac64] hover:bg-primary/90 dark:hover:bg-[#239b57] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
+                className="rounded-xl bg-primary dark:bg-[#7c3aed] hover:bg-primary/90 dark:hover:bg-[#6d28d9] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
               >
                 {isSubmitting || isAnalyzing ? (
                   <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
@@ -1507,6 +1581,13 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               </Button>
             </motion.div>
           )}
+          </div>
+          
+          {/* Trust Microcopy Injection */}
+          <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group">
+            <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" /> 
+            Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
+          </p>
         </div>
       </motion.div>
     </>

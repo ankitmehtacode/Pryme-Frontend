@@ -89,7 +89,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const impactColors: Record<string, string> = {
-  positive: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+  positive: "text-violet-600 dark:text-violet-400 bg-violet-500/10 border-violet-500/20",
   warning: "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20",
   critical: "text-red-500 dark:text-red-400 bg-red-500/10 border-red-500/20",
 };
@@ -170,7 +170,7 @@ const CibilTips = () => {
             className={cn(
               "text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all duration-200 outline-none focus:ring-2 focus:ring-primary/30",
               filter === f.key
-                ? "bg-primary dark:bg-[#2aac64] text-primary-foreground dark:text-white border-primary dark:border-[#2aac64] shadow-sm"
+                ? "bg-primary dark:bg-[#7c3aed] text-primary-foreground dark:text-white border-primary dark:border-[#7c3aed] shadow-sm"
                 : "bg-secondary/50 dark:bg-[#111] text-muted-foreground border-border dark:border-white/5 hover:border-primary/30 dark:hover:border-white/10"
             )}
           >
@@ -297,7 +297,7 @@ const CibilTips = () => {
       {/* Footer note */}
       <div className="mt-5 pt-4 border-t border-border dark:border-white/5 relative z-10">
         <div className="flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 text-primary dark:text-[#2aac64] shrink-0 mt-0.5" />
+          <ShieldCheck className="w-4 h-4 text-primary dark:text-[#7c3aed] shrink-0 mt-0.5" />
           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider leading-relaxed">
             Data sourced from CIBIL TransUnion, RBI guidelines, and top-tier Indian bank risk frameworks.
           </p>

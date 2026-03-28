@@ -180,7 +180,7 @@ export type FinancialDetails =
   | { path: 'SALARIED'; data: SalariedDetails }
   | { path: 'PROFESSIONAL'; data: ProfessionalDetails }
   | { path: 'SELF_EMPLOYED'; data: BusinessDetails }
-  | { path: null; data: null };
+  | { path: null; data: Partial<SalariedDetails & ProfessionalDetails & BusinessDetails> };
 
 // ─── LOAN REQUIREMENT DATA ──────────────────────────────────────────────────
 

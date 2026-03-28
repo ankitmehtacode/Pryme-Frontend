@@ -50,7 +50,7 @@ const createFreshState = (): ApplicationState => ({
     employmentType: null,
   },
 
-  financialDetails: { path: null, data: null },
+  financialDetails: { path: null, data: {} } as FinancialDetails,
 
   loanRequirements: {
     loanType: 'PERSONAL_LOAN',
@@ -168,7 +168,7 @@ export const useApplicationStore = create<ApplicationStore>()(
           return {
             basicKYC: updatedKYC,
             financialDetails: employmentChanged
-              ? { path: null, data: null } as FinancialDetails
+              ? { path: null, data: {} } as FinancialDetails
               : state.financialDetails,
             lastModifiedAt: new Date().toISOString(),
           };

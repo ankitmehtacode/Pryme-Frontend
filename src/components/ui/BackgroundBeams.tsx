@@ -51,7 +51,7 @@ export const BackgroundBeams = ({ className }: { className?: string }) => {
             ease: "linear",
             delay: 3,
           }}
-          className="absolute top-0 right-1/4 w-[1px] h-[500px] bg-gradient-to-b from-transparent via-emerald-400 to-transparent blur-[3px]"
+          className="absolute top-0 right-1/4 w-[1px] h-[500px] bg-gradient-to-b from-transparent via-violet-400 to-transparent blur-[3px]"
           style={{ width: "3px" }}
         />
         {/* Beam 3 */}

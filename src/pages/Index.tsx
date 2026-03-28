@@ -217,8 +217,8 @@ const Index = () => {
                     
                     
                     {/* Trust Mini-Card under Analytics */}
-                    <div className="bg-primary/5 dark:bg-[#2aac64]/5 border border-primary/20 dark:border-[#2aac64]/20 rounded-[2rem] p-6 lg:p-8 backdrop-blur-md shadow-inner">
-                      <h4 className="text-primary dark:text-[#2aac64] font-bold text-lg mb-3 flex items-center gap-2.5">
+                    <div className="bg-primary/5 dark:bg-[#7c3aed]/5 border border-primary/20 dark:border-[#7c3aed]/20 rounded-[2rem] p-6 lg:p-8 backdrop-blur-md shadow-inner">
+                      <h4 className="text-primary dark:text-[#7c3aed] font-bold text-lg mb-3 flex items-center gap-2.5">
                         <Building2 className="w-5 h-5" /> Real-Time Analytics
                       </h4>
                       <p className="text-xs lg:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">

@@ -39,7 +39,7 @@ const BankComparisonTable = ({
   };
 
   const getApprovalColor = (probability: number) => {
-    if (probability >= 80) return { bg: "bg-emerald-500", text: "text-emerald-500", border: "border-emerald-500/20", bgLight: "bg-emerald-500/10", label: "High" };
+    if (probability >= 80) return { bg: "bg-violet-500", text: "text-violet-500", border: "border-violet-500/20", bgLight: "bg-violet-500/10", label: "High" };
     if (probability >= 60) return { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500/20", bgLight: "bg-blue-500/10", label: "Medium" };
     return { bg: "bg-amber-500", text: "text-amber-500", border: "border-amber-500/20", bgLight: "bg-amber-500/10", label: "Low" };
   };
@@ -49,7 +49,7 @@ const BankComparisonTable = ({
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
-  const itemVariants = {
+  const itemVariants: import("framer-motion").Variants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } }
   };
@@ -91,11 +91,19 @@ const BankComparisonTable = ({
                   <Building2 className={cn("w-7 h-7 md:w-8 md:h-8", offer.recommended ? "text-primary" : "text-slate-400")} />
                 </div>
                 <div>
-                  {offer.recommended && (
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-primary/30 bg-primary/10 text-[10px] font-medium tracking-widest uppercase text-primary mb-1">
-                      <Star className="w-3 h-3 fill-primary" /> Top Match
-                    </div>
-                  )}
+                  {/* Decision Anchoring Tags */}
+                  <div className="flex flex-wrap gap-2 mb-1.5">
+                    {offer.recommended && (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#7c3aed]/10 border border-[#7c3aed]/20 text-[10px] font-bold tracking-widest uppercase text-[#7c3aed]">
+                        Lowest EMI
+                      </div>
+                    )}
+                    {offer.processingTime.includes("hours") && (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold tracking-widest uppercase text-amber-500">
+                        Fastest Approval
+                      </div>
+                    )}
+                  </div>
                   <h4 className="text-lg md:text-xl font-semibold text-foreground tracking-tight">{offer.bankName}</h4>
                   <div className="flex items-center gap-1 mt-0.5 text-xs font-medium text-slate-500">
                     <ShieldCheck className="w-3.5 h-3.5" /> 
@@ -106,19 +114,22 @@ const BankComparisonTable = ({
 
               {/* 2. Core Financial Metrics (The 3-Column Split) */}
               <div className="w-full xl:w-[45%] grid grid-cols-3 gap-4 xl:gap-8 border-y xl:border-y-0 xl:border-x border-border py-5 xl:py-0 xl:px-8 relative z-10">
+                {/* Primary Metric: EMI (Decision Anchor) */}
+                <div className="flex flex-col justify-center xl:border-r border-border xl:pr-6 col-span-2 xl:col-span-1">
+                  <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-primary dark:text-[#7c3aed] mb-1">Monthly EMI</p>
+                  <p className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{formatCurrency(offer.emi)}</p>
+                </div>
+                
+                {/* Secondary Metrics */}
                 <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Interest Rate</p>
-                  <p className={cn("text-xl md:text-2xl font-semibold", offer.recommended ? "text-primary" : "text-foreground")}>
-                    {offer.roi}% <span className="text-xs font-medium text-slate-500">p.a.</span>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mb-0.5">Interest Rate</p>
+                  <p className="text-sm md:text-lg font-bold text-foreground">
+                    {offer.roi}% <span className="text-xs font-semibold text-slate-500">p.a.</span>
                   </p>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Monthly EMI</p>
-                  <p className="text-xl md:text-2xl font-semibold text-foreground">{formatCurrency(offer.emi)}</p>
-                </div>
-                <div className="flex flex-col justify-center">
-                  <p className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-slate-500 mb-1">Processing</p>
-                  <p className="text-sm md:text-base font-medium text-muted-foreground">{offer.processingFee}</p>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mb-0.5">Processing Fee</p>
+                  <p className="text-sm md:text-lg font-bold text-foreground">{offer.processingFee}</p>
                 </div>
               </div>
 
@@ -151,7 +162,7 @@ const BankComparisonTable = ({
                       "flex-1 group relative overflow-hidden rounded-xl text-sm md:text-base font-medium py-6 transition-all duration-300 hover:scale-[1.02]",
                       offer.recommended 
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)]" 
-                        : "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-xl"
+                        : "bg-transparent border border-primary/30 dark:border-[#7c3aed]/30 hover:bg-primary/5 dark:hover:bg-[#7c3aed]/10 text-primary dark:text-[#7c3aed]"
                     )}
                   >
                     {/* Apple-style Shimmer on Recommended Button */}

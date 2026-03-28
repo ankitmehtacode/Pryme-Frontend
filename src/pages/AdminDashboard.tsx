@@ -120,7 +120,7 @@ const AdminDashboard = () => {
       return acc;
     }, {});
 
-    const colors = ["#2aac64", "#3b82f6", "#8b5cf6", "#f59e0b", "#ec4899"];
+    const colors = ["#7c3aed", "#3b82f6", "#8b5cf6", "#f59e0b", "#ec4899"];
     return Object.entries(counts).map(([name, count], idx) => ({
       name,
       value: Math.round((count / applications.length) * 100),
@@ -177,7 +177,7 @@ const AdminDashboard = () => {
       NEW: "bg-amber-500/15 text-amber-400 border-amber-500/25",
       SUBMITTED: "bg-blue-500/15 text-blue-400 border-blue-500/25",
       PROCESSING: "bg-purple-500/15 text-purple-400 border-purple-500/25",
-      APPROVED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+      APPROVED: "bg-violet-500/15 text-violet-400 border-violet-500/25",
       REJECTED: "bg-red-500/15 text-red-400 border-red-500/25",
     };
     return map[status?.toUpperCase()] || "bg-white/[0.06] text-slate-300 border-white/[0.08]";
@@ -190,9 +190,9 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050508] relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-emerald-500/10 blur-[100px] animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-violet-500/10 blur-[100px] animate-pulse" />
         <div className="flex flex-col items-center gap-5 relative z-10">
-          <div className="relative"><Loader2 className="w-10 h-10 text-emerald-500 animate-spin" /><div className="absolute inset-0 w-10 h-10 rounded-full bg-emerald-500/20 animate-ping" /></div>
+          <div className="relative"><Loader2 className="w-10 h-10 text-violet-500 animate-spin" /><div className="absolute inset-0 w-10 h-10 rounded-full bg-violet-500/20 animate-ping" /></div>
           <p className="text-slate-400 font-medium text-sm tracking-widest uppercase">Synchronizing CRM Matrix</p>
         </div>
       </div>
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
         <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed h-full z-20">
           <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/25"><ShieldCheck className="w-5 h-5 text-white" /></div>
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-violet-500/25"><ShieldCheck className="w-5 h-5 text-white" /></div>
               <span className="font-semibold text-white tracking-tight">PRYME<span className="text-slate-500 font-normal ml-1">CRM</span></span>
             </div>
           </div>
@@ -223,14 +223,14 @@ const AdminDashboard = () => {
             <p className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mb-4">Workspace</p>
             {sidebarItems.map((item) => (
               <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group active:scale-[0.97] relative", activeTab === item.id ? "bg-white/[0.08] text-white shadow-lg shadow-black/20 border border-white/[0.08]" : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-200 border border-transparent")}>
-                {activeTab === item.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-emerald-500 rounded-r-full shadow-[0_0_8px_rgba(42,172,100,0.6)]" />}
-                <item.icon className={cn("w-4 h-4 transition-colors", activeTab === item.id ? "text-emerald-400" : "text-slate-600 group-hover:text-slate-400")} />{item.label}
+                {activeTab === item.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-r-full shadow-[0_0_8px_rgba(124,58,237,0.6)]" />}
+                <item.icon className={cn("w-4 h-4 transition-colors", activeTab === item.id ? "text-violet-400" : "text-slate-600 group-hover:text-slate-400")} />{item.label}
               </button>
             ))}
           </div>
           <div className="p-4 border-t border-white/[0.06]">
             <div className="flex items-center gap-3 px-3 py-2 mb-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center border border-emerald-500/30"><span className="text-xs font-semibold text-emerald-400">AD</span></div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-600/10 flex items-center justify-center border border-violet-500/30"><span className="text-xs font-semibold text-violet-400">AD</span></div>
               <div className="flex-1 text-left"><p className="text-sm font-semibold text-white truncate">Super Admin</p></div>
             </div>
             <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors active:scale-[0.97]"><LogOut className="w-4 h-4" /> Sign Out</button>
@@ -240,22 +240,22 @@ const AdminDashboard = () => {
         {/* Main Canvas */}
         <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden">
           <header className="h-16 bg-[#0a0a10]/80 backdrop-blur-2xl border-b border-white/[0.06] flex items-center justify-between px-8 sticky top-0 z-10">
-            <div className="flex items-center gap-3 text-sm font-medium"><span className="text-white">{sidebarItems.find(i => i.id === activeTab)?.label}</span><span className="text-[10px] text-emerald-500/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live</span></div>
+            <div className="flex items-center gap-3 text-sm font-medium"><span className="text-white">{sidebarItems.find(i => i.id === activeTab)?.label}</span><span className="text-[10px] text-violet-500/80 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" /> Live</span></div>
             <div className="flex items-center gap-2">
               <div className="relative hidden md:block group">
-                <Search className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                <Search className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-violet-500 transition-colors" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search Matrix..."
-                  className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all w-64 text-white placeholder:text-slate-600"
+                  className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all w-64 text-white placeholder:text-slate-600"
                 />
               </div>
               <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]">
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
-              <button className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]"><Bell className="w-4 h-4" /><div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_6px_rgba(42,172,100,0.8)]" /></button>
+              <button className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]"><Bell className="w-4 h-4" /><div className="absolute top-2 right-2 w-2 h-2 bg-violet-500 rounded-full shadow-[0_0_6px_rgba(124,58,237,0.8)]" /></button>
             </div>
           </header>
 
@@ -276,10 +276,10 @@ const AdminDashboard = () => {
               {activeTab === "overview" && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-emerald-500/20 to-emerald-500/0" }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0" }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-purple-500/20 to-purple-500/0" }, { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0" }].map((metric, i) => (
+                    {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-violet-500/20 to-violet-500/0" }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0" }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-purple-500/20 to-purple-500/0" }, { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0" }].map((metric, i) => (
                       <div key={i} className="relative bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group cursor-default overflow-hidden">
                         <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${metric.glow} rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                        <div className="flex justify-between items-start mb-4 relative z-10"><div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 transition-colors" /></div></div>
+                        <div className="flex justify-between items-start mb-4 relative z-10"><div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-violet-500/30 group-hover:bg-violet-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-violet-400 transition-colors" /></div></div>
                         <p className="text-sm font-medium text-slate-500 relative z-10">{metric.label}</p><p className="text-2xl font-semibold text-white mt-1 relative z-10">{metric.value}</p>
                       </div>
                     ))}
@@ -356,7 +356,7 @@ const AdminDashboard = () => {
                                 >
                                   <td className="px-6 py-4 align-top">
                                     <div className="flex items-start gap-3">
-                                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-medium text-xs mt-1 border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                      <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-400 flex items-center justify-center font-medium text-xs mt-1 border border-violet-500/20 group-hover:bg-violet-500 group-hover:text-white transition-colors">
                                         {app.loanType?.substring(0, 2).toUpperCase() || "LN"}
                                       </div>
                                       <div>
@@ -369,7 +369,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-1">
                                       <p className="font-medium text-white">{app.applicant?.name || 'Unknown'}</p>
                                       <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span>CIBIL: <strong className={app.declaredCibilScore >= 750 ? "text-emerald-400" : "text-amber-400"}>{app.declaredCibilScore}</strong></span>
+                                        <span>CIBIL: <strong className={app.declaredCibilScore >= 750 ? "text-violet-400" : "text-amber-400"}>{app.declaredCibilScore}</strong></span>
                                       </div>
                                     </div>
                                   </td>
@@ -393,7 +393,7 @@ const AdminDashboard = () => {
                                       onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: "PROCESSING" }); }}
                                       disabled={app.status === "PROCESSING" || statusMutation.isPending}
                                       size="sm"
-                                      className="h-8 bg-primary hover:bg-[#239b57] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="h-8 bg-primary hover:bg-[#6d28d9] text-white opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                       Advance <ArrowUpRight className="w-3 h-3 ml-1" />
                                     </Button>
@@ -421,14 +421,14 @@ const AdminDashboard = () => {
                             </div>
                             <div className="flex-1 overflow-y-auto space-y-3 p-2">
                               {filteredApplications.filter((a: any) => a.status === stage).map((app: any) => (
-                                <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#2aac64' : 'rgba(255,255,255,0.08)' }}>
+                                <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#7c3aed' : 'rgba(255,255,255,0.08)' }}>
                                   <div className="flex justify-between items-start mb-2">
                                     <span className="text-xs font-mono text-slate-500">{app.applicationId}</span>
                                     <span className="text-[10px] bg-white/[0.06] text-slate-300 px-1.5 py-0.5 rounded font-medium border border-white/[0.06] uppercase">{app.loanType}</span>
                                   </div>
                                   <p className="text-lg font-semibold text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
                                   <div className="flex justify-between items-center text-xs text-slate-500">
-                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-emerald-400" : "")}><Activity className="w-3 h-3" /> {app.declaredCibilScore}</span>
+                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-violet-400" : "")}><Activity className="w-3 h-3" /> {app.declaredCibilScore}</span>
                                   </div>
                                 </div>
                               ))}
@@ -490,7 +490,7 @@ const AdminDashboard = () => {
                 { id: "details", label: "Details", icon: FileText },
                 { id: "documents", label: "KYC & Docs", icon: FileCheck },
               ].map(tab => (
-                <button key={tab.id} onClick={() => setActiveDrawerTab(tab.id as any)} className={cn("pb-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all", activeDrawerTab === tab.id ? "border-emerald-500 text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-300")}>
+                <button key={tab.id} onClick={() => setActiveDrawerTab(tab.id as any)} className={cn("pb-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all", activeDrawerTab === tab.id ? "border-violet-500 text-violet-400" : "border-transparent text-slate-500 hover:text-slate-300")}>
                   <tab.icon className="w-4 h-4" /> {tab.label}
                 </button>
               ))}
@@ -506,7 +506,7 @@ const AdminDashboard = () => {
                   <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
                     <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
                     <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white uppercase">{selectedApp.loanType}</p></div>
-                    <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore >= 750 ? "text-emerald-400" : "text-amber-400")}>{selectedApp.declaredCibilScore}</p></div>
+                    <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore >= 750 ? "text-violet-400" : "text-amber-400")}>{selectedApp.declaredCibilScore}</p></div>
                     <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
                   </div>
                 </div>
@@ -515,7 +515,7 @@ const AdminDashboard = () => {
 
             <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] grid grid-cols-2 gap-3">
               <Button disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "REJECTED" })} variant="outline" className="w-full text-red-400 border-red-500/20 hover:bg-red-500/10 active:scale-95 transition-all bg-transparent">Reject Lead</Button>
-              <Button disabled={statusMutation.isPending || selectedApp.status === "APPROVED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "APPROVED" })} className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 active:scale-95 transition-all">Mark Approved</Button>
+              <Button disabled={statusMutation.isPending || selectedApp.status === "APPROVED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "APPROVED" })} className="w-full bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg shadow-violet-500/25 active:scale-95 transition-all">Mark Approved</Button>
             </div>
           </div>
         </div>

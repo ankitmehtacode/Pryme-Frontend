@@ -48,7 +48,7 @@ const ReviewCard = ({ review }: { review: typeof reviews[0] }) => (
   <div className="w-[320px] md:w-[400px] flex-shrink-0 bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/20 dark:border-slate-800/50 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
     <div className="flex gap-1">
       {[...Array(review.rating)].map((_, i) => (
-        <Star key={i} className="w-4 h-4 fill-[#2aac64] text-[#2aac64]" />
+        <Star key={i} className="w-4 h-4 fill-[#7c3aed] text-[#7c3aed]" />
       ))}
     </div>
     <p className="text-muted-foreground text-sm md:text-base leading-relaxed italic">
@@ -56,7 +56,7 @@ const ReviewCard = ({ review }: { review: typeof reviews[0] }) => (
     </p>
     <div className="mt-auto pt-4 border-t border-slate-200/10 dark:border-slate-700/50">
       <p className="font-semibold text-foreground">{review.name}</p>
-      <p className="text-xs text-[#2aac64] uppercase tracking-wider mt-1">{review.role}</p>
+      <p className="text-xs text-[#7c3aed] uppercase tracking-wider mt-1">{review.role}</p>
     </div>
   </div>
 );
@@ -91,10 +91,10 @@ const CustomerReviews = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-[#050505]" />
       </div>
       {/* Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#2aac64]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#7c3aed]/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 mb-16 text-center relative z-10">
-        <span className="inline-block text-[10px] md:text-xs font-semibold text-[#2aac64] uppercase tracking-[0.3em] mb-4">
+        <span className="inline-block text-[10px] md:text-xs font-semibold text-[#7c3aed] uppercase tracking-[0.3em] mb-4">
           Verified Success
         </span>
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white tracking-tight">

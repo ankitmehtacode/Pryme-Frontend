@@ -59,7 +59,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1.2 }}
         transition={{ duration: 3, ease: "easeOut" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#2aac64]/10 blur-[100px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#7c3aed]/10 blur-[100px] rounded-full pointer-events-none"
       />
 
       <div className="relative z-10 flex flex-col items-center">
@@ -73,13 +73,13 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         >
           {/* Outer orbital rotating ring */}
           <motion.div 
-            className="absolute inset-0 rounded-3xl border border-[#2aac64]/30"
+            className="absolute inset-0 rounded-3xl border border-[#7c3aed]/30"
             animate={{ rotate: 360 }}
             transition={{ duration: 8, ease: "linear", repeat: Infinity }}
           />
           
           {/* Main Logo Box - Transparent & Premium */}
-          <div className="absolute inset-2 bg-black/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.02),0_0_40px_rgba(42,172,100,0.15)] overflow-hidden">
+          <div className="absolute inset-2 bg-black/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.02),0_0_40px_rgba(124,58,237,0.15)] overflow-hidden">
             {/* Apple-style Glass Shimmer Sweep */}
             <motion.div 
               className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
@@ -87,7 +87,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
               animate={{ x: "100%" }}
               transition={{ duration: 1.5, ease: "easeInOut", delay: 0.4 }}
             />
-            <img src="/src/assets/pryme-logo.svg" alt="Pryme Logo" className="w-14 h-14 relative z-10 drop-shadow-[0_0_25px_rgba(42,172,100,0.6)]" />
+            <img src="/src/assets/pryme-logo.svg" alt="Pryme Logo" className="w-14 h-14 relative z-10 drop-shadow-[0_0_25px_rgba(124,58,237,0.6)]" />
           </div>
         </motion.div>
 
@@ -109,7 +109,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", damping: 20, delay: 0.4 }}
-            className="text-sm font-medium text-[#2aac64] tracking-[0.3em] uppercase"
+            className="text-sm font-medium text-[#7c3aed] tracking-[0.3em] uppercase"
           >
             Intelligent Lending
           </motion.p>
@@ -135,7 +135,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
           transition={{ duration: 2.4, ease: [0.22, 1, 0.36, 1] }} // Mathematical Cubic Ease Out
-          className="h-full bg-gradient-to-r from-emerald-500 via-[#2aac64] to-emerald-200 relative"
+          className="h-full bg-gradient-to-r from-violet-500 via-[#7c3aed] to-violet-200 relative"
         >
           {/* Leading Glow Head (Makes it look like a laser beam loading) */}
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-[4px] bg-white blur-[2px] rounded-full shadow-[0_0_10px_#fff]" />

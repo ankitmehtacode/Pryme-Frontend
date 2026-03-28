@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Cpu, Search, CheckCircle2, CreditCard, IndianRupee, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface AnalysisLoaderProps {
   isVisible: boolean;
@@ -13,211 +11,195 @@ interface AnalysisLoaderProps {
   } | null;
 }
 
-const steps = [
-  { id: "identity", label: "Validating identity credentials", icon: Shield, duration: 1200 },
-  { id: "cibil", label: "Synthesizing credit matrix", icon: CreditCard, duration: 1500 },
-  { id: "income", label: "Verifying liquid assets", icon: IndianRupee, duration: 1200 },
-  { id: "match", label: "Querying partner bank algorithms", icon: Cpu, duration: 1800 },
-  { id: "optimize", label: "Locking lowest ROI tiers", icon: Search, duration: 1400 },
-];
+// ─── DOCUMENT ICON SVG ──────────────────────────────────────────────────────
 
-// ─── FLOATING SVG SHAPES ─────────────────────────────────────────────────────
-
-const FloatingSVGs = () => {
-  const shapes = useMemo(() =>
-    Array.from({ length: 18 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 16 + Math.random() * 40,
-      duration: 15 + Math.random() * 20,
-      delay: Math.random() * 5,
-      drift: 20 + Math.random() * 40,
-      rotation: Math.random() * 360,
-      variant: i % 6,
-    })),
-    []
-  );
+const DocumentIcon = ({ index, activeIndex }: { index: number; activeIndex: number }) => {
+  const isActive = index === activeIndex;
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {shapes.map((s) => (
-        <motion.div
-          key={s.id}
-          className="absolute"
-          style={{ left: `${s.x}%`, top: `${s.y}%` }}
-          initial={{ opacity: 0, y: 0, rotate: s.rotation }}
+    <motion.div
+      className="relative"
+      animate={{
+        scale: isActive ? 1.08 : 1,
+        y: isActive ? -4 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    >
+      {/* Glow behind active document */}
+      <motion.div
+        className="absolute -inset-3 rounded-2xl bg-violet-500/20 blur-xl pointer-events-none"
+        animate={{ opacity: isActive ? 0.8 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      <svg
+        width="72"
+        height="92"
+        viewBox="0 0 72 92"
+        fill="none"
+        className="relative z-10 drop-shadow-lg"
+      >
+        {/* Document body with dog-ear */}
+        <path
+          d="M4 8C4 3.58172 7.58172 0 12 0H48L68 20V84C68 88.4183 64.4183 92 60 92H12C7.58172 92 4 88.4183 4 84V8Z"
+          className="fill-white/[0.07] dark:fill-white/[0.07]"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          style={{ color: isActive ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.1)" }}
+        />
+
+        {/* Dog-ear fold */}
+        <path
+          d="M48 0L68 20H56C51.5817 20 48 16.4183 48 12V0Z"
+          className="fill-white/[0.04]"
+          stroke="currentColor"
+          strokeWidth="1"
+          style={{ color: isActive ? "rgba(139, 92, 246, 0.3)" : "rgba(255,255,255,0.08)" }}
+        />
+
+        {/* Text lines */}
+        {[
+          { y: 34, w: 40 },
+          { y: 44, w: 36 },
+          { y: 54, w: 42 },
+          { y: 64, w: 28 },
+          { y: 74, w: 34 },
+        ].map((line, i) => (
+          <motion.rect
+            key={i}
+            x="14"
+            y={line.y}
+            width={line.w}
+            height="3"
+            rx="1.5"
+            animate={{
+              fill: isActive
+                ? "rgba(139, 92, 246, 0.35)"
+                : "rgba(255, 255, 255, 0.06)",
+            }}
+            transition={{ duration: 0.3 }}
+          />
+        ))}
+
+        {/* Small icon placeholder top-left of text area */}
+        <motion.rect
+          x="14"
+          y="24"
+          width="10"
+          height="3"
+          rx="1.5"
           animate={{
-            opacity: [0, 0.12, 0.08, 0.12, 0],
-            y: [-s.drift, s.drift, -s.drift],
-            x: [-s.drift * 0.5, s.drift * 0.5, -s.drift * 0.5],
-            rotate: [s.rotation, s.rotation + 180, s.rotation + 360],
+            fill: isActive
+              ? "rgba(139, 92, 246, 0.5)"
+              : "rgba(255, 255, 255, 0.08)",
           }}
-          transition={{
-            duration: s.duration,
-            repeat: Infinity,
-            delay: s.delay,
-            ease: "easeInOut",
-          }}
-        >
-          <svg
-            width={s.size}
-            height={s.size}
-            viewBox="0 0 48 48"
-            fill="none"
-            className="text-primary dark:text-[#2aac64]"
-          >
-            {s.variant === 0 && (
-              /* Hexagon */
-              <polygon
-                points="24,2 44,14 44,34 24,46 4,34 4,14"
-                stroke="currentColor"
-                strokeWidth="1"
-                fill="none"
-                opacity="0.5"
-              />
-            )}
-            {s.variant === 1 && (
-              /* Circle with center dot */
-              <>
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.4" />
-                <circle cx="24" cy="24" r="3" fill="currentColor" opacity="0.3" />
-              </>
-            )}
-            {s.variant === 2 && (
-              /* Diamond */
-              <polygon
-                points="24,4 44,24 24,44 4,24"
-                stroke="currentColor"
-                strokeWidth="1"
-                fill="none"
-                opacity="0.4"
-              />
-            )}
-            {s.variant === 3 && (
-              /* Triangle */
-              <polygon
-                points="24,4 44,40 4,40"
-                stroke="currentColor"
-                strokeWidth="1"
-                fill="none"
-                opacity="0.35"
-              />
-            )}
-            {s.variant === 4 && (
-              /* Cross / Plus */
-              <path
-                d="M24 8v32M8 24h32"
-                stroke="currentColor"
-                strokeWidth="1"
-                opacity="0.3"
-              />
-            )}
-            {s.variant === 5 && (
-              /* Concentric Circles */
-              <>
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.3" />
-                <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.25" />
-                <circle cx="24" cy="24" r="5" stroke="currentColor" strokeWidth="0.7" fill="none" opacity="0.2" />
-              </>
-            )}
-          </svg>
-        </motion.div>
-      ))}
-    </div>
+          transition={{ duration: 0.3 }}
+        />
+      </svg>
+    </motion.div>
   );
 };
 
-// ─── SANDY LOADER (CSS-only Lottie-inspired) ─────────────────────────────────
+// ─── MAGNIFYING GLASS SVG ────────────────────────────────────────────────────
 
-const SandyLoader = () => (
-  <div className="relative w-28 h-28 flex items-center justify-center">
-    {/* Outer ring — slow pulse */}
-    <motion.div
-      className="absolute inset-0 rounded-full border border-primary/20 dark:border-[#2aac64]/20"
-      animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.2, 0.5] }}
-      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+const MagnifyingGlass = () => (
+  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+    {/* Glass circle */}
+    <circle
+      cx="24"
+      cy="24"
+      r="18"
+      stroke="rgba(139, 92, 246, 0.6)"
+      strokeWidth="3.5"
+      fill="rgba(139, 92, 246, 0.06)"
     />
-    {/* Middle ring — counter-rotate */}
-    <motion.div
-      className="absolute inset-3 rounded-full border border-dashed border-primary/30 dark:border-[#2aac64]/30"
-      animate={{ rotate: -360 }}
-      transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+    {/* Inner lens shine */}
+    <circle
+      cx="24"
+      cy="24"
+      r="14"
+      stroke="rgba(139, 92, 246, 0.15)"
+      strokeWidth="1"
+      fill="none"
     />
-    {/* Inner ring — rotate */}
-    <motion.div
-      className="absolute inset-6 rounded-full border-2 border-primary/40 dark:border-[#2aac64]/40"
-      style={{ borderTopColor: "transparent", borderLeftColor: "transparent" }}
-      animate={{ rotate: 360 }}
-      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+    {/* Handle */}
+    <line
+      x1="38"
+      y1="38"
+      x2="52"
+      y2="52"
+      stroke="rgba(139, 92, 246, 0.5)"
+      strokeWidth="4"
+      strokeLinecap="round"
     />
-    {/* Dot trail — three orbiting dots */}
-    {[0, 120, 240].map((offset) => (
-      <motion.div
-        key={offset}
-        className="absolute inset-0"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: offset / 360 }}
-      >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary dark:bg-[#2aac64] shadow-[0_0_8px_rgba(42,172,100,0.6)]" />
-      </motion.div>
-    ))}
-    {/* Core icon */}
-    <motion.div
-      animate={{ scale: [1, 1.08, 1], opacity: [0.9, 1, 0.9] }}
-      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      className="relative z-10 bg-primary/10 dark:bg-[#2aac64]/10 p-3 rounded-full border border-primary/20 dark:border-[#2aac64]/20"
-    >
-      <Sparkles className="w-6 h-6 text-primary dark:text-[#2aac64]" />
-    </motion.div>
-  </div>
+    {/* Lens glare */}
+    <path
+      d="M16 16C18 14 21 13 24 13"
+      stroke="rgba(255,255,255,0.15)"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
 );
+
+// ─── STATUS TEXT STEPS ───────────────────────────────────────────────────────
+
+const STATUS_MESSAGES = [
+  "Scanning your documents...",
+  "Verifying credit profile...",
+  "Matching with lender algorithms...",
+  "Locking best offers for you...",
+];
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [activeDocIndex, setActiveDocIndex] = useState(0);
+  const [statusIndex, setStatusIndex] = useState(0);
   const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
-    if (isVisible) {
-      let totalTime = 0;
-
-      timeoutsRef.current.forEach(clearTimeout);
-      timeoutsRef.current = [];
-
-      steps.forEach((step, index) => {
-        const timeout = setTimeout(() => {
-          setCurrentStep(index);
-          if (index > 0) {
-            setCompletedSteps(prev => [...new Set([...prev, steps[index - 1].id])]);
-          }
-        }, totalTime);
-
-        timeoutsRef.current.push(timeout);
-        totalTime += step.duration;
-      });
-
-      const finalTimeout = setTimeout(() => {
-        setCompletedSteps(prev => [...new Set([...prev, steps[steps.length - 1].id])]);
-        const completeTimeout = setTimeout(() => {
-          onComplete();
-        }, 800);
-        timeoutsRef.current.push(completeTimeout);
-      }, totalTime);
-
-      timeoutsRef.current.push(finalTimeout);
-
-    } else {
-      setCurrentStep(0);
-      setCompletedSteps([]);
+    if (!isVisible) {
+      setActiveDocIndex(0);
+      setStatusIndex(0);
+      return;
     }
+
+    // Clear any existing timeouts
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+
+    // Total animation duration: ~3.5s
+    // Cycle through 3 documents, then complete
+    const schedule = [
+      { time: 0, doc: 0, status: 0 },
+      { time: 800, doc: 1, status: 1 },
+      { time: 1600, doc: 2, status: 2 },
+      { time: 2400, doc: 0, status: 3 },
+      { time: 3000, doc: 1, status: 3 },
+    ];
+
+    schedule.forEach(({ time, doc, status }) => {
+      const t = setTimeout(() => {
+        setActiveDocIndex(doc);
+        setStatusIndex(status);
+      }, time);
+      timeoutsRef.current.push(t);
+    });
+
+    // Complete after full scan
+    const completeTimeout = setTimeout(() => {
+      onComplete();
+    }, 3800);
+    timeoutsRef.current.push(completeTimeout);
 
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
     };
   }, [isVisible, onComplete]);
+
+  // Magnifying glass x-position mapped to active document
+  const glassPositions = [-90, 0, 90];
 
   return (
     <AnimatePresence>
@@ -225,101 +207,113 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 backdrop-blur-2xl px-6 overflow-hidden"
+          exit={{ opacity: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0a0a0a]/95 backdrop-blur-2xl px-6 overflow-hidden"
         >
-          {/* Floating SVG Background */}
-          <FloatingSVGs />
+          {/* Ambient background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-500/[0.06] blur-[150px] rounded-full pointer-events-none" />
+          <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-violet-600/[0.04] blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] bg-purple-500/[0.04] blur-[100px] rounded-full pointer-events-none" />
 
-          {/* Ambient glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/8 dark:bg-[#2aac64]/8 blur-[120px] rounded-full pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center">
+            {/* ── Documents + Magnifying Glass Area ─────────────────────── */}
+            <div className="relative mb-12">
+              {/* Three documents in a row */}
+              <div className="flex items-end gap-6 md:gap-8">
+                {[0, 1, 2].map((i) => (
+                  <DocumentIcon key={i} index={i} activeIndex={activeDocIndex} />
+                ))}
+              </div>
 
-          <div className="max-w-xl w-full relative z-10 flex flex-col items-center">
+              {/* Magnifying glass overlay — moves across documents */}
+              <motion.div
+                className="absolute -top-4 left-1/2 pointer-events-none z-20"
+                animate={{
+                  x: glassPositions[activeDocIndex],
+                  marginLeft: "-28px",
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 20,
+                  mass: 0.8,
+                }}
+              >
+                <MagnifyingGlass />
+              </motion.div>
 
-            {/* Sandy Loader */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="mb-12"
-            >
-              <SandyLoader />
-            </motion.div>
-
-            {/* Main Processing List */}
-            <div className="w-full space-y-6 px-4 md:px-10">
-              {steps.map((step, index) => {
-                const isActive = currentStep === index;
-                const isCompleted = completedSteps.includes(step.id);
-
-                return (
-                  <motion.div
-                    key={step.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{
-                      opacity: isActive || isCompleted ? 1 : 0.2,
-                      y: 0,
-                      scale: isActive ? 1.02 : 1
-                    }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex items-center gap-5"
-                  >
-                    <div className="relative flex items-center justify-center w-6 h-6">
-                      <div className={cn(
-                        "w-1.5 h-1.5 rounded-full transition-all duration-500",
-                        isActive ? "bg-primary dark:bg-[#2aac64] shadow-[0_0_10px_rgba(42,172,100,0.8)] scale-150" :
-                          isCompleted ? "bg-primary/50 dark:bg-[#2aac64]/50" : "bg-muted-foreground/20"
-                      )} />
-                      {isActive && (
-                        <motion.div
-                          className="absolute inset-0 border border-primary/40 dark:border-[#2aac64]/40 rounded-full"
-                          animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <p className={cn(
-                        "text-sm md:text-base tracking-wide transition-colors duration-500",
-                        isActive ? "text-foreground font-medium" : isCompleted ? "text-muted-foreground font-light" : "text-muted-foreground/30 font-light"
-                      )}>
-                        {step.label}
-                      </p>
-                    </div>
-
-                    <div className="w-8 flex justify-end">
-                      {isCompleted && (
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                          <CheckCircle2 className="w-5 h-5 text-primary/60 dark:text-[#2aac64]/60 stroke-[1.5px]" />
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
+              {/* Scan line effect */}
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500/40 to-transparent pointer-events-none"
+                animate={{
+                  opacity: [0.3, 0.8, 0.3],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
             </div>
 
-            {/* Sub-context Bar - Data Ledger */}
+            {/* ── Status Text ──────────────────────────────────────────── */}
+            <div className="h-8 relative flex items-center justify-center mb-8">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={statusIndex}
+                  initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="text-sm md:text-base font-medium text-slate-400 tracking-wide"
+                >
+                  {STATUS_MESSAGES[statusIndex]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
+
+            {/* ── Progress Dots ────────────────────────────────────────── */}
+            <div className="flex items-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="rounded-full"
+                  animate={{
+                    width: activeDocIndex === i ? 24 : 6,
+                    height: 6,
+                    backgroundColor:
+                      activeDocIndex === i
+                        ? "rgba(139, 92, 246, 0.8)"
+                        : "rgba(255, 255, 255, 0.1)",
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                />
+              ))}
+            </div>
+
+            {/* ── Sub-context Data Ledger ──────────────────────────────── */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-              className="w-full mt-16 pt-6 border-t border-border flex items-center justify-between px-4"
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="mt-12 flex items-center gap-8 md:gap-12 px-6 py-4 rounded-2xl border border-white/[0.04] bg-white/[0.02]"
             >
               {[
-                { label: "CREDIT SCORE", value: data?.cibilScore || "AWAITING" },
-                { label: "SECTOR", value: data?.productType?.toUpperCase() || "AWAITING" },
-                { label: "CONNECTION", value: "ENCRYPTED" }
+                { label: "CREDIT SCORE", value: data?.cibilScore || "—" },
+                { label: "PRODUCT", value: data?.productType?.replace(/_/g, " ") || "—" },
+                { label: "STATUS", value: "ENCRYPTED" },
               ].map((stat, i) => (
-                <div key={i} className="flex flex-col items-start">
-                  <p className="text-[9px] font-medium text-muted-foreground/40 tracking-[0.2em] mb-1">{stat.label}</p>
-                  <p className="text-xs font-medium text-foreground/80 tabular-nums">{stat.value}</p>
+                <div key={i} className="flex flex-col items-center">
+                  <p className="text-[9px] font-medium text-white/20 tracking-[0.2em] mb-1 uppercase">
+                    {stat.label}
+                  </p>
+                  <p className="text-xs font-semibold text-white/60 tabular-nums">
+                    {stat.value}
+                  </p>
                 </div>
               ))}
             </motion.div>
-
           </div>
         </motion.div>
       )}

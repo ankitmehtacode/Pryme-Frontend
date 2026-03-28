@@ -61,18 +61,18 @@ const PrepaymentCalculator = () => {
   }, [prepaymentAmount, tenure]);
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#2aac64]/30 flex flex-col h-full">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#7c3aed]/30 flex flex-col h-full">
       {/* 🧠 Decorative Ambient Glow */}
-      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-primary/10 dark:bg-[#2aac64]/10 blur-[50px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-primary/10 dark:bg-[#7c3aed]/10 blur-[50px] rounded-full pointer-events-none" />
 
       {/* Header aligned strictly to premium typographic ratios */}
       <div className="flex items-center gap-3.5 mb-6 relative z-10 w-full shrink-0">
-        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-[#2aac64]/20 shadow-sm flex items-center justify-center shrink-0">
-          <Calculator className="w-5 h-5 text-primary dark:text-[#2aac64]" />
+        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-[#7c3aed]/20 shadow-sm flex items-center justify-center shrink-0">
+          <Calculator className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
         </div>
         <div>
           <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">Prepayment ROI</h3>
-          <p className="text-[9px] font-bold text-[#2aac64] uppercase tracking-widest bg-[#2aac64]/10 border border-[#2aac64]/20 px-2 py-0.5 rounded-sm inline-block leading-none">
+          <p className="text-[9px] font-bold text-[#7c3aed] uppercase tracking-widest bg-[#7c3aed]/10 border border-[#7c3aed]/20 px-2 py-0.5 rounded-sm inline-block leading-none">
             REDUCE INTEREST BURDEN
           </p>
         </div>
@@ -82,9 +82,9 @@ const PrepaymentCalculator = () => {
       <div className="space-y-4 mb-6 relative z-10 shrink-0">
         
         {/* Lumpsum Amount Module */}
-        <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#2aac64]/50 hover:border-[#2aac64]/30">
+        <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#7c3aed]/50 hover:border-[#7c3aed]/30">
           <div className="flex justify-between items-center mb-4">
-            <label className="text-[10px] font-bold text-primary dark:text-[#2aac64] uppercase tracking-wider">
+            <label className="text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-wider">
               Yearly Input Amount
             </label>
             <div className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none flex items-center gap-1.5 focus:outline-none">
@@ -108,9 +108,9 @@ const PrepaymentCalculator = () => {
         </div>
 
         {/* 🧠 NEW: Tenure Remaining Module */}
-        <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#2aac64]/50 hover:border-[#2aac64]/30">
+        <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#7c3aed]/50 hover:border-[#7c3aed]/30">
           <div className="flex justify-between items-center mb-4">
-            <label className="text-[10px] font-bold text-primary dark:text-[#2aac64] uppercase tracking-wider">
+            <label className="text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-wider">
               Remaining Tenure
             </label>
             <div className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none flex items-baseline gap-1.5 focus:outline-none">
@@ -145,9 +145,9 @@ const PrepaymentCalculator = () => {
               key={strategy.id}
               onClick={() => setActiveStrategy(strategy.id)}
               className={cn(
-                "relative cursor-pointer rounded-2xl p-4 transition-all duration-300 border focus:outline-none focus:ring-2 focus:ring-[#2aac64]",
+                "relative cursor-pointer rounded-2xl p-4 transition-all duration-300 border focus:outline-none focus:ring-2 focus:ring-[#7c3aed]",
                 isActive 
-                  ? "bg-secondary dark:bg-black/60 border-primary shadow-lg dark:border-[#2aac64]/50 dark:shadow-[0_0_15px_rgba(42,172,100,0.15)]" 
+                  ? "bg-secondary dark:bg-black/60 border-primary shadow-lg dark:border-[#7c3aed]/50 dark:shadow-[0_0_15px_rgba(124,58,237,0.15)]" 
                   : "bg-secondary/30 dark:bg-[#111] border-border dark:border-white/5 hover:border-border dark:hover:border-white/10"
               )}
               role="button"
@@ -155,7 +155,7 @@ const PrepaymentCalculator = () => {
               tabIndex={0}
             >
               {isActive && (
-                <div className="absolute top-4 right-4 text-primary dark:text-[#2aac64] animate-in fade-in zoom-in duration-300">
+                <div className="absolute top-4 right-4 text-primary dark:text-[#7c3aed] animate-in fade-in zoom-in duration-300">
                   <CheckCircle2 className="w-5 h-5 drop-shadow-sm fill-primary/10" />
                 </div>
               )}
@@ -163,7 +163,7 @@ const PrepaymentCalculator = () => {
               <div className="flex items-start gap-4">
                 <div className={cn(
                   "mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-sm",
-                  isActive ? "bg-primary text-primary-foreground dark:bg-[#2aac64]/20 dark:text-[#2aac64] border border-transparent dark:border-[#2aac64]/30" : "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/5 text-muted-foreground"
+                  isActive ? "bg-primary text-primary-foreground dark:bg-[#7c3aed]/20 dark:text-[#7c3aed] border border-transparent dark:border-[#7c3aed]/30" : "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/5 text-muted-foreground"
                 )}>
                   <Icon className="w-5 h-5" />
                 </div>
@@ -188,7 +188,7 @@ const PrepaymentCalculator = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-3 mt-2 border-t border-border dark:border-white/10">
                           <div>
                             <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1">Interest Saved</p>
-                            <p className="text-xl md:text-2xl font-bold text-primary dark:text-[#2aac64] leading-none drop-shadow-sm">{strategy.displaySavings}</p>
+                            <p className="text-xl md:text-2xl font-bold text-primary dark:text-[#7c3aed] leading-none drop-shadow-sm">{strategy.displaySavings}</p>
                           </div>
                           <div className="hidden sm:block h-10 w-px bg-border dark:bg-white/10" />
                           <div>

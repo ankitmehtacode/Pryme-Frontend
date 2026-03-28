@@ -58,20 +58,20 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           className="relative group bg-white/5 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-200/20 dark:border-slate-800 p-6 transition-all duration-300 cursor-help text-center z-10"
         >
           {/* Card Border Hover Glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#2aac64]/0 via-[#2aac64]/0 to-[#2aac64]/0 group-hover:from-[#2aac64]/20 group-hover:via-transparent group-hover:to-[#2aac64]/5 rounded-2xl transition-all duration-500 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed]/0 via-[#7c3aed]/0 to-[#7c3aed]/0 group-hover:from-[#7c3aed]/20 group-hover:via-transparent group-hover:to-[#7c3aed]/5 rounded-2xl transition-all duration-500 pointer-events-none" />
           
           <motion.div
             style={{ translateZ: 40 }} // Pop out effect
-            className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-5 group-hover:bg-[#2aac64]/10 transition-colors duration-300 shadow-inner overflow-hidden relative"
+            className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-5 group-hover:bg-[#7c3aed]/10 transition-colors duration-300 shadow-inner overflow-hidden relative"
           >
              {/* Sweeping light effect inside icon circle */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out_infinite]" />
-            <feature.icon className="w-8 h-8 text-[#2aac64] relative z-10" strokeWidth={2} />
+            <feature.icon className="w-8 h-8 text-[#7c3aed] relative z-10" strokeWidth={2} />
           </motion.div>
           
           <motion.div style={{ translateZ: 30 }}>
-            <h3 className="font-semibold text-foreground mb-2 text-base">{feature.title}</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+            <h3 className="font-semibold text-white mb-2 text-base">{feature.title}</h3>
+            <p className="text-sm text-slate-400 leading-relaxed font-medium">
               {feature.description}
             </p>
           </motion.div>
@@ -127,7 +127,7 @@ const TrustMonologue = () => {
           opacity: [0.1, 0.2, 0.1]
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#2aac64] blur-[150px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#7c3aed] blur-[150px] rounded-full pointer-events-none"
       />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -140,7 +140,7 @@ const TrustMonologue = () => {
             transition={{ duration: 0.7 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-[#2aac64] text-xs font-semibold uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-[#7c3aed] text-xs font-semibold uppercase tracking-widest mb-6">
               <Shield className="w-4 h-4" />
               Your Privacy Protected
             </div>

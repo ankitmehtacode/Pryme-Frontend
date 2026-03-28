@@ -14,9 +14,9 @@ const steps = [
     icon: FileText, 
     title: "Digital Application", 
     desc: "Complete our intelligent 2-minute form. No physical paperwork required.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/20"
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+    border: "border-violet-500/20"
   },
   { 
     icon: UserCheck, 
@@ -106,7 +106,7 @@ const ProcessSection = () => {
             </span>
             <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-white mb-6 leading-[1.1] tracking-tighter">
               Simple. Fast. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-emerald-400 to-primary animate-gradient bg-[length:200%_auto]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-violet-400 to-primary animate-gradient bg-[length:200%_auto]">
                 Transparent.
               </span>
             </h2>
@@ -140,7 +140,7 @@ const ProcessSection = () => {
               {/* 🧠 The Filling Animation Bar (Powered by GSAP) */}
               <div 
                 ref={lineRef} 
-                className="w-full bg-gradient-to-b from-primary to-emerald-400 shadow-[0_0_15px_rgba(var(--primary),0.5)] rounded-full" 
+                className="w-full bg-gradient-to-b from-primary to-violet-400 shadow-[0_0_15px_rgba(var(--primary),0.5)] rounded-full" 
               />
             </div>
 

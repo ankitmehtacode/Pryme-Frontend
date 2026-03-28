@@ -11,11 +11,11 @@ import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 
 const offers = [
-  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: null, color: "text-emerald-500" },
+  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: null, color: "text-violet-500" },
   { id: 2, bank: "ICICI", text: "Zero Processing Fee for Salaried Pros", icon: Tag, logo: iciciLogo, color: "text-blue-500" },
   { id: 3, bank: "AXIS", text: "Instant Disbursal in 2 Hours", icon: Zap, logo: axisLogo, color: "text-amber-500" },
   { id: 4, bank: "TATA", text: "Flat ₹5,000 Voucher on LAP", icon: Gift, logo: tataLogo, color: "text-purple-500" },
-  { id: 5, bank: "KOTAK", text: "Kotak Home Loan starting at 8.35%", icon: Sparkles, logo: kotakLogo, color: "text-emerald-500" },
+  { id: 5, bank: "KOTAK", text: "Kotak Home Loan starting at 8.35%", icon: Sparkles, logo: kotakLogo, color: "text-violet-500" },
   { id: 6, bank: "YES", text: "Yes Bank Pre-Approved Credit Cards", icon: Star, logo: yesLogo, color: "text-blue-500" },
   { id: 7, bank: "PNB", text: "PNB Lowest Auto Loan Rates", icon: Car, logo: pnbLogo, color: "text-amber-500" },
 ];

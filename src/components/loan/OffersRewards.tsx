@@ -58,7 +58,7 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
 
   const getOfferStyling = (type: Offer["type"]) => {
     switch (type) {
-      case "discount": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(52,211,153,0.1)] group-hover:shadow-[0_0_25px_rgba(52,211,153,0.2)]";
+      case "discount": return "text-violet-400 bg-violet-500/10 border-violet-500/20 shadow-[0_0_15px_rgba(52,211,153,0.1)] group-hover:shadow-[0_0_25px_rgba(52,211,153,0.2)]";
       case "cashback": return "text-primary bg-primary/10 border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)] group-hover:shadow-[0_0_25px_rgba(var(--primary),0.2)]";
       case "gift": return "text-amber-400 bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.1)] group-hover:shadow-[0_0_25px_rgba(251,191,36,0.2)]";
       case "reward": return "text-blue-400 bg-blue-500/10 border-blue-500/20 shadow-[0_0_15px_rgba(96,165,250,0.1)] group-hover:shadow-[0_0_25px_rgba(96,165,250,0.2)]";
