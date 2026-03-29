@@ -579,11 +579,41 @@ const DocumentVaultStage = ({
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
 
-const STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
-  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi"
+const STATE_CITIES: Record<string, string[]> = {
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool", "Kakinada", "Rajahmundry", "Tirupati", "Kadapa", "Anantapur", "Eluru", "Ongole", "Vizianagaram", "Machilipatnam", "Adoni", "Tenali", "Proddatur", "Chittoor", "Hindupur", "Bhimavaram", "Srikakulam", "Nandyal", "Tadepalligudem", "Narasaraopet"],
+  "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat", "Tawang", "Ziro", "Bomdila", "Along", "Tezu", "Namsai", "Roing", "Daporijo", "Changlang", "Khonsa", "Seppa", "Anini"],
+  "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Tezpur", "Bongaigaon", "Karimganj", "Sivasagar", "Goalpara", "Dhubri", "North Lakhimpur", "Diphu", "Barpeta", "Golaghat", "Nalbari", "Mangaldai", "Haflong", "Kokrajhar"],
+  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga", "Purnia", "Arrah", "Begusarai", "Katihar", "Munger", "Chapra", "Sasaram", "Hajipur", "Bihar Sharif", "Dehri", "Siwan", "Motihari", "Saharsa", "Bettiah", "Nawada", "Bagaha", "Buxar", "Kishanganj", "Jehanabad", "Aurangabad"],
+  "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur", "Korba", "Durg", "Rajnandgaon", "Jagdalpur", "Raigarh", "Ambikapur", "Chirmiri", "Dhamtari", "Mahasamund", "Kawardha", "Kanker", "Kondagaon", "Mungeli", "Bemetara", "Balod", "Janjgir"],
+  "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa", "Ponda", "Bicholim", "Curchorem", "Sanquelim", "Canacona", "Quepem", "Sanguem", "Valpoi", "Pernem"],
+  "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar", "Junagadh", "Gandhinagar", "Anand", "Nadiad", "Morbi", "Mehsana", "Bharuch", "Navsari", "Surendranagar", "Porbandar", "Valsad", "Gandhidham", "Godhra", "Palanpur", "Vapi", "Veraval", "Dahod", "Botad"],
+  "Haryana": ["Faridabad", "Gurugram", "Panipat", "Ambala", "Yamunanagar", "Rohtak", "Hisar", "Karnal", "Sonipat", "Panchkula", "Bhiwani", "Bahadurgarh", "Sirsa", "Jind", "Thanesar", "Kaithal", "Rewari", "Palwal", "Hansi", "Narnaul", "Fatehabad", "Mahendragarh"],
+  "Himachal Pradesh": ["Shimla", "Dharamshala", "Mandi", "Solan", "Nahan", "Bilaspur", "Hamirpur", "Palampur", "Baddi", "Sundarnagar", "Kullu", "Manali", "Chamba", "Una", "Paonta Sahib", "Kangra", "Keylong", "Rampur", "Rohru", "Parwanoo"],
+  "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh", "Deoghar", "Giridih", "Ramgarh", "Medininagar", "Phusro", "Dumka", "Chaibasa", "Chatra", "Godda", "Lohardaga", "Pakur", "Sahebganj", "Jamtara", "Gumla", "Simdega"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Dharwad", "Belagavi", "Kalaburagi", "Davangere", "Ballari", "Shivamogga", "Tumakuru", "Udupi", "Vijayapura", "Raichur", "Hassan", "Mandya", "Chitradurga", "Gadag", "Haveri", "Bagalkot", "Chikkamagaluru", "Bidar", "Yadgir", "Ramanagara", "Kodagu"],
+  "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Kannur", "Alappuzha", "Palakkad", "Malappuram", "Kottayam", "Kasaragod", "Pathanamthitta", "Idukki", "Wayanad", "Ernakulam", "Munnar", "Guruvayur", "Thalassery", "Mattancherry", "Perinthalmanna"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Sagar", "Dewas", "Satna", "Ratlam", "Rewa", "Katni", "Singrauli", "Burhanpur", "Khandwa", "Morena", "Bhind", "Chhindwara", "Guna", "Shivpuri", "Vidisha", "Damoh", "Mandsaur", "Chhatarpur", "Neemuch", "Datia"],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Kolhapur", "Amravati", "Navi Mumbai", "Sangli", "Malegaon", "Jalgaon", "Akola", "Latur", "Dhule", "Ahmednagar", "Chandrapur", "Parbhani", "Nanded", "Ichalkaranji", "Jalna", "Bhiwandi", "Panvel", "Satara", "Beed", "Yavatmal", "Wardha", "Ratnagiri", "Gondia"],
+  "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Churachandpur", "Kakching", "Senapati", "Ukhrul", "Tamenglong", "Chandel", "Jiribam", "Moreh", "Moirang", "Nambol"],
+  "Meghalaya": ["Shillong", "Tura", "Jowai", "Nongstoin", "Williamnagar", "Baghmara", "Resubelpara", "Nongpoh", "Mairang", "Mawkyrwat", "Khliehriat", "Ampati"],
+  "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Serchhip", "Kolasib", "Lawngtlai", "Saiha", "Mamit", "Saitual", "Hnahthial", "Khawzawl"],
+  "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Wokha", "Zunheboto", "Mon", "Phek", "Kiphire", "Longleng", "Peren", "Chumukedima"],
+  "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur", "Puri", "Balasore", "Baripada", "Bhadrak", "Jharsuguda", "Jeypore", "Bargarh", "Angul", "Kendrapara", "Dhenkanal", "Paradip", "Rayagada", "Koraput", "Phulbani", "Sundargarh"],
+  "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali", "Pathankot", "Hoshiarpur", "Batala", "Moga", "Abohar", "Malerkotla", "Khanna", "Phagwara", "Muktsar", "Barnala", "Rajpura", "Firozpur", "Kapurthala", "Faridkot", "Mansa", "Sangrur", "Nawanshahr", "Gurdaspur"],
+  "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Bikaner", "Ajmer", "Bhilwara", "Alwar", "Bharatpur", "Sikar", "Pali", "Sri Ganganagar", "Jhunjhunu", "Tonk", "Kishangarh", "Beawar", "Hanumangarh", "Chittorgarh", "Nagaur", "Bundi", "Churu", "Barmer", "Dholpur", "Sawai Madhopur", "Banswara", "Dungarpur", "Jaisalmer", "Mount Abu", "Pushkar"],
+  "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing", "Rangpo", "Singtam", "Jorethang", "Naya Bazar", "Ravangla", "Pelling", "Lachung", "Lachen", "Yuksom"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore", "Thoothukudi", "Thanjavur", "Dindigul", "Tiruppur", "Ranipet", "Sivakasi", "Karur", "Nagercoil", "Kanchipuram", "Kumbakonam", "Cuddalore", "Hosur", "Ooty", "Ambur", "Pollachi", "Krishnagiri", "Rajapalayam"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar", "Nalgonda", "Adilabad", "Suryapet", "Miryalaguda", "Siddipet", "Jagtial", "Mancherial", "Kamareddy", "Bhongir", "Bodhan", "Zaheerabad", "Medak", "Wanaparthy"],
+  "Tripura": ["Agartala", "Udaipur", "Dharmanagar", "Kailashahar", "Belonia", "Ambassa", "Khowai", "Sabroom", "Sonamura", "Amarpur", "Teliamura", "Bishalgarh", "Kamalpur"],
+  "Uttar Pradesh": ["Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut", "Prayagraj", "Ghaziabad", "Noida", "Bareilly", "Aligarh", "Moradabad", "Gorakhpur", "Saharanpur", "Jhansi", "Muzaffarnagar", "Mathura", "Firozabad", "Ayodhya", "Shahjahanpur", "Rampur", "Loni", "Unnao", "Bulandshahr", "Sambhal", "Amroha", "Hardoi", "Fatehpur", "Hapur", "Etawah", "Mirzapur", "Budaun", "Bahraich", "Sitapur", "Sultanpur", "Deoria", "Azamgarh", "Basti", "Gonda", "Ballia", "Banda"],
+  "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani", "Roorkee", "Rudrapur", "Kashipur", "Nainital", "Mussoorie", "Pithoragarh", "Almora", "Bageshwar", "Chamoli", "Champawat", "Tehri", "Uttarkashi", "Pauri", "Srinagar", "Lansdowne", "Kotdwar"],
+  "West Bengal": ["Kolkata", "Howrah", "Asansol", "Siliguri", "Durgapur", "Bardhaman", "Malda", "Baharampur", "Habra", "Kharagpur", "Shantiniketan", "Darjeeling", "Jalpaiguri", "Balurghat", "Basirhat", "Bankura", "Purulia", "Raiganj", "Cooch Behar", "Haldia", "Krishnanagar", "Midnapore", "Ranaghat", "Contai", "Bolpur"],
+  "Delhi": ["New Delhi", "Central Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi", "North East Delhi", "North West Delhi", "South East Delhi", "South West Delhi", "Shahdara", "Dwarka", "Rohini", "Lajpat Nagar", "Karol Bagh", "Connaught Place", "Chandni Chowk", "Saket", "Vasant Kunj", "Mehrauli"]
+};
+
+const RELIGIONS = [
+  "Hinduism", "Islam", "Christianity", "Sikhism", "Buddhism", "Jainism",
+  "Zoroastrianism", "Judaism", "Bahá'í Faith", "Tribal Religions", "Other"
 ];
 
 const EMPLOYMENT_OPTIONS: { value: EmploymentType; label: string; icon: any }[] = [
@@ -620,7 +650,7 @@ function validateStage1(store: ReturnType<typeof useApplicationStore.getState>):
   if (!k.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(k.email)) errors.email = "Enter a valid email address";
   if (!k.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
   if (!k.state) errors.state = "Select your state";
-  if (!k.city || k.city.trim().length < 2) errors.city = "Enter your city";
+  if (!k.city) errors.city = "Select your city";
   if (!k.pinCode || !/^\d{6}$/.test(k.pinCode)) errors.pinCode = "Enter a valid 6-digit PIN code";
   return errors;
 }
@@ -974,6 +1004,19 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     isValid={!!store.basicKYC.dateOfBirth}
                     error={errors.dateOfBirth}
                   />
+
+                  <StyledSelect
+                    label="Religion"
+                    icon={User}
+                    value={store.basicKYC.religion}
+                    onValueChange={(v) => store.updateBasicKYC({ religion: v })}
+                    placeholder="Select Religion"
+                    error={errors.religion}
+                  >
+                    {RELIGIONS.map((r) => (
+                      <SelectItem key={r} value={r} className="cursor-pointer">{r}</SelectItem>
+                    ))}
+                  </StyledSelect>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -981,24 +1024,29 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     label="State"
                     icon={MapPin}
                     value={store.basicKYC.state}
-                    onValueChange={(v) => store.updateBasicKYC({ state: v })}
+                    onValueChange={(v) => {
+                      store.updateBasicKYC({ state: v, city: '' });
+                    }}
                     placeholder="Select State"
                     error={errors.state}
                   >
-                    {STATES.map((s) => (
+                    {Object.keys(STATE_CITIES).map((s) => (
                       <SelectItem key={s} value={s} className="cursor-pointer">{s}</SelectItem>
                     ))}
                   </StyledSelect>
 
-                  <ValidatedInput
+                  <StyledSelect
                     label="City"
-                    placeholder="Mumbai"
                     icon={Building2}
                     value={store.basicKYC.city}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ city: e.target.value })}
-                    isValid={store.basicKYC.city.length >= 2}
+                    onValueChange={(v) => store.updateBasicKYC({ city: v })}
+                    placeholder={store.basicKYC.state ? "Select City" : "Select state first"}
                     error={errors.city}
-                  />
+                  >
+                    {(STATE_CITIES[store.basicKYC.state] || []).map((c) => (
+                      <SelectItem key={c} value={c} className="cursor-pointer">{c}</SelectItem>
+                    ))}
+                  </StyledSelect>
 
                   <ValidatedInput
                     label="PIN Code"

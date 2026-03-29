@@ -105,6 +105,9 @@ export interface BasicKYC {
   city: string;
   pinCode: string;               // 6-digit
 
+  // Religion
+  religion: string;
+
   // Employment pivot — this single field determines the entire downstream flow
   employmentType: EmploymentType | null;
 }

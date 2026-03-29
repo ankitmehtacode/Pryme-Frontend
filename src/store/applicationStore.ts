@@ -47,6 +47,7 @@ const createFreshState = (): ApplicationState => ({
     state: '',
     city: '',
     pinCode: '',
+    religion: '',
     employmentType: null,
   },
 
@@ -123,7 +124,7 @@ const defaultBusiness: BusinessDetails = {
 // Bump this when the ApplicationState shape changes. Zustand's persist
 // middleware uses this to decide whether to hydrate or purge stale data.
 
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 
 // ─── THE STORE ──────────────────────────────────────────────────────────────
 

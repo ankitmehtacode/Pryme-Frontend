@@ -1,400 +1,378 @@
 import { useRef, useEffect, memo, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Zap, Sparkles, Percent, ChevronRight, CheckCircle2 } from "lucide-react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShuffleText } from "@/components/ui/ShuffleText";
+import { 
+  ArrowRight, Zap, Sparkles, Percent, 
+  ChevronRight, ChevronLeft, CheckCircle2,
+  TrendingUp, WalletCards, Coins, Landmark, BadgePercent, ShieldCheck
+} from "lucide-react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
-import iciciLogo from "@/assets/icici.svg";
+import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
+import unionLogo from "@/assets/union-bank-of-india.svg";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
 const initialOffers = [
+  { 
+    id: "idbi-personal", bank: "IDBI BANK", logo: idbiLogo,
+    title: "Zero Processing Fee on Personal Loans", 
+    highlights: ["Quick digital sanction in 4 hours", "Foreclosure charges waived off"],
+    tag: "SPECIAL FESTIVE OFFER", icon: Zap,
+    aurora1: "#38bdf8", // Sky blue orb
+    aurora2: "#818cf8", // Indigo orb
+    aurora3: "#0284c7", // Deep blue orb
+    accentColor: "#0284c7",   
+    bgIcons: [Coins, ShieldCheck]
+  },
   { 
     id: "axis-pre", bank: "AXIS BANK", logo: axisLogo, 
     title: "Pre-Approved Limit up to ₹50,00,000", 
     highlights: ["Zero documentation for salary accounts", "Funds disbursed within 3 hours"],
     tag: "FAST TRACK APPROVAL", icon: Sparkles,
-    bgClass: "from-[#97144d] via-[#6b0f38] to-[#3d0920]",
-    bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400&auto=format&fit=crop",
-    accentColor: "#f472b6",
-    accentGlow: "rgba(244,114,182,0.12)",
+    aurora1: "#f472b6", // Pink orb
+    aurora2: "#fb7185", // Rose orb
+    aurora3: "#c084fc", // Purple orb
+    accentColor: "#ec4899",   
+    bgIcons: [TrendingUp, WalletCards] 
   },
   { 
-    id: "icici-cashback", bank: "ICICI BANK", logo: iciciLogo,
-    title: "Get ₹5,000 Instant Cashback on Approval", 
-    highlights: ["Direct credit to your account on 1st EMI", "100% Digital Process & Fast Approval"],
-    tag: "EXCLUSIVE PRYME OFFER", icon: Zap,
-    bgClass: "from-[#1e3a8a] via-[#172554] to-[#0c1a3d]",
-    bgImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1400&auto=format&fit=crop",
-    accentColor: "#60a5fa",
-    accentGlow: "rgba(96,165,250,0.12)",
-  },
-  { 
-    id: "hdfc-holi", bank: "HDFC BANK", logo: null,
-    title: "25% Off Processing Fees + Lowest Rates", 
-    highlights: ["Interest Rates starting at 10.25%*", "Zero pre-closure charges after 12 months"],
-    tag: "LIMITED TIME OFFER", icon: Percent,
-    bgClass: "from-[#004b87] via-[#003560] to-[#001b30]",
-    bgImage: "https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1400&auto=format&fit=crop",
-    accentColor: "#34d399",
-    accentGlow: "rgba(52,211,153,0.12)",
+    id: "union-lowest", bank: "UNION BANK", logo: unionLogo,
+    title: "Lowest Interest Rates Starting at 10.15%", 
+    highlights: ["Public Sector Bank Trust & Reliability", "Flexible repayment tenures up to 84 months"],
+    tag: "BEST RATE GUARANTEE", icon: Percent,
+    aurora1: "#34d399", // Emerald orb
+    aurora2: "#6ee7b7", // Teal orb
+    aurora3: "#10b981", // Green orb
+    accentColor: "#10b981",   
+    bgIcons: [BadgePercent, Landmark]
   }
 ];
 
 const marqueeOffers = [
-  { text: "25% off on HDFC", color: "#3b82f6" },
-  { text: "₹5,000 Cashback ICICI", color: "#f97316" },
+  { text: "Zero Processing Fee IDBI", color: "#0284c7" },
+  { text: "10.15%* on Union Bank", color: "#10b981" },
   { text: "Pre-Approved ₹50L Axis", color: "#ec4899" },
-  { text: "10.25%* Interest Rate", color: "#10b981" },
+  { text: "Public Trust via Union", color: "#059669" },
   { text: "Zero Documentation", color: "#8b5cf6" },
-  { text: "3hr Disbursal", color: "#06b6d4" },
+  { text: "4hr Disbursal", color: "#06b6d4" },
   { text: "No Pre-closure Fee", color: "#f59e0b" },
   { text: "Salary A/C Special", color: "#ec4899" },
 ];
 
-/* Staggered reveal variants — Onething-style cinematic entrance */
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+// ─────────────────────────────────────────────────────────────────────────────
+// FRAMER MOTION VARIANTS
+// ─────────────────────────────────────────────────────────────────────────────
+const bgFadeVariants: Variants = {
+  enter: { opacity: 0 },
+  center: { opacity: 1, transition: { duration: 1.5, ease: "easeInOut" } },
+  exit: { opacity: 0, transition: { duration: 1.2, ease: "easeInOut" } }
 };
-import { Variants } from "framer-motion";
 
-const fadeUpVariant: Variants = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+const contentVariants: Variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 50 : -50,
+    opacity: 0,
+    scale: 0.96,
+    filter: "blur(4px)"
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 50 : -50,
+    opacity: 0,
+    scale: 0.96,
+    filter: "blur(4px)",
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+  })
 };
 
 const HeroSection = memo(() => {
-  const containerRef = useRef<HTMLElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [[page, direction], setPage] = useState([0, 0]);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
-    window.addEventListener("mousemove", handler);
-    return () => window.removeEventListener("mousemove", handler);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % initialOffers.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleNext = useCallback(() => setActiveIndex((p) => (p + 1) % initialOffers.length), []);
-
-  useGSAP(() => {
-    const glow = glowRef.current;
-    if (!glow) return;
-    const xTo = gsap.quickTo(glow, "x", { duration: 0.8, ease: "power3" });
-    const yTo = gsap.quickTo(glow, "y", { duration: 0.8, ease: "power3" });
-    const tick = () => {
-      xTo(mouseRef.current.x - window.innerWidth / 2);
-      yTo(mouseRef.current.y - window.innerHeight / 2);
-    };
-    gsap.ticker.add(tick);
-  }, { scope: containerRef });
-
+  const activeIndex = Math.abs(page % initialOffers.length);
   const offer = initialOffers[activeIndex];
 
+  const paginate = useCallback((newDirection: number) => {
+    setIsAutoPlaying(false);
+    setPage([page + newDirection, newDirection]);
+  }, [page]);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(() => {
+      setPage((prevPage) => [prevPage[0] + 1, 1]);
+    }, 7000); 
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
   return (
-    <section ref={containerRef} className="hero-banner-section relative w-full z-10 overflow-hidden">
-      <div className="hero-banner-inner relative w-full">
+    // Outer Container is incredibly light/white to maximize the vivid liquid colors underneath
+    <section className="relative w-full overflow-hidden flex items-center justify-center px-4 sm:px-6 md:px-10 pt-4 pb-2 md:pt-6 md:pb-4 min-h-[350px] bg-[#fafafa]">
+      
+      {/* ────────────────── LIQUID AURORA BACKGROUND ────────────────── */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={page + 'aurora'}
+          variants={bgFadeVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+        >
+          {/* Massive, slow-pulsing liquid color orbs */}
+          <div 
+            className="absolute top-[-20%] left-[-10%] w-[60%] h-[80%] rounded-full blur-[100px] md:blur-[140px] opacity-60 animate-[pulse_8s_ease-in-out_infinite]" 
+            style={{ backgroundColor: offer.aurora1 }} 
+          />
+          <div 
+            className="absolute bottom-[-30%] right-[-10%] w-[70%] h-[90%] rounded-full blur-[120px] opacity-50 animate-[pulse_12s_ease-in-out_infinite_reverse]" 
+            style={{ backgroundColor: offer.aurora2 }} 
+          />
+          <div 
+            className="absolute top-[10%] right-[20%] w-[40%] h-[60%] rounded-full blur-[90px] opacity-50 animate-[pulse_10s_ease-in-out_infinite]" 
+            style={{ backgroundColor: offer.aurora3 }} 
+          />
+          
+          {/* Extremely fine noise grain to give the liquid a hyper-realistic physical texture */}
+          <div 
+            className="absolute inset-0 opacity-[0.25] mix-blend-overlay pointer-events-none" 
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E\")" }} 
+          />
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Background slider with cinematic cross-dissolve */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={offer.id}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className={`absolute inset-0 z-0 bg-gradient-to-br ${offer.bgClass}`}
-          >
-            <img src={offer.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-overlay pointer-events-none" />
-            {/* Noise texture for depth */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")" }} />
-            <div className="absolute right-8 md:right-16 bottom-12 md:bottom-20 w-32 md:w-52 h-32 md:h-52 opacity-[0.03] text-white pointer-events-none -rotate-12">
-              <offer.icon className="w-full h-full" />
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      {/* ────────────────── TOP 1% LIQUID GLASS CARD ────────────────── */}
+      {/* 
+        This is the masterpiece:
+        - bg-white/20 for high transparency allowing aurora to bleed through
+        - backdrop-blur-[60px] completely liquefies the orbs underneath
+        - Complex inner shadows to create the 3D Apple-style edge bevel
+      */}
+      <div className="relative z-10 w-full max-w-[1700px] h-[300px] sm:h-[320px] md:h-[330px] lg:h-[340px] rounded-[32px] md:rounded-[40px] overflow-hidden 
+        bg-white/20 backdrop-blur-[60px] 
+        shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-1px_1px_rgba(255,255,255,0.4),0_32px_100px_rgba(0,0,0,0.1)]
+        border-[0.5px] border-white/50
+        flex flex-col justify-between"
+      >
+        {/* Specular Glare (the light bouncing off the glass surface) */}
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-80" />
 
-        {/* Deep cinematic overlays — layered for realism */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/75 via-black/40 to-black/15 pointer-events-none" />
-        <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
-        {/* Vignette effect */}
-        <div className="absolute inset-0 z-[1] pointer-events-none" style={{ background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%)" }} />
-
-        {/* Mouse glow (desktop) — organic feel */}
-        <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none hidden md:block">
-          <div className="flex items-center justify-center w-full h-full">
-            <div ref={glowRef} className="absolute w-[28rem] h-[28rem] bg-[#7c3aed]/6 rounded-full blur-[120px] mix-blend-screen will-change-transform" />
-          </div>
+        {/* ────────────────── FIT-TO-WINDOW SVGS ────────────────── */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0 mask-image-[linear-gradient(to_bottom,black,transparent)]">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={page + 'svgs'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 1.5 } }}
+              exit={{ opacity: 0, transition: { duration: 0.8 } }}
+              className="relative w-full h-full"
+            >
+              {offer.bgIcons.map((Icon, idx) => (
+                <Icon 
+                  key={idx} 
+                  strokeWidth={1} 
+                  color={"#ffffff"} 
+                  className={`absolute top-1/2 -translate-y-1/2 opacity-[0.15] mix-blend-overlay w-[160px] h-[160px] md:w-[260px] md:h-[260px] filter drop-shadow-lg transition-transform duration-1000 ${
+                    idx === 0 
+                      ? "left-2 md:left-12 -rotate-[15deg] scale-110" 
+                      : "right-2 md:right-12 rotate-[15deg] scale-110"
+                  }`} 
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* ─── Content: Left text + Right offer card ─── */}
-        <div className="relative z-10 w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-6 sm:py-8 md:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-5 md:gap-10">
+        {/* ────────────────── TOP BAR ────────────────── */}
+        <div className="relative z-10 w-full px-6 py-4 md:px-8 md:py-4 flex items-center justify-between pointer-events-none">
           
-          {/* LEFT: Cinematic Text Block */}
-          <motion.div 
-            className="flex-1 max-w-xl flex flex-col justify-center"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Eyebrow with accent line */}
-            <motion.div variants={fadeUpVariant} className="flex items-center gap-2.5 mb-2 sm:mb-3">
-              <div className="w-5 sm:w-7 h-px bg-gradient-to-r from-[#7c3aed] to-transparent" />
-              <p className="text-[8px] sm:text-[9px] md:text-[10px] font-medium text-white/40 tracking-[0.2em] uppercase">
-                Bypass the bureaucracy
-              </p>
-            </motion.div>
-            
-            {/* Headline — dramatic weight contrast */}
-            <motion.h1 variants={fadeUpVariant} className="text-[1.75rem] sm:text-[2.25rem] md:text-[3rem] lg:text-[3.5rem] tracking-tighter leading-[0.92] mb-2.5 sm:mb-3.5 text-white">
-              <span className="font-extralight inline"><ShuffleText text="INSTANT CAPITAL." delay={100} duration={800} /></span>{" "}
-              <span className="font-medium text-[#7c3aed] drop-shadow-[0_0_20px_rgba(124,58,237,0.2)] inline"><ShuffleText text="ZERO FRICTION." delay={800} duration={1200} /></span>
-            </motion.h1>
-            
-            {/* Subtext — airy & refined */}
-            <motion.p variants={fadeUpVariant} className="text-[9px] sm:text-[10px] md:text-xs text-white/40 font-normal leading-relaxed max-w-sm md:max-w-md mb-4 sm:mb-5">
-              Compare rates from 15+ banks, calculate your EMI, and apply in under 5 minutes.
+          {/* LEFT: Eyebrow - Slow Blur Reveal Cinematic Entrance */}
+          <div className="flex items-center gap-2 md:gap-3 flex-1">
+            <motion.span 
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              transition={{ duration: 2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
+              className="w-5 md:w-8 h-[1.5px] bg-slate-800/40 rounded-full origin-left shrink-0" 
+            />
+            <motion.p 
+              initial={{ opacity: 0, filter: "blur(8px)", x: -10 }}
+              animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
+              transition={{ duration: 3, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+              className="text-[9px] md:text-[10px] font-mono tracking-[0.2em] uppercase text-slate-800/80 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
+            >
+              Instant Capital. Zero Friction.
             </motion.p>
+          </div>
 
-            {/* Social proof — refined with separator */}
-            <motion.div variants={fadeUpVariant} className="flex items-center gap-3">
-              <div className="flex -space-x-1.5">
-                {[1,2,3,4].map(i => (
-                  <div 
+          {/* CENTER: 10,000+ Trust Widget - Made ultra-glassy */}
+          <div className="hidden lg:flex items-center justify-center flex-1">
+            <div className="flex items-center gap-3 bg-white/30 backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_20px_rgba(0,0,0,0.05)] rounded-full pr-5 pl-1.5 py-1.5 pointer-events-auto hover:bg-white/50 hover:scale-[1.02] transition-all border border-white/40">
+              <div className="flex -space-x-2">
+                {[1, 5, 8, 12].map((imgId, i) => (
+                  <img 
                     key={i} 
-                    className="w-[24px] h-[24px] sm:w-[28px] sm:h-[28px] rounded-full flex items-center justify-center border-2 border-black/60"
-                    style={{ 
-                      background: `linear-gradient(135deg, rgba(124,58,237,${0.15 + i * 0.05}) 0%, rgba(124,58,237,${0.05 + i * 0.03}) 100%)`,
-                    }}
-                  >
-                    <span className="text-[6px] sm:text-[7px] font-bold text-violet-400/90">{String.fromCharCode(64 + i)}</span>
-                  </div>
+                    src={`https://i.pravatar.cc/100?img=${imgId}`} 
+                    alt="User" 
+                    className="w-6 h-6 rounded-full border border-white/80 object-cover shadow-sm"
+                  />
                 ))}
               </div>
-              <div className="w-px h-5 bg-white/10" />
-              <div className="flex flex-col gap-0.5">
-                <p className="text-[9px] sm:text-[10px] md:text-[11px] text-white/60 font-medium leading-none">
-                  <span className="text-violet-400 font-semibold tabular-nums">10,000+</span> applications processed
+              <div className="flex flex-col items-start leading-none">
+                <p className="text-[10px] font-semibold text-slate-800/90 tracking-tight drop-shadow-sm">
+                  <span className="text-slate-900 font-extrabold">10,000+</span> applications processed
                 </p>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 mt-1">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-50" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-violet-400" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-70" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                   </span>
-                  <span className="text-[7px] sm:text-[8px] text-white/30 font-medium tracking-widest uppercase">Live</span>
+                  <span className="text-[8px] text-slate-600/90 font-bold tracking-widest uppercase">Live</span>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
-          {/* RIGHT: Premium Offer Card — elevated glassmorphism */}
-          <div className="w-full md:w-[44%] lg:w-[40%] xl:w-[38%] flex items-center justify-center relative">
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                key={offer.id + "-card"}
-                initial={{ opacity: 0, x: 40, scale: 0.97 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -40, scale: 0.97 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="hero-offer-card w-full max-w-[420px] mr-12 sm:mr-14 relative group"
+          {/* RIGHT: Slider Pagination Controls */}
+          <div className="flex justify-end flex-1 pointer-events-auto">
+            <div className="hidden md:flex items-center gap-2 bg-white/30 backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_20px_rgba(0,0,0,0.05)] border border-white/40 rounded-full p-1.5 hover:bg-white/50 transition-colors">
+              <button 
+                onClick={() => paginate(-1)} 
+                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
               >
-                {/* Animated gradient border */}
-                <div className="absolute -inset-px rounded-[18px] hero-gradient-border opacity-50 group-hover:opacity-80 transition-opacity duration-600" />
-                
-                {/* Card body — absolute fixed height to lock all cards perfectly to Axis bank size */}
-                <div className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl rounded-[18px] p-4 sm:p-5 md:p-6 overflow-hidden border border-white/[0.06] flex flex-col justify-between h-[230px] sm:h-[250px]">
-                  {/* Ambient glow — top-right accent */}
-                  <div 
-                    className="absolute -top-8 -right-8 w-40 h-40 rounded-full blur-[60px] pointer-events-none transition-all duration-700" 
-                    style={{ backgroundColor: offer.accentGlow }}
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <div className="flex items-center gap-1.5 px-2">
+                {initialOffers.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setIsAutoPlaying(false);
+                      setPage([page + (i - activeIndex), i > activeIndex ? 1 : -1]);
+                    }}
+                    className={`rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        i === activeIndex ? "bg-slate-800 w-5 h-1.5 shadow-sm" : "bg-slate-800/30 w-1.5 h-1.5 hover:bg-slate-800/50"
+                    }`}
                   />
-                  {/* Shimmer sweep on hover */}
-                  <div className="absolute inset-0 hero-card-shimmer rounded-[18px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                  
-                  {/* Header: Tag + Bank logo */}
-                  <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4 relative z-10">
-                    <div className="bg-gradient-to-r from-[#facc15] to-[#eab308] text-[#422006] text-[6.5px] sm:text-[7.5px] font-extrabold uppercase tracking-[0.06em] px-2.5 sm:px-3 py-[5px] rounded-md flex items-center gap-1.5 shadow-[0_2px_16px_rgba(250,204,21,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]">
-                      <Zap className="w-2.5 h-2.5 fill-current" /> {offer.tag}
-                    </div>
-                    <div className="bg-white/[0.06] backdrop-blur-sm text-white/75 text-[7px] sm:text-[8px] font-semibold px-3 py-1.5 rounded-lg uppercase tracking-[0.1em] border border-white/[0.06] flex items-center justify-center min-w-[55px] flex-shrink-0">
-                      {offer.logo ? (
-                        <img src={offer.logo} alt={offer.bank} className="h-3 sm:h-3.5 w-auto object-contain brightness-0 invert opacity-80" />
-                      ) : (
-                        offer.bank
-                      )}
-                    </div>
-                  </div>
-                  
-                  <h3 className="relative z-10 text-[15px] sm:text-lg md:text-xl lg:text-[1.35rem] font-semibold text-white/95 leading-snug tracking-tight mb-3 line-clamp-2">
-                    {offer.title}
-                  </h3>
-                  
-                  {/* Highlights with subtle left accent — pushed to fill remaining space */}
-                  <div className="relative z-10 flex flex-col gap-2 mb-4 pl-2.5 border-l border-white/[0.06] flex-1">
-                    {offer.highlights.map((h, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 opacity-70" style={{ color: offer.accentColor }} />
-                        <span className="text-[8px] sm:text-[9px] md:text-[10px] font-medium text-white/80 leading-snug">{h}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer — dots + CTA — pushed to bottom naturally */}
-                  <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/[0.05] mt-auto">
-                    <div className="flex gap-2">
-                      {initialOffers.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setActiveIndex(i)}
-                          aria-label={`View offer ${i + 1}`}
-                          className={`rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                            i === activeIndex 
-                              ? "bg-white w-6 h-[5px] shadow-[0_0_10px_rgba(255,255,255,0.2)]" 
-                              : "bg-white/10 w-[5px] h-[5px] hover:bg-white/25"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <Link 
-                      to="/apply" 
-                      className="hero-card-cta relative overflow-hidden bg-white/[0.07] backdrop-blur-sm text-white/90 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-[8px] sm:text-[9px] md:text-[10px] tracking-wide transition-all flex items-center gap-2 border border-white/[0.1] hover:border-white/25 hover:bg-white/[0.12] group/cta active:scale-[0.97]"
-                    >
-                      Apply Now 
-                      <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white/10 flex items-center justify-center group-hover/cta:bg-white/20 transition-colors">
-                        <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 group-hover/cta:translate-x-[1px] transition-transform" />
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Next arrow — refined */}
-            <button 
-              onClick={handleNext} 
-              aria-label="Next offer"
-              className="absolute right-0 md:-right-4 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08] text-white/40 hover:text-white/90 hover:bg-white/[0.1] hover:border-white/20 flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 group"
-            >
-              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
-            </button>
-          </div>
-        </div>
-
-        {/* ─── Marquee Bar — minimal & clean ─── */}
-        <div className="relative z-10 w-full hero-marquee-bar">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-          {/* Left/right fade masks */}
-          <div className="absolute top-0 left-0 w-16 sm:w-24 h-full bg-gradient-to-r from-black/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute top-0 right-0 w-16 sm:w-24 h-full bg-gradient-to-l from-black/80 to-transparent z-10 pointer-events-none" />
-          
-          <div className="hero-marquee-track flex items-center py-2.5 sm:py-3 gap-2.5 sm:gap-3">
-            {[...marqueeOffers, ...marqueeOffers].map((o, i) => (
-              <div 
-                key={i} 
-                className="flex-shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-[6px] sm:py-2 rounded-full border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-400 cursor-default group/pill"
-              >
-                <span 
-                  className="w-[5px] h-[5px] rounded-full flex-shrink-0 transition-shadow duration-400 group-hover/pill:shadow-[0_0_8px_var(--dot-color)]" 
-                  style={{ backgroundColor: o.color, ["--dot-color" as string]: `${o.color}80` }} 
-                />
-                <span className="text-[8.5px] sm:text-[9.5px] md:text-[10.5px] font-medium text-white/40 group-hover/pill:text-white/70 whitespace-nowrap tracking-wide transition-colors duration-400">{o.text}</span>
+                ))}
               </div>
-            ))}
+              <button 
+                onClick={() => paginate(1)} 
+                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* ────────────────── CENTER BILLBOARD CANVAS ────────────────── */}
+        <div className="relative z-20 flex-1 w-full flex flex-col items-center justify-center px-4 md:px-10 overflow-hidden pointer-events-none md:-mt-2">
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={page + 'content'}
+              custom={direction}
+              variants={contentVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="absolute flex flex-col items-center justify-center w-full max-w-5xl text-center pointer-events-auto"
+            >
+              {/* Tag & Bank Header - Ultra Glassy */}
+              <div className="flex items-center justify-center gap-3 px-4 py-1.5 mb-2 md:mb-3 rounded-full bg-white/30 backdrop-blur-3xl border border-white/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-lg hover:bg-white/40 transition-all">
+                <div className="px-2 py-0.5 rounded-full bg-white text-slate-800 text-[8.5px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                  <Zap className="w-2.5 h-2.5" style={{ color: offer.accentColor }} /> {offer.tag}
+                </div>
+                {offer.logo ? (
+                  <img src={offer.logo} className="h-4 sm:h-5 object-contain opacity-100 filter drop-shadow-sm mix-blend-multiply" alt={offer.bank} />
+                ) : (
+                  <span className="text-[10px] font-bold text-slate-800 tracking-wider">{offer.bank}</span>
+                )}
+              </div>
+
+              {/* Massive Cinematic Offer Headline - Contrast boosted */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-slate-900 tracking-tight leading-[1.05] mb-4 md:mb-5 px-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] max-w-4xl">
+                {offer.title}
+              </h2>
+
+              {/* Highlights + CTA Array */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 w-full mt-2">
+                
+                {/* Highlights - Deep glass style */}
+                <div className="hidden sm:flex flex-wrap items-center justify-center gap-3">
+                  {offer.highlights.map((h, i) => (
+                    <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-sm text-slate-900/90 text-[10px] md:text-[11.5px] font-bold tracking-wide">
+                      <CheckCircle2 className="w-3 h-3" style={{ color: offer.accentColor }} />
+                      {h}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Vertical Divider */}
+                <div className="hidden md:block w-px h-6 bg-slate-800/10" />
+
+                {/* Apply CTA - Elevated 3D Feel */}
+                <div className="relative inline-block mt-2 md:mt-0 group pointer-events-auto">
+                  <div 
+                    className="absolute -inset-1.5 rounded-full blur-[12px] opacity-40 group-hover:opacity-70 transition-opacity duration-500" 
+                    style={{ backgroundColor: offer.accentColor }} 
+                  />
+                  <Link 
+                    to="/apply"
+                    className="relative overflow-hidden bg-slate-900 text-white px-6 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm tracking-wide flex items-center gap-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                  >
+                    Apply Now
+                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-[2px] transition-transform" />
+                    </span>
+                  </Link>
+                </div>
+
+              </div>
+
+              {/* Platform Pitch Anchored beneath the CTA */}
+              <div className="mt-4 flex items-center justify-center px-4 max-w-lg">
+                <p className="text-[10px] md:text-[11px] text-slate-800/80 font-semibold tracking-wide drop-shadow-[0_1px_10px_rgba(255,255,255,0.6)]">
+                  Compare rates from <span className="text-slate-900 font-extrabold">15+ banks</span>, calculate your EMI, and apply in under <span className="text-slate-900 font-extrabold">5 minutes.</span>
+                </p>
+              </div>
+              
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ────────────────── MARQUEE TOP 1% GLASS ────────────────── */}
+        <div className="relative z-30 w-full hero-marquee-bar border-t-[0.5px] border-white/50 bg-white/20 backdrop-blur-md hidden md:block mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] pt-1">
+          
+          <div className="absolute top-0 left-0 w-24 md:w-40 h-full bg-gradient-to-r from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-bl-[32px] md:rounded-bl-[40px] mix-blend-overlay" />
+          <div className="absolute top-0 right-0 w-24 md:w-40 h-full bg-gradient-to-l from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-br-[32px] md:rounded-br-[40px] mix-blend-overlay" />
+          
+          <div className="hero-marquee-track flex items-center py-2.5 gap-3 md:gap-4 px-4 overflow-hidden">
+            <div className="flex animate-[marquee_35s_linear_infinite] whitespace-nowrap gap-3 md:gap-4 hover:[animation-play-state:paused]">
+              {[...marqueeOffers, ...marqueeOffers].map((o, i) => (
+                <div 
+                  key={`${o.text}-${i}`} 
+                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/40 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-md hover:-translate-y-0.5 hover:bg-white/60 transition-all duration-300 cursor-default group"
+                >
+                  <span 
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.2)] group-hover:scale-125 transition-transform" 
+                    style={{ backgroundColor: o.color, boxShadow: `0 0 10px ${o.color}` }} 
+                  />
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 group-hover:text-slate-900 tracking-wide transition-colors">{o.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
-
-      <style>{`
-        .hero-banner-inner { min-height: 280px; }
-        @media (min-width: 768px) { .hero-banner-inner { min-height: 340px; } }
-        @media (min-width: 1024px) { .hero-banner-inner { min-height: 320px; } }
-
-        .hero-marquee-bar {
-          background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.6) 100%);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        }
-
-        .hero-marquee-track { 
-          animation: heroMarqueeScroll 35s linear infinite; 
-          width: max-content; 
-        }
-        .hero-marquee-track:hover { animation-play-state: paused; }
-        @keyframes heroMarqueeScroll { 
-          0% { transform: translateX(0); } 
-          100% { transform: translateX(-50%); } 
-        }
-
-        /* Rotating gradient border on offer card */
-        .hero-gradient-border {
-          background: conic-gradient(
-            from var(--border-angle, 0deg),
-            transparent 20%,
-            rgba(255,255,255,0.12) 40%,
-            rgba(124,58,237,0.15) 50%,
-            rgba(255,255,255,0.12) 60%,
-            transparent 80%
-          );
-          animation: rotateBorder 6s linear infinite;
-        }
-        @property --border-angle {
-          syntax: "<angle>";
-          initial-value: 0deg;
-          inherits: false;
-        }
-        @keyframes rotateBorder {
-          to { --border-angle: 360deg; }
-        }
-
-        /* Shimmer sweep */
-        .hero-card-shimmer {
-          background: linear-gradient(
-            105deg, 
-            transparent 30%, 
-            rgba(255,255,255,0.04) 45%, 
-            rgba(255,255,255,0.07) 50%, 
-            rgba(255,255,255,0.04) 55%, 
-            transparent 70%
-          );
-          background-size: 250% 100%;
-          animation: cardShimmer 4s ease-in-out infinite;
-        }
-        @keyframes cardShimmer {
-          0%, 100% { background-position: 250% 0; }
-          50% { background-position: -250% 0; }
-        }
-
-        .hero-offer-card {
-          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .hero-offer-card:hover {
-          transform: translateY(-3px);
-        }
-
-        /* CTA micro-interaction */
-        .hero-card-cta::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 60%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-          transition: left 0.5s ease;
-        }
-        .hero-card-cta:hover::after {
-          left: 120%;
-        }
-      `}</style>
     </section>
   );
 });
