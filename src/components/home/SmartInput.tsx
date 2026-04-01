@@ -39,10 +39,10 @@ const SmartInput = () => {
         onMouseLeave={() => setOpacity(0)}
         className={cn(
           "relative overflow-hidden rounded-full p-[1px] transition-all duration-300",
-          isFocused ? "shadow-lg shadow-violet-500/10 scale-[1.01]" : "shadow-md shadow-slate-200/50"
+          isFocused ? "shadow-lg shadow-blue-500/10 scale-[1.01]" : "shadow-md shadow-slate-200/50"
         )}
         style={{
-            // Brand Green Tint (#7c3aed is approx 42, 172, 100)
+            // Brand Green Tint (#103783 is approx 42, 172, 100)
             background: isFocused ? "rgba(124, 58, 237, 0.1)" : "rgba(226, 232, 240, 0.6)"
         }}
       >
@@ -60,7 +60,7 @@ const SmartInput = () => {
           
           {/* Search Icon */}
           <div className="pl-6 pr-3 text-slate-400">
-            <Search className={cn("w-5 h-5 transition-colors", isFocused && "text-[#7c3aed]")} />
+            <Search className={cn("w-5 h-5 transition-colors", isFocused && "text-[#103783]")} />
           </div>
 
           {/* Input Field */}
@@ -81,8 +81,8 @@ const SmartInput = () => {
                 className={cn(
                     "h-12 px-6 rounded-full font-semibold text-sm transition-all duration-300 flex items-center gap-2",
                     value.trim() 
-                        // Updated to Brand Green (#7c3aed) and slightly darker green on hover (#6d28d9)
-                        ? "bg-[#7c3aed] text-white shadow-md shadow-violet-200 hover:bg-[#6d28d9] hover:scale-105 active:scale-95" 
+                        // Updated to Brand Green (#103783) and slightly darker green on hover (#0c2a66)
+                        ? "bg-[#103783] text-white shadow-md shadow-blue-200 hover:bg-[#0c2a66] hover:scale-105 active:scale-95" 
                         : "bg-slate-100 text-slate-400 cursor-not-allowed"
                 )}
                 disabled={!value.trim()}

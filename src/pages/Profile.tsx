@@ -56,7 +56,7 @@ const Profile = () => {
                     <div>
                       <h2 className="text-2xl font-semibold text-foreground uppercase tracking-tight">{user?.name || "Member"}</h2>
                       <p className="text-slate-500 dark:text-slate-400">Verified User Session</p>
-                      <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 text-violet-500 text-[10px] font-bold border border-violet-500/20">
+                      <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-bold border border-blue-500/20">
                          <Shield className="w-3 h-3" /> VERIFIED ACCOUNT
                       </div>
                     </div>

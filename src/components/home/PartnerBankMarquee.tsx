@@ -9,19 +9,15 @@ import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 
 export const banks = [
-  { name: "ICICI Bank", logo: iciciLogo },
   { name: "Axis Bank", logo: axisLogo },
   { name: "IDBI Bank", logo: idbiLogo },
+  { name: "HDFC Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=hdfcbank.com&sz=256" },
   { name: "Union Bank", logo: unionLogo },
-  { name: "Kotak Mahindra", logo: kotakLogo },
-  { name: "Yes Bank", logo: yesLogo },
-  { name: "Punjab National", logo: pnbLogo },
-  { name: "Tata Capital", logo: tataLogo },
-  { name: "Standard Chartered", logo: idbiLogo },
-  { name: "Citi Bank", logo: iciciLogo },
-  { name: "IndusInd Bank", logo: axisLogo },
-  { name: "HSBC", logo: kotakLogo },
-  { name: "IDFC First", logo: yesLogo },
+  { name: "State Bank of India", logo: "https://s2.googleusercontent.com/s2/favicons?domain=onlinesbi.sbi&sz=256" },
+  { name: "Bank of Baroda", logo: "https://s2.googleusercontent.com/s2/favicons?domain=bankofbaroda.in&sz=256" },
+  { name: "Standard Chartered", logo: "https://s2.googleusercontent.com/s2/favicons?domain=sc.com&sz=256" },
+  { name: "IndusInd Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=indusind.com&sz=256" },
+  { name: "RBL Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=rblbank.com&sz=256" },
 ];
 
 const PartnerBankMarquee = memo(() => {
@@ -52,28 +48,59 @@ const PartnerBankMarquee = memo(() => {
         </div>
 
         {/* Marquee Track */}
-        <div className="flex whitespace-nowrap animate-marquee hover:[animation-play-state:paused] items-center min-w-[200%]">
-          {[...banks, ...banks, ...banks, ...banks].map((bank, index) => (
-            <div
-              key={index}
-              className="mx-8 sm:mx-12 flex-shrink-0 group cursor-pointer relative py-3"
-            >
-              {/* Hover bloom — soft green radial glow */}
-              <div className="absolute inset-0 -inset-x-6 -inset-y-3 rounded-full bg-primary/0 group-hover:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
+        <div className="flex w-full group overflow-hidden">
+          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-4">
+            {banks.map((bank, index) => (
+              <div
+                key={`track1-${index}`}
+                className="mx-8 sm:mx-12 flex-shrink-0 flex items-center gap-3 group/item cursor-pointer relative py-3"
+              >
+                {/* Hover bloom — soft green radial glow */}
+                <div className="absolute inset-0 -inset-x-8 -inset-y-3 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
 
-              {/* Logo — Full original brand colours, no filters */}
-              <img
-                src={bank.logo}
-                alt={bank.name}
-                className="relative h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px] object-contain select-none
-                  opacity-70 group-hover:opacity-100
-                  group-hover:scale-110
-                  group-hover:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)]
-                  transition-all duration-500 ease-out"
-              />
+                <img
+                  src={bank.logo}
+                  alt={bank.name}
+                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 group-hover/item:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)] transition-all duration-500 ease-out ${
+                    bank.logo.includes("google") ? "h-[28px] sm:h-[34px] w-auto rounded-md shadow-sm" : "h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px]"
+                  }`}
+                />
 
-            </div>
-          ))}
+                {/* If it's a web-fetched square favicon, display the bank name next to it to match the horizontal styling of local SVGs */}
+                {bank.logo.includes("google") && (
+                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-500">
+                    {bank.name}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-4">
+            {banks.map((bank, index) => (
+              <div
+                key={`track2-${index}`}
+                className="mx-8 sm:mx-12 flex-shrink-0 flex items-center gap-3 group/item cursor-pointer relative py-3"
+              >
+                {/* Hover bloom — soft green radial glow */}
+                <div className="absolute inset-0 -inset-x-8 -inset-y-3 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
+
+                <img
+                  src={bank.logo}
+                  alt={bank.name}
+                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 group-hover/item:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)] transition-all duration-500 ease-out ${
+                    bank.logo.includes("google") ? "h-[28px] sm:h-[34px] w-auto rounded-md shadow-sm" : "h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px]"
+                  }`}
+                />
+
+                {/* If it's a web-fetched square favicon, display the bank name next to it to match the horizontal styling of local SVGs */}
+                {bank.logo.includes("google") && (
+                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-500">
+                    {bank.name}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

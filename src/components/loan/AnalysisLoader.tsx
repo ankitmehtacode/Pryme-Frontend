@@ -27,7 +27,7 @@ const DocumentIcon = ({ index, activeIndex }: { index: number; activeIndex: numb
     >
       {/* Glow behind active document */}
       <motion.div
-        className="absolute -inset-3 rounded-2xl bg-violet-500/20 blur-xl pointer-events-none"
+        className="absolute -inset-3 rounded-2xl bg-blue-500/20 blur-xl pointer-events-none"
         animate={{ opacity: isActive ? 0.8 : 0 }}
         transition={{ duration: 0.3 }}
       />
@@ -212,9 +212,9 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0a0a0a]/95 backdrop-blur-2xl px-6 overflow-hidden"
         >
           {/* Ambient background glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-500/[0.06] blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-violet-600/[0.04] blur-[100px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] bg-purple-500/[0.04] blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/[0.06] blur-[150px] rounded-full pointer-events-none" />
+          <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-blue-800/[0.04] blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] bg-blue-700/[0.04] blur-[100px] rounded-full pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center">
             {/* ── Documents + Magnifying Glass Area ─────────────────────── */}
@@ -245,7 +245,7 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
 
               {/* Scan line effect */}
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500/40 to-transparent pointer-events-none"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent pointer-events-none"
                 animate={{
                   opacity: [0.3, 0.8, 0.3],
                 }}

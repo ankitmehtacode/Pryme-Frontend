@@ -26,7 +26,7 @@ const Notifications = () => {
 
             <div className="space-y-4">
               {[
-                { icon: ShieldCheck, title: "Identity Verified", text: "Your PAN card and Aadhaar have been successfully cross-verified with NSDL.", time: "2 hours ago", color: "text-violet-500", bg: "bg-violet-500/10" },
+                { icon: ShieldCheck, title: "Identity Verified", text: "Your PAN card and Aadhaar have been successfully cross-verified with NSDL.", time: "2 hours ago", color: "text-blue-500", bg: "bg-blue-500/10" },
                 { icon: CreditCard, title: "New Offer Unlocked", text: "HDFC Bank has offered a special interest rate of 8.65% based on your profile.", time: "5 hours ago", color: "text-blue-500", bg: "bg-blue-500/10" },
                 { icon: MessageSquare, title: "RM Message Received", text: "Your Relationship Manager has requested additional salary slips for PRY-9042.", time: "1 day ago", color: "text-amber-500", bg: "bg-amber-500/10" },
                 { icon: Clock, title: "Session Security", text: "New login alert from Chrome on Windows 11 detected for your account.", time: "2 days ago", color: "text-slate-500", bg: "bg-slate-500/10" }

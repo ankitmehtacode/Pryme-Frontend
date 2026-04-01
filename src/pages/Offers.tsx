@@ -267,9 +267,9 @@ export default function Offers() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                   {[
                     { icon: Zap, title: "Zero Processing Fees", bank: "HDFC Bank Special", text: "Available for Home Loans above ₹50L.", color: "from-blue-500/10 to-blue-600/10" },
-                    { icon: Sparkles, title: "0.25% ROI Reduction", bank: "Standard Chartered", text: "Exclusive for PRYME customers with CIBIL > 800.", color: "from-violet-500/10 to-violet-600/10" },
+                    { icon: Sparkles, title: "0.25% ROI Reduction", bank: "Standard Chartered", text: "Exclusive for PRYME customers with CIBIL > 800.", color: "from-blue-500/10 to-blue-800/10" },
                     { icon: Gift, title: "₹5000 Amazon Voucher", bank: "Personal Loan Perk", text: "Get rewarded on first disbursement through our platform.", color: "from-amber-500/10 to-amber-600/10" },
-                    { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "2x points on all digital spends for 90 days.", color: "from-purple-500/10 to-purple-600/10" },
+                    { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "2x points on all digital spends for 90 days.", color: "from-blue-700/10 to-blue-800/10" },
                   ].map((offer, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
                       <div className={`p-8 rounded-[2.5rem] bg-gradient-to-br ${offer.color} border border-border flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02]`}>
@@ -309,7 +309,7 @@ export default function Offers() {
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-hidden">
         {/* Ambient light — Depth perception */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-violet-500/[0.05] dark:from-[#7c3aed]/[0.07] to-transparent blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-blue-500/[0.05] dark:from-[#103783]/[0.07] to-transparent blur-[140px] rounded-full pointer-events-none" />
 
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
 
@@ -354,7 +354,7 @@ export default function Offers() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="mb-8"
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary dark:text-[#a78bfa] mb-1.5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary dark:text-[#9BAFD9] mb-1.5">
               We found your best match
             </p>
             <h1 className="text-2xl md:text-[28px] font-semibold tracking-tight text-foreground">
@@ -384,7 +384,7 @@ export default function Offers() {
                 initial={{ opacity: 0, y: 20, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 0.1, ...spring }}
-                className="relative rounded-[1.75rem] overflow-hidden shadow-2xl shadow-violet-500/[0.08] dark:shadow-[#7c3aed]/[0.1]"
+                className="relative rounded-[1.75rem] overflow-hidden shadow-2xl shadow-blue-500/[0.08] dark:shadow-[#103783]/[0.1]"
               >
                 {/* Gradient background — Visual contrast strategy */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#1e1145] via-[#1a103a] to-[#0f0a26] dark:from-[#1a0e3a] dark:via-[#130c2c] dark:to-[#0a0618]" />
@@ -393,7 +393,7 @@ export default function Offers() {
                 <ShimmerEffect />
 
                 {/* Subtle border glow */}
-                <div className="absolute inset-0 rounded-[1.75rem] border border-violet-500/20 dark:border-[#7c3aed]/20 pointer-events-none z-10" />
+                <div className="absolute inset-0 rounded-[1.75rem] border border-blue-500/20 dark:border-[#103783]/20 pointer-events-none z-10" />
 
                 <div className="relative z-10 p-7 md:p-10">
 
@@ -597,7 +597,7 @@ export default function Offers() {
                                   onClick={() => handleUnlock(offer)}
                                   disabled={isLocking !== null}
                                   variant="outline"
-                                  className="rounded-xl h-10 px-5 text-xs font-bold border-primary/20 dark:border-[#7c3aed]/20 text-primary dark:text-[#a78bfa] hover:bg-primary/5 dark:hover:bg-[#7c3aed]/5 transition-all"
+                                  className="rounded-xl h-10 px-5 text-xs font-bold border-primary/20 dark:border-[#103783]/20 text-primary dark:text-[#9BAFD9] hover:bg-primary/5 dark:hover:bg-[#103783]/5 transition-all"
                                 >
                                   {isLocking === offer.id ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -636,7 +636,7 @@ export default function Offers() {
                                   {/* Cost breakdown */}
                                   <div>
                                     <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-                                      <Calculator className="w-3.5 h-3.5 text-primary dark:text-[#7c3aed]" /> Cost Breakdown
+                                      <Calculator className="w-3.5 h-3.5 text-primary dark:text-[#103783]" /> Cost Breakdown
                                     </h4>
                                     <div className="space-y-2">
                                       {[
@@ -655,7 +655,7 @@ export default function Offers() {
                                   {/* Required docs */}
                                   <div>
                                     <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-                                      <FileText className="w-3.5 h-3.5 text-primary dark:text-[#7c3aed]" /> Documents
+                                      <FileText className="w-3.5 h-3.5 text-primary dark:text-[#103783]" /> Documents
                                     </h4>
                                     <div className="space-y-1.5">
                                       {offer.requiredDocs.map((doc, i) => (
@@ -687,7 +687,7 @@ export default function Offers() {
                 {[
                   { icon: ShieldCheck, label: "No credit score impact", color: "text-emerald-500" },
                   { icon: Lock, label: "256-bit SSL encryption", color: "text-blue-500" },
-                  { icon: BadgeCheck, label: "RBI-regulated partners", color: "text-violet-500" },
+                  { icon: BadgeCheck, label: "RBI-regulated partners", color: "text-blue-500" },
                   { icon: Users, label: "Trusted by 2,00,000+ users", color: "text-muted-foreground" },
                 ].map((t, i) => (
                   <div key={i} className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground/50">
@@ -710,7 +710,7 @@ export default function Offers() {
           <Button
             onClick={() => handleUnlock(heroOffer)}
             disabled={isLocking !== null}
-            className="rounded-xl h-11 px-6 bg-primary dark:bg-[#7c3aed] text-white text-sm font-bold shadow-lg shadow-primary/20"
+            className="rounded-xl h-11 px-6 bg-primary dark:bg-[#103783] text-white text-sm font-bold shadow-lg shadow-primary/20"
           >
             {isLocking ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4 mr-1.5" /> Unlock offer</>}
           </Button>

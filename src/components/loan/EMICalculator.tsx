@@ -86,27 +86,27 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#7c3aed]/20 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#7c3aed]/40 flex flex-col h-full", className)}>
+    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full", className)}>
       
       {/* 🧠 Ambient Glow Engine */}
-      <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-primary/5 dark:bg-[#7c3aed]/10 blur-[60px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-primary/5 dark:bg-[#103783]/10 blur-[60px] rounded-full pointer-events-none" />
 
       {/* Header */}
-      <div className="flex items-center gap-3.5 mb-6 relative z-10 shrink-0">
-        <div className="w-11 h-11 rounded-xl bg-secondary dark:bg-[#111] shadow-sm flex items-center justify-center border border-border dark:border-[#7c3aed]/20 shrink-0">
-          <Calculator className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+      <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10 shrink-0">
+        <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-secondary dark:bg-[#111] shadow-sm flex items-center justify-center border border-border dark:border-[#103783]/20 shrink-0">
+          <Calculator className="w-4 h-4 md:w-5 md:h-5 text-primary dark:text-[#103783]" />
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">EMI Calculator</h3>
-          <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Real-time payment estimation</p>
+          <h3 className="text-lg md:text-2xl font-bold text-foreground tracking-tight leading-none mb-0.5 md:mb-1">EMI Calculator</h3>
+          <p className="text-[8px] md:text-[9px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Real-time payment estimation</p>
         </div>
       </div>
 
       {/* Sleek EMI Display & Pie Chart (Compact) */}
-      <div className="flex flex-row items-center justify-between gap-5 p-4 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner mb-6 relative z-10 shrink-0">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-5 p-3 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-inner mb-4 md:mb-6 relative z-10 shrink-0">
         
         {/* Glowing Pie Chart */}
-        <div className="relative w-28 h-28 md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto md:mx-0">
+        <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg">
           <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
             <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
             
@@ -114,7 +114,7 @@ const EMICalculator = ({
             <circle
               cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
               strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
-              className="stroke-[#7c3aed] transition-all duration-1000 ease-out"
+              className="stroke-[#103783] transition-all duration-1000 ease-out"
             />
             {/* Interest Segment */}
             <circle
@@ -124,82 +124,92 @@ const EMICalculator = ({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-[#7c3aed] mb-0.5">Monthly EMI</span>
-            <span className="text-xl md:text-2xl font-bold text-foreground">{formatShortCurrency(emi)}</span>
+            <span className="text-[7px] md:text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-0.5">Monthly EMI</span>
+            <span className="text-lg md:text-2xl font-bold text-foreground">{formatShortCurrency(emi)}</span>
           </div>
         </div>
 
         {/* Legend */}
-        <div className="flex-1 space-y-3 w-full">
-          <div className="flex items-center justify-between p-3.5 bg-background dark:bg-[#0a0a0a] rounded-xl shadow-sm border border-border dark:border-white/5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-3 h-3 rounded-full bg-[#7c3aed] shadow-[0_0_8px_rgba(124,58,237,0.4)]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Principal</span>
+        <div className="flex-1 space-y-2 w-full">
+          {/* Total Payable — Hero metric */}
+          <div className="flex items-center justify-between p-3.5 bg-gradient-to-r from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm">
+                <span className="text-[8px] font-black text-white leading-none">Σ</span>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
             </div>
-            <div className="text-right flex flex-col items-end">
-              <p className="text-sm md:text-base font-bold text-foreground leading-none mb-1">{formatCurrency(amount)}</p>
-              <p className="text-[10px] font-bold text-[#7c3aed] bg-[#7c3aed]/10 px-1.5 py-0.5 rounded leading-none">{principalPercentage.toFixed(1)}%</p>
-            </div>
+            <p className="text-base md:text-lg font-extrabold text-foreground leading-none">{formatCurrency(totalPayment)}</p>
           </div>
-          
-          <div className="flex items-center justify-between p-3.5 bg-background dark:bg-[#0a0a0a] rounded-xl shadow-sm border border-border dark:border-white/5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Interest</span>
+
+          {/* Principal & Interest — Compact secondary rows */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-2.5 bg-background dark:bg-[#0a0a0a] rounded-lg border border-border dark:border-white/5">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(124,58,237,0.3)] shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Principal</p>
+                <p className="text-xs md:text-sm font-bold text-foreground leading-none">{formatCurrency(amount)}</p>
+              </div>
+              <span className="text-[9px] font-bold text-[#103783] bg-[#103783]/10 px-1.5 py-0.5 rounded leading-none ml-auto shrink-0">{principalPercentage.toFixed(0)}%</span>
             </div>
-            <div className="text-right flex flex-col items-end">
-              <p className="text-sm md:text-base font-bold text-foreground leading-none mb-1">{formatCurrency(totalInterest)}</p>
-              <p className="text-[10px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded leading-none">{interestPercentage.toFixed(1)}%</p>
+
+            <div className="flex items-center gap-2 p-2.5 bg-background dark:bg-[#0a0a0a] rounded-lg border border-border dark:border-white/5">
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Interest</p>
+                <p className="text-xs md:text-sm font-bold text-foreground leading-none">{formatCurrency(totalInterest)}</p>
+              </div>
+              <span className="text-[9px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded leading-none ml-auto shrink-0">{interestPercentage.toFixed(0)}%</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Interactive Sliders (Condensed) */}
-      <div className="space-y-4 relative z-10 flex-1 flex flex-col justify-center">
+      <div className="space-y-3 md:space-y-4 relative z-10 flex-1 flex flex-col justify-center">
         
         {/* Amount Slider */}
-        <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#7c3aed]/30">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-wider">Loan Amount</span>
-            <span className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
+        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount</span>
+            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
               {formatCurrency(amount)}
             </span>
           </div>
           <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={10000000} step={50000} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-3">
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Crore</span>
+          <div className="flex justify-between mt-2 md:mt-3">
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Crore</span>
           </div>
         </div>
 
         {/* Rate Slider */}
-        <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#7c3aed]/30">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-wider">Interest Rate</span>
-            <span className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
-              {rate}% <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mt-0.5">p.a.</span>
+        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate</span>
+            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
+              {rate}% <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mt-0.5">p.a.</span>
             </span>
           </div>
           <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={6} max={24} step={0.25} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-3">
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">6%</span>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">24%</span>
+          <div className="flex justify-between mt-2 md:mt-3">
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">6%</span>
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">24%</span>
           </div>
         </div>
 
         {/* Tenure Slider */}
-        <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#7c3aed]/30">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-wider">Loan Tenure</span>
-            <span className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1.5 leading-none">
-              {months} Mo <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">({(months / 12).toFixed(1)} Yrs)</span>
+        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure</span>
+            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1 md:gap-1.5 leading-none">
+              {months} Mo <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">({(months / 12).toFixed(1)} Yrs)</span>
             </span>
           </div>
           <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={12} max={360} step={12} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-3">
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">1 Year</span>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">30 Years</span>
+          <div className="flex justify-between mt-2 md:mt-3">
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">1 Year</span>
+            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">30 Years</span>
           </div>
         </div>
       </div>
@@ -209,7 +219,7 @@ const EMICalculator = ({
         <div className="mt-5 pt-4 border-t border-border dark:border-white/10 relative z-10 shrink-0">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="terminology" className="border-0">
-              <AccordionTrigger className="text-[11px] font-bold text-muted-foreground hover:text-primary dark:hover:text-[#7c3aed] py-2 hover:no-underline uppercase tracking-widest transition-colors">
+              <AccordionTrigger className="text-[11px] font-bold text-muted-foreground hover:text-primary dark:hover:text-[#103783] py-2 hover:no-underline uppercase tracking-widest transition-colors">
                 <div className="flex items-center gap-2.5">
                   <Info className="w-4 h-4" />
                   <span>Terminology Guide</span>

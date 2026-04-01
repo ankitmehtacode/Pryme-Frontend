@@ -102,7 +102,7 @@ export default function ProgressiveContinuationForm({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={spring}
-      className="w-full bg-card dark:bg-[#111] border-2 border-primary/20 dark:border-[#7c3aed]/30 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden"
+      className="w-full bg-card dark:bg-[#111] border-2 border-primary/20 dark:border-[#103783]/30 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden"
     >
       {/* Background ambient glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
@@ -111,7 +111,7 @@ export default function ProgressiveContinuationForm({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border dark:border-white/10 pb-6 mb-8 relative z-10">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center shrink-0">
-            <Building2 className="w-6 h-6 text-primary dark:text-[#7c3aed]" />
+            <Building2 className="w-6 h-6 text-primary dark:text-[#103783]" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-foreground">Completing Application for {bankName}</h3>

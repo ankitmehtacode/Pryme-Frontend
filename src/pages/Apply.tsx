@@ -159,8 +159,8 @@ const Apply = () => {
   };
 
   const features = [
-    { icon: Shield, label: "256-bit Encrypted", color: "text-violet-500" },
-    { icon: CheckCircle, label: "Real-time Offers", color: "text-primary dark:text-[#7c3aed]" },
+    { icon: Shield, label: "256-bit Encrypted", color: "text-blue-500" },
+    { icon: CheckCircle, label: "Real-time Offers", color: "text-primary dark:text-[#103783]" },
   ];
 
   return (
@@ -189,8 +189,8 @@ const Apply = () => {
 
       {/* 🧠 UI FIX: Changed hardcoded black `#0a0a0a` to semantic adaptive `bg-slate-50 dark:bg-[#0a0a0a]` */}
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-violet-500/5 dark:bg-[#2e1065]/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-violet-500/5 dark:bg-[#2e1065]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-blue-500/5 dark:bg-[#0a1f4d]/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-blue-500/5 dark:bg-[#0a1f4d]/10 blur-[120px] rounded-full pointer-events-none" />
 
         <Header />
 
@@ -214,14 +214,14 @@ const Apply = () => {
                       }}
                     >
                       <div className="max-w-xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card dark:bg-[#0a0a0a] border border-border dark:border-[#7c3aed]/20 shadow-sm mb-6 mt-2">
-                          <LockKeyhole className="w-3.5 h-3.5 text-primary dark:text-[#7c3aed]" />
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card dark:bg-[#0a0a0a] border border-border dark:border-[#103783]/20 shadow-sm mb-6 mt-2">
+                          <LockKeyhole className="w-3.5 h-3.5 text-primary dark:text-[#103783]" />
                           <span className="text-[10px] font-bold text-muted-foreground dark:text-slate-300 uppercase tracking-widest">
                             Bank-Grade Security Protocol Active
                           </span>
                         </div>
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-6 tracking-tight leading-tight">
-                          Intelligent Loan <span className="text-primary dark:text-[#7c3aed]">Matchmaking.</span>
+                          Intelligent Loan <span className="text-primary dark:text-[#103783]">Matchmaking.</span>
                         </h1>
                         <p className="text-base text-muted-foreground mb-8 font-medium max-w-md leading-relaxed">
                           Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits and lowest interest rates instantly.
@@ -282,7 +282,7 @@ const Apply = () => {
                           transition={{ duration: 0.6 }}
                         />
                         <div className="relative bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl overflow-hidden z-10">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
                           <LoanApplicationForm
                             onAmountChange={setLoanAmount}
                             onFormSubmit={handleFormSubmit}
@@ -310,18 +310,18 @@ const Apply = () => {
                 transition={spring}
                 className="w-full relative z-20 pb-20"
               >
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 dark:via-[#7c3aed]/30 to-transparent mb-16" />
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 dark:via-[#103783]/30 to-transparent mb-16" />
 
                 <div className="container mx-auto px-4 max-w-7xl space-y-8">
                   {/* ── SECTION A: Psychological Anchors (Top Fold) ────────────────── */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                     {/* Main Approval Anchor */}
-                    <div className="lg:col-span-2 bg-gradient-to-br from-primary/10 to-transparent dark:from-[#7c3aed]/10 border border-primary/20 dark:border-[#7c3aed]/20 p-6 md:p-8 rounded-[2rem] shadow-lg relative overflow-hidden backdrop-blur-xl flex flex-col justify-center">
+                    <div className="lg:col-span-2 bg-gradient-to-br from-primary/10 to-transparent dark:from-[#103783]/10 border border-primary/20 dark:border-[#103783]/20 p-6 md:p-8 rounded-[2rem] shadow-lg relative overflow-hidden backdrop-blur-xl flex flex-col justify-center">
                       <div className="absolute top-0 right-0 p-6 opacity-20">
-                        <CheckCircle className="w-24 h-24 text-primary dark:text-[#7c3aed]" />
+                        <CheckCircle className="w-24 h-24 text-primary dark:text-[#103783]" />
                       </div>
                       <div className="relative z-10">
-                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-[#7c3aed]/10 border border-primary/30 text-[10px] font-bold text-primary dark:text-[#7c3aed] uppercase tracking-widest">
+                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-[#103783]/10 border border-primary/30 text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-widest">
                           <Sparkles className="w-3.5 h-3.5" /> High Approval Odds
                         </div>
                         <h2 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-2">
@@ -336,7 +336,7 @@ const Apply = () => {
                             initial={{ width: 0 }}
                             animate={{ width: "78%" }}
                             transition={{ duration: 1.5, delay: 0.2, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-primary to-violet-500 rounded-full"
+                            className="h-full bg-gradient-to-r from-primary to-blue-500 rounded-full"
                           />
                         </div>
                       </div>

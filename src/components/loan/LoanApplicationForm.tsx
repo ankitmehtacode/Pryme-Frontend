@@ -35,7 +35,7 @@ import {
 const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
   ({ label, error, isValid, isSecure, icon: Icon, className: _className, ...props }, ref) => (
     <div className="relative group w-full">
-      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-1 block">{label}</Label>
+      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
       <div className="relative">
         {Icon && (
           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
@@ -46,10 +46,10 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           ref={ref}
           {...props}
           className={cn(
-            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#7c3aed]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#7c3aed]/10",
+            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#103783]/10",
             Icon && "pl-11",
             error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
-            isValid && !error && "border-primary/20 dark:border-[#7c3aed]/20"
+            isValid && !error && "border-primary/20 dark:border-[#103783]/20"
           )}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -61,7 +61,7 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           )}
           {isValid && !error && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
-              <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
+              <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#103783]" />
             </motion.div>
           )}
         </div>
@@ -85,10 +85,10 @@ const StyledSelect = ({
   placeholder: string; children: React.ReactNode; error?: string;
 }) => (
   <div className="group w-full">
-    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-1 block">{label}</Label>
+    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn(
-        "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#7c3aed]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#7c3aed]/10",
+        "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#103783]/10",
         Icon && "pl-11",
         error && "border-red-500/30"
       )}>
@@ -120,7 +120,7 @@ const PillSelector = <T extends string>({
   value: T | null; onChange: (v: T) => void; icon?: any;
 }) => (
   <div className="w-full">
-    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#7c3aed]/80 ml-1 mb-2 flex items-center gap-2">
+    <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-2 flex items-center gap-2">
       {Icon && <Icon className="w-3.5 h-3.5" />}
       {label}
     </Label>
@@ -138,7 +138,7 @@ const PillSelector = <T extends string>({
             className={cn(
               "py-3.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 border flex items-center justify-center gap-2",
               isSelected
-                ? "bg-primary dark:bg-[#7c3aed] text-white border-primary dark:border-[#7c3aed] shadow-lg shadow-primary/20 dark:shadow-[#7c3aed]/20"
+                ? "bg-primary dark:bg-[#103783] text-white border-primary dark:border-[#103783] shadow-lg shadow-primary/20 dark:shadow-[#103783]/20"
                 : "bg-secondary/50 dark:bg-white/[0.03] text-muted-foreground border-border dark:border-white/[0.06] hover:text-foreground hover:border-primary/20 dark:hover:border-white/15"
             )}
           >
@@ -166,7 +166,7 @@ const ToggleSwitch = ({
     className={cn(
       "w-full flex items-center justify-between gap-4 p-4 rounded-xl border transition-all duration-300",
       checked
-        ? "bg-primary/5 dark:bg-[#7c3aed]/5 border-primary/20 dark:border-[#7c3aed]/20"
+        ? "bg-primary/5 dark:bg-[#103783]/5 border-primary/20 dark:border-[#103783]/20"
         : "bg-secondary/30 dark:bg-white/[0.02] border-border dark:border-white/[0.06] hover:border-primary/10 dark:hover:border-white/[0.1]"
     )}
   >
@@ -174,11 +174,11 @@ const ToggleSwitch = ({
       {Icon && (
         <div className={cn(
           "w-9 h-9 rounded-lg flex items-center justify-center transition-colors",
-          checked ? "bg-primary/10 dark:bg-[#7c3aed]/10" : "bg-secondary dark:bg-white/[0.05]"
+          checked ? "bg-primary/10 dark:bg-[#103783]/10" : "bg-secondary dark:bg-white/[0.05]"
         )}>
           <Icon className={cn(
             "w-4 h-4 transition-colors",
-            checked ? "text-primary dark:text-[#7c3aed]" : "text-muted-foreground/50"
+            checked ? "text-primary dark:text-[#103783]" : "text-muted-foreground/50"
           )} />
         </div>
       )}
@@ -194,7 +194,7 @@ const ToggleSwitch = ({
     </div>
     <div className={cn(
       "w-11 h-6 rounded-full relative transition-colors duration-300",
-      checked ? "bg-primary dark:bg-[#7c3aed]" : "bg-border dark:bg-white/[0.1]"
+      checked ? "bg-primary dark:bg-[#103783]" : "bg-border dark:bg-white/[0.1]"
     )}>
       <motion.div
         className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
@@ -239,17 +239,17 @@ const DocumentCard = ({
       className={cn(
         "group relative p-4 rounded-xl border transition-all duration-300",
         file
-          ? "bg-primary/[0.03] dark:bg-[#7c3aed]/[0.03] border-primary/20 dark:border-[#7c3aed]/20"
+          ? "bg-primary/[0.03] dark:bg-[#103783]/[0.03] border-primary/20 dark:border-[#103783]/20"
           : "bg-secondary/30 dark:bg-white/[0.02] border-border dark:border-white/[0.06] hover:border-primary/15 dark:hover:border-white/[0.1]"
       )}
     >
       <div className="flex items-start gap-3">
         <div className={cn(
           "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-          file ? "bg-primary/10 dark:bg-[#7c3aed]/10" : "bg-secondary dark:bg-white/[0.05]"
+          file ? "bg-primary/10 dark:bg-[#103783]/10" : "bg-secondary dark:bg-white/[0.05]"
         )}>
           {file ? (
-            <Check className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
+            <Check className="w-4 h-4 text-primary dark:text-[#103783]" />
           ) : (
             <FileText className={cn(
               "w-4 h-4 transition-colors",
@@ -271,8 +271,8 @@ const DocumentCard = ({
 
           {file ? (
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/5 dark:bg-[#7c3aed]/5 border border-primary/10 dark:border-[#7c3aed]/10">
-                <FileText className="w-3 h-3 text-primary dark:text-[#7c3aed]" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10">
+                <FileText className="w-3 h-3 text-primary dark:text-[#103783]" />
                 <span className="text-[11px] font-medium text-foreground truncate max-w-[150px]">{file.name}</span>
                 <span className="text-[10px] text-muted-foreground/50">
                   {(file.size / 1024).toFixed(0)}KB
@@ -381,10 +381,10 @@ function resolveDocuments(store: ReturnType<typeof useApplicationStore.getState>
 }
 
 const CATEGORY_META: Record<DocEntry['category'], { label: string; icon: any; color: string }> = {
-  identity: { label: 'Identity & KYC', icon: ShieldCheck, color: 'text-violet-500' },
+  identity: { label: 'Identity & KYC', icon: ShieldCheck, color: 'text-blue-500' },
   income: { label: 'Income Proof', icon: IndianRupee, color: 'text-blue-500' },
   property: { label: 'Property Documents', icon: Home, color: 'text-amber-500' },
-  business: { label: 'Business Documents', icon: BriefcaseBusiness, color: 'text-violet-500' },
+  business: { label: 'Business Documents', icon: BriefcaseBusiness, color: 'text-blue-500' },
   education: { label: 'Education Documents', icon: GraduationCap, color: 'text-pink-500' },
 };
 
@@ -466,12 +466,12 @@ const DocumentVaultStage = ({
     >
       {/* Header Card */}
       <div className={cardCn}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-              <FolderOpen className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+              <FolderOpen className="w-5 h-5 text-primary dark:text-[#103783]" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground tracking-tight">Document Vault</h3>
@@ -484,7 +484,7 @@ const DocumentVaultStage = ({
             <div className="text-right">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Uploaded</p>
               <p className="text-lg font-bold tabular-nums text-foreground">
-                <span className="text-primary dark:text-[#7c3aed]">{uploadedRequired}</span>
+                <span className="text-primary dark:text-[#103783]">{uploadedRequired}</span>
                 <span className="text-muted-foreground/30"> / {totalRequired}</span>
               </p>
             </div>
@@ -494,7 +494,7 @@ const DocumentVaultStage = ({
                 <motion.circle
                   cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeWidth="2.5"
                   strokeLinecap="round"
-                  className="text-primary dark:text-[#7c3aed]"
+                  className="text-primary dark:text-[#103783]"
                   strokeDasharray={`${2 * Math.PI * 15.5}`}
                   animate={{ strokeDashoffset: 2 * Math.PI * 15.5 * (1 - progress / 100) }}
                   transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
@@ -852,7 +852,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   const cibilScore = store.loanRequirements.cibilScore;
   const cibilUi = useMemo(() => {
-    if (cibilScore >= 750) return { color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20", label: "Excellent" };
+    if (cibilScore >= 750) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Excellent" };
     if (cibilScore >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
     if (cibilScore >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
     return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
@@ -903,7 +903,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-colors duration-300",
                       isActive
-                        ? "bg-primary dark:bg-[#7c3aed] text-white"
+                        ? "bg-primary dark:bg-[#103783] text-white"
                         : "bg-secondary dark:bg-[#1a1a1a] text-muted-foreground border border-border dark:border-white/10"
                     )}
                   >
@@ -915,7 +915,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   </motion.div>
                   <span className={cn(
                     "text-[10px] mt-2 font-semibold uppercase tracking-widest transition-colors duration-300",
-                    isActive ? "text-primary dark:text-[#7c3aed]" : "text-muted-foreground/50"
+                    isActive ? "text-primary dark:text-[#103783]" : "text-muted-foreground/50"
                   )}>
                     {meta.label}
                   </span>
@@ -925,7 +925,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             {/* Connector line */}
             <div className="absolute top-4 left-8 right-8 h-[2px] bg-border dark:bg-white/[0.06] -z-0">
               <motion.div
-                className="h-full bg-primary dark:bg-[#7c3aed]"
+                className="h-full bg-primary dark:bg-[#103783]"
                 animate={{ width: `${((displayStep - 1) / (STEP_META.length - 1)) * 100}%` }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               />
@@ -948,11 +948,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
               className={cardCn}
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+                  <User className="w-5 h-5 text-primary dark:text-[#103783]" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground tracking-tight">Verify Identity</h3>
               </div>
@@ -1077,11 +1077,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             >
               {/* Employment Category Selector */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+                    <Briefcase className="w-5 h-5 text-primary dark:text-[#103783]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Employment & Income</h3>
                 </div>
@@ -1309,11 +1309,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               className="space-y-5"
             >
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#103783]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
                 </div>
@@ -1402,11 +1402,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             >
               {/* ── Universal Financial Footprint Card ──────────────────────── */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#7c3aed]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <FileSearch className="w-5 h-5 text-primary dark:text-[#7c3aed]" />
+                    <FileSearch className="w-5 h-5 text-primary dark:text-[#103783]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Financial Footprint</h3>
                 </div>
@@ -1562,10 +1562,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </AnimatePresence>
 
         {/* ── Real-Time Signal Injection ──────────────────────────────────────── */}
-        <div className="mt-6 p-4 rounded-xl bg-primary/5 dark:bg-[#7c3aed]/5 border border-primary/10 dark:border-[#7c3aed]/10 flex items-center justify-between">
+        <div className="mt-6 p-4 rounded-xl bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-[#7c3aed]/10 flex items-center justify-center animate-pulse">
-              <Sparkles className="w-4 h-4 text-primary dark:text-[#7c3aed]" />
+            <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-[#103783]/10 flex items-center justify-center animate-pulse">
+              <Sparkles className="w-4 h-4 text-primary dark:text-[#103783]" />
             </div>
             <div>
               <p className="text-xs font-semibold text-foreground">
@@ -1608,7 +1608,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               <Button
                 type="button"
                 onClick={nextStep}
-                className="bg-primary dark:bg-[#7c3aed] hover:bg-primary/90 dark:hover:bg-[#6d28d9] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
+                className="bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
               >
                 Continue <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -1619,7 +1619,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || isAnalyzing}
-                className="rounded-xl bg-primary dark:bg-[#7c3aed] hover:bg-primary/90 dark:hover:bg-[#6d28d9] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
+                className="rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
               >
                 {isSubmitting || isAnalyzing ? (
                   <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>

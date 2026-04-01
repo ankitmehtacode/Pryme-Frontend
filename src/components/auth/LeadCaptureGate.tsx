@@ -110,7 +110,7 @@ export default function LeadCaptureGate({
           className="relative w-full max-w-sm mx-4 bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
         >
           {/* Top accent */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-violet-400 to-violet-600" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-800" />
 
           {onClose && (
             <button
@@ -124,8 +124,8 @@ export default function LeadCaptureGate({
           <div className="p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 mb-4">
-                <Lock className="w-6 h-6 text-violet-400" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4">
+                <Lock className="w-6 h-6 text-blue-400" />
               </div>
               <h2 className="text-xl font-display font-semibold text-white tracking-tight mb-2">
                 Sign in to continue
@@ -173,7 +173,7 @@ export default function LeadCaptureGate({
 
             {/* Trust Signal */}
             <div className="flex items-center justify-center gap-2 mt-6 pt-4 border-t border-white/5">
-              <Shield className="w-3 h-3 text-violet-500 shrink-0" />
+              <Shield className="w-3 h-3 text-blue-500 shrink-0" />
               <p className="text-[10px] text-slate-500">
                 Your data is encrypted and never shared.
               </p>

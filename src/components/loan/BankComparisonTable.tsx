@@ -39,7 +39,7 @@ const BankComparisonTable = ({
   };
 
   const getApprovalColor = (probability: number) => {
-    if (probability >= 80) return { bg: "bg-violet-500", text: "text-violet-500", border: "border-violet-500/20", bgLight: "bg-violet-500/10", label: "High" };
+    if (probability >= 80) return { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500/20", bgLight: "bg-blue-500/10", label: "High" };
     if (probability >= 60) return { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500/20", bgLight: "bg-blue-500/10", label: "Medium" };
     return { bg: "bg-amber-500", text: "text-amber-500", border: "border-amber-500/20", bgLight: "bg-amber-500/10", label: "Low" };
   };
@@ -94,7 +94,7 @@ const BankComparisonTable = ({
                   {/* Decision Anchoring Tags */}
                   <div className="flex flex-wrap gap-2 mb-1.5">
                     {offer.recommended && (
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#7c3aed]/10 border border-[#7c3aed]/20 text-[10px] font-bold tracking-widest uppercase text-[#7c3aed]">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#103783]/10 border border-[#103783]/20 text-[10px] font-bold tracking-widest uppercase text-[#103783]">
                         Lowest EMI
                       </div>
                     )}
@@ -116,7 +116,7 @@ const BankComparisonTable = ({
               <div className="w-full xl:w-[45%] grid grid-cols-3 gap-4 xl:gap-8 border-y xl:border-y-0 xl:border-x border-border py-5 xl:py-0 xl:px-8 relative z-10">
                 {/* Primary Metric: EMI (Decision Anchor) */}
                 <div className="flex flex-col justify-center xl:border-r border-border xl:pr-6 col-span-2 xl:col-span-1">
-                  <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-primary dark:text-[#7c3aed] mb-1">Monthly EMI</p>
+                  <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-primary dark:text-[#103783] mb-1">Monthly EMI</p>
                   <p className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{formatCurrency(offer.emi)}</p>
                 </div>
                 
@@ -162,7 +162,7 @@ const BankComparisonTable = ({
                       "flex-1 group relative overflow-hidden rounded-xl text-sm md:text-base font-medium py-6 transition-all duration-300 hover:scale-[1.02]",
                       offer.recommended 
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)]" 
-                        : "bg-transparent border border-primary/30 dark:border-[#7c3aed]/30 hover:bg-primary/5 dark:hover:bg-[#7c3aed]/10 text-primary dark:text-[#7c3aed]"
+                        : "bg-transparent border border-primary/30 dark:border-[#103783]/30 hover:bg-primary/5 dark:hover:bg-[#103783]/10 text-primary dark:text-[#103783]"
                     )}
                   >
                     {/* Apple-style Shimmer on Recommended Button */}

@@ -8,10 +8,10 @@
   h1, h2, h3 { font-family: "Space Grotesk", system-ui, sans-serif; }
 
   :root {
-    /* --- BRAND IDENTITY: Purple & Gold (Bank Grade) --- */
+    /* --- BRAND IDENTITY: Pryme Blue & Gold (Bank Grade) --- */
     
-    /* Background: Clean White */
-    --background: 0 0% 100%;
+    /* Background: Pryme Light Grey #F6F6F6 */
+    --background: 0 0% 96.5%;
     --foreground: 222 47% 11%;
 
     /* Card: Pure White */
@@ -21,9 +21,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary: PRYME Purple (#7c3aed) */
-    /* HSL: 263deg, 70%, 58% */
-    --primary: 263 70% 58%;
+    /* Primary: PRYME Deep Blue (#103783) */
+    /* HSL: 216deg, 77%, 30% */
+    --primary: 216 77% 30%;
     --primary-foreground: 0 0% 100%;
 
     /* Accent: Premium Gold (#ffd600) - For Rewards/VIP */
@@ -55,8 +55,8 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     
-    /* Focus Rings (Purple) */
-    --ring: 263 70% 58%;
+    /* Focus Rings (Pryme Blue) */
+    --ring: 216 77% 30%;
 
     --radius: 0.75rem;
   }
@@ -122,7 +122,7 @@
   }
   
   .glass-card:hover {
-    @apply bg-white/90 shadow-lg border-violet-200/50 -translate-y-1;
+    @apply bg-white/90 shadow-lg border-blue-200/50 -translate-y-1;
   }
   
   .custom-scrollbar::-webkit-scrollbar {
@@ -137,12 +137,12 @@
     border-radius: 8px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(124, 58, 237, 0.5);
+    background: rgba(16, 55, 131, 0.5);
   }
 
   /* --- Typography Gradients --- */
   .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-violet-600 to-purple-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#103783] via-[#9BAFD9] to-[#103783];
   }
 
   .text-gradient-gold {
@@ -150,7 +150,7 @@
   }
 
   .text-gradient-shimmer {
-    @apply bg-clip-text text-transparent bg-[linear-gradient(110deg,#7c3aed,45%,#c4b5fd,55%,#7c3aed)] bg-[length:250%_100%] animate-shimmer;
+    @apply bg-clip-text text-transparent bg-[linear-gradient(110deg,#103783,45%,#9BAFD9,55%,#103783)] bg-[length:250%_100%] animate-shimmer;
   }
 
   /* --- Button Systems --- */
@@ -159,7 +159,7 @@
   }
   
   .btn-primary-glow {
-    @apply bg-primary text-primary-foreground shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:bg-[#6d28d9] transition-all duration-300;
+    @apply bg-primary text-primary-foreground shadow-lg shadow-blue-700/25 hover:shadow-blue-700/40 hover:bg-[#0c2a66] transition-all duration-300;
   }
 
   /* --- Infinite Marquee (Bank Logos) --- */
@@ -179,14 +179,14 @@
 
   /* --- Form Inputs --- */
   .input-modern {
-    @apply bg-white/80 border-slate-200 focus:border-[#7c3aed] focus:ring-4 focus:ring-violet-500/10 transition-all duration-200 rounded-xl placeholder:text-slate-400;
+    @apply bg-white/80 border-slate-200 focus:border-[#103783] focus:ring-4 focus:ring-blue-700/10 transition-all duration-200 rounded-xl placeholder:text-slate-400;
   }
 }
 
 @layer utilities {
   /* --- 🧠 Holographic Typography (For High-Value Stats) --- */
   .holographic-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-[#7c3aed] to-violet-400 animate-pulse bg-[length:200%_auto];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#103783] via-[#9BAFD9] to-[#103783] animate-pulse bg-[length:200%_auto];
   }
 
   /* --- Animations & Keyframes --- */

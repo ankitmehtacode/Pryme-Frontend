@@ -94,7 +94,7 @@ const TestimonialsSlider = () => {
             </span>
           </div>
           <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-white mb-6 tracking-tighter">
-            Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-400">Thousands.</span>
+            Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Thousands.</span>
           </h2>
           <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium">
             See what our customers have to say about their experience with the PRYME financial algorithm.

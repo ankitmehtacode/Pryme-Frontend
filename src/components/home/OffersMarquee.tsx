@@ -11,11 +11,11 @@ import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 
 const offers = [
-  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: null, color: "text-violet-500" },
+  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: null, color: "text-blue-500" },
   { id: 2, bank: "ICICI", text: "Zero Processing Fee for Salaried Pros", icon: Tag, logo: iciciLogo, color: "text-blue-500" },
   { id: 3, bank: "AXIS", text: "Instant Disbursal in 2 Hours", icon: Zap, logo: axisLogo, color: "text-amber-500" },
-  { id: 4, bank: "TATA", text: "Flat ₹5,000 Voucher on LAP", icon: Gift, logo: tataLogo, color: "text-purple-500" },
-  { id: 5, bank: "KOTAK", text: "Kotak Home Loan starting at 8.35%", icon: Sparkles, logo: kotakLogo, color: "text-violet-500" },
+  { id: 4, bank: "TATA", text: "Flat ₹5,000 Voucher on LAP", icon: Gift, logo: tataLogo, color: "text-blue-700" },
+  { id: 5, bank: "KOTAK", text: "Kotak Home Loan starting at 8.35%", icon: Sparkles, logo: kotakLogo, color: "text-blue-500" },
   { id: 6, bank: "YES", text: "Yes Bank Pre-Approved Credit Cards", icon: Star, logo: yesLogo, color: "text-blue-500" },
   { id: 7, bank: "PNB", text: "PNB Lowest Auto Loan Rates", icon: Car, logo: pnbLogo, color: "text-amber-500" },
 ];
@@ -28,35 +28,63 @@ const OffersMarquee = () => {
       <div className="absolute top-0 right-0 w-16 md:w-32 h-full bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none" />
 
       <div className="relative flex w-full max-w-[100vw]">
-        <div className="flex whitespace-nowrap animate-marquee hover:[animation-play-state:paused] items-center min-w-[200%]">
-          {/* Duplicate the array multipe times for an infinite seamless loop */}
-          {[...offers, ...offers, ...offers, ...offers].map((offer, index) => {
-            const Icon = offer.icon;
-            return (
-              <div 
-                key={index} 
-                className="flex items-center gap-2.5 mx-8 shrink-0 group cursor-pointer h-10"
-              >
-                {/* Logo or Icon */}
-                <div className="flex items-center justify-center h-full min-w-[3.5rem] px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-slate-700">
-                  {offer.logo ? (
-                     <img 
-                       src={offer.logo} 
-                       alt={offer.bank} 
-                       className="h-5 w-auto object-contain dark:brightness-0 dark:invert opacity-80 group-hover:opacity-100 transition-opacity" 
-                     />
-                  ) : (
-                     <Icon className={`w-5 h-5 ${offer.color} opacity-80 group-hover:opacity-100`} />
-                  )}
+        <div className="flex w-full group overflow-hidden">
+          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around gap-8 px-4 group-hover:[animation-play-state:paused] h-16">
+            {offers.map((offer, index) => {
+              const Icon = offer.icon;
+              return (
+                <div 
+                  key={`track1-${index}`} 
+                  className="flex items-center gap-2.5 shrink-0 hover:scale-[1.02] cursor-pointer h-10 transition-transform"
+                >
+                  <div className="flex items-center justify-center h-full min-w-[3.5rem] px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover/item:bg-white dark:group-hover/item:bg-slate-700">
+                    {offer.logo ? (
+                       <img 
+                         src={offer.logo} 
+                         alt={offer.bank} 
+                         className="h-5 w-auto object-contain dark:brightness-0 dark:invert opacity-80 group-hover/item:opacity-100 transition-opacity" 
+                       />
+                    ) : (
+                       <Icon className={`w-5 h-5 ${offer.color} opacity-80 group-hover/item:opacity-100`} />
+                    )}
+                  </div>
+                  
+                  <span className="text-sm md:text-base font-bold text-muted-foreground tracking-wide uppercase hover:text-primary transition-colors">
+                    {offer.text}
+                  </span>
+                  <span className="ml-8 text-slate-300 dark:text-slate-700 font-bold">•</span>
                 </div>
-                
-                <span className="text-sm md:text-base font-bold text-muted-foreground tracking-wide uppercase group-hover:text-primary transition-colors">
-                  {offer.text}
-                </span>
-                <span className="mx-6 text-slate-300 dark:text-slate-700 font-bold">•</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around gap-8 px-4 group-hover:[animation-play-state:paused] h-16">
+            {offers.map((offer, index) => {
+              const Icon = offer.icon;
+              return (
+                <div 
+                  key={`track2-${index}`} 
+                  className="flex items-center gap-2.5 shrink-0 hover:scale-[1.02] cursor-pointer h-10 transition-transform"
+                >
+                  <div className="flex items-center justify-center h-full min-w-[3.5rem] px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover/item:bg-white dark:group-hover/item:bg-slate-700">
+                    {offer.logo ? (
+                       <img 
+                         src={offer.logo} 
+                         alt={offer.bank} 
+                         className="h-5 w-auto object-contain dark:brightness-0 dark:invert opacity-80 group-hover/item:opacity-100 transition-opacity" 
+                       />
+                    ) : (
+                       <Icon className={`w-5 h-5 ${offer.color} opacity-80 group-hover/item:opacity-100`} />
+                    )}
+                  </div>
+                  
+                  <span className="text-sm md:text-base font-bold text-muted-foreground tracking-wide uppercase hover:text-primary transition-colors">
+                    {offer.text}
+                  </span>
+                  <span className="ml-8 text-slate-300 dark:text-slate-700 font-bold">•</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

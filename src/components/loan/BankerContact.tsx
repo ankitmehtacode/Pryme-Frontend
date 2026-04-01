@@ -58,8 +58,8 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
           </div>
           
           {/* Live 'Online' pulsing dot */}
-          <div className="absolute bottom-1 right-1 w-6 h-6 bg-violet-500 border-[3px] border-white dark:border-[#0a0a0a] rounded-full z-20 shadow-sm flex items-center justify-center">
-             <span className="absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75 animate-ping" />
+          <div className="absolute bottom-1 right-1 w-6 h-6 bg-blue-500 border-[3px] border-white dark:border-[#0a0a0a] rounded-full z-20 shadow-sm flex items-center justify-center">
+             <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
           </div>
         </div>
         
@@ -67,7 +67,7 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
         <p className="text-xs font-medium text-primary uppercase tracking-widest mt-1.5 mb-3">{banker.designation}</p>
         
         <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 border border-border text-[10px] font-medium text-slate-600 dark:text-slate-400 shadow-sm">
-          <ShieldCheck className="w-3 h-3 text-violet-500" /> Secure Line Active
+          <ShieldCheck className="w-3 h-3 text-blue-500" /> Secure Line Active
         </div>
       </div>
 
@@ -93,7 +93,7 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
           <Phone className="w-4 h-4 mr-2" /> Call Now
         </Button>
         <Button variant="outline" className="w-full py-6 rounded-xl bg-secondary/50 hover:bg-slate-100 dark:hover:bg-white/10 border-border text-foreground font-medium backdrop-blur-md transition-all duration-300 hover:scale-[1.02] shadow-sm">
-          <MessageSquare className="w-4 h-4 mr-2 text-violet-500" /> WhatsApp
+          <MessageSquare className="w-4 h-4 mr-2 text-blue-500" /> WhatsApp
         </Button>
       </div>
     </div>

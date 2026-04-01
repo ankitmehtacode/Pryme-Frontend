@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
@@ -13,9 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import prymeLogo from "@/assets/pryme-typo-logo.svg";
+import pryme2Logo from "@/assets/Pryme2.svg";
 
 // 🧠 Closed-Loop Security Context & API
 import { useAuth } from "@/contexts/AuthContext";
+
+// Removed native canvas background for static minimalist layout
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -91,15 +95,15 @@ const Auth = () => {
     
     if (error) {
       toast({
-        title: "Access Denied",
-        description: error.message || "Invalid secure credentials.",
+        title: "Login Failed",
+        description: error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
       loginForm.setValue("password", ""); 
     } else {
       toast({
-        title: "Session Authorized",
-        description: "Welcome back to the Pryme CRM system. Booting matrix...",
+        title: "Welcome Back",
+        description: "Successfully logged into your Pryme account.",
       });
     }
     
@@ -123,8 +127,8 @@ const Auth = () => {
       });
     } else {
       toast({
-        title: "Identity Established",
-        description: "Session securely authorized. Warping to Dashboard...",
+        title: "Account Created",
+        description: "Welcome to Pryme! Redirecting to your dashboard...",
       });
     }
     
@@ -157,8 +161,18 @@ const Auth = () => {
 
   if (isContextLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F4F7FA] relative overflow-hidden">
+        <motion.div 
+          animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }} 
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="relative z-10 flex flex-col items-center"
+        >
+          <img src={pryme2Logo} className="w-20 h-auto sm:w-28 drop-shadow-xl mb-10" alt="Pryme Logo" />
+          <div className="flex flex-col items-center gap-3">
+             <Loader2 className="w-5 h-5 text-[#103783] animate-spin" />
+             <p className="text-[10px] sm:text-[11px] font-extrabold text-[#103783] tracking-[0.3em] uppercase">Authenticating</p>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -166,416 +180,300 @@ const Auth = () => {
   return (
     <>
       <Helmet>
-        <title>{view === "login" ? "Secure Login" : view === "signup" ? "Sign Up" : "Reset Access"} | PYRME Consulting</title>
-        <meta name="description" content="Secure portal to access your PYRME Consulting dashboard." />
+        <title>{view === "login" ? "Log in" : view === "signup" ? "Get Started" : "Reset Password"} | Pryme</title>
+        <meta name="description" content="Log in to manage your Pryme capital and loan applications." />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      {/* GLOBAL CINEMATIC LIGHT GLASS CANVAS */}
-      <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500/20">
-        
-        {/* Background Gradients & Physics */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          {/* Base Noise Grain */}
-          <div 
-            className="absolute inset-0 mix-blend-overlay opacity-10"
-            style={{ 
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
-            }}
-          />
-          {/* Liquid Aurora Orbs - Light theme colors */}
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.4, 0.3],
-              x: ["-10%", "10%", "-10%"]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-300/40 blur-[120px]"
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.3, 0.2],
-              y: ["-10%", "10%", "-10%"]
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[70%] rounded-full bg-emerald-300/30 blur-[120px]"
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.2, 0.3, 0.2]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[30%] left-[40%] w-[40%] h-[40%] rounded-full bg-rose-300/30 blur-[120px]"
-          />
-          {/* Global Ambient Glow  */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-slate-50/70 to-slate-100/80" />
-        </div>
+      {/* 0.01% TIER GLASSMORPHIC PREMIUM FINTECH BACKGROUND */}
+      <div 
+        className="min-h-[100dvh] w-full relative flex items-center justify-center bg-[#F4F7FA] font-sans text-slate-900 p-4 sm:p-6 md:p-8 overflow-hidden"
+      >
+        {/* High-End Dotted Mesh SVG Grid with Edge Fading */}
+        <div 
+          className="absolute inset-0 z-0 opacity-80"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%23103783' fill-opacity='0.15'/%3E%3C/svg%3E")`,
+            backgroundSize: '24px 24px',
+            WebkitMaskImage: 'radial-gradient(circle at center, black 0%, transparent 80%)',
+            maskImage: 'radial-gradient(circle at center, black 0%, transparent 95%)'
+          }}
+        />
 
-        {/* MAIN SPLIT LAYOUT */}
-        <div className="relative z-10 w-full sm:w-[95%] max-w-[1400px] min-h-[100vh] sm:min-h-[700px] flex sm:rounded-[40px] overflow-hidden sm:border border-white/60 shadow-[0_12px_48px_rgba(0,0,0,0.06)] backdrop-blur-3xl bg-white/40">
+        {/* Abstract Cinematic Glassmorphic Energy Blobs (Animated via Framer Motion) */}
+        <motion.div 
+          className="absolute top-[0%] left-[0%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-gradient-to-br from-[#10B981] to-[#1E4DAB] rounded-full mix-blend-multiply filter blur-[100px] md:blur-[140px] opacity-60"
+          animate={{ x: [0, 100, -50, 0], y: [0, -50, 100, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-[0%] right-[0%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] bg-gradient-to-tl from-[#103783] to-[#10B981] rounded-full mix-blend-multiply filter blur-[120px] md:blur-[160px] opacity-50"
+          animate={{ x: [0, -120, 80, 0], y: [0, 80, -100, 0], scale: [1, 1.15, 0.85, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute top-[25%] left-[30%] w-[350px] md:w-[500px] h-[350px] md:h-[500px] bg-[#DBEAFE] rounded-full mix-blend-multiply filter blur-[80px] md:blur-[100px] opacity-70"
+          animate={{ x: [0, 80, -90, 0], y: [0, 120, -60, 0], scale: [1, 0.9, 1.1, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        
+        {/* MAIN SPLIT CARD - Flawless Glassmorphism & Micro-animations */}
+        <motion.div 
+          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] sm:rounded-[32px] shadow-[0_24px_60px_rgba(16,55,131,0.15),0_0_0_1px_rgba(255,255,255,0.6)_inset] flex flex-col lg:flex-row overflow-hidden bg-white/10 backdrop-blur-[40px] saturate-[1.2] z-10"
+          initial={{ opacity: 0, scale: 0.96, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }} // Hyper-smooth spring curve
+        >
           
           {/* ========================================================= */}
-          {/* LEFT PANEL: 3D Finance Vector Showcase */}
+          {/* LEFT PANEL: High-Fidelity Photography & Glass Overlay */}
           {/* ========================================================= */}
-          <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative border-r border-slate-200/50">
-            {/* Logo */}
-            <div className="flex justify-start">
-               <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate("/")}>
-                 <div className="w-12 h-12 rounded-2xl bg-white/80 border border-slate-200 flex items-center justify-center backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] group-hover:bg-white transition-all">
-                   <Building2 className="w-6 h-6 text-slate-800" />
-                 </div>
-                 <div>
-                   <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                     PYRME <Sparkles className="w-4 h-4 text-emerald-500" />
-                   </h1>
-                   <p className="text-[10px] tracking-[0.3em] text-slate-500 uppercase font-medium">CONSULTING</p>
-                 </div>
-               </div>
+          <div className="relative hidden w-full lg:flex lg:w-1/2 flex-col items-center justify-center p-14 overflow-hidden border-r border-white/20">
+            {/* Cinematic Background Image */}
+            <img 
+              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" 
+              alt="Pryme Finance Corporate" 
+              className="absolute inset-0 w-full h-full object-cover z-0 scale-105" 
+            />
+            
+            {/* Elegant Glassmorphic Pryme Overlay with Heavy Fade */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/90 via-[#103783]/70 to-[#10B981]/50 mix-blend-multiply z-0"></div>
+            <div className="absolute inset-0 bg-[#103783]/30 backdrop-blur-[4px] z-0"></div>
+
+            {/* Logo Centralized (White version over dark overlay) */}
+            <div className="relative z-10 flex flex-col items-center cursor-pointer mb-2 drop-shadow-2xl" onClick={() => navigate("/")}>
+               <img 
+                 src={prymeLogo} 
+                 alt="Pryme Logo" 
+                 className="h-[64px] w-auto transition-duration-500 hover:scale-110 hover:-translate-y-1" 
+                 style={{ filter: 'brightness(0) invert(1) drop-shadow(0px 8px 16px rgba(0,0,0,0.6))' }} 
+               /> 
             </div>
 
-            {/* Floating 3D Graphic Cluster */}
-            <div className="relative w-full aspect-square max-h-[400px] my-auto flex items-center justify-center pointer-events-none">
-                
-                {/* Back Shield */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 30, rotate: -5 }} animate={{ opacity: 1, y: 0, rotate: -10 }} transition={{ duration: 1.5, delay: 0.2 }}
-                  className="absolute right-6 top-6 w-40 h-40 rounded-3xl bg-white/80 border border-white backdrop-blur-xl flex items-center justify-center shadow-[0_12px_32px_rgba(244,63,94,0.08)] transform -rotate-12"
-                >
-                   <ShieldCheck className="w-16 h-16 text-rose-500 drop-shadow-sm" strokeWidth={1.5} />
-                </motion.div>
+            {/* Premium Typography Tagline */}
+            <p className="relative z-10 mt-8 text-white font-medium text-[16px] leading-[1.6] text-center max-w-[340px] tracking-wide opacity-95 drop-shadow-md">
+               Experience the future of financial agility. Extremely secure, seamless, and uniquely yours.
+               <br/><br/><span className="text-[#10B981] font-bold tracking-[0.25em] text-[10px] uppercase drop-shadow-[0_0_12px_rgba(16,185,129,0.8)]">Powering Innovation</span>
+            </p>
 
-                {/* Left Wallet */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -30, rotate: 10 }} animate={{ opacity: 1, x: 0, rotate: 5 }} transition={{ duration: 1.5, delay: 0.4 }}
-                  className="absolute left-0 bottom-16 w-36 h-36 rounded-3xl bg-white/80 border border-white backdrop-blur-xl flex items-center justify-center shadow-[0_12px_32px_rgba(16,185,129,0.08)]"
-                >
-                   <Wallet className="w-14 h-14 text-emerald-500 drop-shadow-sm" strokeWidth={1.5} />
-                </motion.div>
-
-                {/* Center Main Card */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1.5, delay: 0.6, type: "spring" }}
-                  className="relative z-10 w-64 h-80 rounded-[32px] bg-gradient-to-br from-white/90 to-white/60 border border-white backdrop-blur-3xl shadow-[0_24px_64px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] flex flex-col p-8 overflow-hidden"
-                >
-                   {/* Card Specular Glare */}
-                   <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-white/80 to-transparent opacity-60 pointer-events-none" />
-                   
-                   <TrendingUp className="w-12 h-12 text-indigo-500 mb-6 drop-shadow-sm" strokeWidth={1.5} />
-                   <h3 className="text-2xl font-bold leading-tight text-slate-900 relative z-10">
-                     Scale Your<br/>Capital.
-                   </h3>
-                   <div className="mt-auto space-y-3 relative z-10">
-                      <div className="h-1.5 w-full bg-slate-200 rounded-full" />
-                      <div className="h-1.5 w-2/3 bg-slate-200 rounded-full" />
-                   </div>
-                </motion.div>
-            </div>
-
-            {/* Bottom Copy */}
-            <div>
-              <p className="text-sm text-slate-500 font-medium tracking-wide">Over <span className="text-slate-900 font-bold">10,000+</span> secured applications processed.</p>
+            {/* Subtle Footer Links */}
+            <div className="absolute bottom-10 flex gap-6 text-[10px] font-bold text-white/80 uppercase tracking-widest z-10">
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">About</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Privacy</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Terms</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">FAQ</span>
             </div>
           </div>
           
           {/* ========================================================= */}
-          {/* RIGHT PANEL: Volumetric Glass Auth Card */}
+          {/* RIGHT PANEL: Auth Form Overlay */}
           {/* ========================================================= */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16 relative">
-             <div className="w-full max-w-[420px] relative z-10">
+          <div className="w-full lg:w-1/2 bg-white/70 backdrop-blur-[20px] shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
+             
+             <div className="w-full max-w-[320px] z-10 flex flex-col w-[100%] items-stretch">
                 {/* Mobile Header (Hidden on LG) */}
-                <div className="lg:hidden flex items-center gap-3 justify-center cursor-pointer mb-10 group" onClick={() => navigate("/")}>
-                 <div className="w-10 h-10 rounded-xl bg-white/80 border border-white flex items-center justify-center backdrop-blur-md shadow-sm">
-                   <Building2 className="w-5 h-5 text-slate-900" />
-                 </div>
-                 <div>
-                   <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-                     PYRME <Sparkles className="w-3 h-3 text-emerald-500" />
-                   </h1>
-                   <p className="text-[9px] tracking-[0.3em] text-slate-500 uppercase font-medium">CONSULTING</p>
-                 </div>
+                <div className="lg:hidden flex justify-center cursor-pointer mb-8 sm:mb-10" onClick={() => navigate("/")}>
+                   <img src={prymeLogo} alt="Pryme Logo" className="h-[34px] sm:h-8 auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
                 </div>
 
-                {/* Form Container */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-                  className="rounded-[32px] bg-white/60 backdrop-blur-[60px] border border-white p-8 shadow-[0_12px_48px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)] relative overflow-hidden"
-                >
-                  {/* Subtle Top Glare */}
-                  <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
-
-                  <AnimatePresence mode="wait">
-                    {view === "forgot-password" ? (
-                      <motion.div
-                        key="fp"
-                        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
+                {/* Premium Segmented Control Auth Toggle (In Flow) */}
+                {view !== "forgot-password" && (
+                   <div className="w-full flex p-1 mb-8 bg-black/5 border border-black/5 backdrop-blur-md rounded-full relative z-20">
+                      <button 
+                        onClick={() => setView("login")} 
+                        className={cn("relative z-10 flex-1 h-[36px] sm:h-[40px] flex items-center justify-center text-[11px] sm:text-xs font-extrabold rounded-full transition-colors uppercase tracking-wider", view === "login" ? "text-white" : "text-slate-500 hover:text-slate-800")}
                       >
-                        <button 
-                          onClick={() => setView("login")}
-                          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6 transition-colors"
-                        >
-                          <ArrowLeft className="w-4 h-4" />
-                          Back to Login
-                        </button>
-                        <h2 className="text-2xl font-semibold text-slate-900 mb-2">Reset Password</h2>
-                        <p className="text-slate-600 mb-8 text-sm">
-                          Enter your email and we'll send you a secure reset link.
-                        </p>
+                        {view === "login" && (
+                          <motion.div layoutId="auth-toggle-pill" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="absolute inset-0 bg-[#103783] rounded-full shadow-md -z-10" />
+                        )}
+                        Log in
+                      </button>
+                      <button 
+                        onClick={() => setView("signup")} 
+                        className={cn("relative z-10 flex-1 h-[36px] sm:h-[40px] flex items-center justify-center text-[11px] sm:text-xs font-extrabold rounded-full transition-colors uppercase tracking-wider", view === "signup" ? "text-white" : "text-slate-500 hover:text-slate-800")}
+                      >
+                        {view === "signup" && (
+                          <motion.div layoutId="auth-toggle-pill" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="absolute inset-0 bg-[#10B981] rounded-full shadow-md -z-10" />
+                        )}
+                        Register
+                      </button>
+                   </div>
+                )}
 
-                        <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-5">
-                          <div className="space-y-2">
-                            <Label className="text-sm font-semibold text-slate-700">Email</Label>
-                            <div className="relative group">
-                              <Input
-                                type="email"
-                                placeholder="admin@pryme.in"
-                                className="h-11 bg-white/80 border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-400 shadow-sm rounded-xl transition-all"
-                                {...forgotPasswordForm.register("email")}
-                              />
-                              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                            </div>
-                            {forgotPasswordForm.formState.errors.email && (
-                              <p className="text-xs text-rose-500">{forgotPasswordForm.formState.errors.email.message}</p>
+                <AnimatePresence mode="wait">
+                  {view === "forgot-password" ? (
+                    <motion.div key="fp" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
+                      <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-800 mb-6 transition-colors uppercase tracking-wider">
+                        <ArrowLeft className="w-3.5 h-3.5" /> Back
+                      </button>
+                      <h2 className="text-[24px] sm:text-[26px] font-extrabold text-[#103783] mb-2 tracking-tight">Reset Password</h2>
+                      <p className="text-slate-500 mb-8 text-[11px] sm:text-xs font-medium">Enter your email and we'll send a secure reset link.</p>
+
+                      <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-6">
+                        <div className="space-y-1">
+                          <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
+                          <Input
+                            type="email"
+                            placeholder="you@example.com"
+                            className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+                            {...forgotPasswordForm.register("email")}
+                          />
+                          {forgotPasswordForm.formState.errors.email && (
+                            <p className="text-[10px] text-rose-500 mt-1 pl-1">{forgotPasswordForm.formState.errors.email.message}</p>
+                          )}
+                        </div>
+                        <Button type="submit" disabled={isLoading} className="mt-8 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-0.5 transition-all duration-300 text-[12px] sm:text-[11px] uppercase" size="sm">
+                          {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : "Send Link"}
+                        </Button>
+                      </form>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="auth" initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: 0.3 }}>
+                      
+                      <h2 className="text-[28px] sm:text-[32px] font-black text-[#103783] mb-8 sm:mb-10 tracking-tight drop-shadow-sm">
+                        {view === "login" ? "Welcome Back" : "Create Account"}
+                      </h2>
+
+                      {view === "login" ? (
+                        <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-6">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
+                            <Input
+                              type="email"
+                              placeholder="admin@pryme.com"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+                              {...loginForm.register("email")}
+                            />
+                            {loginForm.formState.errors.email && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{loginForm.formState.errors.email.message}</p>
                             )}
                           </div>
 
-                          <Button type="submit" disabled={isLoading} className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all" size="lg">
-                            {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                            {isLoading ? "Sending..." : "Send Reset Link"}
-                            {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
-                          </Button>
-                        </form>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="auth"
-                        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}
-                      >
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2 text-center tracking-tight">
-                          {view === "login" ? "System Access" : "Create Account"}
-                        </h2>
-                        <p className="text-slate-600 text-center mb-6 text-sm">
-                          {view === "login"
-                            ? "Enter your secure credentials to proceed"
-                            : "Sign up to access exclusive capital"}
-                        </p>
-
-                        <div className="flex bg-slate-100/60 border border-slate-200 rounded-xl p-1 mb-6 shadow-inner">
-                          <button
-                            onClick={() => setView("login")}
-                            className={cn(
-                              "flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300",
-                              view === "login" ? "bg-white text-slate-900 shadow-sm border border-slate-200/60" : "text-slate-500 hover:text-slate-800"
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Password</Label>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                              {...loginForm.register("password")}
+                            />
+                            {loginForm.formState.errors.password && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{loginForm.formState.errors.password.message}</p>
                             )}
-                          >
-                            Sign In
-                          </button>
-                          <button
-                            onClick={() => setView("signup")}
-                            className={cn(
-                              "flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300",
-                              view === "signup" ? "bg-white text-slate-900 shadow-sm border border-slate-200/60" : "text-slate-500 hover:text-slate-800"
-                            )}
-                          >
-                            Register
-                          </button>
-                        </div>
+                          </div>
 
-                        {view === "login" ? (
-                          <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Email</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="email"
-                                  placeholder="admin@pryme.com"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...loginForm.register("email")}
-                                />
-                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                              </div>
-                              {loginForm.formState.errors.email && (
-                                <p className="text-xs text-rose-500 ml-1">{loginForm.formState.errors.email.message}</p>
+                          <div className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group">
+                             <div className="w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border border-[#10B981] flex items-center justify-center cursor-pointer transition-colors group-hover:bg-[#10B981]/10">
+                                <div className="w-2 h-2 rounded-[2px] bg-[#10B981]" />
+                             </div>
+                             <span className="text-[11px] sm:text-xs font-bold text-slate-500 cursor-pointer transition-colors group-hover:text-[#103783]">Keep me logged in</span>
+                          </div>
+
+                          <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">
+                            <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-[2px] transition-all duration-300 text-[12px] sm:text-[11px] uppercase flex items-center justify-center gap-2" size="sm">
+                              {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
+                                <>
+                                  Continue <ArrowRight className="w-4 h-4 ml-1" />
+                                </>
                               )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Password</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="password"
-                                  placeholder="••••••••"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 tracking-widest focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...loginForm.register("password")}
-                                />
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                              </div>
-                              {loginForm.formState.errors.password && (
-                                <p className="text-xs text-rose-500 ml-1">{loginForm.formState.errors.password.message}</p>
-                              )}
-                            </div>
-
-                            <div className="pt-2">
-                              <Button type="submit" disabled={isLoading} className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-[0_8px_16px_rgba(15,23,42,0.15)] hover:shadow-[0_8px_20px_rgba(15,23,42,0.2)] transition-all duration-300" size="lg">
-                                {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {isLoading ? "Authenticating..." : "Authorize Session"}
-                                {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
-                              </Button>
-                            </div>
+                            </Button>
                             
-                            <div className="flex justify-center pt-2">
-                               <Button type="button" variant="ghost" onClick={fillAdminCredentials} className="text-[10px] uppercase tracking-wider text-slate-500 hover:text-slate-900 hover:bg-slate-100 h-7 px-3 rounded-lg border border-slate-200 transition-colors">
-                                 <Code2 className="w-3 h-3 mr-2"/> Fill Admin Demo
-                               </Button>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => setView("forgot-password")}
-                              className="w-full text-center text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
-                            >
+                            <button type="button" onClick={() => setView("forgot-password")} className="text-[11px] sm:text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors pl-1">
                               Forgot Password?
                             </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5 sm:space-y-6">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Name</Label>
+                            <Input
+                              type="text"
+                              placeholder="John Doe"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+                              {...signupForm.register("fullName")}
+                            />
+                            {signupForm.formState.errors.fullName && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.fullName.message}</p>
+                            )}
+                          </div>
 
-                            <div className="relative my-4">
-                              <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-slate-200"></div>
-                              </div>
-                              <div className="relative flex justify-center text-xs">
-                                <span className="bg-transparent backdrop-blur-3xl px-4 text-slate-500 font-medium">or</span>
-                              </div>
-                            </div>
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
+                            <Input
+                              type="email"
+                              placeholder="you@email.com"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+                              {...signupForm.register("email")}
+                            />
+                            {signupForm.formState.errors.email && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.email.message}</p>
+                            )}
+                          </div>
 
-                            <Button
-                              type="button"
-                              onClick={handleGoogleSignIn}
-                              disabled={isLoading}
-                              variant="outline"
-                              className="w-full h-11 flex items-center justify-center gap-3 bg-white text-slate-800 border-slate-200 hover:bg-slate-50 transition-all rounded-xl shadow-sm"
-                            >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                              </svg>
-                              Continue with Google
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pass</Label>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                              {...signupForm.register("password")}
+                            />
+                            {signupForm.formState.errors.password && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.password.message}</p>
+                            )}
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Confirm</Label>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                              {...signupForm.register("confirmPassword")}
+                            />
+                            {signupForm.formState.errors.confirmPassword && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.confirmPassword.message}</p>
+                            )}
+                          </div>
+
+                          <div className="pt-6 flex flex-col items-start w-full">
+                            <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-[2px] transition-all duration-300 text-[12px] sm:text-[11px] uppercase flex items-center justify-center gap-2" size="sm">
+                              {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
+                                <>
+                                  Create Account <ArrowRight className="w-4 h-4 ml-1" />
+                                </>
+                              )}
                             </Button>
-                          </form>
-                        ) : (
-                          <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Full Name</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="text"
-                                  placeholder="John Doe"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 focus-visible:ring-1 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...signupForm.register("fullName")}
-                                />
-                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                              </div>
-                              {signupForm.formState.errors.fullName && (
-                                <p className="text-xs text-rose-500 ml-1">{signupForm.formState.errors.fullName.message}</p>
-                              )}
-                            </div>
+                          </div>
+                        </form>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Email</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="email"
-                                  placeholder="you@example.com"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 focus-visible:ring-1 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...signupForm.register("email")}
-                                />
-                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                              </div>
-                              {signupForm.formState.errors.email && (
-                                <p className="text-xs text-rose-500 ml-1">{signupForm.formState.errors.email.message}</p>
-                              )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Password</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="password"
-                                  placeholder="••••••••"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 tracking-widest focus-visible:ring-1 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...signupForm.register("password")}
-                                />
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                              </div>
-                              {signupForm.formState.errors.password && (
-                                <p className="text-xs text-rose-500 ml-1">{signupForm.formState.errors.password.message}</p>
-                              )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-slate-700 ml-1">Confirm Password</Label>
-                              <div className="relative group">
-                                <Input
-                                  type="password"
-                                  placeholder="••••••••"
-                                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 pl-10 tracking-widest focus-visible:ring-1 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-xl transition-all"
-                                  {...signupForm.register("confirmPassword")}
-                                />
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                              </div>
-                              {signupForm.formState.errors.confirmPassword && (
-                                <p className="text-xs text-rose-500 ml-1">{signupForm.formState.errors.confirmPassword.message}</p>
-                              )}
-                            </div>
-
-                            <div className="pt-2">
-                              <Button type="submit" disabled={isLoading} className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-[0_8px_16px_rgba(15,23,42,0.15)] hover:shadow-[0_8px_20px_rgba(15,23,42,0.2)] transition-all duration-300" size="lg">
-                                {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {isLoading ? "Creating account..." : "Create Account"}
-                                {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
-                              </Button>
-                            </div>
-
-                            <div className="relative my-4">
-                              <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-slate-200"></div>
-                              </div>
-                              <div className="relative flex justify-center text-xs">
-                                <span className="bg-transparent backdrop-blur-3xl px-4 text-slate-500 font-medium">or</span>
-                              </div>
-                            </div>
-
-                            <Button
-                              type="button"
-                              onClick={handleGoogleSignIn}
-                              disabled={isLoading}
-                              variant="outline"
-                              className="w-full h-11 flex items-center justify-center gap-3 bg-white text-slate-800 border-slate-200 hover:bg-slate-50 transition-all rounded-xl shadow-sm"
-                            >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                              </svg>
-                              Continue with Google
-                            </Button>
-                          </form>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                {/* Fintech Trust Signals */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="mt-8 pt-6 border-t border-slate-200 flex flex-col items-center gap-2"
+                >
+                   <div className="flex items-center justify-center gap-3 sm:gap-4 w-full">
+                     <div className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+                        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-slate-400 uppercase mt-[1px]">RBI Compliant</span>
+                     </div>
+                     <div className="w-[3px] h-[3px] rounded-full bg-slate-300"></div>
+                     <div className="flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-[#103783]/50" />
+                        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-slate-400 uppercase mt-[1px]">SHA-256 Secure</span>
+                     </div>
+                   </div>
                 </motion.div>
-
-                <p className="text-center text-[10px] text-slate-400 mt-8 font-mono uppercase tracking-wider">
-                  Protected by Pryme Code X Architecture.<br />
-                  By continuing, you agree to our Terms of Service.
-                </p>
              </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </>
   );

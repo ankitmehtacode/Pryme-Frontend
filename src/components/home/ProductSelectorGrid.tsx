@@ -125,7 +125,7 @@ const ProductSelectorGrid = memo(() => {
                   {/* Ribbon Tag (Floats safely above without clipping) */}
                   {product.tag && (
                     <div 
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2e1065] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300 group-hover:-translate-y-1"
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300 group-hover:-translate-y-1"
                       style={{ transform: "translateZ(20px) translateX(-50%)" }} 
                     >
                       {product.tag}
@@ -159,11 +159,11 @@ const ProductSelectorGrid = memo(() => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block text-[9px] font-medium text-[#7c3aed] uppercase tracking-[0.3em] bg-[#7c3aed]/10 border border-[#7c3aed]/20 px-3 py-1 rounded-full mb-3">
+          <span className="inline-block text-[9px] font-medium text-[#103783] uppercase tracking-[0.3em] bg-[#103783]/10 border border-[#103783]/20 px-3 py-1 rounded-full mb-3">
             Our Products
           </span>
           <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-3 uppercase leading-none">
-            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-violet-400">Loan.</span>
+            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
           </h2>
           <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-lg mx-auto">
             Competitive rates from 15+ banks. Select your product to get started in minutes.

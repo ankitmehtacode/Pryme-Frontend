@@ -33,7 +33,7 @@ const initialOffers = [
     tag: "FAST TRACK APPROVAL", icon: Sparkles,
     aurora1: "#f472b6", // Pink orb
     aurora2: "#fb7185", // Rose orb
-    aurora3: "#c084fc", // Purple orb
+    aurora3: "#9BAFD9", // Purple orb
     accentColor: "#ec4899",   
     bgIcons: [TrendingUp, WalletCards] 
   },
@@ -55,7 +55,7 @@ const marqueeOffers = [
   { text: "10.15%* on Union Bank", color: "#10b981" },
   { text: "Pre-Approved ₹50L Axis", color: "#ec4899" },
   { text: "Public Trust via Union", color: "#059669" },
-  { text: "Zero Documentation", color: "#8b5cf6" },
+  { text: "Zero Documentation", color: "#103783" },
   { text: "4hr Disbursal", color: "#06b6d4" },
   { text: "No Pre-closure Fee", color: "#f59e0b" },
   { text: "Salary A/C Special", color: "#ec4899" },
@@ -354,18 +354,32 @@ const HeroSection = memo(() => {
           <div className="absolute top-0 left-0 w-24 md:w-40 h-full bg-gradient-to-r from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-bl-[32px] md:rounded-bl-[40px] mix-blend-overlay" />
           <div className="absolute top-0 right-0 w-24 md:w-40 h-full bg-gradient-to-l from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-br-[32px] md:rounded-br-[40px] mix-blend-overlay" />
           
-          <div className="hero-marquee-track flex items-center py-2.5 gap-3 md:gap-4 px-4 overflow-hidden">
-            <div className="flex animate-[marquee_35s_linear_infinite] whitespace-nowrap gap-3 md:gap-4 hover:[animation-play-state:paused]">
-              {[...marqueeOffers, ...marqueeOffers].map((o, i) => (
+          <div className="hero-marquee-track flex py-2.5 overflow-hidden group">
+            <div className="flex shrink-0 animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2">
+              {marqueeOffers.map((o, i) => (
                 <div 
-                  key={`${o.text}-${i}`} 
-                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/40 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-md hover:-translate-y-0.5 hover:bg-white/60 transition-all duration-300 cursor-default group"
+                  key={`track1-${o.text}-${i}`} 
+                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/40 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-md hover:-translate-y-0.5 hover:bg-white/60 transition-all duration-300 cursor-default"
                 >
                   <span 
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.2)] group-hover:scale-125 transition-transform" 
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.2)]" 
                     style={{ backgroundColor: o.color, boxShadow: `0 0 10px ${o.color}` }} 
                   />
-                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 group-hover:text-slate-900 tracking-wide transition-colors">{o.text}</span>
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">{o.text}</span>
+                </div>
+              ))}
+            </div>
+            <div aria-hidden="true" className="flex shrink-0 animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2">
+              {marqueeOffers.map((o, i) => (
+                <div 
+                  key={`track2-${o.text}-${i}`} 
+                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/40 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-md hover:-translate-y-0.5 hover:bg-white/60 transition-all duration-300 cursor-default"
+                >
+                  <span 
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.2)]" 
+                    style={{ backgroundColor: o.color, boxShadow: `0 0 10px ${o.color}` }} 
+                  />
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">{o.text}</span>
                 </div>
               ))}
             </div>

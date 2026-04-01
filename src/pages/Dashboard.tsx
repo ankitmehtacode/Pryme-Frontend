@@ -72,11 +72,11 @@ const getStatusConfig = (status: string) => {
     case "SUBMITTED":
       return { color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50 dark:text-blue-400", icon: FileText, progress: 20, label: "Submitted" };
     case "PROCESSING":
-      return { color: "text-purple-600 bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-800/50 dark:text-purple-400", icon: Activity, progress: 50, label: "Processing" };
+      return { color: "text-blue-800 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50 dark:text-blue-400", icon: Activity, progress: 50, label: "Processing" };
     case "VERIFIED":
       return { color: "text-indigo-600 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/40 dark:border-indigo-800/50 dark:text-indigo-400", icon: ShieldCheck, progress: 75, label: "Verified" };
     case "APPROVED":
-      return { color: "text-violet-600 bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-800/50 dark:text-violet-400", icon: CheckCircle, progress: 100, label: "Approved" };
+      return { color: "text-blue-800 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-950/50 dark:text-blue-400", icon: CheckCircle, progress: 100, label: "Approved" };
     case "REJECTED":
       return { color: "text-red-600 bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-400", icon: AlertCircle, progress: 100, label: "Rejected" };
     default:
@@ -471,7 +471,7 @@ const Dashboard: React.FC = () => {
                           return (
                             <div key={s.id} className="flex gap-4">
                               <div className="mt-1">
-                                {isCompleted ? <CheckCircle2 className="w-6 h-6 text-violet-500" /> : 
+                                {isCompleted ? <CheckCircle2 className="w-6 h-6 text-blue-500" /> : 
                                  isActive ? <Circle className="w-6 h-6 text-blue-500 fill-blue-500/10" /> : 
                                  <Circle className="w-6 h-6 text-slate-300 dark:text-slate-700" />}
                               </div>
@@ -600,7 +600,7 @@ const Dashboard: React.FC = () => {
                                           disabled={isUploading}
                                         />
                                         {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-violet-500/10 text-violet-600 border-violet-500/20 hover:bg-violet-500/20 cursor-default pointer-events-none">
+                                          <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
                                             <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
                                           </Button>
                                         ) : (
@@ -643,7 +643,7 @@ const Dashboard: React.FC = () => {
                                           disabled={isUploading}
                                         />
                                         {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-violet-500/10 text-violet-600 border-violet-500/20 hover:bg-violet-500/20 cursor-default pointer-events-none">
+                                          <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
                                             <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
                                           </Button>
                                         ) : (

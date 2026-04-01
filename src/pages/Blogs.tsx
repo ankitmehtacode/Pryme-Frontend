@@ -5,6 +5,8 @@ import Footer from "@/components/layout/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { BookOpen, Search, ArrowRight, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { blogs } from "@/data/blogs";
 
 const Blogs = () => {
   return (
@@ -36,28 +38,29 @@ const Blogs = () => {
               </div>
             </ScrollReveal>
 
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-              {[
-                { title: "Building a 800+ CIBIL Score", cat: "Credit Tips", date: "Mar 10, 2024", img: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=800&auto=format&fit=crop" },
-                { title: "Home Loans: Resale vs New Construction", cat: "Guides", date: "Mar 08, 2024", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=800&auto=format&fit=crop" },
-                { title: "MSME Loans for Digital Businesses", cat: "Business", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" }
-              ].map((blog, i) => (
-                <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                  <div className="group rounded-[2rem] bg-card text-card-foreground border border-border overflow-hidden shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div className="h-56 overflow-hidden relative">
+              {blogs.map((blog, i) => (
+                <ScrollReveal key={i} direction="up" delay={(i % 3) * 0.1}>
+                  <Link to={`/blogs/${blog.slug}`} className="group flex flex-col h-full rounded-[2rem] bg-card text-card-foreground border border-border overflow-hidden shadow-xl hover:-translate-y-2 transition-all duration-300">
+                    <div className="h-56 shrink-0 overflow-hidden relative">
                       <img src={blog.img} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 dark:bg-black/80 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest text-primary border border-primary/20">{blog.cat}</div>
+                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 dark:bg-black/80 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest text-[#103783] border border-[#103783]/20">{blog.cat}</div>
                     </div>
-                    <div className="p-8">
+                    <div className="p-6 md:p-8 flex flex-col flex-1">
                       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 uppercase tracking-widest font-medium">
                         <Clock className="w-3 h-3" /> {blog.date}
                       </div>
-                      <h3 className="text-xl font-semibold text-foreground mb-6 group-hover:text-primary transition-colors leading-tight">{blog.title}</h3>
-                      <button className="flex items-center gap-2 text-sm font-bold text-primary italic">
-                        Read Analytics <ArrowRight className="w-4 h-4" />
-                      </button>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-6 group-hover:text-[#103783] transition-colors leading-tight line-clamp-3">
+                        {blog.title}
+                      </h3>
+                      <div className="mt-auto">
+                        <span className="flex items-center gap-2 text-sm font-bold text-[#103783] hover:text-[#0b265c] transition-colors">
+                          Read Full Article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </ScrollReveal>
               ))}
             </div>

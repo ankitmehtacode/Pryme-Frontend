@@ -10,6 +10,7 @@ const About = lazy(() => import("@/pages/About"));
 const Services = lazy(() => import("@/pages/Services"));
 const Contact = lazy(() => import("@/pages/Contact"));
 const Blogs = lazy(() => import("@/pages/Blogs"));
+const BlogDetail = lazy(() => import("@/pages/BlogDetail"));
 const Offers = lazy(() => import("@/pages/Offers"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -19,6 +20,9 @@ const EMICalculatorPage = lazy(
 );
 const RewardsCalculatorPage = lazy(
   () => import("@/pages/tools/RewardsCalculatorPage")
+);
+const PrepaymentCalculatorPage = lazy(
+  () => import("@/pages/tools/PrepaymentCalculatorPage")
 );
 
 // Authenticated Client Portal
@@ -41,8 +45,10 @@ export const AppRoutes = () => (
     <Route path="/services" element={<Services />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="/blogs" element={<Blogs />} />
+    <Route path="/blogs/:slug" element={<BlogDetail />} />
     <Route path="/offers" element={<Offers />} />
     <Route path="/emi-calculator" element={<EMICalculatorPage />} />
+    <Route path="/prepayment-calculator" element={<PrepaymentCalculatorPage />} />
     <Route path="/rewards-calculator" element={<RewardsCalculatorPage />} />
 
     {/* ============================
