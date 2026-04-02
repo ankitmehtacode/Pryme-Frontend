@@ -114,13 +114,17 @@ export interface BasicKYC {
 
 // ─── SALARIED EMPLOYEE FINANCIALS ───────────────────────────────────────────
 
+export type CompanyType = 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PRIVATE_LIMITED' | 'PUBLIC_LIMITED' | 'OTHER';
+
 export interface SalariedDetails {
   subType: SalariedSubType;
+  companyType?: CompanyType;
   companyName: string;
   designation: string;
   officialEmail: string;
   totalExperienceYears: number;
   currentCompanyYears: number;
+
   netMonthlySalary: number;      // Take-home
   hasExistingLoans: boolean;
   existingEMI: number;           // Total monthly EMI burden
@@ -187,6 +191,13 @@ export type FinancialDetails =
 
 // ─── LOAN REQUIREMENT DATA ──────────────────────────────────────────────────
 
+export type HomePropertyType = 'FLAT' | 'HOME' | 'PLOT';
+
+export type CommercialPropertyType = 'HOSPITAL' | 'HOSTEL' | 'RESTAURANTS' | 'HOTEL' | 'MARRIAGE_GARDEN' | 'SCHOOL' | 'SHOP' | 'WAREHOUSE' | 'GODOWN';
+export type IndustrialPropertyType = 'FACTORIES' | 'WAREHOUSES' | 'DISTRIBUTION_CENTER' | 'R_AND_D_FACILITY' | 'FLEX_SPACES';
+
+export type PropertyType = HomePropertyType | CommercialPropertyType | IndustrialPropertyType;
+
 export interface LoanRequirements {
   loanType: LoanType;
   loanAmount: number;
@@ -196,11 +207,13 @@ export interface LoanRequirements {
 
   // Home Loan / LAP
   propertyIdentified?: boolean;
-  propertyType?: 'FLAT' | 'INDEPENDENT_HOUSE' | 'PLOT' | 'COMMERCIAL';
+  propertyType?: PropertyType;
+  propertyCategory?: 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL'; // for LAP
   propertyValue?: number;
   propertyCity?: string;
 
   // Business Loan
+  businessPropertyCategory?: 'COMMERCIAL' | 'INDUSTRIAL';
   endUse?: string;
 
   // Education Loan

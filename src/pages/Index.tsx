@@ -138,7 +138,7 @@ const Index = () => {
         <meta property="og:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
         <meta property="og:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://pryme.in" />
+        <link rel="canonical" href="https://gopryme.tech" />
       </Helmet>
 
       {/* Safe Smooth Scrolling wrapper */}
@@ -171,7 +171,7 @@ const Index = () => {
             </section>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
-            <section className="py-24 md:py-36 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="py-16 md:py-24 lg:py-32 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
@@ -179,49 +179,41 @@ const Index = () => {
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
-                <div className="text-center mb-16 md:mb-20">
+                <div className="text-center mb-12 md:mb-16 lg:mb-20">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
                   </span>
-                  <h2 className="text-2xl md:text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tighter">
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground mb-4 md:mb-6 tracking-tighter">
                     Calculate & Evaluate
                   </h2>
-                  <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">
+                  <p className="text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">
                     Run the math before you apply. Check your EMIs and assess your approval probability instantly.
                   </p>
                 </div>
 
-                {/* 60/40 CRO Data Grid Split Rebalanced */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+                {/* Responsive Grid: 1-col mobile → 2-col tablet → 12-col desktop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 items-start">
                   
-                  {/* Left: The Calculators (EMI + Prepayment) */}
-                  <div className="lg:col-span-7 w-full flex flex-col gap-6 lg:gap-8">
-                    
-                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-3 transition-all duration-500">
-                      <EMICalculator loanAmount={500000} showTerminology={true} />
-                    </div>
-
-                    <div className="bg-card text-card-foreground rounded-[2.5rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-border p-2 md:p-3 transition-all duration-500">
-                       <PrepaymentCalculator />
-                    </div>
-
+                  {/* Left: The Calculators (EMI + Prepayment) — NO double-wrapper */}
+                  <div className="md:col-span-1 lg:col-span-7 w-full min-w-0 overflow-hidden flex flex-col gap-6 lg:gap-8">
+                    <EMICalculator loanAmount={500000} showTerminology={true} />
+                    <PrepaymentCalculator />
                   </div>
                   
                   {/* Right: The Data Context & Trust Elements */}
-                  <div className="lg:col-span-5 w-full flex flex-col gap-6 lg:gap-8">
+                  <div className="md:col-span-1 lg:col-span-5 w-full min-w-0 overflow-hidden flex flex-col gap-6 lg:gap-8">
                     <EligibilityScore score={82} cibilScore={750} monthlyIncome={85000} loanAmount={500000} />
                     
                     {/* 🧠 ANIMATED STATS BLOCK: Numbers tick up on scroll */}
                     <AnimatedStatsBlock />
                     
-                    
                     {/* Trust Mini-Card under Analytics */}
-                    <div className="bg-primary/5 dark:bg-[#103783]/5 border border-primary/20 dark:border-[#103783]/20 rounded-[2rem] p-6 lg:p-8 backdrop-blur-md shadow-inner">
-                      <h4 className="text-primary dark:text-[#103783] font-bold text-lg mb-3 flex items-center gap-2.5">
-                        <Building2 className="w-5 h-5" /> Real-Time Analytics
+                    <div className="bg-primary/5 dark:bg-[#103783]/5 border border-primary/20 dark:border-[#103783]/20 rounded-[2rem] p-5 md:p-6 lg:p-8 backdrop-blur-md shadow-inner">
+                      <h4 className="text-primary dark:text-[#103783] font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center gap-2.5">
+                        <Building2 className="w-5 h-5 shrink-0" /> Real-Time Analytics
                       </h4>
-                      <p className="text-xs lg:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">
+                      <p className="text-xs md:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">
                         These metrics are calculated using the exact proprietary algorithms deployed by top-tier Indian banks to assess creditworthiness.
                       </p>
                     </div>
@@ -246,14 +238,14 @@ const Index = () => {
               </ScrollReveal>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
-              <section className="py-24 container mx-auto px-4">
+              <section className="py-16 md:py-20 lg:py-24 container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                   <div>
                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
                       <BookOpen className="w-4 h-4" />
                       Pryme Insights
                     </span>
-                    <h2 className="text-3xl font-semibold text-foreground tracking-tight">Financial Intelligence</h2>
+                    <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">Financial Intelligence</h2>
                   </div>
                   <Button asChild variant="ghost" className="text-primary hover:text-primary/80 gap-2">
                     <Link to="/blogs">View All Articles <ArrowRight className="w-4 h-4" /></Link>

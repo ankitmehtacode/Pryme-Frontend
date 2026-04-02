@@ -2,14 +2,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import {
-  Building2, TrendingUp, ShieldCheck, ArrowRight,
-  Clock, IndianRupee, Percent, Zap, Loader2,
-  Gift, Sparkles, FileText, CheckCircle2, Shield,
-  Download, ChevronDown, ChevronUp, Lock,
-  Wallet, Calculator, Star, ExternalLink, Users,
-  BadgeCheck, ChevronRight
-} from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck } from "lucide-react";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -18,6 +11,14 @@ import ScrollReveal from "@/components/ui/ScrollReveal";
 import OffersMarquee from "@/components/home/OffersMarquee";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+
+// ── Local Bank Logo Assets ──────────────────────────────────────────────
+import hdfcLogo from "@/assets/hdfc.svg";
+import iciciLogo from "@/assets/icici.svg";
+import axisLogo from "@/assets/axis-bank-logo-1.svg";
+import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -27,6 +28,8 @@ interface BankOffer {
   id: string;
   bankName: string;
   logoColor: string;
+  logoUrl?: string;
+  brandHex: string;
   interestRate: number;
   processingFee: number;
   maxTenure: number;
@@ -155,25 +158,29 @@ export default function Offers() {
 
     return [
       {
-        id: "hdfc", bankName: "HDFC Bank", logoColor: "bg-blue-600",
+        id: "hdfc", bankName: "HDFC Bank", logoColor: "bg-[#004c8f]", brandHex: "#004c8f",
+        logoUrl: hdfcLogo,
         interestRate: baseRate, processingFee: 1.5, maxTenure: 5, maxLoanAmount: 5000000,
         approvalOdds: baseOdds, processingTime: "24–48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16 / ITR"],
       },
       {
-        id: "icici", bankName: "ICICI Bank", logoColor: "bg-orange-500",
+        id: "icici", bankName: "ICICI Bank", logoColor: "bg-[#f58220]", brandHex: "#f58220",
+        logoUrl: iciciLogo,
         interestRate: baseRate + 0.25, processingFee: 1.0, maxTenure: 5, maxLoanAmount: 4000000,
         approvalOdds: Math.max(10, baseOdds - 5), processingTime: "48–72 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
       },
       {
-        id: "axis", bankName: "Axis Bank", logoColor: "bg-rose-700",
+        id: "axis", bankName: "Axis Bank", logoColor: "bg-[#97144d]", brandHex: "#97144d",
+        logoUrl: axisLogo,
         interestRate: baseRate + 0.5, processingFee: 2.0, maxTenure: 7, maxLoanAmount: 4500000,
         approvalOdds: Math.max(10, baseOdds + 2), processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16"],
       },
       {
-        id: "kotak", bankName: "Kotak Mahindra", logoColor: "bg-red-600",
+        id: "kotak", bankName: "Kotak Mahindra", logoColor: "bg-[#ed1c24]", brandHex: "#ed1c24",
+        logoUrl: kotakLogo,
         interestRate: baseRate + 0.75, processingFee: 1.5, maxTenure: 5, maxLoanAmount: 3500000,
         approvalOdds: Math.max(10, baseOdds - 10), processingTime: "3–5 days",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16 / ITR", "Address Proof"],
@@ -234,6 +241,7 @@ export default function Offers() {
     } catch {
       toast({ title: "Connection Error", description: "Please try again.", variant: "destructive" });
       setIsLocking(null);
+      throw new Error("API Gateway routing failed"); // Throw so the error boundary can catch it
     }
   };
 
@@ -262,7 +270,7 @@ export default function Offers() {
                   </p>
                 </div>
               </ScrollReveal>
-              <div className="py-12 bg-secondary/50 backdrop-blur-md border-y border-border mb-20"><OffersMarquee /></div>
+              <div className="py-12 bg-white/30 dark:bg-white/[0.02] backdrop-blur-xl border-y border-white/30 dark:border-white/[0.06] mb-20"><OffersMarquee /></div>
               <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                   {[
@@ -272,8 +280,8 @@ export default function Offers() {
                     { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "2x points on all digital spends for 90 days.", color: "from-blue-700/10 to-blue-800/10" },
                   ].map((offer, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                      <div className={`p-8 rounded-[2.5rem] bg-gradient-to-br ${offer.color} border border-border flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02]`}>
-                        <div className="w-24 h-24 rounded-3xl bg-card flex items-center justify-center shrink-0 shadow-lg border border-white/20">
+                      <div className={`p-8 rounded-[2.5rem] bg-white/50 dark:bg-white/[0.03] backdrop-blur-xl ${offer.color} border border-white/40 dark:border-white/[0.08] flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02] hover:shadow-lg`}>
+                        <div className="w-24 h-24 rounded-3xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-xl flex items-center justify-center shrink-0 shadow-lg border border-white/40 dark:border-white/[0.1]">
                           <offer.icon className="w-10 h-10 text-primary" />
                         </div>
                         <div className="text-center md:text-left flex-1">
@@ -308,8 +316,13 @@ export default function Offers() {
       <Header />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-hidden">
-        {/* Ambient light — Depth perception */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-blue-500/[0.05] dark:from-[#103783]/[0.07] to-transparent blur-[140px] rounded-full pointer-events-none" />
+        {/* Ambient glow — Dynamic bank brand color */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] blur-[160px] rounded-full pointer-events-none opacity-[0.07]"
+          style={{ background: `radial-gradient(circle, ${heroOffer.brandHex}, transparent 70%)` }}
+        />
+        {/* Secondary ambient */}
+        <div className="absolute top-[200px] right-0 w-[400px] h-[400px] bg-gradient-to-b from-[#103783]/[0.04] to-transparent blur-[120px] rounded-full pointer-events-none" />
 
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
 
@@ -320,7 +333,7 @@ export default function Offers() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-8 bg-card dark:bg-[#111] border border-border dark:border-white/[0.06] rounded-2xl px-5 py-3.5 shadow-sm flex flex-wrap items-center justify-between gap-4"
+            className="mb-8 bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl border border-white/40 dark:border-white/[0.08] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
           >
             <div className="flex items-center gap-6 md:gap-8">
               {[
@@ -338,7 +351,7 @@ export default function Offers() {
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck className="w-3 h-3" /> No credit impact
               </div>
-              <div className="w-px h-4 bg-border dark:bg-white/[0.06]" />
+              <div className="w-px h-4 bg-white/30 dark:bg-white/[0.06]" />
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
                 <Lock className="w-3 h-3" /> Encrypted
               </div>
@@ -384,41 +397,53 @@ export default function Offers() {
                 initial={{ opacity: 0, y: 20, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 0.1, ...spring }}
-                className="relative rounded-[1.75rem] overflow-hidden shadow-2xl shadow-blue-500/[0.08] dark:shadow-[#103783]/[0.1]"
+                className="relative rounded-[2rem] overflow-hidden"
+                style={{ boxShadow: `0 24px 60px ${heroOffer.brandHex}18, 0 0 0 1px ${heroOffer.brandHex}15` }}
               >
-                {/* Gradient background — Visual contrast strategy */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1e1145] via-[#1a103a] to-[#0f0a26] dark:from-[#1a0e3a] dark:via-[#130c2c] dark:to-[#0a0618]" />
+                {/* Dynamic gradient bg — Uses hero bank's brand colour */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${heroOffer.brandHex} 0%, ${heroOffer.brandHex}dd 40%, ${heroOffer.brandHex}aa 100%)`,
+                  }}
+                />
+                {/* Glass overlay for depth */}
+                <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
 
                 {/* Shimmer sweep */}
                 <ShimmerEffect />
 
-                {/* Subtle border glow */}
-                <div className="absolute inset-0 rounded-[1.75rem] border border-blue-500/20 dark:border-[#103783]/20 pointer-events-none z-10" />
+                {/* Glassmorphic border */}
+                <div className="absolute inset-0 rounded-[2rem] border border-white/15 pointer-events-none z-10" />
 
                 <div className="relative z-10 p-7 md:p-10">
 
                   {/* ── Top: Identity + Recommended Label ──────────── */}
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 rounded-2xl ${heroOffer.logoColor} flex items-center justify-center shadow-xl ring-2 ring-white/10`}>
-                        <Building2 className="w-7 h-7 text-white" />
+                      <div className="w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-xl flex items-center justify-center shadow-xl ring-2 ring-white/30 p-2 overflow-hidden">
+                        {heroOffer.logoUrl ? (
+                          <img src={heroOffer.logoUrl} alt={heroOffer.bankName} className="w-full h-full object-contain" />
+                        ) : (
+                          <Building2 className="w-7 h-7" style={{ color: heroOffer.brandHex }} />
+                        )}
                       </div>
                       <div>
                         <h2 className="text-xl md:text-2xl font-bold text-white">{heroOffer.bankName}</h2>
                         <div className="flex items-center gap-2.5 mt-1">
-                          <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                          <span className="text-[11px] font-bold text-emerald-300 flex items-center gap-1">
                             <TrendingUp className="w-3 h-3" /> {heroOffer.approvalOdds}% approval
                           </span>
                           <span className="text-white/20">•</span>
-                          <span className="text-[11px] text-white/40 flex items-center gap-1">
+                          <span className="text-[11px] text-white/50 flex items-center gap-1">
                             <Clock className="w-3 h-3" /> {heroOffer.processingTime}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Recommended badge */}
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-400/20 to-yellow-400/10 border border-amber-400/20 text-amber-300 text-[11px] font-bold uppercase tracking-wider shrink-0">
+                    {/* Recommended badge — frosted glass */}
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[11px] font-bold uppercase tracking-wider shrink-0">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> Recommended for you
                     </div>
                   </div>
@@ -429,10 +454,10 @@ export default function Offers() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/15"
+                      className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-[12px] font-bold text-emerald-300">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                      <span className="text-[12px] font-bold text-white">
                         You save ₹{savingsVsNext.totalDiff.toLocaleString("en-IN")} vs {savingsVsNext.comparedTo}
                       </span>
                     </motion.div>
@@ -441,22 +466,23 @@ export default function Offers() {
                   {/* ── EMI — PRIMARY METRIC (giant) ───────────────── */}
                   <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10 mb-7">
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-1">Monthly EMI</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40 mb-1">Monthly EMI</p>
                       <p className="text-[44px] md:text-[52px] font-extrabold text-white tracking-tight leading-none tabular-nums">
-                        <span className="text-xl font-semibold text-white/40 mr-1">₹</span>{(emis[heroOffer.id] || 0).toLocaleString("en-IN")}
+                        <span className="text-xl font-semibold text-white/50 mr-1">₹</span>{(emis[heroOffer.id] || 0).toLocaleString("en-IN")}
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-6 md:gap-8 pb-1">
+                    {/* Frosted glass metric chips */}
+                    <div className="flex flex-wrap gap-3 pb-1">
                       {[
                         { label: "Total Repayment", value: `₹${(totalRepayments[heroOffer.id] || 0).toLocaleString("en-IN")}` },
                         { label: "Interest (APR)", value: `${heroOffer.interestRate}%` },
                         { label: "Tenure", value: `${heroOffer.maxTenure} yrs` },
                         { label: "Processing Fee", value: `${heroOffer.processingFee}%` },
                       ].map((m, i) => (
-                        <div key={i}>
-                          <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/25 mb-0.5">{m.label}</p>
-                          <p className="text-lg font-bold text-white/80 tabular-nums">{m.value}</p>
+                        <div key={i} className="px-3.5 py-2 rounded-xl bg-white/[0.08] backdrop-blur-xl border border-white/[0.1]">
+                          <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 leading-none mb-1">{m.label}</p>
+                          <p className="text-sm font-bold text-white/90 tabular-nums leading-none">{m.value}</p>
                         </div>
                       ))}
                     </div>
@@ -469,8 +495,8 @@ export default function Offers() {
                       `${heroOffer.approvalOdds}% approval probability`,
                       `Fast disbursal (${heroOffer.processingTime})`,
                     ].map((reason, i) => (
-                      <span key={i} className="flex items-center gap-1.5 text-[12px] font-medium text-white/50">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> {reason}
+                      <span key={i} className="flex items-center gap-1.5 text-[12px] font-medium text-white/60">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" /> {reason}
                       </span>
                     ))}
                   </div>
@@ -480,26 +506,35 @@ export default function Offers() {
                     <ValueScoreBar score={heroValueScore} />
                   </div>
 
-                  {/* ── CTA + Trust ─────────────────────────────────── */}
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <Button
-                      onClick={() => handleUnlock(heroOffer)}
-                      disabled={isLocking !== null}
-                      className="rounded-xl h-14 px-10 text-base font-bold bg-white text-[#1a103a] hover:bg-white/90 shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all hover:scale-[1.02] active:scale-[0.99]"
-                    >
-                      {isLocking === heroOffer.id ? (
-                        <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Securing...</span>
-                      ) : (
-                        <span className="flex items-center gap-2"><Zap className="w-5 h-5" /> Unlock this offer</span>
-                      )}
-                    </Button>
+                  {/* ── CTA + Trust — Glassmorphic button ──────────── */}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <Button
+                        onClick={() => handleUnlock(heroOffer)}
+                        disabled={isLocking !== null}
+                        className="rounded-xl h-14 px-10 text-base font-bold bg-white/95 backdrop-blur-xl text-foreground hover:bg-white shadow-2xl shadow-black/10 hover:shadow-black/15 transition-all hover:scale-[1.02] active:scale-[0.99] border border-white/60 w-full sm:w-auto"
+                        style={{ color: heroOffer.brandHex }}
+                      >
+                        {isLocking === heroOffer.id ? (
+                          <span className="flex items-center gap-2 justify-center"><Loader2 className="w-5 h-5 animate-spin" /> Securing...</span>
+                        ) : (
+                          <span className="flex items-center gap-2 justify-center">Apply with Pryme <ArrowRight className="w-5 h-5" /></span>
+                        )}
+                      </Button>
+                      <button
+                        className="rounded-xl h-14 px-6 text-sm font-semibold transition-all border backdrop-blur-md bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:text-white flex items-center justify-center gap-2 w-full sm:w-auto"
+                        title={`Apply directly on ${heroOffer.bankName} website`}
+                      >
+                        Apply Directly <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                    <div className="flex items-center gap-4">
-                      <span className="text-[10px] text-white/30 flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-emerald-400/60" /> No impact on credit score
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-[10px] text-white/35 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-emerald-300/60" /> No impact on credit score
                       </span>
-                      <span className="text-[10px] text-white/30 flex items-center gap-1">
-                        <Users className="w-3 h-3 text-white/30" /> Trusted by 2L+ users
+                      <span className="text-[10px] text-white/35 flex items-center gap-1">
+                        <Users className="w-3 h-3 text-white/35" /> Trusted by 2L+ users
                       </span>
                     </div>
                   </div>
@@ -514,166 +549,34 @@ export default function Offers() {
                   <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 mb-4 ml-1">
                     Other options
                   </p>
-                  <div className="space-y-3">
-                    {otherOffers.map((offer, index) => {
-                      const emi = emis[offer.id] || 0;
-                      const totalRep = totalRepayments[offer.id] || 0;
-                      const emiDiffFromHero = emi - (emis[heroOffer.id] || 0);
-                      const totalDiffFromHero = totalRep - (totalRepayments[heroOffer.id] || 0);
-                      const isExpanded = expandedCard === offer.id;
+                  <ErrorBoundary>
+                    <div className="space-y-3">
+                      {otherOffers.map((offer) => {
+                        const emi = emis[offer.id] || 0;
+                        const totalRep = totalRepayments[offer.id] || 0;
+                        const emiDiffFromHero = emi - (emis[heroOffer.id] || 0);
+                        const totalDiffFromHero = totalRep - (totalRepayments[heroOffer.id] || 0);
+                        const isExpanded = expandedCard === offer.id;
 
-                      return (
-                        <motion.div
-                          key={offer.id}
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.25 + index * 0.08, ...spring }}
-                          className={`
-                            group relative rounded-2xl border bg-card dark:bg-[#111] overflow-hidden
-                            transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                            border-border/60 dark:border-white/[0.05] shadow-sm
-                            hover:shadow-lg hover:border-border dark:hover:border-white/[0.1]
-                            hover:scale-[1.005]
-                          `}
-                        >
-                          <div className="p-5 md:p-6">
-                            {/* Top row */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-
-                              {/* Identity + EMI */}
-                              <div className="flex items-center gap-8">
-                                <div className="flex items-center gap-3 min-w-[180px]">
-                                  <div className={`w-10 h-10 rounded-xl ${offer.logoColor} flex items-center justify-center shadow-md shrink-0`}>
-                                    <Building2 className="w-5 h-5 text-white" />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-sm font-bold text-foreground">{offer.bankName}</h3>
-                                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                                      <TrendingUp className="w-2.5 h-2.5" /> {offer.approvalOdds}% approval
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* EMI — still primary within each card */}
-                                <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/40">EMI</p>
-                                  <p className="text-2xl font-extrabold text-foreground tabular-nums leading-tight">
-                                    <span className="text-sm text-muted-foreground/40">₹</span>{emi.toLocaleString("en-IN")}
-                                  </p>
-                                </div>
-
-                                {/* Comparison intelligence — DO THE MATH FOR USER */}
-                                {emiDiffFromHero > 0 && (
-                                  <div className="hidden md:block">
-                                    <p className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
-                                      ₹{emiDiffFromHero.toLocaleString("en-IN")}/mo more
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground/40 tabular-nums">
-                                      ₹{totalDiffFromHero.toLocaleString("en-IN")} extra total
-                                    </p>
-                                  </div>
-                                )}
-
-                                {/* Supporting metrics */}
-                                <div className="hidden lg:flex items-center gap-6">
-                                  <div>
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/30">APR</p>
-                                    <p className="text-sm font-bold text-foreground tabular-nums">{offer.interestRate}%</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/30">Tenure</p>
-                                    <p className="text-sm font-bold text-foreground tabular-nums">{offer.maxTenure} yrs</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/30">Proc. Fee</p>
-                                    <p className="text-sm font-bold text-foreground tabular-nums">{offer.processingFee}%</p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* CTA */}
-                              <div className="flex items-center gap-3 shrink-0">
-                                <Button
-                                  onClick={() => handleUnlock(offer)}
-                                  disabled={isLocking !== null}
-                                  variant="outline"
-                                  className="rounded-xl h-10 px-5 text-xs font-bold border-primary/20 dark:border-[#103783]/20 text-primary dark:text-[#9BAFD9] hover:bg-primary/5 dark:hover:bg-[#103783]/5 transition-all"
-                                >
-                                  {isLocking === offer.id ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                  ) : (
-                                    <>Get this loan <ArrowRight className="w-3.5 h-3.5 ml-1.5" /></>
-                                  )}
-                                </Button>
-                                <button
-                                  onClick={() => setExpandedCard(isExpanded ? null : offer.id)}
-                                  className="text-[10px] font-medium text-muted-foreground/40 hover:text-muted-foreground transition-colors flex items-center gap-0.5"
-                                >
-                                  Details {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Mobile comparison callout */}
-                            {emiDiffFromHero > 0 && (
-                              <p className="md:hidden mt-3 text-[10px] font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
-                                ₹{emiDiffFromHero.toLocaleString("en-IN")}/mo more than {heroOffer.bankName} · ₹{totalDiffFromHero.toLocaleString("en-IN")} extra total
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Expandable details */}
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                                className="overflow-hidden border-t border-border/40 dark:border-white/[0.04]"
-                              >
-                                <div className="p-5 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                  {/* Cost breakdown */}
-                                  <div>
-                                    <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-                                      <Calculator className="w-3.5 h-3.5 text-primary dark:text-[#103783]" /> Cost Breakdown
-                                    </h4>
-                                    <div className="space-y-2">
-                                      {[
-                                        { l: "Principal", v: leadData.loanAmount },
-                                        { l: "Total Interest", v: totalRep - leadData.loanAmount },
-                                        { l: `Processing (${offer.processingFee}%)`, v: Math.round(leadData.loanAmount * offer.processingFee / 100) },
-                                        { l: "GST on PF", v: Math.round(leadData.loanAmount * offer.processingFee / 100 * 0.18) },
-                                      ].map((r, i) => (
-                                        <div key={i} className="flex justify-between text-[11px]">
-                                          <span className="text-muted-foreground">{r.l}</span>
-                                          <span className="font-bold text-foreground tabular-nums">₹{r.v.toLocaleString("en-IN")}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                  {/* Required docs */}
-                                  <div>
-                                    <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-                                      <FileText className="w-3.5 h-3.5 text-primary dark:text-[#103783]" /> Documents
-                                    </h4>
-                                    <div className="space-y-1.5">
-                                      {offer.requiredDocs.map((doc, i) => (
-                                        <div key={i} className="flex items-center gap-2 text-[11px]">
-                                          <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
-                                          <span className="text-foreground/80">{doc}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                        return (
+                          <BankComparisonCard
+                            key={offer.id}
+                            offer={offer as BankOfferDTO}
+                            emi={emi}
+                            totalRepayment={totalRep}
+                            emiDiffFromHero={emiDiffFromHero}
+                            totalDiffFromHero={totalDiffFromHero}
+                            heroBankName={heroOffer.bankName}
+                            principalAmount={leadData.loanAmount}
+                            isExpanded={isExpanded}
+                            onToggleExpand={() => setExpandedCard(isExpanded ? null : offer.id)}
+                            onApply={async (providerId) => await handleUnlock(dynamicOffers.find(o => o.id === providerId)!)}
+                            isGlobalLocking={isLocking !== null}
+                          />
+                        );
+                      })}
+                    </div>
+                  </ErrorBoundary>
                 </div>
               )}
 
@@ -710,7 +613,7 @@ export default function Offers() {
           <Button
             onClick={() => handleUnlock(heroOffer)}
             disabled={isLocking !== null}
-            className="rounded-xl h-11 px-6 bg-primary dark:bg-[#103783] text-white text-sm font-bold shadow-lg shadow-primary/20"
+            className="rounded-xl h-11 px-6 bg-[#103783] text-white text-sm font-bold shadow-lg shadow-[#103783]/20 hover:bg-[#0c2a66]"
           >
             {isLocking ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4 mr-1.5" /> Unlock offer</>}
           </Button>

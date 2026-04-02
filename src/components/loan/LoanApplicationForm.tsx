@@ -23,7 +23,8 @@ import AnalysisLoader from "@/components/loan/AnalysisLoader";
 import { useApplicationStore } from "@/store/applicationStore";
 import type {
   EmploymentType, SalariedSubType, ProfessionalSubType, BusinessSubType,
-  StageNumber, LoanType, ApplicationStore
+  StageNumber, LoanType, ApplicationStore, PropertyType, HomePropertyType,
+  CommercialPropertyType, IndustrialPropertyType
 } from "@/lib/applicationTypes";
 import {
   EMPLOYMENT_LABELS, SALARIED_LABELS, PROFESSIONAL_LABELS,
@@ -33,7 +34,7 @@ import {
 // ─── STABLE VALIDATED INPUT (outside component to prevent remount) ──────────
 
 const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
-  ({ label, error, isValid, isSecure, icon: Icon, className: _className, ...props }, ref) => (
+  ({ label, error, isValid, icon: Icon, className: _className, ...props }, ref) => (
     <div className="relative group w-full">
       <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
       <div className="relative">
@@ -46,14 +47,13 @@ const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           ref={ref}
           {...props}
           className={cn(
-            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#103783]/10",
+            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
             Icon && "pl-11",
             error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
             isValid && !error && "border-primary/20 dark:border-[#103783]/20"
           )}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          {isSecure && <LockKeyhole className="w-4 h-4 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground/50" />}
           {error && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
               <XCircle className="w-4 h-4 text-red-500/80" />
@@ -88,7 +88,7 @@ const StyledSelect = ({
     <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn(
-        "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-primary/10 dark:focus:ring-[#103783]/10",
+        "relative w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
         Icon && "pl-11",
         error && "border-red-500/30"
       )}>
@@ -136,7 +136,7 @@ const PillSelector = <T extends string>({
             whileTap={{ scale: 0.97 }}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "py-3.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 border flex items-center justify-center gap-2",
+              "py-3.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 border flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50",
               isSelected
                 ? "bg-primary dark:bg-[#103783] text-white border-primary dark:border-[#103783] shadow-lg shadow-primary/20 dark:shadow-[#103783]/20"
                 : "bg-secondary/50 dark:bg-white/[0.03] text-muted-foreground border-border dark:border-white/[0.06] hover:text-foreground hover:border-primary/20 dark:hover:border-white/15"
@@ -665,10 +665,12 @@ function validateStage2(store: ReturnType<typeof useApplicationStore.getState>):
   if (emp === "SALARIED" && fin.path === "SALARIED") {
     const d = fin.data;
     if (!d.subType) errors.subType = "Select private or government";
+    if (d.subType === "PRIVATE" && !d.companyType) errors.companyType = "Select company type";
     if (!d.companyName || d.companyName.trim().length < 2) errors.companyName = "Enter your company name";
     if (!d.designation || d.designation.trim().length < 2) errors.designation = "Enter your designation";
     if (!d.netMonthlySalary || d.netMonthlySalary < 10000) errors.netMonthlySalary = "Minimum salary is ₹10,000";
-    if (d.totalExperienceYears < 0) errors.totalExperienceYears = "Enter valid experience";
+    if (typeof d.totalExperienceYears !== 'number' || d.totalExperienceYears < 0) errors.totalExperienceYears = "Enter valid experience";
+    if (typeof d.currentCompanyYears !== 'number' || d.currentCompanyYears < 0) errors.currentCompanyYears = "Enter valid current experience";
   }
 
   if (emp === "PROFESSIONAL" && fin.path === "PROFESSIONAL") {
@@ -962,7 +964,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   label="Full Name (As per PAN)"
                   placeholder="Rahul Sharma"
                   icon={User}
-                  isSecure
                   value={store.basicKYC.fullName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ fullName: e.target.value })}
                   isValid={store.basicKYC.fullName.length >= 3}
@@ -985,7 +986,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     type="email"
                     placeholder="rahul@company.com"
                     icon={Mail}
-                    isSecure
                     value={store.basicKYC.email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ email: e.target.value })}
                     isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.basicKYC.email)}
@@ -998,7 +998,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     label="Date of Birth"
                     type="date"
                     icon={Calendar}
-                    isSecure
                     value={store.basicKYC.dateOfBirth}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ dateOfBirth: e.target.value })}
                     isValid={!!store.basicKYC.dateOfBirth}
@@ -1128,6 +1127,26 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                           onChange={(v) => store.updateSalariedDetails({ subType: v })}
                         />
 
+                        {store.financialDetails.path === "SALARIED" && store.financialDetails.data.subType === "PRIVATE" && (
+                          <div className="mb-5">
+                            <StyledSelect
+                              label="Company Entity Type"
+                              icon={Building2}
+                              value={store.financialDetails.data.companyType || ""}
+                              onValueChange={(v) => store.updateSalariedDetails({ companyType: v as any })}
+                              placeholder="Select Company Type"
+                              error={errors.companyType}
+                            >
+                              <SelectItem value="PRIVATE_LIMITED">Private Limited</SelectItem>
+                              <SelectItem value="PUBLIC_LIMITED">Public Limited</SelectItem>
+                              <SelectItem value="LLP">Limited Liability Partnership (LLP)</SelectItem>
+                              <SelectItem value="PARTNERSHIP">Partnership</SelectItem>
+                              <SelectItem value="PROPRIETORSHIP">Proprietorship</SelectItem>
+                              <SelectItem value="OTHER">Other</SelectItem>
+                            </StyledSelect>
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <ValidatedInput
                             label="Company Name"
@@ -1149,7 +1168,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="mb-5">
                           <ValidatedInput
                             label="Net Monthly Salary (₹)"
                             type="number"
@@ -1160,6 +1179,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.netMonthlySalary : 0) >= 10000}
                             error={errors.netMonthlySalary}
                           />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <ValidatedInput
                             label="Total Experience (Years)"
                             type="number"
@@ -1169,6 +1191,16 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ totalExperienceYears: Number(e.target.value) })}
                             isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.totalExperienceYears : 0) > 0}
                             error={errors.totalExperienceYears}
+                          />
+                          <ValidatedInput
+                            label="Current Experience (Years)"
+                            type="number"
+                            placeholder="2"
+                            icon={Calendar}
+                            value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.currentCompanyYears || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ currentCompanyYears: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.currentCompanyYears : 0) > 0}
+                            error={errors.currentCompanyYears}
                           />
                         </div>
                       </motion.div>
@@ -1251,7 +1283,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             { value: "ITR_BASED", label: "ITR Based", icon: CreditCard },
                             { value: "GST_BASED", label: "GST Based", icon: CreditCard },
                             { value: "BANKING_PROGRAM", label: "Banking (ABB)", icon: Landmark },
-                            { value: "CASH_FLOW_PROGRAM", label: "Cash Flow", icon: IndianRupee },
                           ]}
                           value={store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.subType : null}
                           onChange={(v) => store.updateBusinessDetails({ subType: v })}
@@ -1291,6 +1322,99 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                       </motion.div>
                     )}
                   </AnimatePresence>
+
+                  {/* ── Conditional Property Selectors based on Loan Type (Moved to Stage 2) ── */}
+                  <AnimatePresence mode="popLayout">
+                    {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP" || store.loanRequirements.loanType === "BUSINESS_LOAN") && (
+                      <motion.div
+                        key="property-selectors"
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: "auto", marginTop: 24 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="p-5 rounded-2xl border border-primary/10 bg-primary/5 dark:bg-[#103783]/10 overflow-hidden"
+                      >
+                        <div className="flex items-center gap-2 mb-4">
+                          <Home className="w-4 h-4 text-primary dark:text-[#103783]" />
+                          <h4 className="text-sm font-bold text-foreground">Property Type Selection</h4>
+                        </div>
+                        <div className="space-y-4">
+                          {store.loanRequirements.loanType === "LAP" && (
+                            <StyledSelect
+                              label="Type of Property"
+                              value={store.loanRequirements.propertyCategory || "RESIDENTIAL"}
+                              onValueChange={(v) => store.updateLoanRequirements({ propertyCategory: v as 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL', propertyType: undefined, businessPropertyCategory: undefined })}
+                              placeholder="Select category"
+                            >
+                              <SelectItem value="RESIDENTIAL" className="cursor-pointer">Residential</SelectItem>
+                              <SelectItem value="COMMERCIAL_INDUSTRIAL" className="cursor-pointer">Commercial & Industrial</SelectItem>
+                            </StyledSelect>
+                          )}
+
+                          {(store.loanRequirements.loanType === "HOME_LOAN" || (store.loanRequirements.loanType === "LAP" && store.loanRequirements.propertyCategory === "RESIDENTIAL")) && (
+                            <StyledSelect
+                              label="Property"
+                              value={store.loanRequirements.propertyType || ""}
+                              onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as Extract<PropertyType, HomePropertyType> })}
+                              placeholder="Select property type"
+                            >
+                              <SelectItem value="FLAT" className="cursor-pointer">Flat</SelectItem>
+                              <SelectItem value="HOME" className="cursor-pointer">Home</SelectItem>
+                              <SelectItem value="PLOT" className="cursor-pointer">Plot</SelectItem>
+                            </StyledSelect>
+                          )}
+
+                          {((store.loanRequirements.loanType === "LAP" && store.loanRequirements.propertyCategory === "COMMERCIAL_INDUSTRIAL") || store.loanRequirements.loanType === "BUSINESS_LOAN") && (
+                            <>
+                              <StyledSelect
+                                label={store.loanRequirements.loanType === "BUSINESS_LOAN" ? "Type of Property" : "Business Property Category"}
+                                value={store.loanRequirements.businessPropertyCategory || ""}
+                                onValueChange={(v) => store.updateLoanRequirements({ businessPropertyCategory: v as 'COMMERCIAL' | 'INDUSTRIAL', propertyType: undefined })}
+                                placeholder="Select category"
+                              >
+                                <SelectItem value="COMMERCIAL" className="cursor-pointer">Commercial</SelectItem>
+                                <SelectItem value="INDUSTRIAL" className="cursor-pointer">Industrial</SelectItem>
+                              </StyledSelect>
+
+                              {store.loanRequirements.businessPropertyCategory === "COMMERCIAL" && (
+                                <StyledSelect
+                                  label="Commercial Property"
+                                  value={store.loanRequirements.propertyType || ""}
+                                  onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as Extract<PropertyType, CommercialPropertyType> })}
+                                  placeholder="Select commercial property"
+                                >
+                                  <SelectItem value="HOSPITAL" className="cursor-pointer">Hospital</SelectItem>
+                                  <SelectItem value="HOSTEL" className="cursor-pointer">Hostel</SelectItem>
+                                  <SelectItem value="RESTAURANTS" className="cursor-pointer">Restaurants</SelectItem>
+                                  <SelectItem value="HOTEL" className="cursor-pointer">Hotel</SelectItem>
+                                  <SelectItem value="MARRIAGE_GARDEN" className="cursor-pointer">Marriage Garden</SelectItem>
+                                  <SelectItem value="SCHOOL" className="cursor-pointer">School</SelectItem>
+                                  <SelectItem value="SHOP" className="cursor-pointer">Shop</SelectItem>
+                                  <SelectItem value="WAREHOUSE" className="cursor-pointer">Warehouse</SelectItem>
+                                  <SelectItem value="GODOWN" className="cursor-pointer">Godown</SelectItem>
+                                </StyledSelect>
+                              )}
+
+                              {store.loanRequirements.businessPropertyCategory === "INDUSTRIAL" && (
+                                <StyledSelect
+                                  label="Industrial Property"
+                                  value={store.loanRequirements.propertyType || ""}
+                                  onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as Extract<PropertyType, IndustrialPropertyType> })}
+                                  placeholder="Select industrial property"
+                                >
+                                  <SelectItem value="FACTORIES" className="cursor-pointer">Factories</SelectItem>
+                                  <SelectItem value="WAREHOUSES" className="cursor-pointer">Warehouses</SelectItem>
+                                  <SelectItem value="DISTRIBUTION_CENTER" className="cursor-pointer">Distribution Center</SelectItem>
+                                  <SelectItem value="R_AND_D_FACILITY" className="cursor-pointer">R&D Facility</SelectItem>
+                                  <SelectItem value="FLEX_SPACES" className="cursor-pointer">Flex Spaces</SelectItem>
+                                </StyledSelect>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </motion.div>
@@ -1317,15 +1441,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
                 </div>
-
-                <div className="space-y-6 relative z-10">
-                  {/* Product Selector */}
-                  <PillSelector<LoanType>
-                    label="Select Product"
-                    options={PRODUCT_OPTIONS.map(p => ({ ...p, icon: undefined }))}
-                    value={store.loanRequirements.loanType}
-                    onChange={(v) => store.updateLoanRequirements({ loanType: v })}
-                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
@@ -1417,7 +1532,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                     label="PAN Card Number"
                     placeholder="ABCDE1234F"
                     icon={CreditCard}
-                    isSecure
                     value={store.financialFootprint.panNumber}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateFinancialFootprint({ panNumber: e.target.value.toUpperCase() })}
                     isValid={/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(store.financialFootprint.panNumber)}
@@ -1516,7 +1630,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   </motion.div>
                 )}
 
-                {/* BUSINESS_LOAN → Above ₹50 Lakhs Toggle */}
+                {/* BUSINESS_LOAN → Override */}
                 {store.loanRequirements.loanType === "BUSINESS_LOAN" && (
                   <motion.div
                     key="business-override"
@@ -1536,13 +1650,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                       </div>
                     </div>
 
-                    <ToggleSwitch
-                      label="Is requested limit above ₹50 Lakhs?"
-                      description="Higher limits require additional underwriting"
-                      icon={IndianRupee}
-                      checked={store.financialFootprint.isAbove50Lakhs}
-                      onChange={(v) => store.updateFinancialFootprint({ isAbove50Lakhs: v })}
-                    />
+                    <div className="space-y-4">
+                      <ToggleSwitch
+                        label="Is requested limit above ₹50 Lakhs?"
+                        description="Higher limits require additional underwriting"
+                        icon={IndianRupee}
+                        checked={store.financialFootprint.isAbove50Lakhs}
+                        onChange={(v) => store.updateFinancialFootprint({ isAbove50Lakhs: v })}
+                      />
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

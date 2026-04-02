@@ -86,7 +86,7 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full", className)}>
+    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full min-w-0", className)}>
       
       {/* 🧠 Ambient Glow Engine */}
       <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-primary/5 dark:bg-[#103783]/10 blur-[60px] rounded-full pointer-events-none" />
@@ -102,65 +102,79 @@ const EMICalculator = ({
         </div>
       </div>
 
-      {/* Sleek EMI Display & Pie Chart (Compact) */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-5 p-3 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-inner mb-4 md:mb-6 relative z-10 shrink-0">
+      {/* EMI Display & Pie Chart — Overlap-proof stacked layout */}
+      <div className="flex flex-col items-center gap-3 md:gap-4 p-3 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-inner mb-4 md:mb-6 relative z-10 shrink-0 overflow-hidden">
         
-        {/* Glowing Pie Chart */}
-        <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg">
-          <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
-            
-            {/* Principal Segment */}
-            <circle
-              cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
-              strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
-              className="stroke-[#103783] transition-all duration-1000 ease-out"
-            />
-            {/* Interest Segment */}
-            <circle
-              cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
-              strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
-              className="stroke-amber-500 transition-all duration-1000 ease-out"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
-            <span className="text-[7px] md:text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-0.5">Monthly EMI</span>
-            <span className="text-lg md:text-2xl font-bold text-foreground">{formatShortCurrency(emi)}</span>
+        {/* Row 1: Pie Chart + Total Payable side by side */}
+        <div className="flex items-center gap-4 md:gap-6 w-full">
+          {/* Glowing Pie Chart */}
+          <div className="relative w-24 h-24 md:w-36 md:h-36 shrink-0 drop-shadow-md dark:drop-shadow-lg">
+            <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
+              {/* Principal Segment */}
+              <circle
+                cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
+                strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
+                className="stroke-[#103783] transition-all duration-1000 ease-out"
+              />
+              {/* Interest Segment */}
+              <circle
+                cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
+                strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
+                className="stroke-amber-500 transition-all duration-1000 ease-out"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-1">Monthly EMI</span>
+              <span className="text-base md:text-xl font-bold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
+            </div>
+          </div>
+
+          {/* Total Payable — hero metric with supporting data */}
+          <div className="flex-1 min-w-0 p-3 md:p-5 bg-gradient-to-br from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-5 h-5 md:w-6 md:h-6 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm shrink-0">
+                  <span className="text-[8px] md:text-[9px] font-black text-white leading-none">Σ</span>
+                </div>
+                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
+              </div>
+              <p className="text-xl md:text-3xl font-extrabold text-foreground leading-none whitespace-nowrap">{formatCurrency(totalPayment)}</p>
+            </div>
+
+            {/* Micro-metrics — fills the void space with actionable data */}
+            <div className="mt-3 pt-3 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center gap-3 md:gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Per Day</p>
+                <p className="text-xs md:text-sm font-bold text-foreground">{formatShortCurrency(Math.round(emi / 30))}</p>
+              </div>
+              <div className="w-px h-7 bg-[#103783]/10 dark:bg-[#103783]/20 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Interest Cost</p>
+                <p className="text-xs md:text-sm font-bold text-foreground">{((totalInterest / amount) * 100).toFixed(1)}%</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex-1 space-y-2 w-full">
-          {/* Total Payable — Hero metric */}
-          <div className="flex items-center justify-between p-3.5 bg-gradient-to-r from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm">
-                <span className="text-[8px] font-black text-white leading-none">Σ</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
+        {/* Row 2: Principal & Interest — balanced stat cards */}
+        <div className="grid grid-cols-2 gap-3 md:gap-4 w-full">
+          <div className="p-3.5 md:p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
             </div>
-            <p className="text-base md:text-lg font-extrabold text-foreground leading-none">{formatCurrency(totalPayment)}</p>
+            <p className="text-base md:text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(amount)}</p>
+            <span className="inline-block text-[9px] font-bold text-[#103783] bg-[#103783]/10 px-2 py-0.5 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
           </div>
 
-          {/* Principal & Interest — Compact secondary rows */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 p-2.5 bg-background dark:bg-[#0a0a0a] rounded-lg border border-border dark:border-white/5">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(124,58,237,0.3)] shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Principal</p>
-                <p className="text-xs md:text-sm font-bold text-foreground leading-none">{formatCurrency(amount)}</p>
-              </div>
-              <span className="text-[9px] font-bold text-[#103783] bg-[#103783]/10 px-1.5 py-0.5 rounded leading-none ml-auto shrink-0">{principalPercentage.toFixed(0)}%</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2.5 bg-background dark:bg-[#0a0a0a] rounded-lg border border-border dark:border-white/5">
+          <div className="p-3.5 md:p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
               <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Interest</p>
-                <p className="text-xs md:text-sm font-bold text-foreground leading-none">{formatCurrency(totalInterest)}</p>
-              </div>
-              <span className="text-[9px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded leading-none ml-auto shrink-0">{interestPercentage.toFixed(0)}%</span>
             </div>
+            <p className="text-base md:text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(totalInterest)}</p>
+            <span className="inline-block text-[9px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
           </div>
         </div>
       </div>

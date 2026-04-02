@@ -61,7 +61,7 @@ const Contact = () => {
                 <div className="flex flex-col gap-8 h-full">
                   {[
                     { icon: Phone, title: "Call Us", detail: "1800-309-4001", sub: "Mon-Sat, 10AM - 7PM" },
-                    { icon: Mail, title: "Email Support", detail: "info@pryme.in", sub: "24/7 Priority Response" },
+                    { icon: Mail, title: "Email Support", detail: "info@gopryme.tech", sub: "24/7 Priority Response" },
                     { icon: MapPin, title: "Headquarters", detail: "Digital Hub, Phase-IV", sub: "Gurajat, India" }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-sm">

@@ -204,10 +204,10 @@ const Apply = () => {
                 className="py-8 md:py-12"
               >
                 <div className="container mx-auto px-4 max-w-7xl">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-start">
 
                     <div 
-                      className="lg:col-span-5 space-y-10 lg:sticky lg:top-24 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      className="md:col-span-1 lg:col-span-5 space-y-8 md:space-y-10 lg:sticky lg:top-24 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                       style={{
                         filter: isFormFocused ? "blur(3px)" : "blur(0px)",
                         opacity: isFormFocused ? 0.5 : 1,
@@ -255,7 +255,7 @@ const Apply = () => {
                     </div>
 
                     <div 
-                      className="lg:col-span-7 w-full space-y-8"
+                      className="md:col-span-1 lg:col-span-7 w-full space-y-6 md:space-y-8"
                       onFocus={handleFormFocus}
                       onBlur={handleFormBlur}
                       tabIndex={-1}
@@ -294,6 +294,11 @@ const Apply = () => {
                         <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
                           <EMICalculator loanAmount={loanAmount} showTerminology={false} />
                         </div>
+                      </div>
+
+                      {/* CIBIL Improvement Tips — fills void below form */}
+                      <div className="hidden lg:block mt-2">
+                        <CibilTips />
                       </div>
                     </div>
 

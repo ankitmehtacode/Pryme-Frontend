@@ -56,7 +56,7 @@ const AdminDashboard = () => {
     queryKey: ["admin_users"],
     // Fallback until the users API is fully implemented
     queryFn: async () => [
-      { id: "1", email: "admin@pryme.com", full_name: "Super Admin", created_at: new Date().toISOString(), role: "SUPER_ADMIN" }
+      { id: "1", email: "admin@gopryme.tech", full_name: "Super Admin", created_at: new Date().toISOString(), role: "SUPER_ADMIN" }
     ]
   });
 

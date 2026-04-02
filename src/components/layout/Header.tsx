@@ -24,7 +24,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import prymeLogo from "@/assets/pryme-typo-logo.svg";
+import pryme2Logo from "@/assets/Pryme2.svg";
+import prymeWordmark from "@/assets/pryme-wordmark.svg";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -47,7 +48,6 @@ const toolLinks = [
 ];
 
 const navLinks = [
-  { href: "/", label: "Home" },
   { href: "/services", label: "Compare Loans" },
   { href: "/about", label: "About" },
   { href: "/blogs", label: "Insights" },
@@ -182,13 +182,26 @@ const Header = memo(() => {
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none">
         <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center shrink-0 group">
-            <img src={prymeLogo} alt="PRYME" className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]" />
+          {/* Logo — Icon mark + SVG wordmark lockup */}
+          <Link to="/" className="flex items-center gap-1.5 shrink-0 group" aria-label="PRYME Home">
+            <img
+              src={pryme2Logo}
+              alt=""
+              aria-hidden="true"
+              className="h-8 md:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+            />
+            <img
+              src={prymeWordmark}
+              alt="PRYME"
+              className="h-[18px] md:h-5 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+            />
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1 bg-white/50 rounded-full px-2 py-1 border border-white/20 backdrop-blur-sm shadow-sm">
+            <Link to="/" className={cn("px-4 py-2 text-sm font-medium rounded-full transition-all hover:bg-black/5", location.pathname === "/" ? "text-[#103783]" : "text-slate-600")}>
+              <div className="flex items-center gap-1.5"><Home className="w-4 h-4" /> Home</div>
+            </Link>
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
@@ -223,13 +236,7 @@ const Header = memo(() => {
             </NavigationMenu>
             {navLinks.map(link => (
               <Link key={link.href} to={link.href} className={cn("px-4 py-2 text-sm font-medium rounded-full transition-all hover:bg-black/5", location.pathname === link.href ? "text-[#103783]" : "text-slate-600")}>
-                {link.label === "Home" ? (
-                  <div className="flex items-center gap-1.5">
-                    <Home className="w-4 h-4" /> {link.label}
-                  </div>
-                ) : (
-                  link.label
-                )}
+                {link.label}
               </Link>
             ))}
           </nav>

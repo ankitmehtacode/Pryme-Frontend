@@ -6,7 +6,7 @@ import prymeLogo from "@/assets/Pryme2.svg";
 
 const CONTACT_PHONE = "1800-309-4001";
 const CONTACT_PHONE_LINK = "tel:18003094001";
-const CONTACT_EMAIL = "hello@pryme.in";
+const CONTACT_EMAIL = "hello@gopryme.tech";
 const COMPANY_ADDRESS = "INDORE, INDIA";
 
 const SOCIAL_LINKS = {

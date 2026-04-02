@@ -154,10 +154,8 @@ const Auth = () => {
     });
   };
 
-  const fillAdminCredentials = () => {
-    loginForm.setValue("email", "admin@pryme.com");
-    loginForm.setValue("password", "admin123");
-  };
+
+
 
   if (isContextLoading) {
     return (
@@ -340,7 +338,7 @@ const Auth = () => {
                             <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
                             <Input
                               type="email"
-                              placeholder="admin@pryme.com"
+                              placeholder="you@company.com"
                               className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
                               {...loginForm.register("email")}
                             />

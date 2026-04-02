@@ -20,7 +20,7 @@ const defaultBanker: BankerInfo = {
   designation: "Senior Relationship Manager",
   bank: "PRYME Concierge",
   phone: "+91 98765 43210",
-  email: "aadesh@pryme.in",
+  email: "aadesh@gopryme.tech",
   availability: "Mon-Sat, 9 AM - 6 PM",
 };
 
