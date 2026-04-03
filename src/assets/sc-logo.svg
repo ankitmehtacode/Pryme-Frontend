@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120">
+  <!-- Standard Chartered logo mark -->
+  <g transform="translate(10, 15)">
+    <rect x="0" y="0" width="90" height="90" rx="12" fill="#007b5e"/>
+    <g fill="#fff" transform="translate(20, 18)">
+      <rect x="0" y="0" width="10" height="54" rx="2"/>
+      <rect x="20" y="10" width="10" height="34" rx="2"/>
+      <rect x="40" y="5" width="10" height="44" rx="2"/>
+    </g>
+  </g>
+  <!-- Standard Chartered text -->
+  <g>
+    <text x="120" y="48" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="30" fill="#007b5e" letter-spacing="0.5">Standard</text>
+    <text x="120" y="82" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="30" fill="#007b5e" letter-spacing="0.5">Chartered</text>
+  </g>
+</svg>

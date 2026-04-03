@@ -12,7 +12,8 @@ export type LoanType =
   | 'HOME_LOAN'
   | 'LAP'              // Loan Against Property
   | 'BUSINESS_LOAN'
-  | 'EDUCATION_LOAN';
+  | 'EDUCATION_LOAN'
+  | 'AUTO_LOAN';
 
 // ─── EMPLOYMENT HIERARCHY (The Critical Pivot Point) ─────────────────────────
 // Level 1: Category

@@ -12,7 +12,7 @@ import OffersMarquee from "@/components/home/OffersMarquee";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
-import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
 // ── Local Bank Logo Assets ──────────────────────────────────────────────
 import hdfcLogo from "@/assets/hdfc.svg";
@@ -315,7 +315,7 @@ export default function Offers() {
       <Helmet><title>Your Best Loan Option | PRYME</title></Helmet>
       <Header />
 
-      <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-hidden">
+      <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">
         {/* Ambient glow — Dynamic bank brand color */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] blur-[160px] rounded-full pointer-events-none opacity-[0.07]"
@@ -324,7 +324,7 @@ export default function Offers() {
         {/* Secondary ambient */}
         <div className="absolute top-[200px] right-0 w-[400px] h-[400px] bg-gradient-to-b from-[#103783]/[0.04] to-transparent blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="container mx-auto px-4 max-w-5xl relative z-10">
+        <div className="container mx-auto px-4 max-w-6xl relative z-10">
 
           {/* ═══════════════════════════════════════════════════════════
               STICKY MINI SUMMARY BAR — Replaces sidebar entirely
@@ -549,7 +549,7 @@ export default function Offers() {
                   <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 mb-4 ml-1">
                     Other options
                   </p>
-                  <ErrorBoundary>
+                  <AppErrorBoundary>
                     <div className="space-y-3">
                       {otherOffers.map((offer) => {
                         const emi = emis[offer.id] || 0;
@@ -576,7 +576,7 @@ export default function Offers() {
                         );
                       })}
                     </div>
-                  </ErrorBoundary>
+                  </AppErrorBoundary>
                 </div>
               )}
 

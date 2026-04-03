@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { 
   ArrowRight, Zap, Sparkles, Percent, 
   ChevronRight, ChevronLeft, CheckCircle2,
-  TrendingUp, WalletCards, Coins, Landmark, BadgePercent, ShieldCheck
+  TrendingUp, WalletCards, Coins, Landmark, BadgePercent, ShieldCheck,
+  Award, CreditCard, PiggyBank, Building, Banknote, HandCoins
 } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
@@ -156,7 +157,7 @@ const HeroSection = memo(() => {
         - backdrop-blur-[60px] completely liquefies the orbs underneath
         - Complex inner shadows to create the 3D Apple-style edge bevel
       */}
-      <div className="relative z-10 w-full max-w-[1700px] h-[300px] sm:h-[320px] md:h-[330px] lg:h-[340px] rounded-[32px] md:rounded-[40px] overflow-hidden 
+      <div className="relative z-10 w-full max-w-[1700px] min-h-[300px] sm:min-h-[320px] md:min-h-[330px] lg:min-h-[340px] h-auto rounded-[32px] md:rounded-[40px] overflow-hidden 
         bg-white/20 backdrop-blur-[60px] 
         shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-1px_1px_rgba(255,255,255,0.4),0_32px_100px_rgba(0,0,0,0.1)]
         border-[0.5px] border-white/50
@@ -192,21 +193,21 @@ const HeroSection = memo(() => {
         </div>
 
         {/* ────────────────── TOP BAR ────────────────── */}
-        <div className="relative z-10 w-full px-6 py-4 md:px-8 md:py-4 flex items-center justify-between pointer-events-none">
+        <div className="relative z-10 w-full px-6 py-4 md:px-8 md:py-4 flex items-center justify-between pointer-events-none shrink-0">
           
           {/* LEFT: Eyebrow - Slow Blur Reveal Cinematic Entrance */}
-          <div className="flex items-center gap-2 md:gap-3 flex-1">
+          <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0">
             <motion.span 
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
               transition={{ duration: 2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-              className="w-5 md:w-8 h-[1.5px] bg-slate-800/40 rounded-full origin-left shrink-0" 
+              className="w-3 sm:w-5 md:w-8 h-[1.5px] bg-slate-800/40 rounded-full origin-left shrink-0" 
             />
             <motion.p 
               initial={{ opacity: 0, filter: "blur(8px)", x: -10 }}
               animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
               transition={{ duration: 3, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-              className="text-[9px] md:text-[10px] font-mono tracking-[0.2em] uppercase text-slate-800/80 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
+              className="text-[8.5px] sm:text-[9px] md:text-[10px] font-mono tracking-[0.1em] sm:tracking-[0.2em] uppercase text-slate-800/80 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] whitespace-nowrap"
             >
               Instant Capital. Zero Friction.
             </motion.p>
@@ -240,9 +241,9 @@ const HeroSection = memo(() => {
             </div>
           </div>
 
-          {/* RIGHT: Slider Pagination Controls */}
+          {/* RIGHT: Slider Pagination Controls — Compact counter for 10 cards */}
           <div className="flex justify-end flex-1 pointer-events-auto">
-            <div className="hidden md:flex items-center gap-2 bg-white/30 backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_20px_rgba(0,0,0,0.05)] border border-white/40 rounded-full p-1.5 hover:bg-white/50 transition-colors">
+            <div className="hidden md:flex items-center gap-1.5 bg-white/30 backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_20px_rgba(0,0,0,0.05)] border border-white/40 rounded-full p-1.5 hover:bg-white/50 transition-colors">
               <button 
                 onClick={() => paginate(-1)} 
                 className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
@@ -274,7 +275,7 @@ const HeroSection = memo(() => {
         </div>
 
         {/* ────────────────── CENTER BILLBOARD CANVAS ────────────────── */}
-        <div className="relative z-20 flex-1 w-full flex flex-col items-center justify-center px-4 md:px-10 overflow-hidden pointer-events-none md:-mt-2">
+        <div className="relative z-20 flex-1 w-full grid items-center px-4 md:px-10 pointer-events-none py-4 sm:py-6">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={page + 'content'}
@@ -283,10 +284,10 @@ const HeroSection = memo(() => {
               initial="enter"
               animate="center"
               exit="exit"
-              className="absolute flex flex-col items-center justify-center w-full max-w-5xl text-center pointer-events-auto"
+              className="col-start-1 row-start-1 flex flex-col items-center justify-center w-full max-w-5xl place-self-center text-center pointer-events-auto"
             >
               {/* Tag & Bank Header - Ultra Glassy */}
-              <div className="flex items-center justify-center gap-3 px-4 py-1.5 mb-2 md:mb-3 rounded-full bg-white/30 backdrop-blur-3xl border border-white/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-lg hover:bg-white/40 transition-all">
+              <div className="flex items-center justify-center gap-3 px-4 py-1.5 mb-2 rounded-full bg-white/30 backdrop-blur-3xl border border-white/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-lg hover:bg-white/40 transition-all">
                 <div className="px-2 py-0.5 rounded-full bg-white text-slate-800 text-[8.5px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
                   <Zap className="w-2.5 h-2.5" style={{ color: offer.accentColor }} /> {offer.tag}
                 </div>
@@ -297,49 +298,49 @@ const HeroSection = memo(() => {
                 )}
               </div>
 
-              {/* Massive Cinematic Offer Headline - Contrast boosted */}
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-slate-900 tracking-tight leading-[1.05] mb-4 md:mb-5 px-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] max-w-4xl">
+              {/* Cinematic Offer Headline */}
+              <h2 className="text-[1.35rem] sm:text-2xl md:text-3xl lg:text-[2.25rem] font-extrabold text-slate-900 tracking-tight leading-tight md:leading-[1.05] mb-1.5 md:mb-3 px-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] max-w-3xl">
                 {offer.title}
               </h2>
 
               {/* Highlights + CTA Array */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 w-full mt-2">
+              <div className="md:gap-3 flex flex-col md:flex-row items-center justify-center gap-2.5 w-full">
                 
                 {/* Highlights - Deep glass style */}
-                <div className="hidden sm:flex flex-wrap items-center justify-center gap-3">
+                <div className="hidden sm:flex flex-wrap items-center justify-center gap-2">
                   {offer.highlights.map((h, i) => (
-                    <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-sm text-slate-900/90 text-[10px] md:text-[11.5px] font-bold tracking-wide">
-                      <CheckCircle2 className="w-3 h-3" style={{ color: offer.accentColor }} />
+                    <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/5 backdrop-blur-xl border border-slate-900/10 shadow-sm text-slate-900/90 text-[9px] md:text-[10px] font-bold tracking-wide">
+                      <CheckCircle2 className="w-2.5 h-2.5 shrink-0" style={{ color: offer.accentColor }} />
                       {h}
                     </div>
                   ))}
                 </div>
 
                 {/* Vertical Divider */}
-                <div className="hidden md:block w-px h-6 bg-slate-800/10" />
+                <div className="hidden md:block w-px h-4 bg-slate-800/10" />
 
                 {/* Apply CTA - Elevated 3D Feel */}
-                <div className="relative inline-block mt-2 md:mt-0 group pointer-events-auto">
+                <div className="relative inline-block mt-0.5 md:mt-0 group pointer-events-auto">
                   <div 
-                    className="absolute -inset-1.5 rounded-full blur-[12px] opacity-40 group-hover:opacity-70 transition-opacity duration-500" 
+                    className="absolute -inset-1.5 rounded-full blur-[10px] opacity-40 group-hover:opacity-70 transition-opacity duration-500" 
                     style={{ backgroundColor: offer.accentColor }} 
                   />
                   <Link 
                     to="/apply"
-                    className="relative overflow-hidden bg-slate-900 text-white px-6 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm tracking-wide flex items-center gap-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                    className="relative overflow-hidden bg-slate-900 text-white px-5 md:px-7 py-1.5 md:py-2 rounded-full font-bold text-[11px] md:text-xs tracking-wide flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                   >
                     Apply Now
-                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
-                      <ArrowRight className="w-3 h-3 group-hover:translate-x-[2px] transition-transform" />
+                    <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
+                      <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-[2px] transition-transform" />
                     </span>
                   </Link>
                 </div>
 
               </div>
 
-              {/* Platform Pitch Anchored beneath the CTA */}
-              <div className="mt-4 flex items-center justify-center px-4 max-w-lg">
-                <p className="text-[10px] md:text-[11px] text-slate-800/80 font-semibold tracking-wide drop-shadow-[0_1px_10px_rgba(255,255,255,0.6)]">
+              {/* Tagline */}
+              <div className="mt-1.5 md:mt-3 flex items-center justify-center px-4 max-w-lg">
+                <p className="text-[9px] md:text-[10px] text-slate-800/80 font-semibold tracking-wide drop-shadow-[0_1px_10px_rgba(255,255,255,0.6)]">
                   Compare rates from <span className="text-slate-900 font-extrabold">15+ banks</span>, calculate your EMI, and apply in under <span className="text-slate-900 font-extrabold">5 minutes.</span>
                 </p>
               </div>
@@ -349,7 +350,7 @@ const HeroSection = memo(() => {
         </div>
 
         {/* ────────────────── MARQUEE TOP 1% GLASS ────────────────── */}
-        <div className="relative z-30 w-full hero-marquee-bar border-t-[0.5px] border-white/50 bg-white/20 backdrop-blur-md hidden md:block mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] pt-1">
+        <div className="relative z-30 w-full hero-marquee-bar border-t-[0.5px] border-white/50 bg-white/20 backdrop-blur-md hidden md:block mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] pt-1 shrink-0">
           
           <div className="absolute top-0 left-0 w-24 md:w-40 h-full bg-gradient-to-r from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-bl-[32px] md:rounded-bl-[40px] mix-blend-overlay" />
           <div className="absolute top-0 right-0 w-24 md:w-40 h-full bg-gradient-to-l from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-br-[32px] md:rounded-br-[40px] mix-blend-overlay" />

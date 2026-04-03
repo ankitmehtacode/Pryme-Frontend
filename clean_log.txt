@@ -1,0 +1,99 @@
+browsers data 
+(caniuse-lite) is 10 
+months old. Please run:
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Bro  
+  wserslist: b...ld. Ple   
+ ase run::String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  npx update-browserslist-d
+b@latest
+  Why you should do it 
+regularly: https://github.c
+om/browserslist/update-db#r
+eadme
+
+warn - 
+The class `ease-[cubic-bezi
+er(0.16,1,0.3,1)]` is 
+ambiguous and matches 
+multiple utilities.
+warn - 
+If this is content and not 
+a class, replace it with `e
+ase-&lsqb;cubic-bezier(0.16
+,1,0.3,1)&rsqb;` to 
+silence this warning.
+
+warn - 
+The class `ease-[cubic-bezi
+er(0.22,1,0.36,1)]` is 
+ambiguous and matches 
+multiple utilities.
+warn - 
+If this is content and not 
+a class, replace it with `e
+ase-&lsqb;cubic-bezier(0.22
+,1,0.36,1)&rsqb;` to 
+silence this warning.
+
+/grid-pattern.svg 
+referenced in 
+/grid-pattern.svg didn't 
+resolve at build time, it 
+will remain unchanged to 
+be resolved at runtime
+Γ£ô 1774 modules transformed.
+x Build failed 
+in 1.84s
+error during build:
+[vite:load-fallback] 
+Could not load C:\Users\KAS
+HISH\Downloads\IT\Pryme-Fro
+ntend\src/components/ui/Err
+orBoundary (imported by 
+src/pages/Offers.tsx): 
+ENOENT: no such file or 
+directory, open 'C:\Users\K
+ASHISH\Downloads\IT\Pryme-F
+rontend\src\components\ui\E
+rrorBoundary'
+    at async open (node:int
+ernal/fs/promises:637:25)
+    at async 
+Object.readFile (node:inter
+nal/fs/promises:1269:14)
+    at async Object.load (f
+ile:///C:/Users/KASHISH/Dow
+nloads/IT/Pryme-Frontend/no
+de_modules/vite/dist/node/c
+hunks/dep-C6uTJdX2.js:65341
+:25)
+    at async PluginDriver.h
+ookFirstAndGetPlugin (file:
+///C:/Users/KASHISH/Downloa
+ds/IT/Pryme-Frontend/node_m
+odules/rollup/dist/es/share
+d/node-entry.js:20630:28)
+    at async file:///C:/Use
+rs/KASHISH/Downloads/IT/Pry
+me-Frontend/node_modules/ro
+llup/dist/es/shared/node-en
+try.js:19750:33
+    at async Queue.work (fi
+le:///C:/Users/KASHISH/Down
+loads/IT/Pryme-Frontend/nod
+e_modules/rollup/dist/es/sh
+ared/node-entry.js:20840:32
+)

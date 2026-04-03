@@ -110,7 +110,7 @@ const ProcessSection = () => {
                 Transparent.
               </span>
             </h2>
-            <p className="text-slate-400 text-lg leading-relaxed mb-10 font-normal">
+            <p className="text-slate-200 text-lg leading-relaxed mb-10 font-normal">
               We've removed the complexity of traditional banking. 
               No branch visits, no waiting rooms, just a streamlined digital process.
             </p>
@@ -135,24 +135,28 @@ const ProcessSection = () => {
           {/* Right Side: GSAP Timeline Track */}
           <div ref={triggerRef} className="lg:w-2/3 relative pl-8 lg:pl-16">
             
-            {/* The Vertical Track Background */}
-            <div className="absolute left-[3px] lg:left-[43px] top-8 bottom-20 w-[2px] bg-white/5">
-              {/* 🧠 The Filling Animation Bar (Powered by GSAP) */}
+            {/* The Vertical Track Background (Glass Groove) */}
+            <div className="absolute left-[15px] lg:left-[31px] top-12 bottom-12 w-[2px] bg-gradient-to-b from-transparent via-white/10 to-transparent">
+              {/* 🧠 Neon Comet Line (Powered by GSAP) */}
               <div 
                 ref={lineRef} 
-                className="w-full bg-gradient-to-b from-primary to-blue-400 shadow-[0_0_15px_rgba(var(--primary),0.5)] rounded-full" 
-              />
+                className="w-full relative overflow-visible rounded-full bg-gradient-to-b from-transparent via-blue-500/80 to-cyan-400" 
+              >
+                {/* Comet Head Glowing Core */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-8 bg-cyan-200 rounded-full shadow-[0_0_20px_5px_rgba(34,211,238,0.9),0_0_40px_10px_rgba(59,130,246,0.6)] blur-[0.5px]" />
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[3px] h-12 bg-gradient-to-t from-transparent to-cyan-300 blur-sm opacity-90" />
+              </div>
             </div>
 
             <div className="space-y-12 md:space-y-16">
               {steps.map((step, idx) => (
                 <div key={idx} className="process-card relative flex flex-col sm:flex-row items-start gap-6 sm:gap-8 group">
                   
-                  {/* Timeline Node (GSAP activates this as the line hits it) */}
-                  <div className="absolute -left-[9px] lg:-left-[41px] top-8 w-6 h-6 rounded-full border-4 border-[#030303] bg-slate-700 z-10 transition-all duration-700 group-hover:bg-primary group-hover:shadow-[0_0_20px_rgba(var(--primary),0.6)] group-hover:scale-125" />
+                  {/* Elegant Neon Pulse Node */}
+                  <div className="absolute -left-[22px] lg:-left-[38px] top-12 w-3 h-3 rounded-full border border-white/20 bg-[#030303] z-10 transition-all duration-700 group-hover:bg-cyan-400 group-hover:border-cyan-300 group-hover:shadow-[0_0_25px_6px_rgba(34,211,238,0.9)] group-hover:scale-[1.8]" />
                   
-                  {/* Glassmorphic Content Card */}
-                  <div className="flex-1 w-full bg-white dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-border shadow-2xl hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-white/10 transition-all duration-500">
+                  {/* Premium Dark Glassmorphic Content Card */}
+                  <div className="flex-1 w-full bg-white/5 backdrop-blur-2xl p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-primary/40 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(16,55,131,0.3)] transition-all duration-500">
                     <div className="flex items-center gap-5 mb-4">
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
                         <step.icon className={cn("w-6 h-6", step.color)} />
@@ -161,7 +165,7 @@ const ProcessSection = () => {
                         {step.title}
                       </h3>
                     </div>
-                    <p className="text-slate-400 leading-relaxed font-medium pl-[76px] sm:pl-0">
+                    <p className="text-slate-300 leading-relaxed font-medium pl-[76px] sm:pl-0">
                       {step.desc}
                     </p>
                   </div>

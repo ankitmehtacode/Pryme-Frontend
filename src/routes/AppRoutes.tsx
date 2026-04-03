@@ -2,10 +2,12 @@ import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
-// Public Pages
-const Index = lazy(() => import("@/pages/Index"));
+// Core Routes (Synchronous for FCP)
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+
+// Secondary Routes (Aggressively Lazy-Loaded)
 const Apply = lazy(() => import("@/pages/Apply"));
-const Auth = lazy(() => import("@/pages/Auth"));
 const About = lazy(() => import("@/pages/About"));
 const Services = lazy(() => import("@/pages/Services"));
 const Contact = lazy(() => import("@/pages/Contact"));

@@ -19,6 +19,7 @@ import type {
   DocumentItem,
 } from '@/types/application';
 import { resolveDocumentMatrix } from '@/lib/documentMatrix';
+import { generateSafeUUID } from '@/lib/utils';
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
 
@@ -28,7 +29,7 @@ const APPLICATION_VERSION = '1.0.0';
 // ─── DEFAULT STATE FACTORY ──────────────────────────────────────────────────
 
 const createDefaultState = (): ApplicationState => ({
-  applicationId: crypto.randomUUID(),
+  applicationId: generateSafeUUID(),
   status: 'DRAFT',
   currentStep: 'BASIC_KYC',
   completedSteps: [],
@@ -297,32 +298,27 @@ const STEP_ORDER: FormStep[] = [
 ];
 
 export function useApplicationState(initialLoanType?: string): UseApplicationReturn {
-  // Hydrate from session on first mount
-  const initialState = useRef<ApplicationState>(() => {
-    const hydrated = hydrateFromSession();
-    if (hydrated) return hydrated;
-
-    const fresh = createDefaultState();
-    // If a loan type was passed in (e.g. from product card click), pre-set it
-    if (initialLoanType) {
-      const typeMap: Record<string, ApplicationState['loanRequirements']['loanType']> = {
-        personal: 'PERSONAL_LOAN',
-        home: 'HOME_LOAN',
-        business: 'BUSINESS_LOAN',
-        education: 'EDUCATION_LOAN',
-        lap: 'LAP',
-      };
-      fresh.loanRequirements.loanType = typeMap[initialLoanType.toLowerCase()] || 'PERSONAL_LOAN';
-    }
-    return fresh;
-  });
-
   const [state, dispatch] = useReducer(
     applicationReducer,
-    undefined,
-    () => typeof initialState.current === 'function'
-      ? (initialState.current as () => ApplicationState)()
-      : initialState.current
+    initialLoanType,
+    (initType) => {
+      const hydrated = hydrateFromSession();
+      if (hydrated) return hydrated;
+
+      const fresh = createDefaultState();
+      // If a loan type was passed in (e.g. from product card click), pre-set it
+      if (initType) {
+        const typeMap: Record<string, ApplicationState['loanRequirements']['loanType']> = {
+          personal: 'PERSONAL_LOAN',
+          home: 'HOME_LOAN',
+          business: 'BUSINESS_LOAN',
+          education: 'EDUCATION_LOAN',
+          lap: 'LAP',
+        };
+        fresh.loanRequirements.loanType = typeMap[initType.toLowerCase()] || 'PERSONAL_LOAN';
+      }
+      return fresh;
+    }
   );
 
   // ── Persist on every state change ─────────────────────────────────────────

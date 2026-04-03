@@ -15,7 +15,8 @@ export type LoanType =
   | 'LAP'                  // Loan Against Property
   | 'BUSINESS_LOAN'
   | 'PERSONAL_LOAN'
-  | 'EDUCATIONAL_LOAN';
+  | 'EDUCATIONAL_LOAN'
+  | 'AUTO_LOAN';
 
 export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   HOME_LOAN: 'Home Loan',
@@ -23,6 +24,7 @@ export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   BUSINESS_LOAN: 'Business Loan',
   PERSONAL_LOAN: 'Personal Loan',
   EDUCATIONAL_LOAN: 'Education Loan',
+  AUTO_LOAN: 'Auto Loan',
 };
 
 // ─── EMPLOYMENT HIERARCHY (The Critical Pivot Point) ─────────────────────────
@@ -127,7 +129,8 @@ export interface SalariedDetails {
 
   netMonthlySalary: number;      // Take-home
   hasExistingLoans: boolean;
-  existingEMI: number;           // Total monthly EMI burden
+  existingEMI: number;           // Total monthly EMI burden (Step A)
+  maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 
 // ─── PROFESSIONAL FINANCIALS ────────────────────────────────────────────────
@@ -136,12 +139,16 @@ export interface ProfessionalDetails {
   subType: ProfessionalSubType;
   registrationNumber: string;    // ICAI / ICSI / MCI / Bar Council
   practiceName: string;
+  /** @deprecated use totalPracticeYears — kept for session hydration compat */
   practiceYears: number;
+  totalPracticeYears: number;    // Total years in profession (underwriting: seasoning)
+  yearsInCurrentFirm: number;   // Years at current practice/firm (stability signal)
   practiceAddress: string;
-  annualGrossReceipts: number;   // Gross professional receipts
+  annualGrossReceipts: number;   // Gross professional receipts (pre-expense)
   netMonthlyIncome: number;
   hasExistingLoans: boolean;
-  existingEMI: number;
+  existingEMI: number;           // Total monthly EMI burden (Step A)
+  maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 
 // ─── SELF-EMPLOYED / BUSINESS FINANCIALS ────────────────────────────────────
@@ -158,10 +165,15 @@ export interface BusinessDetails {
   annualTurnover?: number;
   netProfit?: number;
   itrFiledYears?: number;        // 2-3 required
+  /** Depreciation add-back for P&L normalisation — shown for HOME_LOAN / LAP only */
+  depreciation?: number;
 
   // ── GST-Based ──
   gstNumber?: string;            // 15-digit GSTIN
+  /** @deprecated use last12MonthsGstTurnover for new captures */
   monthlyGSTTurnover?: number;
+  /** Aggregate GST turnover for last 12 months (primary income proxy for GST program) */
+  last12MonthsGstTurnover?: number;
   gstFilingMonths?: number;
 
   // ── Banking Program ──
@@ -173,10 +185,15 @@ export interface BusinessDetails {
   avgMonthlyCredits?: number;
   bankStatementMonths?: number;
 
+  // ── Compliance ──
+  /** Whether accounts are CA-certified or audited — boosts creditworthiness for SELF_EMPLOYED */
+  isCaCertifiedOrAudited?: boolean;
+
   // Common
   netMonthlyIncome: number;
   hasExistingLoans: boolean;
-  existingEMI: number;
+  existingEMI: number;           // Total monthly EMI burden (Step A)
+  maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 
 // ─── DISCRIMINATED FINANCIAL DETAILS UNION ──────────────────────────────────

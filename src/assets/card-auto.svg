@@ -1,0 +1,66 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="url(#bg_grad)"/>
+  
+  <!-- Ground Grid/Gradients to match premium feel -->
+  <path d="M0 260 L400 260" stroke="url(#grid_line)" stroke-width="1" opacity="0.3"/>
+  <path d="M0 280 L400 280" stroke="url(#grid_line)" stroke-width="1" opacity="0.2"/>
+  
+  <!-- Neon glow from car -->
+  <circle cx="200" cy="220" r="140" fill="url(#glow_grad)" opacity="0.6"/>
+  
+  <!-- Car Silhouette / Body -->
+  <path d="M85 240L95 210C98 198 108 190 120 190H140L165 155C170 148 178 144 186 144H260C272 144 282 152 286 163L300 190H305C316 190 325 199 325 210V240C325 248 318 255 310 255H300C294 255 290 250 290 245A25 25 0 0 0 240 245C240 250 236 255 230 255H170C164 255 160 250 160 245A25 25 0 0 0 110 245C110 250 106 255 100 255H90C82 255 75 248 75 240V235C75 224 82 215 93 214" fill="url(#body_grad)"/>
+  
+  <!-- Windows -->
+  <path d="M168 156L145 190H185V150H174C171 150 169 152 168 156Z" fill="url(#window_grad)"/>
+  <path d="M195 150V190H285L273 154C271 151 268 150 265 150H195Z" fill="url(#window_grad)"/>
+  
+  <!-- Wheels -->
+  <circle cx="135" cy="245" r="25" fill="#0F172A"/>
+  <circle cx="135" cy="245" r="16" fill="url(#wheel_grad)"/>
+  <circle cx="135" cy="245" r="6" fill="#38BDF8"/>
+  
+  <circle cx="265" cy="245" r="25" fill="#0F172A"/>
+  <circle cx="265" cy="245" r="16" fill="url(#wheel_grad)"/>
+  <circle cx="265" cy="245" r="6" fill="#38BDF8"/>
+  
+  <!-- Headlights / Taillights -->
+  <path d="M78 220H88V230H78V220Z" fill="#F43F5E"/>
+  <path d="M312 220H322V230H312V220Z" fill="#38BDF8"/>
+  
+  <!-- Highlights -->
+  <path d="M140 190H285L270 195H135L140 190Z" fill="#FFFFFF" opacity="0.2"/>
+
+  <!-- Speed lines -->
+  <line x1="30" y1="265" x2="180" y2="265" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="100" y1="275" x2="300" y2="275" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <line x1="50" y1="255" x2="120" y2="255" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+  <defs>
+    <linearGradient id="bg_grad" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020617"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="grid_line" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#38BDF8" stop-opacity="1"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow_grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 220) rotate(90) scale(140)">
+      <stop stop-color="#0284C7" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#0284C7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="body_grad" x1="200" y1="144" x2="200" y2="255" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0EA5E9"/>
+      <stop offset="1" stop-color="#0369A1"/>
+    </linearGradient>
+    <linearGradient id="window_grad" x1="200" y1="150" x2="200" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BAE6FD" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#0284C7" stop-opacity="0.3"/>
+    </linearGradient>
+    <radialGradient id="wheel_grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(135 245) rotate(90) scale(16)">
+      <stop stop-color="#94A3B8"/>
+      <stop offset="1" stop-color="#334155"/>
+    </radialGradient>
+  </defs>
+</svg>

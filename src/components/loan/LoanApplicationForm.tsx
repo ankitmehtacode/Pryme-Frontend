@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -7,7 +7,7 @@ import {
   Building2, Stethoscope, Scale, GraduationCap, CreditCard, MapPin,
   Phone, Mail, Calendar, Hash, Landmark, BriefcaseBusiness,
   Home, HandCoins, FileSearch, UserPlus, ToggleLeft,
-  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload, Sparkles
+  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload, Sparkles, Edit2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import React from "react";
 
 import AnalysisLoader from "@/components/loan/AnalysisLoader";
 import { useApplicationStore } from "@/store/applicationStore";
+import { useShallow } from "zustand/react/shallow";
 import type {
   EmploymentType, SalariedSubType, ProfessionalSubType, BusinessSubType,
   StageNumber, LoanType, ApplicationStore, PropertyType, HomePropertyType,
@@ -377,6 +378,14 @@ function resolveDocuments(store: ReturnType<typeof useApplicationStore.getState>
     );
   }
 
+  // AUTO LOAN
+  if (loanType === 'AUTO_LOAN') {
+    docs.push(
+      { id: 'vehicle_quotation', label: 'Proforma Invoice / Quotation', description: 'Quotation from authorized dealer', required: true, category: 'property' },
+      { id: 'driving_license', label: 'Driving License', description: 'Valid driving license', required: true, category: 'identity' },
+    );
+  }
+
   return docs;
 }
 
@@ -728,7 +737,43 @@ interface LoanApplicationFormProps {
 const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const store = useApplicationStore();
+  // Enforce atomic selectors for Zustand optimization
+  const store: ApplicationStore = {
+    // Stage navigation & Meta
+    applicationId: useApplicationStore((s) => s.applicationId),
+    completedStages: useApplicationStore(useShallow((s) => s.completedStages)),
+    createdAt: useApplicationStore((s) => s.createdAt),
+    lastModifiedAt: useApplicationStore((s) => s.lastModifiedAt),
+    currentStage: useApplicationStore((s) => s.currentStage),
+    setStage: useApplicationStore((s) => s.setStage),
+    completeStage: useApplicationStore((s) => s.completeStage),
+
+    // Data Slices
+    basicKYC: useApplicationStore(useShallow((s) => s.basicKYC)),
+    financialDetails: useApplicationStore(useShallow((s) => s.financialDetails)),
+    loanRequirements: useApplicationStore(useShallow((s) => s.loanRequirements)),
+    financialFootprint: useApplicationStore(useShallow((s) => s.financialFootprint)),
+    documents: useApplicationStore(useShallow((s) => s.documents)),
+    consent: useApplicationStore(useShallow((s) => s.consent)),
+
+    // Mutators
+    updateBasicKYC: useApplicationStore((s) => s.updateBasicKYC),
+    updateFinancialDetails: useApplicationStore((s) => s.updateFinancialDetails),
+    updateSalariedDetails: useApplicationStore((s) => s.updateSalariedDetails),
+    updateProfessionalDetails: useApplicationStore((s) => s.updateProfessionalDetails),
+    updateBusinessDetails: useApplicationStore((s) => s.updateBusinessDetails),
+    updateLoanRequirements: useApplicationStore((s) => s.updateLoanRequirements),
+    updateFinancialFootprint: useApplicationStore((s) => s.updateFinancialFootprint),
+    updateDocuments: useApplicationStore((s) => s.updateDocuments),
+    setDocumentStatus: useApplicationStore((s) => s.setDocumentStatus),
+    setConsent: useApplicationStore((s) => s.setConsent),
+    resetApplication: useApplicationStore((s) => s.resetApplication),
+    
+    // Computed Helpers
+    getActiveEmploymentPath: useApplicationStore((s) => s.getActiveEmploymentPath),
+    getProgress: useApplicationStore((s) => s.getProgress),
+    isStageAccessible: useApplicationStore((s) => s.isStageAccessible),
+  };
 
   // ── Sync URL query parameter to store ─────────────────────────────────────
   useEffect(() => {
@@ -742,6 +787,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         home: "HOME_LOAN",
         lap: "LAP",
         education: "EDUCATIONAL_LOAN",
+        auto: "AUTO_LOAN",
       };
       
       const resolvedType = typeMap[typeParam.toLowerCase()];
@@ -758,6 +804,20 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingCibil, setEditingCibil] = useState(false);
+  const [cibilInputVal, setCibilInputVal] = useState("");
+
+  const formEndRef = useRef<HTMLDivElement>(null);
+  const [isBottomVisible, setIsBottomVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      // Add a small threshold offset so it transitions just before leaving layout
+      setIsBottomVisible(entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight);
+    }, { rootMargin: "0px 0px 50px 0px" });
+    if (formEndRef.current) observer.observe(formEndRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Map internal stages to display steps (we only show 1-4 for now)
   const displayStep = Math.min(store.currentStage, 4);
@@ -798,44 +858,65 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // ── Submit ────────────────────────────────────────────────────────────────
 
   const handleSubmit = useCallback(() => {
-    // Validate Stage 3 before allowing submission
-    const validationErrors = validateStage3(useApplicationStore.getState());
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      toast({ title: "Incomplete Details", description: "Please complete your loan requirements.", variant: "destructive" });
-      return;
+    try {
+      // Validate Stage 3 before allowing submission
+      const validationErrors = validateStage3(useApplicationStore.getState());
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        toast({ title: "Incomplete Details", description: "Please complete your loan requirements.", variant: "destructive" });
+        return;
+      }
+      setErrors({});
+      store.completeStage(3 as StageNumber);
+
+      setIsSubmitting(true);
+
+      const fin = store.financialDetails;
+      const fp = store.financialFootprint;
+
+      // Bridge to the old Apply.tsx interface with strict null-safety
+      const data = {
+        fullName: store.basicKYC?.fullName ?? "Guest",
+        email: store.basicKYC?.email ?? "",
+        phone: store.basicKYC?.mobileNumber ?? "",
+        panCard: store.basicKYC?.panNumber ?? "",
+        dob: store.basicKYC?.dateOfBirth ?? "",
+        productType: store.loanRequirements?.loanType?.toLowerCase().replace('_loan', '').replace('_', '') ?? "personal",
+        loanAmount: Number(store.loanRequirements?.loanAmount ?? 500000),
+        loanTenure: Number(store.loanRequirements?.tenureYears ?? 5),
+        cibilScore: Number(store.loanRequirements?.cibilScore ?? 750),
+        occupation: store.basicKYC?.employmentType?.toLowerCase() ?? "salaried",
+        monthlyIncome: (() => {
+          if (fin?.path === "SALARIED") return Number(fin.data?.netMonthlySalary ?? 50000);
+          if (fin?.path === "PROFESSIONAL") return Number(fin.data?.netMonthlyIncome ?? 50000);
+          if (fin?.path === "SELF_EMPLOYED") return Number(fin.data?.netMonthlyIncome ?? 50000);
+          return 50000;
+        })(),
+        state: store.basicKYC?.state ?? "",
+        city: store.basicKYC?.city ?? "",
+        employmentType: store.basicKYC?.employmentType ?? "SALARIED",
+        
+        // Phase 5 underwriting variables safely mapped with explicit casts to bypass union constraints
+        depreciation: Number((fin?.data as any)?.depreciation ?? 0),
+        isCaCertifiedOrAudited: Boolean((fin?.data as any)?.isCaCertifiedOrAudited ?? false),
+        last12MonthsGstTurnover: Number((fin?.data as any)?.last12MonthsGstTurnover ?? 0),
+        annualGrossReceipts: Number((fin?.data as any)?.annualGrossReceipts ?? 0),
+        totalPracticeYears: Number((fin?.data as any)?.totalPracticeYears ?? 0),
+        propertyIdentified: Boolean(fp?.propertyIdentified ?? false),
+        estimatedPropertyValue: Number(fp?.estimatedPropertyValue ?? 0),
+        isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
+        hasExistingLoan: Boolean((fp as any)?.hasExistingLoan ?? false),
+        eligibleExistingEmi: Number((fp as any)?.existingEmi ?? 0)
+      };
+
+      onFormSubmit?.(data);
+      setIsAnalyzing(true);
+    } catch (error) {
+      console.error("Fatal exception during payload construction or submission:", error);
+      toast({ title: "System Error", description: "Could not process form data. Please check your inputs.", variant: "destructive" });
+      setIsSubmitting(false);
+      setIsAnalyzing(false);
     }
-    setErrors({});
-    store.completeStage(3 as StageNumber);
-
-    setIsSubmitting(true);
-
-    // Bridge to the old Apply.tsx interface
-    const data = {
-      fullName: store.basicKYC.fullName,
-      email: store.basicKYC.email,
-      phone: store.basicKYC.mobileNumber,
-      panCard: store.basicKYC.panNumber,
-      dob: store.basicKYC.dateOfBirth,
-      productType: store.loanRequirements.loanType.toLowerCase().replace('_loan', '').replace('_', ''),
-      loanAmount: store.loanRequirements.loanAmount,
-      loanTenure: store.loanRequirements.tenureYears,
-      cibilScore: store.loanRequirements.cibilScore,
-      occupation: store.basicKYC.employmentType?.toLowerCase() || "salaried",
-      monthlyIncome: (() => {
-        const fin = store.financialDetails;
-        if (fin.path === "SALARIED") return fin.data.netMonthlySalary;
-        if (fin.path === "PROFESSIONAL") return fin.data.netMonthlyIncome;
-        if (fin.path === "SELF_EMPLOYED") return fin.data.netMonthlyIncome;
-        return 50000;
-      })(),
-      state: store.basicKYC.state,
-      city: store.basicKYC.city,
-      employmentType: store.basicKYC.employmentType,
-    };
-
-    onFormSubmit?.(data);
-    setIsAnalyzing(true);
   }, [store, onFormSubmit]);
 
   const handleAnalysisComplete = useCallback(() => {
@@ -1203,6 +1284,48 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             error={errors.currentCompanyYears}
                           />
                         </div>
+
+                        {/* ── EMI Disclosure (Step A + conditional Step B) ── */}
+                        <div className="h-px bg-gradient-to-r from-transparent via-border dark:via-white/[0.06] to-transparent" />
+
+                        <ValidatedInput
+                          label="Total Monthly EMI across all loans (₹)"
+                          type="number"
+                          placeholder="e.g. 45000"
+                          icon={CreditCard}
+                          value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.existingEMI || "") : ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ existingEMI: Number(e.target.value) })}
+                          isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.existingEMI : -1) >= 0}
+                        />
+
+                        <AnimatePresence>
+                          {store.financialDetails.path === "SALARIED" && (store.financialDetails.data.existingEMI ?? 0) > 0 && (
+                            <motion.div
+                              key="salaried-maturity"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 rounded-xl border border-primary/10 bg-primary/5 dark:bg-[#103783]/10">
+                                <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
+                                  <IndianRupee className="w-3.5 h-3.5 text-primary dark:text-[#103783]" />
+                                  Are any of these loans finishing in the next 12 months? If yes, enter the EMI of those specific loans.
+                                </p>
+                                <ValidatedInput
+                                  label="EMI of loans closing in next 12 months (₹)"
+                                  type="number"
+                                  placeholder="e.g. 15000 (or 0 if none)"
+                                  icon={IndianRupee}
+                                  value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ maturingLoanEMI: Number(e.target.value) })}
+                                  isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </motion.div>
                     )}
 
@@ -1240,28 +1363,98 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.practiceName : "").length >= 2}
                             error={errors.practiceName}
                           />
+                        </div>
+
+                        {/* ── Practice Vintage — split into total + current firm ── */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <ValidatedInput
-                            label="Practice Vintage (Years)"
+                            label="Total Practice Vintage (Years)"
                             type="number"
-                            placeholder="8"
+                            placeholder="e.g. 12"
                             icon={Calendar}
-                            value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.practiceYears || "") : ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ practiceYears: Number(e.target.value) })}
-                            isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.practiceYears : 0) > 0}
+                            value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.totalPracticeYears || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              const v = Number(e.target.value);
+                              store.updateProfessionalDetails({ totalPracticeYears: v, practiceYears: v });
+                            }}
+                            isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.totalPracticeYears : 0) > 0}
                             error={errors.practiceYears}
+                          />
+                          <ValidatedInput
+                            label="Years in Current Firm"
+                            type="number"
+                            placeholder="e.g. 4"
+                            icon={Briefcase}
+                            value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.yearsInCurrentFirm || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ yearsInCurrentFirm: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.yearsInCurrentFirm : 0) > 0}
                           />
                         </div>
 
+                        {/* ── Income fields ──────────────────────────────────── */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <ValidatedInput
+                            label="Annual Gross Receipts (₹)"
+                            type="number"
+                            placeholder="e.g. 3600000"
+                            icon={IndianRupee}
+                            value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.annualGrossReceipts || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ annualGrossReceipts: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.annualGrossReceipts : 0) > 0}
+                          />
+                          <ValidatedInput
+                            label="Net Monthly Income (₹)"
+                            type="number"
+                            placeholder="150000"
+                            icon={IndianRupee}
+                            value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ netMonthlyIncome: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                            error={errors.netMonthlyIncome}
+                          />
+                        </div>
+
+                        {/* ── EMI Disclosure (Step A + conditional Step B) ── */}
+                        <div className="h-px bg-gradient-to-r from-transparent via-border dark:via-white/[0.06] to-transparent" />
+
                         <ValidatedInput
-                          label="Net Monthly Income (₹)"
+                          label="Total Monthly EMI across all loans (₹)"
                           type="number"
-                          placeholder="150000"
-                          icon={IndianRupee}
-                          value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ netMonthlyIncome: Number(e.target.value) })}
-                          isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
-                          error={errors.netMonthlyIncome}
+                          placeholder="e.g. 45000"
+                          icon={CreditCard}
+                          value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.existingEMI || "") : ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ existingEMI: Number(e.target.value) })}
+                          isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.existingEMI : -1) >= 0}
                         />
+
+                        <AnimatePresence>
+                          {store.financialDetails.path === "PROFESSIONAL" && (store.financialDetails.data.existingEMI ?? 0) > 0 && (
+                            <motion.div
+                              key="professional-maturity"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 rounded-xl border border-primary/10 bg-primary/5 dark:bg-[#103783]/10">
+                                <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
+                                  <IndianRupee className="w-3.5 h-3.5 text-primary dark:text-[#103783]" />
+                                  Are any of these loans finishing in the next 12 months? If yes, enter the EMI of those specific loans.
+                                </p>
+                                <ValidatedInput
+                                  label="EMI of loans closing in next 12 months (₹)"
+                                  type="number"
+                                  placeholder="e.g. 15000 (or 0 if none)"
+                                  icon={IndianRupee}
+                                  value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ maturingLoanEMI: Number(e.target.value) })}
+                                  isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </motion.div>
                     )}
 
@@ -1299,26 +1492,247 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             error={errors.businessName}
                           />
                           <ValidatedInput
-                            label="Annual Turnover (₹)"
+                            label="Business Vintage (Years)"
                             type="number"
-                            placeholder="5000000"
-                            icon={IndianRupee}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.annualTurnover || "") : ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ annualTurnover: Number(e.target.value) })}
-                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) > 0}
+                            placeholder="5"
+                            icon={Calendar}
+                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.vintageYears || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ vintageYears: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.vintageYears || 0 : 0) > 0}
+                            error={errors.vintageYears}
                           />
                         </div>
 
+                        {/* ── Program-specific income / turnover fields ─────── */}
+                        {(() => {
+                          const subType = store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.subType : null;
+
+                          if (subType === "GST_BASED") return (
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key="gst-fields"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                                className="space-y-5"
+                              >
+
+                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                  {/* Last 12 months GST turnover — the primary income proxy */}
+                                  <ValidatedInput
+                                    label="Last 12 Months GST Turnover (₹)"
+                                    type="number"
+                                    placeholder="e.g. 6000000"
+                                    icon={IndianRupee}
+                                    value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.last12MonthsGstTurnover || "") : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                      const val = Number(e.target.value);
+                                      // Mirror monthly avg to netMonthlyIncome for downstream eligibility calc
+                                      store.updateBusinessDetails({
+                                        last12MonthsGstTurnover: val,
+                                        monthlyGSTTurnover: Math.round(val / 12),
+                                        netMonthlyIncome: Math.round(val / 12),
+                                      });
+                                    }}
+                                    isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.last12MonthsGstTurnover || 0 : 0) > 0}
+                                    error={errors.netMonthlyIncome}
+                                  />
+
+                                  {/* GST Filing Months */}
+                                  <StyledSelect
+                                    label="GST Returns Filed (Months)"
+                                    icon={FileText}
+                                    value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.gstFilingMonths ? store.financialDetails.data.gstFilingMonths.toString() : undefined}
+                                    onValueChange={(v) => store.updateBusinessDetails({ gstFilingMonths: Number(v) })}
+                                    placeholder="Select filing period"
+                                  >
+                                    <SelectItem value="6">6 Months</SelectItem>
+                                    <SelectItem value="12">12 Months</SelectItem>
+                                    <SelectItem value="24">24 Months</SelectItem>
+                                    <SelectItem value="36">36+ Months</SelectItem>
+                                  </StyledSelect>
+                                </div>
+                              </motion.div>
+                            </AnimatePresence>
+                          );
+
+                          if (subType === "ITR_BASED") return (
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key="itr-fields"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                                className="space-y-5"
+                              >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                  <ValidatedInput
+                                    label="Annual Turnover (₹)"
+                                    type="number"
+                                    placeholder="5000000"
+                                    icon={IndianRupee}
+                                    value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.annualTurnover || "") : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ annualTurnover: Number(e.target.value) })}
+                                    isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) > 0}
+                                  />
+                                  <ValidatedInput
+                                    label="Net Monthly Income (₹)"
+                                    type="number"
+                                    placeholder="100000"
+                                    icon={IndianRupee}
+                                    value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ netMonthlyIncome: Number(e.target.value) })}
+                                    isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                                    error={errors.netMonthlyIncome}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                  <StyledSelect
+                                    label="ITR Filing (Years)"
+                                    icon={FileText}
+                                    value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.itrFiledYears ? store.financialDetails.data.itrFiledYears.toString() : undefined}
+                                    onValueChange={(v) => store.updateBusinessDetails({ itrFiledYears: Number(v) })}
+                                    placeholder="Select years of ITR filed"
+                                  >
+                                    <SelectItem value="1">1 Year</SelectItem>
+                                    <SelectItem value="2">2 Years</SelectItem>
+                                    <SelectItem value="3">3 or more Years</SelectItem>
+                                  </StyledSelect>
+                                </div>
+
+                                {/* Depreciation add-back — only relevant for property-collateral loans */}
+                                <AnimatePresence>
+                                  {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
+                                    <motion.div
+                                      key="depreciation-field"
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: "auto" }}
+                                      exit={{ opacity: 0, height: 0 }}
+                                      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
+                                          <IndianRupee className="w-3.5 h-3.5" />
+                                          P&amp;L Normalisation (Property Loan)
+                                        </p>
+                                        <ValidatedInput
+                                          label="Annual Depreciation Add-back (₹)"
+                                          type="number"
+                                          placeholder="e.g. 240000 — from P&L / Balance Sheet"
+                                          icon={IndianRupee}
+                                          value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.depreciation || "") : ""}
+                                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ depreciation: Number(e.target.value) })}
+                                          isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.depreciation || 0 : 0) >= 0}
+                                        />
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </motion.div>
+                            </AnimatePresence>
+                          );
+
+                          // BANKING_PROGRAM or not yet selected — show net income only
+                          if (subType === "BANKING_PROGRAM") return (
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key="banking-fields"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                              >
+                                <ValidatedInput
+                                  label="Net Monthly Income (₹)"
+                                  type="number"
+                                  placeholder="100000"
+                                  icon={IndianRupee}
+                                  value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ netMonthlyIncome: Number(e.target.value) })}
+                                  isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                                  error={errors.netMonthlyIncome}
+                                />
+                              </motion.div>
+                            </AnimatePresence>
+                          );
+
+                          return null;
+                        })()}
+
+                        {/* ── CA Certification toggle — universal signal for all SELF_EMPLOYED ── */}
+                        <div className="flex items-start gap-4 p-4 rounded-xl border border-border dark:border-white/[0.06] bg-secondary/30 dark:bg-white/[0.02]">
+                          <button
+                            type="button"
+                            role="checkbox"
+                            aria-checked={!!(store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.isCaCertifiedOrAudited)}
+                            onClick={() => {
+                              const current = store.financialDetails.path === "SELF_EMPLOYED" ? !!store.financialDetails.data.isCaCertifiedOrAudited : false;
+                              store.updateBusinessDetails({ isCaCertifiedOrAudited: !current });
+                            }}
+                            className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                              store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.isCaCertifiedOrAudited
+                                ? "bg-primary border-primary dark:bg-[#103783] dark:border-[#103783]"
+                                : "border-border dark:border-white/20 bg-transparent"
+                            }`}
+                          >
+                            {store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.isCaCertifiedOrAudited && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </button>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground leading-snug">
+                              Accounts are CA-Certified / Audited
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+                              Declaring CA-certified accounts improves creditworthiness assessment and may unlock better rates.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* ── EMI Disclosure (Step A + conditional Step B) ── */}
+                        <div className="h-px bg-gradient-to-r from-transparent via-border dark:via-white/[0.06] to-transparent" />
+
                         <ValidatedInput
-                          label="Net Monthly Income (₹)"
+                          label="Total Monthly EMI across all loans (₹)"
                           type="number"
-                          placeholder="100000"
-                          icon={IndianRupee}
-                          value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ netMonthlyIncome: Number(e.target.value) })}
-                          isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
-                          error={errors.netMonthlyIncome}
+                          placeholder="e.g. 45000"
+                          icon={CreditCard}
+                          value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.existingEMI || "") : ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ existingEMI: Number(e.target.value) })}
+                          isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.existingEMI : -1) >= 0}
                         />
+
+                        <AnimatePresence>
+                          {store.financialDetails.path === "SELF_EMPLOYED" && (store.financialDetails.data.existingEMI ?? 0) > 0 && (
+                            <motion.div
+                              key="business-maturity"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 rounded-xl border border-primary/10 bg-primary/5 dark:bg-[#103783]/10">
+                                <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
+                                  <IndianRupee className="w-3.5 h-3.5 text-primary dark:text-[#103783]" />
+                                  Are any of these loans finishing in the next 12 months? If yes, enter the EMI of those specific loans.
+                                </p>
+                                <ValidatedInput
+                                  label="EMI of loans closing in next 12 months (₹)"
+                                  type="number"
+                                  placeholder="e.g. 15000 (or 0 if none)"
+                                  icon={IndianRupee}
+                                  value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ maturingLoanEMI: Number(e.target.value) })}
+                                  isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -1442,6 +1856,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
                 </div>
 
+                <div className="space-y-5 relative z-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
                       label="Loan Amount (₹)"
@@ -1468,20 +1883,54 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
                   {/* CIBIL Slider */}
                   <div className={`p-5 rounded-2xl border backdrop-blur-sm transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
-                    <div className="flex justify-between items-center mb-5">
+                    <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
                       <div className="flex items-center gap-2">
-                        <CreditCard className={`w-5 h-5 ${cibilUi.color}`} />
-                        <span className="text-sm font-medium text-muted-foreground">CIBIL Score</span>
+                        <CreditCard className={`w-5 h-5 shrink-0 ${cibilUi.color}`} />
+                        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">CIBIL Score</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <motion.span
-                          key={cibilScore}
-                          initial={{ y: -8, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          className={`text-2xl font-semibold tabular-nums ${cibilUi.color}`}
-                        >
-                          {cibilScore}
-                        </motion.span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {editingCibil ? (
+                          // ── Inline edit mode ──────────────────────────────
+                          <div className="flex items-center gap-1">
+                            <input
+                              autoFocus
+                              type="number"
+                              min={300}
+                              max={900}
+                              className={`w-20 bg-transparent text-right text-2xl font-semibold tabular-nums outline-none border-b-2 border-primary/50 focus:border-primary transition-colors py-0.5 rounded-none ${cibilUi.color}`}
+                              value={cibilInputVal}
+                              onChange={(e) => setCibilInputVal(e.target.value)}
+                              onBlur={() => {
+                                const val = Math.min(900, Math.max(300, parseInt(cibilInputVal, 10)));
+                                if (!isNaN(val)) store.updateLoanRequirements({ cibilScore: val });
+                                else setCibilInputVal(cibilScore.toString());
+                                setEditingCibil(false);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                if (e.key === "Escape") { setCibilInputVal(cibilScore.toString()); setEditingCibil(false); }
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          // ── Display mode — tap to edit ────────────────────
+                          <button
+                            type="button"
+                            className={`flex items-center gap-1.5 group/edit cursor-pointer`}
+                            onClick={() => { setCibilInputVal(cibilScore.toString()); setEditingCibil(true); }}
+                            title="Click to type exact score"
+                          >
+                            <motion.span
+                              key={cibilScore}
+                              initial={{ y: -8, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              className={`text-2xl font-semibold tabular-nums border-b border-dashed border-current/40 group-hover/edit:border-current pb-0.5 transition-colors ${cibilUi.color}`}
+                            >
+                              {cibilScore}
+                            </motion.span>
+                            <Edit2 className={`w-3.5 h-3.5 opacity-40 group-hover/edit:opacity-100 transition-opacity ${cibilUi.color}`} />
+                          </button>
+                        )}
                         <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
                           {cibilUi.label}
                         </span>
@@ -1701,57 +2150,127 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           </div>
         </div>
 
-        {/* ── Navigation ──────────────────────────────────────────────────── */}
-        <div className="mt-4 pt-6 flex flex-col items-center gap-4">
-          <div className="w-full flex items-center justify-between">
-          <motion.div whileHover={store.currentStage > 1 ? { x: -2 } : {}} whileTap={store.currentStage > 1 ? { scale: 0.96 } : {}}>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={prevStep}
-              disabled={store.currentStage === 1 || isSubmitting || isAnalyzing}
-              className={cn(
-                "bg-transparent border-border dark:border-white/10 text-muted-foreground hover:bg-secondary dark:hover:bg-white/5 hover:border-primary/20 rounded-xl transition-all duration-200",
-                store.currentStage === 1 && "opacity-0 pointer-events-none"
-              )}
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" /> Back
-            </Button>
-          </motion.div>
+        {/* =========================================================== */}
+        {/* NAVIGATION — Dual-layer Thumb Zone Architecture             */}
+        {/* Mobile (<md): fixed bottom bar pinned to thumb zone         */}
+        {/* Tablet/Desktop (md+): inline in document flow               */}
+        {/* =========================================================== */}
 
-          {store.currentStage < 3 ? (
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+        <div ref={formEndRef} className="w-full h-1" aria-hidden="true" />
+
+        {/* Spacer: reserves scroll space so content isn't occluded by fixed bar */}
+        <div className={cn("md:hidden transition-all duration-300", !isBottomVisible ? "h-28" : "h-0")} aria-hidden="true" />
+
+        {/* MOBILE: Pinned CTA — always in reach, jumps to inline when at bottom */}
+        <div className={cn(
+          "w-full z-50 md:hidden flex flex-col gap-2 transition-all duration-300",
+          !isBottomVisible
+            ? "fixed bottom-0 left-0 px-4 pb-8 pt-3 bg-background/90 backdrop-blur-md border-t border-border/50"
+            : "relative mt-4 px-0 bg-transparent"
+        )}>
+          <div className="flex items-center justify-between gap-3">
+            {/* Back — ghost, left side */}
+            <motion.div whileTap={{ scale: 0.96 }} className="shrink-0">
               <Button
                 type="button"
-                onClick={nextStep}
-                className="bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] text-white rounded-xl px-6 py-5 font-semibold transition-colors duration-200"
-              >
-                Continue <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting || isAnalyzing}
-                className="rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] text-white px-8 py-5 font-semibold transition-colors duration-200 min-w-[180px]"
-              >
-                {isSubmitting || isAnalyzing ? (
-                  <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
-                ) : (
-                  <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
+                variant="outline"
+                onClick={prevStep}
+                disabled={store.currentStage === 1 || isSubmitting || isAnalyzing}
+                className={cn(
+                  "h-12 bg-transparent border-border/60 text-muted-foreground rounded-xl transition-all duration-150 active:scale-[0.97]",
+                  !isBottomVisible && "active:bg-secondary",
+                  store.currentStage === 1 && "opacity-0 pointer-events-none"
                 )}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Back
               </Button>
             </motion.div>
-          )}
+
+            {/* Primary CTA — flex-1 fills remaining thumb zone */}
+            {store.currentStage < 3 ? (
+              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="w-full h-12 bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white rounded-xl font-semibold transition-all duration-150"
+                >
+                  Continue <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || isAnalyzing}
+                  className="w-full h-12 rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white font-semibold transition-all duration-150"
+                >
+                  {isSubmitting || isAnalyzing ? (
+                    <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
+                  ) : (
+                    <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
+                  )}
+                </Button>
+              </motion.div>
+            )}
           </div>
-          
-          {/* Trust Microcopy Injection */}
-          <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group">
-            <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" /> 
-            Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
+          <p className="text-[10px] text-muted-foreground/50 font-medium flex items-center gap-1.5 justify-center">
+            <LockKeyhole className="w-3 h-3 text-muted-foreground/40" />
+            Checking eligibility will <span className="font-semibold text-foreground/70">not</span> affect your credit score
           </p>
+        </div>
+
+        {/* TABLET + DESKTOP: Inline document-flow navigation */}
+        <div className="hidden md:block mt-4 pt-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-full flex items-center justify-between">
+              <motion.div whileHover={store.currentStage > 1 ? { x: -2 } : {}} whileTap={store.currentStage > 1 ? { scale: 0.96 } : {}}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={store.currentStage === 1 || isSubmitting || isAnalyzing}
+                  className={cn(
+                    "bg-transparent border-border dark:border-white/10 text-muted-foreground hover:bg-secondary dark:hover:bg-white/5 hover:border-primary/20 rounded-xl transition-all duration-200 active:scale-[0.97]",
+                    store.currentStage === 1 && "opacity-0 pointer-events-none"
+                  )}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" /> Back
+                </Button>
+              </motion.div>
+
+              {store.currentStage < 3 ? (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="w-full md:w-auto md:min-w-[200px] bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white rounded-xl px-6 font-semibold transition-all duration-150"
+                  >
+                    Continue <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || isAnalyzing}
+                    className="w-full md:w-auto md:min-w-[200px] rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white px-8 font-semibold transition-all duration-150"
+                  >
+                    {isSubmitting || isAnalyzing ? (
+                      <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
+                    ) : (
+                      <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </div>
+            <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group">
+              <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+              Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
+            </p>
+          </div>
         </div>
       </motion.div>
     </>

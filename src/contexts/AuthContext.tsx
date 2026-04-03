@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { PrymeAPI } from "@/lib/api";
+import { generateSafeUUID } from "@/lib/utils";
+
 
 // Strictly mapping to the com.pryme.Backend.iam.Role enum
 export type AppRole = "USER" | "EMPLOYEE" | "ADMIN" | "SUPER_ADMIN";
@@ -37,7 +39,7 @@ export const useAuth = () => {
 const getSecureDeviceId = (): string => {
   let deviceId = localStorage.getItem("pryme_device_fingerprint");
   if (!deviceId) {
-    deviceId = crypto.randomUUID();
+    deviceId = generateSafeUUID();
     localStorage.setItem("pryme_device_fingerprint", deviceId);
   }
   return deviceId;

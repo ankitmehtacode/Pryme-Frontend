@@ -143,15 +143,10 @@ const EMICalculator = ({
             </div>
 
             {/* Micro-metrics — fills the void space with actionable data */}
-            <div className="mt-3 pt-3 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center gap-3 md:gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Per Day</p>
+            <div className="mt-3 pt-3 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">
+              <div className="flex-1 flex items-center justify-between min-w-0">
+                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Per Day Equivalent</p>
                 <p className="text-xs md:text-sm font-bold text-foreground">{formatShortCurrency(Math.round(emi / 30))}</p>
-              </div>
-              <div className="w-px h-7 bg-[#103783]/10 dark:bg-[#103783]/20 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Interest Cost</p>
-                <p className="text-xs md:text-sm font-bold text-foreground">{((totalInterest / amount) * 100).toFixed(1)}%</p>
               </div>
             </div>
           </div>

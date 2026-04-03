@@ -6,11 +6,19 @@ import prymeLogo from "@/assets/Pryme2.svg";
 
 const CONTACT_PHONE = "1800-309-4001";
 const CONTACT_PHONE_LINK = "tel:18003094001";
-const CONTACT_EMAIL = "hello@gopryme.tech";
-const COMPANY_ADDRESS = "INDORE, INDIA";
+const CONTACT_EMAIL = "hello@gopryme.in";
+
+const COMPANY_ADDRESS_NODE = (
+  <span className="block leading-relaxed">
+    <strong className="font-semibold text-white dark:text-foreground">Pryme Headquarters</strong><br />
+    4th Floor, Above Mr. DIY Showroom,<br />
+    Ranjeet Hanuman Main Road, Mhow Naka Square,<br />
+    Indore, Madhya Pradesh, 452009, India
+  </span>
+);
 
 const SOCIAL_LINKS = {
-  linkedin: "https://linkedin.com/company/prymefinance",
+  linkedin: "https://www.linkedin.com/company/pryme-consultingindia/",
   twitter: "https://twitter.com/prymefinance",
   facebook: "https://facebook.com/prymefinance",
   instagram: "https://www.instagram.com/go.pryme/",
@@ -79,7 +87,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           {/* Company Info */}
           <div className="col-span-2 lg:col-span-2 space-y-6">
-            <Link to="/" className="inline-block">
+            <Link to="/" className="inline-block pointer-events-auto" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               <img src={prymeLogo} alt="PRYME" className="h-10" />
             </Link>
             <p className="text-sm text-zinc-400 dark:text-muted-foreground leading-relaxed max-w-xs">
@@ -92,9 +100,9 @@ const Footer = () => {
                   const Icon = { linkedin: Linkedin, twitter: Twitter, facebook: Facebook, instagram: Instagram }[name as keyof typeof SOCIAL_LINKS]!;
                   return (
                     <li key={name}>
-                      <a 
-                        href={url} 
-                        target="_blank" 
+                      <a
+                        href={url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="w-10 h-10 rounded-full bg-white/5 dark:bg-secondary border border-white/10 dark:border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                         aria-label={`Follow us on ${name.charAt(0).toUpperCase() + name.slice(1)}`}
@@ -104,12 +112,12 @@ const Footer = () => {
                     </li>
                   );
                 })}
-      </ul>
-    </nav>
+              </ul>
+            </nav>
           </div >
 
-  {/* Products */ }
-  < div >
+          {/* Products */}
+          < div >
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Products</h4>
             <ul className="space-y-3">
               {productLinks.map((link) => (
@@ -122,8 +130,8 @@ const Footer = () => {
             </ul>
           </div >
 
-  {/* Tools */ }
-  < div >
+          {/* Tools */}
+          < div >
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Tools</h4>
             <ul className="space-y-3">
               {toolLinks.map((link) => (
@@ -136,8 +144,8 @@ const Footer = () => {
             </ul>
           </div >
 
-  {/* Company */ }
-  < div >
+          {/* Company */}
+          < div >
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
@@ -150,8 +158,8 @@ const Footer = () => {
             </ul>
           </div >
 
-  {/* Contact */ }
-  < div >
+          {/* Contact */}
+          < div >
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
@@ -169,10 +177,10 @@ const Footer = () => {
                   {CONTACT_EMAIL}
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <span className="text-sm text-zinc-400 dark:text-muted-foreground">
-                  {COMPANY_ADDRESS}
+              <li className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span className="text-xs md:text-sm text-zinc-400 dark:text-muted-foreground transition-colors hover:text-white dark:hover:text-foreground">
+                  {COMPANY_ADDRESS_NODE}
                 </span>
               </li>
             </ul>
@@ -180,39 +188,39 @@ const Footer = () => {
         </div >
       </div >
 
-  {/* Legal Footer */ }
-  < div className = "border-t border-white/10 dark:border-border" >
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <p className="text-xs text-zinc-500 dark:text-muted-foreground">
-            © {currentYear} PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456
-          </p>
-          <div className="flex flex-wrap gap-4">
-            {legalLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="text-xs text-zinc-500 dark:text-muted-foreground hover:text-primary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* Legal Footer */}
+      < div className="border-t border-white/10 dark:border-border" >
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <p className="text-xs text-zinc-500 dark:text-muted-foreground">
+                © {currentYear} PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456
+              </p>
+              <div className="flex flex-wrap gap-4">
+                {legalLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className="text-xs text-zinc-500 dark:text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* RBI Disclaimer */}
+          <div className="mt-6 pt-6 border-t border-white/10 dark:border-border">
+            <p className="text-xs text-zinc-500 dark:text-muted-foreground/80 leading-relaxed max-w-5xl">
+              <strong className="text-zinc-400 dark:text-muted-foreground">Disclaimer:</strong> PRYME is a loan comparison and facilitation platform and not a lender.
+              We partner with RBI-regulated banks and NBFCs to provide loan services. All loans are subject to
+              credit approval and terms & conditions of the respective lending partners. Interest rates, processing
+              fees, and other charges vary based on the loan type and borrower profile. The information provided
+              on this website is for general informational purposes only and should not be considered as financial advice.
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* RBI Disclaimer */}
-      <div className="mt-6 pt-6 border-t border-white/10 dark:border-border">
-        <p className="text-xs text-zinc-500 dark:text-muted-foreground/80 leading-relaxed max-w-5xl">
-          <strong className="text-zinc-400 dark:text-muted-foreground">Disclaimer:</strong> PRYME is a loan comparison and facilitation platform and not a lender.
-          We partner with RBI-regulated banks and NBFCs to provide loan services. All loans are subject to
-          credit approval and terms & conditions of the respective lending partners. Interest rates, processing
-          fees, and other charges vary based on the loan type and borrower profile. The information provided
-          on this website is for general informational purposes only and should not be considered as financial advice.
-        </p>
-      </div>
-    </div>
       </div >
     </footer >
   );

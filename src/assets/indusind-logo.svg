@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120">
+  <!-- IndusInd Bank logo mark -->
+  <g transform="translate(10, 15)">
+    <rect x="0" y="0" width="80" height="90" rx="10" fill="#86368d"/>
+    <text x="40" y="58" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="40" fill="#fff" text-anchor="middle" dominant-baseline="middle">IIB</text>
+  </g>
+  <!-- IndusInd Bank text -->
+  <g>
+    <text x="108" y="48" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="32" fill="#86368d" letter-spacing="0.5">IndusInd</text>
+    <text x="108" y="82" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="24" fill="#86368d" letter-spacing="2">BANK</text>
+  </g>
+</svg>

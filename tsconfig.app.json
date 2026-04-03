@@ -26,5 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["**/*.py", "**/*.cjs", "optimize_typography.py", "refactor_theme.cjs"]
 }

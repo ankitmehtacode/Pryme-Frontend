@@ -79,9 +79,15 @@ const BlogDetail = () => {
                 <button className="p-3 rounded-full bg-slate-100 hover:bg-[#1DA1F2] hover:text-white transition-colors text-slate-600">
                   <Twitter className="w-5 h-5" />
                 </button>
-                <button className="p-3 rounded-full bg-slate-100 hover:bg-[#0A66C2] hover:text-white transition-colors text-slate-600">
+                <a
+                  href="https://www.linkedin.com/company/pryme-consultingindia/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-full bg-slate-100 hover:bg-[#0A66C2] hover:text-white transition-colors text-slate-600"
+                  aria-label="Visit Pryme on LinkedIn"
+                >
                   <Linkedin className="w-5 h-5" />
-                </button>
+                </a>
               </div>
             </div>
 

@@ -1,4 +1,6 @@
 // src/lib/api.ts
+import { generateSafeUUID } from "@/lib/utils";
+
 
 // 🧠 ARCHITECTURE FIX: Hardcoded localhost fallback for local Spring Boot development
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
@@ -177,7 +179,7 @@ export const PrymeAPI = {
 
     return fetchWithAuth(`/leads`, {
       method: "POST",
-      headers: { "Idempotency-Key": crypto.randomUUID() },
+      headers: { "Idempotency-Key": generateSafeUUID() },
       body: JSON.stringify(payload),
     });
   },

@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import { AppProviders } from "@/providers/AppProviders";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { SplashOverlay } from "@/components/SplashOverlay";
 import { PageTransitionLoader } from "@/components/PageTransitionLoader";
 import { AppRoutes } from "@/routes/AppRoutes";
 
 const App = () => (
   <AppProviders>
-    <ErrorBoundary>
+    <AppErrorBoundary>
       <SplashOverlay />
 
       <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-x-hidden flex flex-col w-full relative">
@@ -15,7 +15,7 @@ const App = () => (
           <AppRoutes />
         </Suspense>
       </div>
-    </ErrorBoundary>
+    </AppErrorBoundary>
   </AppProviders>
 );
 

@@ -138,7 +138,7 @@ const Index = () => {
         <meta property="og:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
         <meta property="og:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://gopryme.tech" />
+        <link rel="canonical" href="https://www.gopryme.tech" />
       </Helmet>
 
       {/* Safe Smooth Scrolling wrapper */}

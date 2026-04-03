@@ -103,8 +103,8 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Tools</p>
             <div className="space-y-1">
               {toolLinks.map((item) => (
-                <Link key={item.href} to={item.href} onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><item.icon className="w-4 h-4 text-[#ffd600]" /></div>
+                <Link key={item.href} to={item.href} onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><item.icon className="w-4 h-4 text-[#103783]" /></div>
                   <span className="text-sm font-medium text-slate-700">{item.label}</span>
                 </Link>
               ))}
@@ -183,7 +183,7 @@ const Header = memo(() => {
         <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
 
           {/* Logo — Icon mark + SVG wordmark lockup */}
-          <Link to="/" className="flex items-center gap-1.5 shrink-0 group" aria-label="PRYME Home">
+          <Link to="/" className="flex items-center gap-1.5 shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <img
               src={pryme2Logo}
               alt=""
@@ -224,8 +224,8 @@ const Header = memo(() => {
                   <NavigationMenuContent>
                     <div className="w-[350px] p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
                       {toolLinks.map((item) => (
-                        <Link key={item.href} to={item.href} className="flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 transition-colors group">
-                          <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"><item.icon className="w-4 h-4 text-[#ffd600]" /></div>
+                        <Link key={item.href} to={item.href} className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group">
+                          <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><item.icon className="w-4 h-4 text-[#103783]" /></div>
                           <div><p className="text-sm font-semibold text-slate-900">{item.label}</p><p className="text-xs text-slate-500">{item.description}</p></div>
                         </Link>
                       ))}

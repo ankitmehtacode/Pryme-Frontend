@@ -9,6 +9,7 @@ import cardBusiness from "@/assets/card-business.png";
 import cardHome from "@/assets/card-home.png";
 import cardEducation from "@/assets/card-education.png";
 import cardLap from "@/assets/card-lap.png";
+import cardAuto from "@/assets/card-auto.svg";
 
 const products = [
   {
@@ -17,7 +18,11 @@ const products = [
     image: cardPersonal,
     tag: "CASHBACK",
     href: "/apply?type=personal",
-    accent: "148, 62%, 42%", 
+    accent: "148, 62%, 42%",
+    bg: "#111",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
+    borderColor: "rgba(255,255,255,0.1)",
   },
   {
     id: "business",
@@ -25,7 +30,11 @@ const products = [
     image: cardBusiness,
     tag: "LOWEST RATES",
     href: "/apply?type=business",
-    accent: "217, 91%, 60%", 
+    accent: "217, 91%, 60%",
+    bg: "#111",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
+    borderColor: "rgba(255,255,255,0.1)",
   },
   {
     id: "home",
@@ -33,7 +42,11 @@ const products = [
     image: cardHome,
     tag: "PRE-APPROVED",
     href: "/apply?type=home",
-    accent: "48, 100%, 50%", 
+    accent: "48, 100%, 50%",
+    bg: "#111",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
+    borderColor: "rgba(255,255,255,0.1)",
   },
   {
     id: "lap",
@@ -41,7 +54,12 @@ const products = [
     image: cardLap,
     tag: "HIGH VALUE",
     href: "/apply?type=lap",
-    accent: "190, 90%, 50%", 
+    // Teal — matches bg baked into the image for seamless card edges
+    accent: "174, 45%, 38%",
+    bg: "#0d3330",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.3), rgba(0,0,0,0.05), rgba(255,255,255,0.04))",
+    borderColor: "rgba(45,160,140,0.25)",
   },
   {
     id: "education",
@@ -49,7 +67,23 @@ const products = [
     image: cardEducation,
     tag: "100% FUNDING",
     href: "/apply?type=education",
-    accent: "270, 70%, 60%", 
+    accent: "270, 70%, 60%",
+    bg: "#111",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
+    borderColor: "rgba(255,255,255,0.1)",
+  },
+  {
+    id: "auto",
+    label: "AUTO LOAN",
+    image: cardAuto,
+    tag: "INSTANT APPROVAL",
+    href: "/apply?type=auto",
+    accent: "12, 90%, 55%",
+    bg: "#111",
+    imgClass: "",
+    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
+    borderColor: "rgba(255,255,255,0.1)",
   },
 ];
 
@@ -110,13 +144,23 @@ const ProductSelectorGrid = memo(() => {
                   style={{ transformStyle: "preserve-3d", zIndex: 10 }}
                 >
                   
-                  {/* The Image Container */}
-                  <div className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden bg-[#111] border border-white/10 shadow-[0_15px_30px_-10px_rgba(0,0,0,0.8)] group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,1)] transition-shadow duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-white/10 z-10 pointer-events-none mix-blend-overlay" />
+                  {/* The Image Container — bg, overlay and border are all per-product */}
+                  <div
+                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden shadow-[0_15px_30px_-10px_rgba(0,0,0,0.8)] group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,1)] transition-shadow duration-500"
+                    style={{
+                      backgroundColor: product.bg,
+                      border: `1px solid ${product.borderColor}`,
+                    }}
+                  >
+                    {/* Per-card overlay gradient — LAP gets teal-tinted, others get standard dark */}
+                    <div
+                      className="absolute inset-0 z-10 pointer-events-none mix-blend-overlay"
+                      style={{ background: product.overlay }}
+                    />
                     <img
                       src={product.image}
                       alt={product.label}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0"
+                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 ${product.imgClass}`}
                       loading="lazy"
                       draggable={false}
                     />

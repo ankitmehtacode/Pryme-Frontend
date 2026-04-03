@@ -24,4 +24,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    exclude: ["optimize_typography.py", "refactor_theme.cjs"],
+  },
+  build: {
+    rollupOptions: {
+      // Reverted manualChunks due to Rollup build errors
+    },
+  },
 });

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120">
+  <!-- Bank of Baroda Star -->
+  <polygon points="40,5 49,35 80,35 55,55 64,85 40,65 16,85 25,55 0,35 31,35" fill="#f26522" transform="translate(10,18) scale(0.95)"/>
+  <!-- Bank of Baroda Text -->
+  <g>
+    <text x="110" y="52" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="34" fill="#f26522" letter-spacing="1">Bank of Baroda</text>
+    <text x="110" y="82" font-family="Arial, Helvetica, sans-serif" font-weight="500" font-size="16" fill="#7a7a7a" letter-spacing="3">INDIA'S INTERNATIONAL BANK</text>
+  </g>
+</svg>

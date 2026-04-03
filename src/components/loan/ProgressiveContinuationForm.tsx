@@ -180,9 +180,23 @@ export default function ProgressiveContinuationForm({
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between">
-              <Button variant="ghost" onClick={onCancel} className="text-muted-foreground">Cancel</Button>
-              <Button onClick={handleNextStep} disabled={isSubmitting} className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 group">
+            {/* Spacer for mobile pinned bar */}
+            <div className="h-20 md:hidden" aria-hidden="true" />
+
+            {/* MOBILE: Pinned thumb-zone bar — Step 1 */}
+            <div className="fixed bottom-0 left-0 w-full z-50 md:hidden px-4 pb-8 pt-3 bg-background/90 backdrop-blur-md border-t border-border/50 flex items-center justify-between gap-3">
+              <Button variant="ghost" onClick={onCancel} className="h-12 text-muted-foreground active:scale-[0.97] active:bg-secondary/60 shrink-0">Cancel</Button>
+              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
+                <Button onClick={handleNextStep} disabled={isSubmitting} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] active:bg-primary/80 text-primary-foreground shadow-lg shadow-primary/20 font-semibold transition-all duration-150">
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Secure Step <ChevronRight className="w-5 h-5 ml-1" /></>}
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* DESKTOP: Inline Step 1 footer */}
+            <div className="hidden md:flex pt-6 items-center justify-between">
+              <Button variant="ghost" onClick={onCancel} className="text-muted-foreground active:scale-[0.97]">Cancel</Button>
+              <Button onClick={handleNextStep} disabled={isSubmitting} className="h-12 w-full md:w-auto md:min-w-[200px] px-8 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] active:bg-primary/80 text-primary-foreground shadow-lg shadow-primary/20 group transition-all duration-150">
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 
                 <>Secure Step <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" /></>}
               </Button>
@@ -222,11 +236,11 @@ export default function ProgressiveContinuationForm({
                           <CheckCircle2 className="w-4 h-4" /> Secured
                         </div>
                       ) : (
-                        <Button 
+                       <Button 
                           variant="outline"
                           onClick={() => handleFileUpload(doc)}
                           disabled={isUploading}
-                          className="rounded-lg h-10 border-border hover:border-primary hover:text-primary"
+                          className="rounded-lg h-12 min-w-[100px] border-border hover:border-primary hover:text-primary active:scale-[0.97] active:bg-primary/5 transition-all duration-150"
                         >
                           {isUploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Encrypting...</> : <><UploadCloud className="w-4 h-4 mr-2" /> Upload</>}
                         </Button>
@@ -237,11 +251,27 @@ export default function ProgressiveContinuationForm({
               })}
             </div>
 
-            <div className="pt-8 flex items-center justify-between border-t border-border/50">
+            {/* Spacer for mobile pinned bar */}
+            <div className="h-20 md:hidden" aria-hidden="true" />
+
+            {/* MOBILE: Pinned thumb-zone bar — Step 2 */}
+            <div className="fixed bottom-0 left-0 w-full z-50 md:hidden px-4 pb-8 pt-3 bg-background/90 backdrop-blur-md border-t border-border/50 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase tracking-widest shrink-0">
+                <LockKeyhole className="w-3.5 h-3.5" /> Encrypted
+              </div>
+              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
+                <Button onClick={handleFinalSubmit} disabled={isSubmitting} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] active:bg-primary/80 text-primary-foreground shadow-lg shadow-primary/20 font-semibold transition-all duration-150">
+                  {isSubmitting ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Finalizing...</> : "Submit Application Form"}
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* DESKTOP: Inline Step 2 footer */}
+            <div className="hidden md:flex pt-8 items-center justify-between border-t border-border/50">
               <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
                 <LockKeyhole className="w-3.5 h-3.5" /> Bank-Grade Encryption
               </div>
-              <Button onClick={handleFinalSubmit} disabled={isSubmitting} className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 group">
+              <Button onClick={handleFinalSubmit} disabled={isSubmitting} className="h-12 w-full md:w-auto md:min-w-[220px] px-8 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] active:bg-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-150">
                 {isSubmitting ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
                 {isSubmitting ? "Finalizing..." : "Submit Application Form"}
               </Button>

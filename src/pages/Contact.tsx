@@ -39,11 +39,11 @@ const Contact = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground ml-1">Full Name</label>
-                        <input type="text" placeholder="John Doe" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        <input type="text" placeholder="Rahul Sharma" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground ml-1">Email Address</label>
-                        <input type="email" placeholder="john@example.com" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        <input type="email" placeholder="you@example.com" className="w-full px-5 py-4 rounded-2xl bg-secondary border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -61,17 +61,17 @@ const Contact = () => {
                 <div className="flex flex-col gap-8 h-full">
                   {[
                     { icon: Phone, title: "Call Us", detail: "1800-309-4001", sub: "Mon-Sat, 10AM - 7PM" },
-                    { icon: Mail, title: "Email Support", detail: "info@gopryme.tech", sub: "24/7 Priority Response" },
-                    { icon: MapPin, title: "Headquarters", detail: "Digital Hub, Phase-IV", sub: "Gurajat, India" }
+                    { icon: Mail, title: "Email Support", detail: "hello@gopryme.in", sub: "24/7 Priority Response" },
+                    { icon: MapPin, title: "Headquarters", detail: "Indore HQ", sub: "4th Floor, Above Mr. DIY Showroom,\nRanjeet Hanuman Main Road, Mhow Naka Square,\nIndore, Madhya Pradesh, 452009, India" }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-sm">
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
                         <item.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <h4 className="text-lg font-semibold text-foreground mb-1">{item.title}</h4>
                         <p className="text-xl text-primary font-medium">{item.detail}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{item.sub}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed whitespace-pre-line break-words">{item.sub}</p>
                       </div>
                     </div>
                   ))}

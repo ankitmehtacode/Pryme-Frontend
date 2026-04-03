@@ -27,11 +27,12 @@ import type {
   DocumentStatus,
   StageNumber,
 } from '@/lib/applicationTypes';
+import { generateSafeUUID } from '@/lib/utils';
 
 // ─── DEFAULT STATE FACTORY ──────────────────────────────────────────────────
 
 const createFreshState = (): ApplicationState => ({
-  applicationId: crypto.randomUUID(),
+  applicationId: generateSafeUUID(),
   currentStage: 1,
   completedStages: [],
   createdAt: new Date().toISOString(),
@@ -101,6 +102,8 @@ const defaultProfessional: ProfessionalDetails = {
   registrationNumber: '',
   practiceName: '',
   practiceYears: 0,
+  totalPracticeYears: 0,
+  yearsInCurrentFirm: 0,
   practiceAddress: '',
   annualGrossReceipts: 0,
   netMonthlyIncome: 0,
@@ -115,6 +118,23 @@ const defaultBusiness: BusinessDetails = {
   industryType: '',
   vintageYears: 0,
   businessAddress: '',
+  // ITR fields
+  annualTurnover: 0,
+  netProfit: 0,
+  itrFiledYears: undefined,
+  depreciation: 0,                   // P&L add-back for LAP / HOME_LOAN
+  // GST fields
+  gstNumber: undefined,
+  last12MonthsGstTurnover: 0,        // new primary GST income field
+  monthlyGSTTurnover: 0,
+  gstFilingMonths: undefined,
+  // Banking
+  abbTier: undefined,
+  primaryBankName: undefined,
+  accountHeldMonths: undefined,
+  // Compliance
+  isCaCertifiedOrAudited: false,     // boolean — must default false not undefined
+  // Common
   netMonthlyIncome: 0,
   hasExistingLoans: false,
   existingEMI: 0,
@@ -124,7 +144,7 @@ const defaultBusiness: BusinessDetails = {
 // Bump this when the ApplicationState shape changes. Zustand's persist
 // middleware uses this to decide whether to hydrate or purge stale data.
 
-const STORE_VERSION = 3;
+const STORE_VERSION = 4;
 
 // ─── THE STORE ──────────────────────────────────────────────────────────────
 
@@ -183,14 +203,14 @@ export const useApplicationStore = create<ApplicationStore>()(
 
       updateSalariedDetails: (data: Partial<SalariedDetails>) =>
         set((state) => {
-          const current =
-            state.financialDetails.path === 'SALARIED'
-              ? state.financialDetails.data
-              : defaultSalaried;
+          // 3-way merge: default seeds missing keys → persisted overwrites → update applies
+          const persisted = state.financialDetails.path === 'SALARIED'
+            ? state.financialDetails.data
+            : ({} as Partial<SalariedDetails>);
           return {
             financialDetails: {
               path: 'SALARIED' as const,
-              data: { ...current, ...data },
+              data: { ...defaultSalaried, ...persisted, ...data },
             },
             lastModifiedAt: new Date().toISOString(),
           };
@@ -198,14 +218,14 @@ export const useApplicationStore = create<ApplicationStore>()(
 
       updateProfessionalDetails: (data: Partial<ProfessionalDetails>) =>
         set((state) => {
-          const current =
-            state.financialDetails.path === 'PROFESSIONAL'
-              ? state.financialDetails.data
-              : defaultProfessional;
+          // 3-way merge: default seeds missing keys → persisted overwrites → update applies
+          const persisted = state.financialDetails.path === 'PROFESSIONAL'
+            ? state.financialDetails.data
+            : ({} as Partial<ProfessionalDetails>);
           return {
             financialDetails: {
               path: 'PROFESSIONAL' as const,
-              data: { ...current, ...data },
+              data: { ...defaultProfessional, ...persisted, ...data },
             },
             lastModifiedAt: new Date().toISOString(),
           };
@@ -213,14 +233,14 @@ export const useApplicationStore = create<ApplicationStore>()(
 
       updateBusinessDetails: (data: Partial<BusinessDetails>) =>
         set((state) => {
-          const current =
-            state.financialDetails.path === 'SELF_EMPLOYED'
-              ? state.financialDetails.data
-              : defaultBusiness;
+          // 3-way merge: default seeds missing keys → persisted overwrites → update applies
+          const persisted = state.financialDetails.path === 'SELF_EMPLOYED'
+            ? state.financialDetails.data
+            : ({} as Partial<BusinessDetails>);
           return {
             financialDetails: {
               path: 'SELF_EMPLOYED' as const,
-              data: { ...current, ...data },
+              data: { ...defaultBusiness, ...persisted, ...data },
             },
             lastModifiedAt: new Date().toISOString(),
           };
@@ -316,13 +336,55 @@ export const useApplicationStore = create<ApplicationStore>()(
         consent: state.consent,
       }),
 
-      // Version migration — if STORE_VERSION is bumped, purge stale data
+      // Forward-patch migration — preserves user data across schema version bumps.
+      // Instead of purging, we deep-merge the persisted session over a fresh skeleton.
+      // Only genuinely new fields (not in the old session) get their fresh defaults.
+      // Fields the user already filled in survive the upgrade untouched.
       migrate: (persistedState, version) => {
-        if (version !== STORE_VERSION) {
-          console.info('[Pryme] Store schema updated — resetting application state.');
-          return createFreshState();
+        if (version === STORE_VERSION) {
+          // Same version — no migration needed, hydrate as-is
+          return persistedState as ApplicationState;
         }
-        return persistedState as ApplicationState;
+
+        console.info(`[Pryme] Store migrated v${version} → v${STORE_VERSION} — forward-patching user data.`);
+        const persisted = (persistedState ?? {}) as Partial<ApplicationState>;
+        const fresh = createFreshState();
+
+        // Patch financialDetails: re-hydrate the active path with 3-way merge so
+        // new required fields get their defaults while existing user entries survive.
+        let patchedFinancialDetails: ApplicationState['financialDetails'] = fresh.financialDetails;
+        if (persisted.financialDetails?.path === 'SALARIED') {
+          patchedFinancialDetails = {
+            path: 'SALARIED',
+            data: { ...defaultSalaried, ...persisted.financialDetails.data },
+          };
+        } else if (persisted.financialDetails?.path === 'PROFESSIONAL') {
+          patchedFinancialDetails = {
+            path: 'PROFESSIONAL',
+            data: { ...defaultProfessional, ...persisted.financialDetails.data },
+          };
+        } else if (persisted.financialDetails?.path === 'SELF_EMPLOYED') {
+          patchedFinancialDetails = {
+            path: 'SELF_EMPLOYED',
+            data: { ...defaultBusiness, ...persisted.financialDetails.data },
+          };
+        }
+
+        return {
+          ...fresh,
+          // Preserve identity + progress
+          applicationId:    persisted.applicationId    ?? fresh.applicationId,
+          currentStage:     persisted.currentStage     ?? fresh.currentStage,
+          completedStages:  persisted.completedStages  ?? fresh.completedStages,
+          createdAt:        persisted.createdAt        ?? fresh.createdAt,
+          // Merge flat sub-trees over fresh defaults so new keys appear silently
+          basicKYC:           { ...fresh.basicKYC,           ...persisted.basicKYC },
+          financialDetails:   patchedFinancialDetails,
+          loanRequirements:   { ...fresh.loanRequirements,   ...persisted.loanRequirements },
+          financialFootprint: { ...fresh.financialFootprint, ...persisted.financialFootprint },
+          documents:          persisted.documents ?? fresh.documents,
+          consent:            { ...fresh.consent,            ...persisted.consent },
+        } as ApplicationState;
       },
     }
   )
