@@ -332,42 +332,13 @@ const HeroSection = memo(() => {
           </AnimatePresence>
         </div>
 
-        {/* ────────────── MARQUEE ────────────── */}
-        <div className="relative z-30 w-full hero-marquee-bar border-t-[0.5px] border-white/50 bg-white/30 hidden md:block mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] pt-1 shrink-0">
-          
+        {/* ────────────── STATIC BANNER ────────────── */}
+        <div className="relative z-30 w-full border-t-[0.5px] border-white/50 bg-white/30 hidden md:flex items-center justify-center mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] py-3 shrink-0">
           <div className="absolute top-0 left-0 w-24 md:w-40 h-full bg-gradient-to-r from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-bl-[32px] md:rounded-bl-[40px]" />
           <div className="absolute top-0 right-0 w-24 md:w-40 h-full bg-gradient-to-l from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-br-[32px] md:rounded-br-[40px]" />
-          
-          <div className="hero-marquee-track flex py-2.5 overflow-hidden group">
-            <div className="flex shrink-0 animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2">
-              {marqueeOffers.map((o, i) => (
-                <div 
-                  key={`track1-${o.text}-${i}`} 
-                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white/70 transition-all duration-300 cursor-default"
-                >
-                  <span 
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: o.color, boxShadow: `0 0 6px ${o.color}` }} 
-                  />
-                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">{o.text}</span>
-                </div>
-              ))}
-            </div>
-            <div aria-hidden="true" className="flex shrink-0 animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2">
-              {marqueeOffers.map((o, i) => (
-                <div 
-                  key={`track2-${o.text}-${i}`} 
-                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/40 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white/60 transition-all duration-300 cursor-default"
-                >
-                  <span 
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: o.color, boxShadow: `0 0 6px ${o.color}` }} 
-                  />
-                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">{o.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <p className="text-[11px] md:text-xs font-semibold text-slate-700/90 tracking-wide text-center">
+            Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
+          </p>
         </div>
 
       </div>

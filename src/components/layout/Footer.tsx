@@ -28,10 +28,11 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const productLinks = [
+    { label: "Home Loans", href: "/apply?type=home" },
+    { label: "LAP", href: "/apply?type=lap" },
+    { label: "Vehicle Loans", href: "/apply?type=vehicle" },
     { label: "Personal Loan", href: "/apply?type=personal" },
     { label: "Business Loan", href: "/apply?type=business" },
-    { label: "Home Loan", href: "/apply?type=home" },
-    { label: "Loan Against Property", href: "/apply?type=lap" },
   ];
 
   const companyLinks = [
@@ -39,7 +40,6 @@ const Footer = () => {
     { label: "How It Works", href: "/#process" },
     { label: "Partner Banks", href: "/#partners" },
     { label: "Careers", href: "/careers" },
-    { label: "Contact", href: "/contact" },
   ];
 
   const legalLinks = [
@@ -194,7 +194,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <p className="text-xs text-zinc-500 dark:text-muted-foreground">
-                © {currentYear} PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456
+                © 2026 PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456 GOPRYME FINTECH PVT LTD, and CIN: U70200MP2026PTC081776
               </p>
               <div className="flex flex-wrap gap-4">
                 {legalLinks.map((link) => (
@@ -212,7 +212,7 @@ const Footer = () => {
 
           {/* RBI Disclaimer */}
           <div className="mt-6 pt-6 border-t border-white/10 dark:border-border">
-            <p className="text-xs text-zinc-500 dark:text-muted-foreground/80 leading-relaxed max-w-5xl">
+            <p className="text-xs text-zinc-500 dark:text-muted-foreground/80 leading-relaxed w-full">
               <strong className="text-zinc-400 dark:text-muted-foreground">Disclaimer:</strong> PRYME is a loan comparison and facilitation platform and not a lender.
               We partner with RBI-regulated banks and NBFCs to provide loan services. All loans are subject to
               credit approval and terms & conditions of the respective lending partners. Interest rates, processing

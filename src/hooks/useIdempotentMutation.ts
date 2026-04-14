@@ -1,30 +1,50 @@
-import { useMutation, useQueryClient, UseMutationOptions } from "@tanstack/react-query";
+import { useMutation, useQueryClient, UseMutationOptions, QueryKey } from "@tanstack/react-query";
 import { generateSafeUUID } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🧠 IDEMPOTENT MUTATION WRAPPER
+// 🧠 IDEMPOTENT MUTATION WRAPPER (ANTIGRAVITY ZERO-TRUST)
 // ═══════════════════════════════════════════════════════════════════════════════
-// Drop-in replacement for useMutation that auto-generates a unique
-// Idempotency-Key per mutation invocation. The key is injected into the
-// mutation context and can be consumed by the mutationFn.
+// Drop-in replacement for useMutation that:
+//   1. Auto-generates a unique Idempotency-Key per mutation invocation
+//   2. Exposes the key to the caller for audit trail UIs (PolicyAuditModal)
+//   3. Optionally invalidates specified query keys on success
+//   4. Integrates with the backend's IdempotencyFilter for replay protection
 //
-// NOTE: Since api.ts now auto-injects the Idempotency-Key header at the
-// fetch level, this wrapper primarily serves as a semantic contract and
-// provides the key to the caller for audit trail purposes (PolicyAuditModal).
+// The key is also auto-injected at the fetch level by api.ts, so this
+// wrapper primarily provides the KEY TO THE CALLER and invalidation sugar.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface IdempotentMutationContext {
   idempotencyKey: string;
 }
 
+interface UseIdempotentMutationOptions<
+  TData = unknown,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+> extends UseMutationOptions<TData, TError, TVariables, TContext & IdempotentMutationContext> {
+  /**
+   * Query keys to automatically invalidate on mutation success.
+   * Saves boilerplate onSuccess → queryClient.invalidateQueries chains.
+   * Example: invalidateOnSuccess: [["auth", "me"], ["admin", "leads"]]
+   */
+  invalidateOnSuccess?: QueryKey[];
+}
+
 /**
- * Wraps TanStack Query's useMutation with automatic idempotency key generation.
- * 
+ * Wraps TanStack Query's useMutation with automatic idempotency key generation
+ * and optional query invalidation on success.
+ *
  * Usage:
  * ```ts
  * const mutation = useIdempotentMutation({
- *   mutationFn: async (data) => api.post("/endpoint", data),
+ *   mutationFn: async (data) => PrymeAPI.createAdminBank(data),
+ *   invalidateOnSuccess: [["admin", "banks"]],
  * });
+ *
+ * // Access the generated key for audit display:
+ * mutation.context?.idempotencyKey
  * ```
  */
 export function useIdempotentMutation<
@@ -33,12 +53,14 @@ export function useIdempotentMutation<
   TVariables = void,
   TContext = unknown,
 >(
-  options: UseMutationOptions<TData, TError, TVariables, TContext & IdempotentMutationContext>
+  options: UseIdempotentMutationOptions<TData, TError, TVariables, TContext>
 ) {
   const queryClient = useQueryClient();
+  const { invalidateOnSuccess, ...mutationOptions } = options;
 
   return useMutation<TData, TError, TVariables, TContext & IdempotentMutationContext>({
-    ...options,
+    ...mutationOptions,
+
     onMutate: async (variables) => {
       const idempotencyKey = generateSafeUUID();
 
@@ -51,6 +73,22 @@ export function useIdempotentMutation<
         ...userContext,
         idempotencyKey,
       } as TContext & IdempotentMutationContext;
+    },
+
+    onSuccess: async (data, variables, context) => {
+      // Auto-invalidate specified query keys
+      if (invalidateOnSuccess?.length) {
+        await Promise.all(
+          invalidateOnSuccess.map((key) =>
+            queryClient.invalidateQueries({ queryKey: key })
+          )
+        );
+      }
+
+      // Execute the user's onSuccess if provided
+      if (options.onSuccess) {
+        await options.onSuccess(data, variables, context);
+      }
     },
   });
 }

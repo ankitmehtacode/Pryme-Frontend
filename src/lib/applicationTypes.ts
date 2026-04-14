@@ -116,7 +116,7 @@ export interface BasicKYC {
 
 // ─── SALARIED EMPLOYEE FINANCIALS ───────────────────────────────────────────
 
-export type CompanyType = 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PRIVATE_LIMITED' | 'PUBLIC_LIMITED' | 'OTHER';
+export type CompanyType = 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PRIVATE_LIMITED' | 'PUBLIC_LIMITED_LISTED' | 'PUBLIC_LIMITED_UNLISTED' | 'OTHER';
 
 export interface SalariedDetails {
   subType: SalariedSubType;
@@ -127,6 +127,7 @@ export interface SalariedDetails {
   totalExperienceYears: number;
   currentCompanyYears: number;
 
+  grossSalary: number;           // Pre-tax
   netMonthlySalary: number;      // Take-home
   hasExistingLoans: boolean;
   existingEMI: number;           // Total monthly EMI burden (Step A)
@@ -239,6 +240,9 @@ export interface LoanRequirements {
   courseCountry?: 'INDIA' | 'ABROAD';
   courseDurationYears?: number;
   admissionStatus?: 'CONFIRMED' | 'APPLIED' | 'NOT_YET';
+
+  // Auto Loan
+  vehicleQuotationPrice?: number;
 }
 
 // ─── FINANCIAL FOOTPRINT (Stage 4 — Universal + Conditional Overrides) ──────

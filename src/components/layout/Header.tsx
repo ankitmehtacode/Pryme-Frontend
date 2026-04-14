@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Menu, X, Phone, User, LogOut, Settings, ChevronDown,
-  Calculator, Home, Briefcase, Building2, Wallet, Gift, Bell, TrendingDown
+  Calculator, Home, Briefcase, Building2, Wallet, Gift, Bell, TrendingDown, Car, CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -35,20 +35,21 @@ const CONTACT_PHONE = "1800-309-4001";
 const CONTACT_PHONE_LINK = "tel:18003094001";
 
 const productLinks = [
+  { href: "/apply?type=home", label: "Home Loans", icon: Home, description: "Make your dream home real" },
+  { href: "/apply?type=lap", label: "LAP", icon: Building2, description: "Borrow against your property" },
+  { href: "/apply?type=vehicle", label: "Vehicle Loans", icon: Car, description: "Drive your dream today" },
   { href: "/apply?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs" },
   { href: "/apply?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth" },
-  { href: "/apply?type=home", label: "Home Loan", icon: Home, description: "Make your dream home real" },
-  { href: "/apply?type=lap", label: "Loan Against Property", icon: Building2, description: "Borrow against your property" },
 ];
 
 const toolLinks = [
+  { href: "/apply", label: "Eligibility Checker", icon: CheckCircle, description: "Check your loan eligibility" },
   { href: "/emi-calculator", label: "EMI Calculator", icon: Calculator, description: "Calculate your monthly EMI with precision" },
   { href: "/prepayment-calculator", label: "Prepayment Calculator", icon: TrendingDown, description: "See how prepayments reduce your loan" },
   { href: "/rewards-calculator", label: "Rewards Calculator", icon: Gift, description: "Discover your exclusive reward tier" },
 ];
 
 const navLinks = [
-  { href: "/services", label: "Compare Loans" },
   { href: "/about", label: "About" },
   { href: "/blogs", label: "Insights" },
 ];
@@ -84,8 +85,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         <div className="p-5 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
           <div>
             <Link to="/" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm"><Home className="w-4 h-4 text-muted-foreground" /></div>
-              <span className="text-sm font-semibold text-foreground">Home</span>
+              <span className="text-sm font-semibold text-foreground px-2">Home</span>
             </Link>
           </div>
           <div>
@@ -138,15 +138,10 @@ const Header = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isHomePage = location.pathname === "/";
-
   useGSAP(() => {
-    // PERF FIX: Replaced continuous `onUpdate` callback (fired on every scroll pixel)
-    // with a simple onEnter/onLeaveBack toggle. The old version was calling gsap.to()
-    // on every single scroll event, generating a new tween each time.
-    const scrollTrigger = ScrollTrigger.create({
+    ScrollTrigger.create({
       start: 100,
-      end: 101,
+      end: "max",
       onEnter: () => {
         gsap.to(navContainerRef.current, {
           width: "90%",
@@ -174,9 +169,18 @@ const Header = memo(() => {
           duration: 0.4,
           ease: "power2.out"
         });
+        gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+      },
+      onUpdate: (self) => {
+        if (self.scroll() > 100) {
+          if (self.direction === 1) {
+            gsap.to(headerRef.current, { yPercent: -100, duration: 0.3, ease: "power2.out" });
+          } else {
+            gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+          }
+        }
       }
     });
-    return () => scrollTrigger.kill();
   }, []);
 
   return (
@@ -202,7 +206,7 @@ const Header = memo(() => {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1 bg-white/50 rounded-full px-2 py-1 border border-white/20 backdrop-blur-sm shadow-sm">
             <Link to="/" className={cn("px-4 py-2 text-sm font-medium rounded-full transition-all hover:bg-black/5", location.pathname === "/" ? "text-[#103783]" : "text-slate-600")}>
-              <div className="flex items-center gap-1.5"><Home className="w-4 h-4" /> Home</div>
+              Home
             </Link>
             <NavigationMenu>
               <NavigationMenuList>

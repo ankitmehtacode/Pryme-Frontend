@@ -3,13 +3,10 @@ import { generateSafeUUID } from "@/lib/utils";
 import type { MeResponse, DictionaryMap } from "@/types/auth.types";
 
 
-// ARCHITECTURE FIX: Rely strictly on environment variables. 
-// In dev, this uses Vite proxy (/api/v1). In prod, it uses the actual domain.
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-if (!API_BASE_URL) {
-  console.error("CRITICAL: VITE_API_URL is not defined in environment variables.");
-}
+// ARCHITECTURE: VITE_API_URL = "/api/v1" in dev (Vite proxy handles routing).
+// In production, set to the actual API domain (e.g., https://crm.pryme.in/api/v1).
+// Fallback to /api/v1 guarantees the app never breaks — it just uses the proxy.
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 /**
  * 🧠 SECURE FETCH ENGINE (PRODUCTION GRADE — ZERO-TRUST)
@@ -49,8 +46,15 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
     // 🧠 GLOBAL INTERCEPTOR: The "Dead Session" Guillotine
     // ZERO localStorage. We dispatch a custom event that useAuth listens to.
+    // CRITICAL: Do NOT fire on boot-sequence endpoints. A 401 on /auth/me or
+    // /config/dictionaries during initial load is EXPECTED (user not logged in).
+    // Firing pryme_auth_expired here causes a deadlock: useAuth wipes queries
+    // mid-hydration, and the AppInitializer never resolves.
     if (response.status === 401 || response.status === 403) {
-      window.dispatchEvent(new Event("pryme_auth_expired"));
+      const isBootEndpoint = endpoint.includes("/auth/me") || endpoint.includes("/config/");
+      if (!isBootEndpoint) {
+        window.dispatchEvent(new Event("pryme_auth_expired"));
+      }
       throw new Error("Session expired. Please sign in again.");
     }
 
@@ -63,13 +67,17 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     if (!response.ok) {
       let errorMessage = `API Request failed (${response.status})`;
       try {
-        const errorData = await response.json();
+        // Clone BEFORE reading — body stream can only be consumed once
+        const errorData = await response.clone().json();
         console.error(`🚨 Spring Boot Backend Error on ${endpoint}:`, errorData);
-        // Maps to our GlobalExceptionHandler's exact JSON structure
         errorMessage = errorData.message || errorData.error || errorData.errors?.[Object.keys(errorData.errors)[0]] || errorMessage;
       } catch (e) {
-        const rawText = await response.text();
-        console.error(`🚨 Critical Java Crash on ${endpoint}:`, rawText);
+        try {
+          const rawText = await response.text();
+          console.error(`🚨 Critical Java Crash on ${endpoint}:`, rawText.substring(0, 500));
+        } catch (_) {
+          // Body already consumed — nothing to log
+        }
         errorMessage = "The server experienced a critical internal crash. Check your terminal.";
       }
       throw new Error(errorMessage);
@@ -132,22 +140,12 @@ export const PrymeAPI = {
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
 
-    const payload = { fullName, email, password, role: "USER" };
-
-    const res = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/auth/register`, {
+    // 🧠 Uses fetchWithAuth to get idempotency headers + global error handling.
+    // Registration is permitAll in SecurityConfig, so the missing cookie is fine.
+    return fetchWithAuth("/auth/register", {
       method: "POST",
-      credentials: "include",
-      mode: "cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ fullName, email, password, role: "USER" }),
     });
-
-    if (!res.ok) {
-      let msg = "Registration failed";
-      try { const err = await res.json(); msg = err.message || err.error || msg; } catch(e){}
-      throw new Error(msg);
-    }
-    return res.json();
   },
 
   login: async (...args: any[]) => {
@@ -163,20 +161,13 @@ export const PrymeAPI = {
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
 
-    const res = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/auth/login`, {
+    // 🧠 Uses fetchWithAuth for consistent error handling + idempotency.
+    // Login is permitAll in SecurityConfig. The response Set-Cookie header
+    // plants the PRYME_SID HttpOnly cookie — the sole session proof.
+    return fetchWithAuth("/auth/login", {
       method: "POST",
-      credentials: "include",
-      mode: "cors",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-
-    if (!res.ok) {
-      let msg = "Invalid credentials";
-      try { const err = await res.json(); msg = err.message || err.error || msg; } catch(e){}
-      throw new Error(msg);
-    }
-    return res.json();
   },
 
   logout: async () => fetchWithAuth("/auth/logout", { method: "POST" }),
@@ -264,6 +255,10 @@ export const PrymeAPI = {
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
   
   // POLICY ENGINE LAYER
+  getPolicyEntities: async () => {
+    return fetchWithAuth(`/policies/entities`, { method: "GET" });
+  },
+  
   getPolicyValue: async (entityId: string, fieldKey: string) => {
     return fetchWithAuth(`/policies/value?entityId=${entityId}&fieldKey=${fieldKey}`, {
       method: "GET",

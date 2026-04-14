@@ -1,6 +1,7 @@
 import { lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Core Routes (Synchronous for FCP)
 import Index from "@/pages/Index";
@@ -35,46 +36,64 @@ const Notifications = lazy(() => import("@/pages/Notifications"));
 // Admin
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 
-export const AppRoutes = () => (
-  <Routes>
-    {/* ============================
-        ZONE 1: PUBLIC ACQUISITION LAYER
-        ============================ */}
-    <Route path="/" element={<Index />} />
-    <Route path="/apply" element={<Apply />} />
-    <Route path="/auth" element={<Auth />} />
-    <Route path="/about" element={<About />} />
-    <Route path="/services" element={<Services />} />
-    <Route path="/contact" element={<Contact />} />
-    <Route path="/blogs" element={<Blogs />} />
-    <Route path="/blogs/:slug" element={<BlogDetail />} />
-    <Route path="/offers" element={<Offers />} />
-    <Route path="/emi-calculator" element={<EMICalculatorPage />} />
-    <Route path="/prepayment-calculator" element={<PrepaymentCalculatorPage />} />
-    <Route path="/rewards-calculator" element={<RewardsCalculatorPage />} />
+const pageVariants = {
+  initial: { opacity: 0, y: 50 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
+};
 
-    {/* ============================
-        ZONE 2: STANDARD USER TIER
-        ============================ */}
-    <Route element={<ProtectedRoute />}>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/notifications" element={<Notifications />} />
-    </Route>
-
-    {/* ============================
-        ZONE 3: ADMIN TIER (RBAC)
-        ============================ */}
-    <Route
-      element={
-        <ProtectedRoute
-          allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
-        />
-      }
-    >
-      <Route path="/admin" element={<AdminDashboard />} />
-    </Route>
-
-    <Route path="*" element={<NotFound />} />
-  </Routes>
+const PageWrapper = ({ children }: { children: React.ReactNode }) => (
+  <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="w-full h-full min-h-screen">
+    {children}
+  </motion.div>
 );
+
+export const AppRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* ============================
+            ZONE 1: PUBLIC ACQUISITION LAYER
+            ============================ */}
+        <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
+        <Route path="/apply" element={<PageWrapper><Apply /></PageWrapper>} />
+        <Route path="/auth" element={<PageWrapper><Auth /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+        <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+        <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+        <Route path="/blogs" element={<PageWrapper><Blogs /></PageWrapper>} />
+        <Route path="/blogs/:slug" element={<PageWrapper><BlogDetail /></PageWrapper>} />
+        <Route path="/offers" element={<PageWrapper><Offers /></PageWrapper>} />
+        <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
+        <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
+        <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
+
+        {/* ============================
+            ZONE 2: STANDARD USER TIER
+            ============================ */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+          <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+          <Route path="/notifications" element={<PageWrapper><Notifications /></PageWrapper>} />
+        </Route>
+
+        {/* ============================
+            ZONE 3: ADMIN TIER (RBAC)
+            ============================ */}
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
+            />
+          }
+        >
+          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+        </Route>
+
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};

@@ -93,7 +93,7 @@ const TestimonialCard = memo(({ t, isActive }: { t: typeof testimonials[0]; isAc
       )}
     >
       {/* Image */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-36 md:h-40 overflow-hidden">
         <img 
           src={t.image} 
           alt={t.name} 
@@ -207,10 +207,10 @@ const TestimonialsSlider = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 shadow-xl">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6 shadow-xl">
             <ShieldCheck className="w-4 h-4 text-primary" />
-            <span className="text-[10px] md:text-xs font-medium text-slate-300 uppercase tracking-[0.2em]">
-              Verified Algorithm Success
+            <span className="text-[10px] md:text-xs font-semibold text-primary uppercase tracking-[0.2em]">
+              Verified Success
             </span>
           </div>
           <h2 className="text-2xl md:text-xl lg:text-2xl font-semibold text-white mb-6 tracking-tighter">

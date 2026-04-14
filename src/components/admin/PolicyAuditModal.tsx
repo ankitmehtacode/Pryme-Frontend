@@ -1,67 +1,110 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import React, { useState } from "react";
+import { FieldMetadata } from "@/lib/validations/policySchema";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, ShieldAlert } from "lucide-react";
-import { generateSafeUUID } from "@/lib/utils";
-import { FieldMetadata } from "@/lib/validations/policySchema";
 
-interface Props {
+interface PolicyAuditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (reason: string, idempotencyKey: string) => void;
-  metadata: FieldMetadata;
-  oldValue: any;
-  newValue: any;
+  onConfirm: (auditReason: string) => void;
+  metadata: FieldMetadata | null;
+  oldValue: string;
+  newValue: string;
 }
 
-export const PolicyAuditModal = ({ isOpen, onClose, onConfirm, metadata, oldValue, newValue }: Props) => {
+export const PolicyAuditModal: React.FC<PolicyAuditModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  metadata,
+  oldValue,
+  newValue,
+}) => {
   const [reason, setReason] = useState("");
 
-  const handleCommit = () => {
-    if (reason.length < 10) return; // Basic validation
-    onConfirm(reason, generateSafeUUID());
-    setReason("");
+  const handleConfirm = () => {
+    if (reason.length > 10) {
+      onConfirm(reason);
+      setReason(""); // reset for next time
+    }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setReason("");
+      onClose();
+    }
+  };
+
+  if (!metadata) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0a0a10] border border-white/[0.1] text-slate-200">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="bg-[#050508] border-slate-800 text-slate-100 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-amber-500">
-            <ShieldAlert className="w-5 h-5" /> Confirm Matrix Modification
+          <DialogTitle className="text-xl font-bold tracking-tight">
+            Matrix Blast Radius
           </DialogTitle>
+          <DialogDescription className="text-slate-400">
+            You are about to modify a core banking policy parameter. This change 
+            will immediately affect the evaluation engine.
+          </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-4 py-4">
-          <p className="text-sm text-slate-400">
-            You are altering the live routing logic for <strong className="text-white">{metadata.displayName}</strong>.
-          </p>
-          
-          {/* 🧠 THE DIFF VIEWER */}
-          <div className="flex items-center justify-between p-4 bg-white/[0.02] rounded-lg border border-white/[0.04] font-mono text-sm">
-            <div className="flex flex-col"><span className="text-xs text-slate-500 mb-1">Current State</span><span className="text-red-400">{String(oldValue)}</span></div>
-            <ArrowRight className="w-4 h-4 text-slate-600" />
-            <div className="flex flex-col items-end"><span className="text-xs text-slate-500 mb-1">New State</span><span className="text-emerald-400">{String(newValue)}</span></div>
+
+        <div className="py-6 flex flex-col gap-6">
+          {/* Diff Renderer */}
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+              {metadata.displayName}
+            </span>
+            <div className="flex items-center gap-4 bg-slate-950 p-4 rounded-md border border-slate-800 font-mono text-lg">
+              <span className="text-red-400 line-through decoration-red-400/50">
+                {oldValue || "empty"}
+              </span>
+              <span className="text-slate-500">→</span>
+              <span className="text-green-400 font-bold">
+                {newValue || "empty"}
+              </span>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Audit Trail Justification</label>
-            <Textarea 
-              placeholder="e.g., RBI Repo Rate adjustment Q3, approved by Risk Dept."
+          <div className="flex flex-col gap-2">
+            <label htmlFor="reason" className="text-sm font-medium text-slate-300">
+              Audit Justification (Required)
+            </label>
+            <Textarea
+              id="reason"
+              placeholder="E.g., Approved via internal ticket IT-4029. Adjusting FOIR limits."
+              className="bg-slate-950 border-slate-800 min-h-[100px] text-slate-100 placeholder:text-slate-600 focus-visible:ring-blue-500"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="bg-black/50 border-white/[0.08] focus:border-amber-500/50 resize-none"
             />
+            <span className={`text-xs ${reason.length > 10 ? "text-green-500" : "text-amber-500"}`}>
+              {reason.length} / 11 min characters
+            </span>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-white/[0.06]">
-          <Button variant="ghost" onClick={onClose} className="hover:bg-white/[0.04]">Cancel</Button>
-          <Button disabled={reason.length < 10} onClick={handleCommit} className="bg-amber-600 hover:bg-amber-700 text-white">
+        <DialogFooter className="sm:justify-between">
+          <Button variant="ghost" onClick={onClose} className="text-slate-400 hover:text-slate-100 hover:bg-slate-800">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={reason.length <= 10}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-medium"
+          >
             Commit to Matrix
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

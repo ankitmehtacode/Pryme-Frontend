@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -7,7 +8,7 @@ import {
   Building2, Stethoscope, Scale, GraduationCap, CreditCard, MapPin,
   Phone, Mail, Calendar, Hash, Landmark, BriefcaseBusiness,
   Home, HandCoins, FileSearch, UserPlus, ToggleLeft,
-  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload, Sparkles, Edit2
+  Upload, FolderOpen, FileText, ShieldCheck, Check, X, CloudUpload, Sparkles, Edit2, ShieldAlert
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -621,8 +622,7 @@ const STATE_CITIES: Record<string, string[]> = {
 };
 
 const RELIGIONS = [
-  "Hinduism", "Islam", "Christianity", "Sikhism", "Buddhism", "Jainism",
-  "Zoroastrianism", "Judaism", "Bahá'í Faith", "Tribal Religions", "Other"
+  "Hinduism", "Islam", "Christianity", "Sikhism", "Buddhism", "Jainism", "Other"
 ];
 
 const EMPLOYMENT_OPTIONS: { value: EmploymentType; label: string; icon: any }[] = [
@@ -1017,20 +1017,140 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
 
         {/* ── Step Content ─────────────────────────────────────────────────── */}
-        <AnimatePresence mode="wait" custom={direction}>
+        
+        <div className="space-y-8 md:space-y-12">
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* STAGE 3: LOAN REQUIREMENTS (Moved to Top)                       */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+═════════════════════════════════════════════════════════════ */}
+          <div className={cardCn}>
+              <div className={cardCn}>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+
+                <div className="flex items-center gap-3 mb-6 relative z-10">
+                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#103783]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
+                </div>
+
+                <div className="space-y-5 relative z-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ValidatedInput
+                      label="Loan Amount (₹)"
+                      type="number"
+                      placeholder="500000"
+                      icon={IndianRupee}
+                      value={store.loanRequirements.loanAmount || ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ loanAmount: Number(e.target.value) })}
+                      isValid={store.loanRequirements.loanAmount >= 50000}
+                    />
+                    <ValidatedInput
+                      label="Tenure (Years)"
+                      type="number"
+                      placeholder="5"
+                      icon={Calendar}
+                      value={store.loanRequirements.tenureYears}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ tenureYears: parseInt(e.target.value) || 0 })}
+                      onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
+                      isValid={
+                        (store.loanRequirements.loanType === 'PERSONAL_LOAN' || store.loanRequirements.loanType === 'BUSINESS_LOAN')
+                          ? (store.loanRequirements.tenureYears >= 1 && store.loanRequirements.tenureYears <= 7)
+                          : (store.loanRequirements.tenureYears >= 3 && store.loanRequirements.tenureYears <= 30)
+                      }
+                      error={
+                        store.loanRequirements.tenureYears > 0
+                          ? ((store.loanRequirements.loanType === 'PERSONAL_LOAN' || store.loanRequirements.loanType === 'BUSINESS_LOAN') && (store.loanRequirements.tenureYears < 1 || store.loanRequirements.tenureYears > 7)
+                            ? "Must be 1 to 7 Years"
+                            : ((store.loanRequirements.loanType === 'HOME_LOAN' || store.loanRequirements.loanType === 'LAP') && (store.loanRequirements.tenureYears < 3 || store.loanRequirements.tenureYears > 30)
+                              ? "Must be 3 to 30 Years" : undefined))
+                          : undefined
+                      }
+                    />
+                  </div>
+
+                  {/* CIBIL Slider */}
+                  <div className={`p-5 rounded-2xl border backdrop-blur-sm transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
+                    <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className={`w-5 h-5 shrink-0 ${cibilUi.color}`} />
+                        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">CIBIL Score</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {editingCibil ? (
+                          // ── Inline edit mode ──────────────────────────────
+                          <div className="flex items-center gap-1">
+                            <input
+                              autoFocus
+                              type="number"
+                              min={-1}
+                              max={900}
+                              className={`w-20 bg-transparent text-right text-2xl font-semibold tabular-nums outline-none border-b-2 border-primary/50 focus:border-primary transition-colors py-0.5 rounded-none ${cibilUi.color}`}
+                              value={cibilInputVal}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setCibilInputVal(e.target.value)}
+                              onBlur={() => {
+                                const parsed = parseInt(cibilInputVal, 10);
+                                let val;
+                                if (parsed === -1 || parsed === 0) val = parsed;
+                                else val = Math.min(900, Math.max(300, parsed));
+                                
+                                if (!isNaN(val)) store.updateLoanRequirements({ cibilScore: val });
+                                else setCibilInputVal(cibilScore.toString());
+                                setEditingCibil(false);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                if (e.key === "Escape") { setCibilInputVal(cibilScore.toString()); setEditingCibil(false); }
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          // ── Display mode — tap to edit ────────────────────
+                          <button
+                            type="button"
+                            className={`flex items-center gap-1.5 group/edit cursor-pointer`}
+                            onClick={() => { setCibilInputVal(cibilScore.toString()); setEditingCibil(true); }}
+                            title="Click to type exact score"
+                          >
+                            <motion.span
+                              key={cibilScore}
+                              initial={{ y: -8, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              className={`text-2xl font-semibold tabular-nums border-b border-dashed border-current/40 group-hover/edit:border-current pb-0.5 transition-colors ${cibilUi.color}`}
+                            >
+                              {cibilScore}
+                            </motion.span>
+                            <Edit2 className={`w-3.5 h-3.5 opacity-40 group-hover/edit:opacity-100 transition-opacity ${cibilUi.color}`} />
+                          </button>
+                        )}
+                        <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
+                          {cibilUi.label}
+                        </span>
+                      </div>
+                    </div>
+                    <Slider
+                      value={[cibilScore]}
+                      onValueChange={(v) => store.updateLoanRequirements({ cibilScore: v[0] })}
+                      min={300} max={900} step={10}
+                      className="cursor-pointer mb-2"
+                    />
+                    <div className="flex justify-between text-[10px] font-medium text-muted-foreground/50 uppercase tracking-widest mt-2">
+                      <span>300</span>
+                      <span>900</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {/* STAGE 1: BASIC KYC                                             */}
+          
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {store.currentStage === 1 && (
-            <motion.div
-              key="stage1"
-              custom={direction}
-              initial={{ x: direction * 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
-              exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
-              className={cardCn}
-            >
+          {/* STAGE 1: BASIC KYC                                              */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+════════════════════════════════════════════════════════════ */}
+          <div className={cardCn}>
               <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -1052,16 +1172,26 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <ValidatedInput
-                    label="Mobile Number"
-                    placeholder="9876543210"
-                    icon={Phone}
-                    maxLength={10}
-                    value={store.basicKYC.mobileNumber}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                    isValid={/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber)}
-                    error={errors.mobileNumber}
-                  />
+                  <div className="flex flex-col gap-2 relative">
+                    <ValidatedInput
+                      label="Mobile Number"
+                      placeholder="9876543210"
+                      icon={Phone}
+                      maxLength={10}
+                      value={store.basicKYC.mobileNumber}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      isValid={/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber)}
+                      error={errors.mobileNumber}
+                    />
+                    {/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber) && (
+                      <div className="flex animate-in fade-in slide-in-from-top-1 items-center gap-2 mt-1">
+                        <Input type="text" placeholder="Enter OTP" className="w-1/2 h-10 bg-white/50 border-slate-200 focus:border-primary/50" maxLength={6} />
+                        <Button type="button" variant="outline" className="w-1/2 h-10 border-primary text-primary hover:bg-primary hover:text-white transition-colors">
+                          Verify OTP
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <ValidatedInput
                     label="Email Address"
                     type="email"
@@ -1077,7 +1207,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <ValidatedInput
                     label="Date of Birth"
-                    type="date"
+                    type="date" max={new Date(new Date().setFullYear(new Date().getFullYear() - 19)).toISOString().split("T")[0]} 
                     icon={Calendar}
                     value={store.basicKYC.dateOfBirth}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ dateOfBirth: e.target.value })}
@@ -1140,21 +1270,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                   />
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {/* STAGE 2: EMPLOYMENT & INCOME (The Smart Pivot)                  */}
+          
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {store.currentStage === 2 && (
-            <motion.div
-              key="stage2"
-              custom={direction}
-              initial={{ x: direction * 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
-              exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
-              className="space-y-5"
-            >
+          {/* STAGE 2: EMPLOYMENT DETAILS                                     */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+═════════════════════════════════════════════════════════════ */}
+          <div className={cardCn}>
               {/* Employment Category Selector */}
               <div className={cardCn}>
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
@@ -1219,7 +1343,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                               error={errors.companyType}
                             >
                               <SelectItem value="PRIVATE_LIMITED">Private Limited</SelectItem>
-                              <SelectItem value="PUBLIC_LIMITED">Public Limited</SelectItem>
+                              <SelectItem value="PUBLIC_LIMITED_LISTED">Public Limited (Listed)</SelectItem>
+                              <SelectItem value="PUBLIC_LIMITED_UNLISTED">Public Limited (Unlisted)</SelectItem>
                               <SelectItem value="LLP">Limited Liability Partnership (LLP)</SelectItem>
                               <SelectItem value="PARTNERSHIP">Partnership</SelectItem>
                               <SelectItem value="PROPRIETORSHIP">Proprietorship</SelectItem>
@@ -1249,9 +1374,18 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                           />
                         </div>
 
-                        <div className="mb-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                           <ValidatedInput
-                            label="Net Monthly Salary (₹)"
+                            label="Gross Salary (₹)"
+                            type="number"
+                            placeholder="100000"
+                            icon={IndianRupee}
+                            value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.grossSalary || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ grossSalary: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.grossSalary : 0) >= 10000}
+                          />
+                          <ValidatedInput
+                            label="Net Salary (₹)"
                             type="number"
                             placeholder="85000"
                             icon={IndianRupee}
@@ -1323,11 +1457,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </motion.div>
-                          )}
+                            </div>
                         </AnimatePresence>
-                      </motion.div>
-                    )}
+                      </div>
 
                     {/* ── PROFESSIONAL PATH ──────────────────────────────── */}
                     {store.basicKYC.employmentType === "PROFESSIONAL" && (
@@ -1403,7 +1535,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.annualGrossReceipts : 0) > 0}
                           />
                           <ValidatedInput
-                            label="Net Monthly Income (₹)"
+                            label="Professional Income as per ITR (₹)"
                             type="number"
                             placeholder="150000"
                             icon={IndianRupee}
@@ -1452,11 +1584,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </motion.div>
-                          )}
+                            </div>
                         </AnimatePresence>
-                      </motion.div>
-                    )}
+                      </div>
 
                     {/* ── SELF-EMPLOYED / BUSINESS PATH ──────────────────── */}
                     {store.basicKYC.employmentType === "SELF_EMPLOYED" && (
@@ -1604,7 +1734,22 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
                                 {/* Depreciation add-back — only relevant for property-collateral loans */}
                                 <AnimatePresence>
-                                  {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
+                                  
+                {store.loanRequirements.loanType === "AUTO_LOAN" && (
+                  <div className="grid grid-cols-1 gap-5">
+                    <ValidatedInput
+                      label="Vehicle Quotation Price (₹)"
+                      type="number"
+                      placeholder="850000"
+                      icon={IndianRupee}
+                      value={store.loanRequirements.vehicleQuotationPrice || ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleQuotationPrice: Number(e.target.value) })}
+                      isValid={(store.loanRequirements.vehicleQuotationPrice || 0) > 100000}
+                    />
+                  </div>
+                )}
+                
+                {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
                                     <motion.div
                                       key="depreciation-field"
                                       initial={{ opacity: 0, height: 0 }}
@@ -1628,8 +1773,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                           isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.depreciation || 0 : 0) >= 0}
                                         />
                                       </div>
-                                    </motion.div>
-                                  )}
+                                    </div>
                                 </AnimatePresence>
                               </motion.div>
                             </AnimatePresence>
@@ -1730,11 +1874,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </motion.div>
-                          )}
+                            </div>
                         </AnimatePresence>
-                      </motion.div>
-                    )}
+                      </div>
                   </AnimatePresence>
 
                   {/* ── Conditional Property Selectors based on Loan Type (Moved to Stage 2) ── */}
@@ -1826,144 +1968,19 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             </>
                           )}
                         </div>
-                      </motion.div>
-                    )}
+                      </div>
                   </AnimatePresence>
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {/* STAGE 3: LOAN DETAILS                                           */}
-          {/* ═════════════════════════════════════════════════════════════════ */}
-          {store.currentStage === 3 && (
-            <motion.div
-              key="stage3"
-              custom={direction}
-              initial={{ x: direction * 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
-              exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
-              className="space-y-5"
-            >
-              <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
-
-                <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <IndianRupee className="w-5 h-5 text-primary dark:text-[#103783]" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
-                </div>
-
-                <div className="space-y-5 relative z-10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <ValidatedInput
-                      label="Loan Amount (₹)"
-                      type="number"
-                      placeholder="500000"
-                      icon={IndianRupee}
-                      value={store.loanRequirements.loanAmount || ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ loanAmount: Number(e.target.value) })}
-                      isValid={store.loanRequirements.loanAmount >= 50000}
-                    />
-                    <StyledSelect
-                      label="Tenure (Years)"
-                      value={store.loanRequirements.tenureYears.toString()}
-                      onValueChange={(v) => store.updateLoanRequirements({ tenureYears: parseInt(v) })}
-                      placeholder="Select tenure"
-                    >
-                      {[1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30].map((y) => (
-                        <SelectItem key={y} value={y.toString()} className="cursor-pointer">
-                          {y} {y === 1 ? "Year" : "Years"}
-                        </SelectItem>
-                      ))}
-                    </StyledSelect>
-                  </div>
-
-                  {/* CIBIL Slider */}
-                  <div className={`p-5 rounded-2xl border backdrop-blur-sm transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>
-                    <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className={`w-5 h-5 shrink-0 ${cibilUi.color}`} />
-                        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">CIBIL Score</span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {editingCibil ? (
-                          // ── Inline edit mode ──────────────────────────────
-                          <div className="flex items-center gap-1">
-                            <input
-                              autoFocus
-                              type="number"
-                              min={300}
-                              max={900}
-                              className={`w-20 bg-transparent text-right text-2xl font-semibold tabular-nums outline-none border-b-2 border-primary/50 focus:border-primary transition-colors py-0.5 rounded-none ${cibilUi.color}`}
-                              value={cibilInputVal}
-                              onChange={(e) => setCibilInputVal(e.target.value)}
-                              onBlur={() => {
-                                const val = Math.min(900, Math.max(300, parseInt(cibilInputVal, 10)));
-                                if (!isNaN(val)) store.updateLoanRequirements({ cibilScore: val });
-                                else setCibilInputVal(cibilScore.toString());
-                                setEditingCibil(false);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                if (e.key === "Escape") { setCibilInputVal(cibilScore.toString()); setEditingCibil(false); }
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          // ── Display mode — tap to edit ────────────────────
-                          <button
-                            type="button"
-                            className={`flex items-center gap-1.5 group/edit cursor-pointer`}
-                            onClick={() => { setCibilInputVal(cibilScore.toString()); setEditingCibil(true); }}
-                            title="Click to type exact score"
-                          >
-                            <motion.span
-                              key={cibilScore}
-                              initial={{ y: -8, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              className={`text-2xl font-semibold tabular-nums border-b border-dashed border-current/40 group-hover/edit:border-current pb-0.5 transition-colors ${cibilUi.color}`}
-                            >
-                              {cibilScore}
-                            </motion.span>
-                            <Edit2 className={`w-3.5 h-3.5 opacity-40 group-hover/edit:opacity-100 transition-opacity ${cibilUi.color}`} />
-                          </button>
-                        )}
-                        <span className={`text-[10px] font-medium uppercase tracking-widest px-2 py-1 rounded border ${cibilUi.bg} ${cibilUi.color} ${cibilUi.border}`}>
-                          {cibilUi.label}
-                        </span>
-                      </div>
-                    </div>
-                    <Slider
-                      value={[cibilScore]}
-                      onValueChange={(v) => store.updateLoanRequirements({ cibilScore: v[0] })}
-                      min={300} max={900} step={10}
-                      className="cursor-pointer mb-2"
-                    />
-                    <div className="flex justify-between text-[10px] font-medium text-muted-foreground/50 uppercase tracking-widest mt-2">
-                      <span>300</span>
-                      <span>900</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
+          
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 4: FINANCIAL FOOTPRINT                                    */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {store.currentStage === 4 && (
-            <motion.div
-              key="stage4"
-              custom={direction}
-              initial={{ x: direction * 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } }}
-              exit={{ x: direction * -24, opacity: 0, transition: { duration: 0.15 } }}
-              className="space-y-5"
-            >
+═════════════════════════════════════════════════════════════ */}
+          <div className={cardCn}>
               {/* ── Universal Financial Footprint Card ──────────────────────── */}
               <div className={cardCn}>
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
@@ -1990,7 +2007,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
-                      label="Total Existing EMIs (Monthly ₹)"
+                      label="Current Monthly EMI (₹)"
                       type="number"
                       placeholder="15000"
                       icon={HandCoins}
@@ -2072,12 +2089,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                               isValid={store.financialFootprint.estimatedPropertyValue >= 100000}
                               error={errors.estimatedPropertyValue}
                             />
-                          </motion.div>
-                        )}
+                          </div>
                       </AnimatePresence>
                     </div>
-                  </motion.div>
-                )}
+                  </div>
 
                 {/* BUSINESS_LOAN → Override */}
                 {store.loanRequirements.loanType === "BUSINESS_LOAN" && (
@@ -2108,23 +2123,24 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                         onChange={(v) => store.updateFinancialFootprint({ isAbove50Lakhs: v })}
                       />
                     </div>
-                  </motion.div>
-                )}
+                  </div>
               </AnimatePresence>
-            </motion.div>
-          )}
+            </div>
 
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 5: DOCUMENT VAULT                                         */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {store.currentStage === 5 && (
-            <DocumentVaultStage
+═════════════════════════════════════════════════════════════ */}
+          <DocumentVaultStage
               store={store}
               direction={direction}
               cardCn={cardCn}
             />
-          )}
-        </AnimatePresence>
+        
+        </div>
+
 
         {/* ── Real-Time Signal Injection ──────────────────────────────────────── */}
         <div className="mt-6 p-4 rounded-xl bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10 flex items-center justify-between">
@@ -2150,131 +2166,63 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           </div>
         </div>
 
-        {/* =========================================================== */}
-        {/* NAVIGATION — Dual-layer Thumb Zone Architecture             */}
-        {/* Mobile (<md): fixed bottom bar pinned to thumb zone         */}
-        {/* Tablet/Desktop (md+): inline in document flow               */}
-        {/* =========================================================== */}
+        
+        
+        {/* Income vs EMI Logic Validation */}
+        {(() => {
+           let income = 0;
+           let emi = 0;
+           if (store.basicKYC.employmentType === 'SALARIED' && store.financialDetails.path === 'SALARIED') {
+              income = store.financialDetails.data.netMonthlySalary || 0;
+              emi = store.financialDetails.data.existingEMI || 0;
+           } else if (store.basicKYC.employmentType === 'SELF_EMPLOYED' && store.financialDetails.path === 'SELF_EMPLOYED') {
+              income = store.financialDetails.data.netMonthlyIncome || 0;
+              emi = store.financialDetails.data.existingEMI || 0;
+           } else if (store.basicKYC.employmentType === 'PROFESSIONAL' && store.financialDetails.path === 'PROFESSIONAL') {
+              income = store.financialDetails.data.netMonthlyIncome || 0;
+              emi = store.financialDetails.data.existingEMI || 0;
+           }
+           
+           if (income > 0 && emi >= income) {
+             return (
+               <div className="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-sm font-medium flex items-center gap-3">
+                  <ShieldAlert className="w-5 h-5" />
+                  Total obligations (EMI) cannot exceed your current income.
+               </div>
+             );
+           }
+           return null;
+        })()}
 
-        <div ref={formEndRef} className="w-full h-1" aria-hidden="true" />
-
-        {/* Spacer: reserves scroll space so content isn't occluded by fixed bar */}
-        <div className={cn("md:hidden transition-all duration-300", !isBottomVisible ? "h-28" : "h-0")} aria-hidden="true" />
-
-        {/* MOBILE: Pinned CTA — always in reach, jumps to inline when at bottom */}
-        <div className={cn(
-          "w-full z-50 md:hidden flex flex-col gap-2 transition-all duration-300",
-          !isBottomVisible
-            ? "fixed bottom-0 left-0 px-4 pb-8 pt-3 bg-background/90 backdrop-blur-md border-t border-border/50"
-            : "relative mt-4 px-0 bg-transparent"
-        )}>
-          <div className="flex items-center justify-between gap-3">
-            {/* Back — ghost, left side */}
-            <motion.div whileTap={{ scale: 0.96 }} className="shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={prevStep}
-                disabled={store.currentStage === 1 || isSubmitting || isAnalyzing}
-                className={cn(
-                  "h-12 bg-transparent border-border/60 text-muted-foreground rounded-xl transition-all duration-150 active:scale-[0.97]",
-                  !isBottomVisible && "active:bg-secondary",
-                  store.currentStage === 1 && "opacity-0 pointer-events-none"
-                )}
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" /> Back
-              </Button>
-            </motion.div>
-
-            {/* Primary CTA — flex-1 fills remaining thumb zone */}
-            {store.currentStage < 3 ? (
-              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
-                <Button
-                  type="button"
-                  onClick={nextStep}
-                  className="w-full h-12 bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white rounded-xl font-semibold transition-all duration-150"
-                >
-                  Continue <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
-                <Button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting || isAnalyzing}
-                  className="w-full h-12 rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white font-semibold transition-all duration-150"
-                >
-                  {isSubmitting || isAnalyzing ? (
-                    <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
-                  ) : (
-                    <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
-                  )}
-                </Button>
-              </motion.div>
-            )}
-          </div>
-          <p className="text-[10px] text-muted-foreground/50 font-medium flex items-center gap-1.5 justify-center">
-            <LockKeyhole className="w-3 h-3 text-muted-foreground/40" />
-            Checking eligibility will <span className="font-semibold text-foreground/70">not</span> affect your credit score
-          </p>
+        <div className="mt-8 relative z-50">
+          <Button 
+             type="submit"
+             disabled={
+               isSubmitting || isAnalyzing ||
+               (() => {
+                 if (store.basicKYC.employmentType === 'SALARIED' && store.financialDetails.path === 'SALARIED') {
+                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlySalary || 0) && (store.financialDetails.data.netMonthlySalary || 0) > 0;
+                 } else if (store.basicKYC.employmentType === 'SELF_EMPLOYED' && store.financialDetails.path === 'SELF_EMPLOYED') {
+                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlyIncome || 0) && (store.financialDetails.data.netMonthlyIncome || 0) > 0;
+                 } else if (store.basicKYC.employmentType === 'PROFESSIONAL' && store.financialDetails.path === 'PROFESSIONAL') {
+                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlyIncome || 0) && (store.financialDetails.data.netMonthlyIncome || 0) > 0;
+                 }
+                 return false;
+               })()
+             }}
+             className="w-full h-14 md:h-16 text-base md:text-lg font-bold rounded-2xl md:rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl transition-all"
+             onClick={(e) => { e.preventDefault(); handleFormSubmit(); }}
+          >
+             {isSubmitting || isAnalyzing ? (
+                <>
+                   <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                   Processing Application...
+                </>
+             ) : (
+                <>
+                   See My Offers <ArrowRight className="ml-2 w-5 h-5" />
+                </>
+             )}
+          </Button>
         </div>
-
-        {/* TABLET + DESKTOP: Inline document-flow navigation */}
-        <div className="hidden md:block mt-4 pt-6">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-full flex items-center justify-between">
-              <motion.div whileHover={store.currentStage > 1 ? { x: -2 } : {}} whileTap={store.currentStage > 1 ? { scale: 0.96 } : {}}>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={prevStep}
-                  disabled={store.currentStage === 1 || isSubmitting || isAnalyzing}
-                  className={cn(
-                    "bg-transparent border-border dark:border-white/10 text-muted-foreground hover:bg-secondary dark:hover:bg-white/5 hover:border-primary/20 rounded-xl transition-all duration-200 active:scale-[0.97]",
-                    store.currentStage === 1 && "opacity-0 pointer-events-none"
-                  )}
-                >
-                  <ChevronLeft className="w-4 h-4 mr-2" /> Back
-                </Button>
-              </motion.div>
-
-              {store.currentStage < 3 ? (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                  <Button
-                    type="button"
-                    onClick={nextStep}
-                    className="w-full md:w-auto md:min-w-[200px] bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white rounded-xl px-6 font-semibold transition-all duration-150"
-                  >
-                    Continue <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                  <Button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || isAnalyzing}
-                    className="w-full md:w-auto md:min-w-[200px] rounded-xl bg-primary dark:bg-[#103783] hover:bg-primary/90 dark:hover:bg-[#0c2a66] active:scale-[0.98] active:bg-primary/80 text-white px-8 font-semibold transition-all duration-150"
-                  >
-                    {isSubmitting || isAnalyzing ? (
-                      <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</span>
-                    ) : (
-                      <span className="flex items-center gap-2"><ArrowRight className="w-5 h-5" /> See My Offers</span>
-                    )}
-                  </Button>
-                </motion.div>
-              )}
-            </div>
-            <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group">
-              <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" />
-              Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
-            </p>
-          </div>
-        </div>
-      </motion.div>
-    </>
-  );
-};
-
-export default LoanApplicationForm;
+;

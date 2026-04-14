@@ -92,6 +92,7 @@ const defaultSalaried: SalariedDetails = {
   officialEmail: '',
   totalExperienceYears: 0,
   currentCompanyYears: 0,
+  grossSalary: 0,
   netMonthlySalary: 0,
   hasExistingLoans: false,
   existingEMI: 0,

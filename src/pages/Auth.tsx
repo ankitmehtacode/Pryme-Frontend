@@ -28,6 +28,7 @@ const loginSchema = z.object({
 
 const signupSchema = loginSchema.extend({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
+  mobileNumber: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -406,6 +407,20 @@ const Auth = () => {
                             />
                             {signupForm.formState.errors.email && (
                               <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.email.message}</p>
+                            )}
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Mobile Number</Label>
+                            <Input
+                              type="tel"
+                              placeholder="9876543210"
+                              maxLength={10}
+                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+                              {...signupForm.register("mobileNumber")}
+                            />
+                            {signupForm.formState.errors.mobileNumber && (
+                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.mobileNumber.message}</p>
                             )}
                           </div>
 

@@ -180,7 +180,7 @@ const CibilTips = () => {
       </div>
 
       {/* Tips Accordion - Constrained Height with Custom Scrollbar */}
-      <div className="space-y-2.5 relative z-10 max-h-[400px] overflow-y-auto overflow-x-hidden pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
+      <div className="space-y-3 relative z-10 max-h-[60vh] overflow-y-auto overflow-x-hidden pb-4 pr-3 overscroll-contain [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
         <AnimatePresence mode="popLayout">
           {filteredTips.map((tip, index) => {
             const isExpanded = expandedIndex === index;

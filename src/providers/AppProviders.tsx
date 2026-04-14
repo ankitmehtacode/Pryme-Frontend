@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AppInitializer } from "@/components/AppInitializer";
+import { AppBootstrapper } from "@/components/AppBootstrapper";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,15 +30,14 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
         <BrowserRouter
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
-          {/* 🧠 ZERO-TRUST: AppInitializer replaces the old AuthProvider.
-              It gates the render tree until /auth/me and /config/dictionaries resolve. */}
-          <AppInitializer>
+          {/* 🧠 ZERO-TRUST: AppBootstrapper gates the render tree until /auth/me and /config/dictionaries resolve. */}
+          <AppBootstrapper>
             <TooltipProvider>
               <Toaster />
               <Sonner />
               {children}
             </TooltipProvider>
-          </AppInitializer>
+          </AppBootstrapper>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

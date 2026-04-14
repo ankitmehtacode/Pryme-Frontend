@@ -207,7 +207,8 @@ const ProductSelectorGrid = memo(() => {
           viewport={viewportHeading}
           transition={headingTransition}
         >
-          <span className="inline-block text-[9px] font-medium text-[#103783] uppercase tracking-[0.3em] bg-[#103783]/10 border border-[#103783]/20 px-3 py-1 rounded-full mb-3">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Our Products
           </span>
           <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-3 uppercase leading-none">

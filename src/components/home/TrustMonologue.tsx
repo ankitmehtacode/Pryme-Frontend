@@ -49,7 +49,7 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           </div>
           
           <div>
-            <h3 className="font-semibold text-white mb-2 text-base">{feature.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 text-base">{feature.title}</h3>
             <p className="text-sm text-slate-400 leading-relaxed font-medium">
               {feature.description}
             </p>
@@ -82,7 +82,7 @@ export default function TrustMonologue() {
     },
     {
       icon: Trash2,
-      title: "100% Deleted",
+      title: "Zero Retention Policy",
       description: "No traces left behind",
       tooltip: "We permanently erase your data after every single visit. No sneaky databases or marketing lists.",
     },
@@ -101,22 +101,22 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative bg-[#030303] overflow-hidden">
+    <section className="py-20 md:py-28 relative bg-slate-50 dark:bg-[#030303] overflow-hidden">
       {/* Background Trust Image */}
       <div className="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=800&fit=crop&auto=format&q=80" 
           alt="" 
-          className="w-full h-full object-cover opacity-[0.08]" 
+          className="w-full h-full object-cover opacity-[0.03] dark:opacity-[0.08]" 
           loading="lazy"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#030303] via-[#030303]/80 to-[#030303]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-slate-50/80 to-slate-50 dark:from-[#030303] dark:via-[#030303]/80 dark:to-[#030303]" />
       </div>
       
       {/* Ambient Glow — CSS animation only, no Framer Motion re-renders */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/20 blur-[50px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/10 md:bg-[#103783]/20 blur-[50px] rounded-full pointer-events-none"
       />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -129,11 +129,11 @@ export default function TrustMonologue() {
             transition={headlineTransition}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-[#103783] text-xs font-semibold uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50 text-[#103783] dark:text-blue-400 text-xs font-semibold uppercase tracking-widest mb-6">
               <Shield className="w-4 h-4" />
               Your Privacy Protected
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-tight mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-slate-900 dark:text-white tracking-tight mb-8">
               Why Trust Us?
             </h2>
             <motion.div
@@ -141,11 +141,11 @@ export default function TrustMonologue() {
               whileInView={quoteInView}
               viewport={viewportOnce}
               transition={quoteTransition}
-              className="max-w-3xl mx-auto bg-gradient-to-b from-white/10 to-transparent p-1 rounded-[2.5rem]"
+              className="max-w-3xl mx-auto bg-gradient-to-b from-slate-200/80 dark:from-white/10 to-transparent p-[1.5px] rounded-[2.5rem]"
             >
-              <div className="bg-[#050505] rounded-[2.4rem] p-8 md:p-12 shadow-2xl">
-                <p className="text-lg md:text-2xl text-slate-300 leading-relaxed font-medium">
-                  "We take your privacy seriously. Your details are securely processed, instantly matched with banks, and completely deleted as soon as you leave. We do not save, sell, or share your personal information."
+              <div className="bg-white dark:bg-[#050505] rounded-[2.4rem] p-8 md:p-12 shadow-xl dark:shadow-2xl">
+                <p className="text-lg md:text-2xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                  "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching, and permanently deleted from the Database after your session. We do not sell, or share your personal information."
                 </p>
               </div>
             </motion.div>

@@ -43,11 +43,11 @@ const EMICalculator = ({
     const interestPct = (interest / total) * 100;
 
     return {
-      emi: Math.round(emiValue),
-      totalPayment: Math.round(total),
-      totalInterest: Math.round(interest),
-      principalPercentage: principalPct,
-      interestPercentage: interestPct,
+      emi: Math.round(emiValue || 0),
+      totalPayment: Math.round(total || 0),
+      totalInterest: Math.round(interest || 0),
+      principalPercentage: principalPct || 0,
+      interestPercentage: interestPct || 0,
     };
   }, [amount, rate, months]);
 
@@ -86,7 +86,7 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full min-w-0", className)}>
+    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full min-w-0 w-full", className)}>
       
       {/* 🧠 Ambient Glow Engine */}
       <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-primary/5 dark:bg-[#103783]/10 blur-[60px] rounded-full pointer-events-none" />
@@ -102,130 +102,150 @@ const EMICalculator = ({
         </div>
       </div>
 
-      {/* EMI Display & Pie Chart — Overlap-proof stacked layout */}
-      <div className="flex flex-col items-center gap-3 md:gap-4 p-3 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-inner mb-4 md:mb-6 relative z-10 shrink-0 overflow-hidden">
+      {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
+      <div className="flex flex-col lg:flex-row gap-6 relative z-10">
         
-        {/* Row 1: Pie Chart + Total Payable side by side */}
-        <div className="flex items-center gap-4 md:gap-6 w-full">
-          {/* Glowing Pie Chart */}
-          <div className="relative w-24 h-24 md:w-36 md:h-36 shrink-0 drop-shadow-md dark:drop-shadow-lg">
-            <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
-              <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
-              {/* Principal Segment */}
-              <circle
-                cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
-                strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
-                className="stroke-[#103783] transition-all duration-1000 ease-out"
+        {/* Left Col: Interactive Sliders (Inputs) */}
+        <div className="flex-1 space-y-4 flex flex-col justify-center order-2 lg:order-1">
+          
+          {/* Amount Slider */}
+          <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount (₹)</label>
+              <input 
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-primary"
+                max={500000000}
+                min={100000}
               />
-              {/* Interest Segment */}
-              <circle
-                cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
-                strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
-                className="stroke-amber-500 transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-1">Monthly EMI</span>
-              <span className="text-base md:text-xl font-bold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
+            </div>
+            <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={500000000} step={100000} className="cursor-pointer py-1" />
+            <div className="flex justify-between mt-3">
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹50 Cr</span>
             </div>
           </div>
 
-          {/* Total Payable — hero metric with supporting data */}
-          <div className="flex-1 min-w-0 p-3 md:p-5 bg-gradient-to-br from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-5 h-5 md:w-6 md:h-6 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm shrink-0">
-                  <span className="text-[8px] md:text-[9px] font-black text-white leading-none">Σ</span>
+          {/* Rate Slider */}
+          <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate (% p.a.)</label>
+              <input 
+                type="number"
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-primary"
+                max={36}
+                min={1}
+                step={0.1}
+              />
+            </div>
+            <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={1} max={36} step={0.25} className="cursor-pointer py-1" />
+            <div className="flex justify-between mt-3">
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">1%</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">36%</span>
+            </div>
+          </div>
+
+          {/* Tenure Slider */}
+          <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure (Months)</label>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="number"
+                  value={months}
+                  onChange={(e) => setMonths(Number(e.target.value))}
+                  className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-primary"
+                  max={360}
+                  min={6}
+                />
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:inline-block">({(months / 12).toFixed(1)} Yrs)</span>
+              </div>
+            </div>
+            <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={6} max={360} step={6} className="cursor-pointer py-1" />
+            <div className="flex justify-between mt-3">
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">6 Mo</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">30 Yrs</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Col: EMI Display & Pie Chart */}
+        <div className="flex-1 flex flex-col p-4 md:p-6 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner order-1 lg:order-2 overflow-hidden">
+          
+          <div className="flex flex-col sm:flex-row items-center gap-6 w-full mb-6">
+            {/* Glowing Pie Chart */}
+            <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto sm:mx-0">
+              <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
+                <circle
+                  cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
+                  strokeDasharray={`${principalArc} ${circumference}`} strokeLinecap="round"
+                  className="stroke-[#103783] transition-all duration-1000 ease-out"
+                />
+                <circle
+                  cx="70" cy="70" r={radius} fill="none" strokeWidth="12"
+                  strokeDasharray={`${circumference - principalArc} ${circumference}`} strokeDashoffset={-principalArc} strokeLinecap="round"
+                  className="stroke-amber-500 transition-all duration-1000 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-1">Monthly EMI</span>
+                <span className="text-xl font-bold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
+              </div>
+            </div>
+
+            {/* Total Payable */}
+            <div className="flex-1 w-full min-w-0 p-5 bg-gradient-to-br from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm shrink-0">
+                    <span className="text-[10px] font-black text-white leading-none">Σ</span>
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
+                <p className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-foreground leading-none whitespace-nowrap">{formatCurrency(totalPayment)}</p>
               </div>
-              <p className="text-xl md:text-3xl font-extrabold text-foreground leading-none whitespace-nowrap">{formatCurrency(totalPayment)}</p>
-            </div>
 
-            {/* Micro-metrics — fills the void space with actionable data */}
-            <div className="mt-3 pt-3 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">
-              <div className="flex-1 flex items-center justify-between min-w-0">
-                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Per Day Equivalent</p>
-                <p className="text-xs md:text-sm font-bold text-foreground">{formatShortCurrency(Math.round(emi / 30))}</p>
+              <div className="mt-4 pt-4 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">
+                <div className="flex-1 flex items-center justify-between min-w-0">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Per Day Equivalent</p>
+                  <p className="text-sm font-bold text-foreground">{formatShortCurrency(Math.round(emi / 30))}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Row 2: Principal & Interest — balanced stat cards */}
-        <div className="grid grid-cols-2 gap-3 md:gap-4 w-full">
-          <div className="p-3.5 md:p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
-              <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
+          {/* Principal & Interest Cards */}
+          <div className="grid grid-cols-2 gap-4 w-full mt-auto">
+            <div className="p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
+              </div>
+              <p className="text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(amount)}</p>
+              <span className="inline-block text-[10px] font-bold text-[#103783] bg-[#103783]/10 px-2.5 py-1 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
             </div>
-            <p className="text-base md:text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(amount)}</p>
-            <span className="inline-block text-[9px] font-bold text-[#103783] bg-[#103783]/10 px-2 py-0.5 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
-          </div>
 
-          <div className="p-3.5 md:p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
+            <div className="p-4 bg-background dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
+              </div>
+              <p className="text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(totalInterest)}</p>
+              <span className="inline-block text-[10px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
             </div>
-            <p className="text-base md:text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(totalInterest)}</p>
-            <span className="inline-block text-[9px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
           </div>
-        </div>
-      </div>
 
-      {/* Interactive Sliders (Condensed) */}
-      <div className="space-y-3 md:space-y-4 relative z-10 flex-1 flex flex-col justify-center">
-        
-        {/* Amount Slider */}
-        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
-          <div className="flex justify-between items-center mb-3 md:mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount</span>
-            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
-              {formatCurrency(amount)}
-            </span>
-          </div>
-          <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={10000000} step={50000} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-2 md:mt-3">
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Crore</span>
-          </div>
-        </div>
-
-        {/* Rate Slider */}
-        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
-          <div className="flex justify-between items-center mb-3 md:mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate</span>
-            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
-              {rate}% <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mt-0.5">p.a.</span>
-            </span>
-          </div>
-          <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={6} max={24} step={0.25} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-2 md:mt-3">
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">6%</span>
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">24%</span>
-          </div>
-        </div>
-
-        {/* Tenure Slider */}
-        <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all dark:hover:border-[#103783]/30">
-          <div className="flex justify-between items-center mb-3 md:mb-4">
-            <span className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure</span>
-            <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1 md:gap-1.5 leading-none">
-              {months} Mo <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">({(months / 12).toFixed(1)} Yrs)</span>
-            </span>
-          </div>
-          <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={12} max={360} step={12} className="cursor-pointer py-1" />
-          <div className="flex justify-between mt-2 md:mt-3">
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">1 Year</span>
-            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">30 Years</span>
-          </div>
         </div>
       </div>
 
       {/* Terminology Accordion */}
       {showTerminology && (
-        <div className="mt-5 pt-4 border-t border-border dark:border-white/10 relative z-10 shrink-0">
+        <div className="mt-6 pt-5 border-t border-border dark:border-white/10 relative z-10 shrink-0">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="terminology" className="border-0">
               <AccordionTrigger className="text-[11px] font-bold text-muted-foreground hover:text-primary dark:hover:text-[#103783] py-2 hover:no-underline uppercase tracking-widest transition-colors">
@@ -235,10 +255,10 @@ const EMICalculator = ({
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="grid gap-3 pt-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
                   {terminology.map((item) => (
-                    <div key={item.term} className="p-3 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
-                      <p className="text-xs font-bold text-foreground mb-1 uppercase tracking-wide">{item.term}</p>
+                    <div key={item.term} className="p-4 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+                      <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wide">{item.term}</p>
                       <p className="text-[11px] font-medium text-muted-foreground dark:text-slate-400 leading-relaxed">{item.definition}</p>
                     </div>
                   ))}

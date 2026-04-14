@@ -59,6 +59,7 @@ import { Link } from "react-router-dom";
 const EMICalculator = lazy(() => import("@/components/loan/EMICalculator"));
 const EligibilityScore = lazy(() => import("@/components/loan/EligibilityScore"));
 const PrepaymentCalculator = lazy(() => import("@/components/loan/PrepaymentCalculator"));
+const OffersRewards = lazy(() => import("@/components/loan/OffersRewards"));
 const CibilTips = lazy(() => import("@/components/loan/CibilTips"));
 
 // 🧠 1. NATIVE ERROR BOUNDARY: Localized crash protection. 
@@ -168,13 +169,13 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Restored normal layout flow to prevent clipping) */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="relative z-20 pt-12 md:pt-20 bg-slate-50 dark:bg-[#0a0a0a]">
+            <div id="products" className="relative z-20 pt-12 md:pt-16 bg-slate-50 dark:bg-[#0a0a0a]">
               <ProductSelectorGrid />
             </div>
             </ScrollReveal>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
-            <section className="py-14 md:py-20 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="pb-14 md:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Bottom gradient section divider */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               <ScrollReveal direction="scale" duration={0.6}>
@@ -205,34 +206,32 @@ const Index = () => {
                   </p>
                 </div>
 
-                {/* Responsive Grid: 1-col mobile → 2-col tablet → 12-col desktop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 items-start">
+                {/* Full Width Stack: EMI -> Prepayment -> Rewards */}
+                <div className="flex flex-col gap-10 md:gap-14 lg:gap-16 items-start w-full">
                   
-                  {/* Left: The Calculators (EMI + Prepayment) — NO double-wrapper */}
-                  <div className="md:col-span-1 lg:col-span-7 w-full min-w-0 overflow-hidden flex flex-col gap-6 lg:gap-8">
+                  {/* EMI Calculator */}
+                  <div className="w-full">
                     <EMICalculator loanAmount={500000} showTerminology={true} />
+                  </div>
+                  
+                  {/* Prepayment Calculator */}
+                  <div className="w-full">
                     <PrepaymentCalculator />
                   </div>
                   
-                  {/* Right: The Data Context & Trust Elements */}
-                  <div className="md:col-span-1 lg:col-span-5 w-full min-w-0 overflow-hidden flex flex-col gap-6 lg:gap-8">
-                    <EligibilityScore score={82} cibilScore={750} monthlyIncome={85000} loanAmount={500000} />
-                    
-                    {/* 🧠 ANIMATED STATS BLOCK: Numbers tick up on scroll */}
-                    <AnimatedStatsBlock />
-                    
-                    {/* Trust Mini-Card under Analytics */}
-                    <div className="bg-primary/5 dark:bg-[#103783]/5 border border-primary/20 dark:border-[#103783]/20 rounded-[2rem] p-5 md:p-6 lg:p-8 shadow-inner">
-                      <h4 className="text-primary dark:text-[#103783] font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center gap-2.5">
-                        <Building2 className="w-5 h-5 shrink-0" /> Real-Time Analytics
-                      </h4>
-                      <p className="text-xs md:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">
-                        These metrics are calculated using the exact proprietary algorithms deployed by top-tier Indian banks to assess creditworthiness.
-                      </p>
-                    </div>
+                  {/* Rewards Calculator */}
+                  <div className="w-full">
+                    <OffersRewards />
+                  </div>
 
-                    {/* 🧠 CIBIL Score Improvement Tips — Interactive Insider Knowledge */}
-                    <CibilTips />
+                  {/* Trust Mini-Card */}
+                  <div className="w-full max-w-3xl mx-auto bg-primary/5 dark:bg-[#103783]/5 border border-primary/20 dark:border-[#103783]/20 rounded-[2rem] p-5 md:p-6 lg:p-8 shadow-inner text-center">
+                    <h4 className="text-primary dark:text-[#103783] font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center justify-center gap-2.5">
+                      <Building2 className="w-5 h-5 shrink-0" /> Calculator Analytics
+                    </h4>
+                    <p className="text-xs md:text-sm text-muted-foreground dark:text-slate-400 font-medium leading-relaxed">
+                      These metrics are calculated using standard banking formulas to give you an overview of your monthly obligations.
+                    </p>
                   </div>
                   
                 </div>
@@ -248,33 +247,26 @@ const Index = () => {
               <ScrollReveal direction="up" duration={1}>
               <TrustMonologue />
               </ScrollReveal>
-              <ScrollReveal direction="up" duration={0.8} delay={0.1}>
               <CustomerReviews />
-              </ScrollReveal>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
               <section className="py-16 md:py-20 lg:py-24 container mx-auto px-4">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-                  <div>
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
-                      <BookOpen className="w-4 h-4" />
-                      Pryme Insights
-                    </span>
-                    <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">Financial Intelligence</h2>
-                  </div>
-                  <Button asChild variant="ghost" className="text-primary hover:text-primary/80 gap-2">
-                    <Link to="/blogs">View All Articles <ArrowRight className="w-4 h-4" /></Link>
-                  </Button>
+                <div className="flex flex-col items-center justify-center text-center mb-12">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+                    <BookOpen className="w-4 h-4" />
+                    Pryme Insights
+                  </span>
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground tracking-tight">Financial Intelligence</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {[
-                    { title: "Building a 800+ CIBIL Score", date: "Mar 10, 2024", img: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=400&auto=format&fit=crop" },
-                    { title: "Home Loans: Resale vs New Construction", date: "Mar 08, 2024", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=400&auto=format&fit=crop" },
-                    { title: "MSME Loans for Digital Businesses", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=400&auto=format&fit=crop" }
+                    { title: "Building a 800+ CIBIL Score", slug: "cibil-score-guide", date: "Mar 10, 2024", img: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=400&auto=format&fit=crop" },
+                    { title: "Home Loans: Resale vs New Construction", slug: "home-loans-resale-vs-new", date: "Mar 08, 2024", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=400&auto=format&fit=crop" },
+                    { title: "MSME Loans for Digital Businesses", slug: "msme-digital-business", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=400&auto=format&fit=crop" }
                   ].map((blog, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                      <Link to="/blogs" className="group block">
+                      <Link to={`/blogs/${blog.slug}`} className="group block">
                         <div className="rounded-3xl overflow-hidden mb-6 aspect-video relative">
                           <img src={blog.img} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" />
                         </div>
@@ -286,7 +278,39 @@ const Index = () => {
                     </ScrollReveal>
                   ))}
                 </div>
+                <div className="flex justify-center mt-12">
+                  <Button asChild variant="outline" className="text-primary border-primary/20 hover:bg-primary/5 gap-2 rounded-full px-6 text-sm">
+                    <Link to="/blogs">View All Articles <ArrowRight className="w-3.5 h-3.5" /></Link>
+                  </Button>
+                </div>
               </section>
+
+              {/* Generic FAQ Accordion */}
+              <section className="py-16 container mx-auto px-4 max-w-3xl">
+                <div className="text-center mb-10">
+                  <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Frequently Asked Questions</h2>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { q: "What is PRYME?", a: "PRYME is a loan comparison and aggregation platform that helps you find the most competitive loan rates from 15+ trusted banks and NBFCs in minutes." },
+                    { q: "Is PRYME a direct lender?", a: "No, PRYME acts as a technology facilitator and connector. We match your profile with our RBI-regulated lending partners." },
+                    { q: "Is my data secure?", a: "Yes. In accordance with strict RBI guidelines and PII standards, your session data is encrypted, processed only for bank matching, and permanently deleted after use." }
+                  ].map((faq, i) => (
+                    <details key={i} className="group border border-border dark:border-white/10 bg-card rounded-2xl p-6 cursor-pointer">
+                      <summary className="font-semibold text-foreground flex justify-between items-center list-none outline-none">
+                        {faq.q}
+                        <span className="transition group-open:rotate-180">
+                          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <p className="text-slate-600 dark:text-slate-400 mt-4 leading-relaxed font-medium text-sm">
+                        {faq.a}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+
             </div>
             </Suspense>
 

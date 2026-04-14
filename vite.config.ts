@@ -8,11 +8,13 @@ export default defineConfig({
     host: true,
     port: 8081,
     proxy: {
-      // 🧠 CLOSED-LOOP: Target port MUST match server.port in application.yml (8082)
-      // If running via Docker, Docker maps 8080→8082 internally.
-      // If running via `mvn spring-boot:run`, it listens on 8082 directly.
+      // 🧠 ZERO-TRUST PROXY: All /api requests are forwarded to Spring Boot.
+      // This is MISSION-CRITICAL for HttpOnly cookie flow:
+      //   Browser → localhost:8081/api/v1/... → Vite proxy → localhost:8080/api/v1/...
+      // The browser sees same-origin, so the PRYME_SID cookie attaches on every request.
+      // changeOrigin rewrites the Host header to match the target.
       '/api': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
