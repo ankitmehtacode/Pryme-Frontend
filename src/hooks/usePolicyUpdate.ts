@@ -1,49 +1,67 @@
 import { useIdempotentMutation } from "@/hooks/useIdempotentMutation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import api from "@/lib/api";
+import { PrymeAPI } from "@/lib/api";
 
+/**
+ * 🧠 CONSOLIDATED POLICY UPDATE HOOK
+ *
+ * Uses PrymeAPI.patchPolicy() → PATCH /api/v1/policies (PolicyAdminController)
+ * Payload matches the backend's PolicyPatchRequest record exactly:
+ *   { entityType, entityId, fieldKey, newValue, reason, idempotencyKey }
+ */
 export const usePolicyUpdate = () => {
   const queryClient = useQueryClient();
 
   return useIdempotentMutation({
-    mutationFn: async ({ id, key, value, auditReason }: { id: string, key: string, value: any, auditReason?: string }) => {
-      return api.patch(`/admin/policies/${id}`, { key, value, auditReason });
+    mutationFn: async ({
+      entityType,
+      entityId,
+      fieldKey,
+      newValue,
+      reason,
+    }: {
+      entityType: string;
+      entityId: string;
+      fieldKey: string;
+      newValue: string;
+      reason?: string;
+    }) => {
+      return PrymeAPI.patchPolicy({ entityType, entityId, fieldKey, newValue, reason });
     },
-    // ANTIGRAVITY MAGIC: Instantly update the cache before network resolves
+    // Optimistic update: Instantly update the cache before network resolves
     onMutate: async (newUpdate) => {
-      await queryClient.cancelQueries({ queryKey: ["admin_policies"] });
-      const previousPolicies = queryClient.getQueryData(["admin_policies"]);
-      
-      queryClient.setQueryData(["admin_policies"], (old: any) => {
-        if (!old || !Array.isArray(old)) return old;
-        
-        return old.map((policy: any) => {
-          if (policy.id === newUpdate.id) {
-            return {
-              ...policy,
-              [newUpdate.key]: newUpdate.value
-            };
-          }
-          return policy;
-        });
-      });
-      
-      return { previousPolicies };
+      await queryClient.cancelQueries({ queryKey: ["policy_value", newUpdate.entityId, newUpdate.fieldKey] });
+      const previousValue = queryClient.getQueryData(["policy_value", newUpdate.entityId, newUpdate.fieldKey]);
+
+      queryClient.setQueryData(
+        ["policy_value", newUpdate.entityId, newUpdate.fieldKey],
+        (old: any) => ({
+          ...old,
+          value: newUpdate.newValue,
+        })
+      );
+
+      return { previousValue };
     },
     // ROLLBACK ON FAILURE
-    onError: (err, newUpdate, context) => {
-      if (context?.previousPolicies) {
-        queryClient.setQueryData(["admin_policies"], context.previousPolicies);
+    onError: (_err, newUpdate, context) => {
+      if (context?.previousValue) {
+        queryClient.setQueryData(
+          ["policy_value", newUpdate.entityId, newUpdate.fieldKey],
+          context.previousValue
+        );
       }
-      toast({ 
-        title: "Matrix Sync Failed", 
-        description: "Rolling back interface.", 
-        variant: "destructive" 
+      toast({
+        title: "Matrix Sync Failed",
+        description: "Rolling back interface.",
+        variant: "destructive",
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin_policies"] });
+    onSettled: (_data, _err, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["policy_value", variables.entityId, variables.fieldKey],
+      });
     },
   });
 };

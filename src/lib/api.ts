@@ -275,7 +275,62 @@ export const PrymeAPI = {
       method: "PATCH",
       body: JSON.stringify(payload),
     });
-  }
+  },
+
+  // ==========================================
+  // PUBLIC DATA ENDPOINTS (No auth required — /public/** is permitAll)
+  // ==========================================
+
+  /** Active partner banks for the marquee — GET /api/v1/public/banks/partners */
+  getPartnerBanks: async () => fetchWithAuth("/public/banks/partners", { method: "GET" }),
+
+  /** Product card grid for Index page — GET /api/v1/public/products */
+  getPublicProducts: async () => fetchWithAuth("/public/products", { method: "GET" }),
+
+  /** Hero offer data — GET /api/v1/public/offers/hero */
+  getHeroOffers: async () => fetchWithAuth("/public/offers/hero", { method: "GET" }),
+
+  /** Bank recommendation engine — GET /api/v1/public/banks/recommendation */
+  getBankRecommendation: async (params: { cibilScore: number; loanAmount: number; loanType: string; monthlyIncome?: number }) => {
+    const qs = new URLSearchParams({
+      cibilScore: String(params.cibilScore),
+      loanAmount: String(params.loanAmount),
+      loanType: params.loanType,
+      ...(params.monthlyIncome ? { monthlyIncome: String(params.monthlyIncome) } : {}),
+    }).toString();
+    return fetchWithAuth(`/public/banks/recommendation?${qs}`, { method: "GET" });
+  },
+
+  /** Public testimonials/reviews — GET /api/v1/public/reviews */
+  getPublicReviews: async () => fetchWithAuth("/public/reviews", { method: "GET" }),
+
+  // ==========================================
+  // ADMIN CRM ENDPOINTS
+  // ==========================================
+
+  /** Admin: List all raw leads — GET /api/v1/admin/leads */
+  getAdminLeads: async () => fetchWithAuth("/admin/leads", { method: "GET" }),
+
+  /** Admin: Bank CRUD — /api/v1/admin/banks */
+  getAdminBanks: async () => fetchWithAuth("/admin/banks", { method: "GET" }),
+  createAdminBank: async (data: { bankName: string; logoUrl: string; isActive: boolean }) =>
+    fetchWithAuth("/admin/banks", { method: "POST", body: JSON.stringify(data) }),
+  updateAdminBank: async (id: string, data: { bankName: string; logoUrl: string; isActive: boolean }) =>
+    fetchWithAuth(`/admin/banks/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  toggleBankVisibility: async (id: string, active: boolean) =>
+    fetchWithAuth(`/admin/banks/${id}/visibility`, { method: "PATCH", body: JSON.stringify({ active }) }),
+  deleteAdminBank: async (id: string) => fetchWithAuth(`/admin/banks/${id}`, { method: "DELETE" }),
+
+  /** Admin: Testimonial CRUD — /api/v1/admin/reviews */
+  getAdminReviews: async () => fetchWithAuth("/admin/reviews", { method: "GET" }),
+  createAdminReview: async (data: any) =>
+    fetchWithAuth("/admin/reviews", { method: "POST", body: JSON.stringify(data) }),
+  updateAdminReview: async (id: string, data: any) =>
+    fetchWithAuth(`/admin/reviews/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteAdminReview: async (id: string) => fetchWithAuth(`/admin/reviews/${id}`, { method: "DELETE" }),
+
+  /** Admin: List active sessions for a user — GET /api/v1/auth/sessions/{userId} */
+  getActiveSessions: async (userId: string) => fetchWithAuth(`/auth/sessions/${userId}`, { method: "GET" }),
 };
 
 // Standard REST Export Map
