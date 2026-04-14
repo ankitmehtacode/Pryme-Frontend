@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { PrymeAPI } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 
 // Enterprise Charting Integration
 import {
@@ -23,6 +24,19 @@ import {
   XAxis, YAxis
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePolicyUpdate } from "@/hooks/usePolicyUpdate";
+import { DynamicPolicyInput } from "@/components/admin/DynamicPolicyInput";
+import { PolicyAuditModal } from "@/components/admin/PolicyAuditModal";
+import { FieldMetadata, PolicyPatchPayload } from "@/lib/validations/policySchema";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
+
+const MOCK_METADATA_DB: Record<string, FieldMetadata> = {
+  "foirAllowed": { fieldKey: "foirAllowed", displayName: "FOIR Allowed", fieldType: "PERCENTAGE", absoluteLowerBound: 0, absoluteUpperBound: 1, allowedValues: null, requiresReason: true, unit: "%" },
+  "minBusinessVintageYears": { fieldKey: "minBusinessVintageYears", displayName: "Min Business Vintage", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 50, allowedValues: null, requiresReason: true, unit: "Yrs" },
+  "itrRequiredYears": { fieldKey: "itrRequiredYears", displayName: "ITR Required", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 10, allowedValues: null, requiresReason: false, unit: "Yrs" },
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -59,6 +73,34 @@ const AdminDashboard = () => {
       { id: "1", email: "admin@gopryme.tech", full_name: "Super Admin", created_at: new Date().toISOString(), role: "SUPER_ADMIN" }
     ]
   });
+
+  // ==========================================
+  // POLICY ENGINE UI STATES
+  // ==========================================
+  const [selectedEntity, setSelectedEntity] = useState("HDFC_HL_001");
+  const [selectedFieldKey, setSelectedFieldKey] = useState<string | null>(null);
+  const [stagedValue, setStagedValue] = useState<any>(null);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+
+  // 1. Fetch current live value of the specific field
+  const { data: currentPolicyValue } = useQuery({
+    queryKey: ["policy_value", selectedEntity, selectedFieldKey],
+    queryFn: () => PrymeAPI.getPolicyValue(selectedEntity, selectedFieldKey!),
+    enabled: !!selectedFieldKey
+  });
+
+  // 2. The Patch Mutation
+  const patchMutation = useMutation({
+    mutationFn: (payload: PolicyPatchPayload) => PrymeAPI.patchPolicy(payload),
+    onSuccess: () => {
+      toast({ title: "Policy Updated", description: "Matrix routing has been updated and audited." });
+      queryClient.invalidateQueries({ queryKey: ["policy_value", selectedEntity, selectedFieldKey] });
+      setIsAuditModalOpen(false);
+      setSelectedFieldKey(null); // Reset UI to safe state
+    }
+  });
+
+  const metadataForField = selectedFieldKey ? MOCK_METADATA_DB[selectedFieldKey] : null;
 
   // ==========================================
   // 🧠 MUTATIONS: OPTIMISTIC PIPELINE UPDATES
@@ -169,7 +211,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSignOut = () => { PrymeAPI.logout().finally(() => navigate("/auth")); };
+  // 🧠 CLOSED-LOOP: Uses useAuth().signOut() to properly clear React Query cache + cookie
+  const { signOut } = useAuth();
+  const handleSignOut = () => signOut();
   const formatCurrency = (val: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(val);
 
   const getStatusColor = (status: string) => {
@@ -465,6 +509,84 @@ const AdminDashboard = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* 🧠 SETTINGS TAB: Layer 4 Execution Container */}
+              {activeTab === "settings" && (
+                <div className="flex h-[calc(100vh-180px)] gap-6 animate-in fade-in slide-in-from-bottom-2">
+                  
+                  {/* Navigation Matrix */}
+                  <div className="w-1/3 bg-[#0d0d14] rounded-2xl border border-white/[0.06] p-4 overflow-y-auto shadow-xl">
+                     <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Partner Matrix</h3>
+                     <button className="w-full text-left p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-medium shadow-sm transition-all hover:bg-blue-500/15">
+                       L&T Finance • LAP
+                     </button>
+                  </div>
+
+                  {/* The Policy Canvas Execution Layer */}
+                  <div className="flex-1 bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-y-auto p-6 md:p-8 relative shadow-xl">
+                     <div className="max-w-2xl bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06]">
+                        {/* Step 1: Select Field */}
+                        <Select onValueChange={(val) => { setSelectedFieldKey(val); setStagedValue(null); }}>
+                           <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white focus:ring-amber-500/50 outline-none">
+                             <SelectValue placeholder="Select a field to modify..." />
+                           </SelectTrigger>
+                           <SelectContent className="bg-[#050508] border-white/[0.08] text-white">
+                             {Object.keys(MOCK_METADATA_DB).map(key => (
+                                <SelectItem key={key} value={key} className="focus:bg-blue-500/10 focus:text-blue-400">
+                                   {MOCK_METADATA_DB[key].displayName}
+                                </SelectItem>
+                             ))}
+                           </SelectContent>
+                        </Select>
+
+                        {/* Step 2: Render Editor if field is selected */}
+                        {selectedFieldKey && metadataForField && (
+                           <div className="mt-6 space-y-4 p-5 border border-blue-500/20 bg-blue-500/5 rounded-xl animate-in fade-in zoom-in-95">
+                              <h4 className="text-sm font-semibold text-blue-400">Modify {metadataForField.displayName}</h4>
+                              
+                              <DynamicPolicyInput 
+                                metadata={metadataForField} 
+                                value={stagedValue ?? currentPolicyValue?.data?.value ?? ''} 
+                                onChange={setStagedValue} 
+                              />
+
+                              <div className="flex justify-end pt-4">
+                                <Button 
+                                  disabled={stagedValue === null || stagedValue === currentPolicyValue?.data?.value}
+                                  onClick={() => setIsAuditModalOpen(true)}
+                                  className="bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-[0_0_15px_rgba(217,119,6,0.3)] transition-all disabled:opacity-50"
+                                >
+                                  Review Change
+                                </Button>
+                              </div>
+                           </div>
+                        )}
+
+                        {/* Step 3: The Interceptor Modal */}
+                        {metadataForField && (
+                          <PolicyAuditModal 
+                            isOpen={isAuditModalOpen}
+                            onClose={() => setIsAuditModalOpen(false)}
+                            metadata={metadataForField}
+                            oldValue={currentPolicyValue?.data?.value ?? ''}
+                            newValue={stagedValue}
+                            onConfirm={(reason, idempotencyKey) => {
+                              patchMutation.mutate({
+                                entityType: "LOAN_PRODUCT",
+                                entityId: selectedEntity,
+                                fieldKey: selectedFieldKey,
+                                oldValue: currentPolicyValue?.data?.value,
+                                newValue: stagedValue,
+                                auditReason: reason,
+                                idempotencyKey
+                              });
+                            }}
+                          />
+                        )}
+                     </div>
+                  </div>
                 </div>
               )}
 

@@ -1,44 +1,50 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import type { Permission } from "@/types/auth.types";
 
 interface ProtectedRouteProps {
-    allowedRoles?: string[];
+  /** Legacy support: role-based gating */
+  allowedRoles?: string[];
+  /** Zero-Trust: permission-based gating (preferred) */
+  requiredPermissions?: Permission[];
 }
 
 /**
- * 🧠 ZERO-COMPROMISE SECURITY GATEWAY
- * Checks for a valid session token and strict role-based access.
- * Unauthenticated users are redirected to /auth.
- * Users without the required clearance are safely downgraded to /dashboard.
+ * 🧠 ZERO-TRUST ROUTE GUARD
+ * 
+ * Reads identity exclusively from the useAuth() hook (React Query cache).
+ * ZERO localStorage. The backend's HttpOnly cookie is the sole session proof.
+ * 
+ * Gating priority:
+ * 1. Not authenticated → /auth
+ * 2. Missing required permissions → /dashboard
+ * 3. Missing allowed role → /dashboard
+ * 4. All checks pass → render Outlet
  */
-export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    // 1. Read the precise token key established by Auth.tsx
-    const token = localStorage.getItem("pryme_session_token");
-    
-    // 2. Safely extract and parse the role from the secure JSON payload
-    let role = "USER"; // Default unprivileged fallback
-    const userDataString = localStorage.getItem("pryme_user_data");
-    
-    if (userDataString) {
-        try {
-            const userData = JSON.parse(userDataString);
-            // 🧠 Force uppercase to completely eliminate case-sensitive routing bugs
-            role = userData?.role?.toUpperCase() || "USER"; 
-        } catch (e) {
-            console.error("Security Router: Failed to parse user payload.", e);
-        }
-    }
+export const ProtectedRoute = ({ allowedRoles, requiredPermissions }: ProtectedRouteProps) => {
+  const { isAuthenticated, user, hasPermission } = useAuth();
 
-    // Rule 1: No valid session token? Eject immediately to the login gate.
-    if (!token) {
-        return <Navigate to="/auth" replace />;
-    }
+  // Rule 1: No valid session → redirect to login
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/auth" replace />;
+  }
 
-    // Rule 2: Token exists, but user lacks necessary RBAC clearance?
-    // Downgrade them to the standard client portal.
-    if (allowedRoles?.length && !allowedRoles.includes(role)) {
-        return <Navigate to="/dashboard" replace />;
+  // Rule 2: Permission-based gating (Zero-Trust — preferred)
+  if (requiredPermissions?.length) {
+    const hasAllPermissions = requiredPermissions.every((p) => hasPermission(p));
+    if (!hasAllPermissions) {
+      return <Navigate to="/dashboard" replace />;
     }
+  }
 
-    // Clearance granted. Render the protected application tier.
-    return <Outlet />;
+  // Rule 3: Legacy role-based gating (backward compatibility)
+  if (allowedRoles?.length) {
+    const userRole = user.role?.toUpperCase();
+    if (!allowedRoles.includes(userRole)) {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  // Clearance granted
+  return <Outlet />;
 };

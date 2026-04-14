@@ -1,26 +1,35 @@
 // src/lib/api.ts
 import { generateSafeUUID } from "@/lib/utils";
+import type { MeResponse, DictionaryMap } from "@/types/auth.types";
 
 
-// 🧠 ARCHITECTURE FIX: Hardcoded localhost fallback for local Spring Boot development
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
+// ARCHITECTURE FIX: Rely strictly on environment variables. 
+// In dev, this uses Vite proxy (/api/v1). In prod, it uses the actual domain.
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!API_BASE_URL) {
+  console.error("CRITICAL: VITE_API_URL is not defined in environment variables.");
+}
 
 /**
- * 🧠 SECURE FETCH ENGINE (PRODUCTION GRADE)
- * Strictly handles standard JSON-based REST calls AND Multipart Binary Streams.
+ * 🧠 SECURE FETCH ENGINE (PRODUCTION GRADE — ZERO-TRUST)
+ * 
+ * 1. credentials: "include" on every request (HttpOnly cookie transport)
+ * 2. Auto-injects Idempotency-Key header on all mutating methods (POST/PUT/PATCH/DELETE)
+ * 3. Global 401/403 interceptor dispatches session expiry event (no localStorage)
+ * 4. Global 429 interceptor for rate limiting
  */
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem("pryme_session_token") || localStorage.getItem("pryme_token");
   
-  // 🧠 160 IQ FIX 1: URL Normalizer (Prevents slash bleeds like /api/v1applications)
+  // URL Normalizer — prevents slash bleeds like /api/v1applications
   const normalizedUrl = endpoint.startsWith("http") 
       ? endpoint 
       : `${API_BASE_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
 
   const isFormData = options.body instanceof FormData;
+  const method = (options.method || "GET").toUpperCase();
 
   const headers: Record<string, string> = {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string>),
   };
 
@@ -29,14 +38,18 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
+  // 🧠 ZERO-TRUST IDEMPOTENCY: Auto-inject Idempotency-Key for all mutating methods.
+  // The backend's IdempotencyFilter will deduplicate based on this key.
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !headers["Idempotency-Key"]) {
+    headers["Idempotency-Key"] = generateSafeUUID();
+  }
+
   try {
-    const response = await fetch(normalizedUrl, { ...options, headers });
+    const response = await fetch(normalizedUrl, { ...options, headers, credentials: "include", mode: "cors" });
 
     // 🧠 GLOBAL INTERCEPTOR: The "Dead Session" Guillotine
+    // ZERO localStorage. We dispatch a custom event that useAuth listens to.
     if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem("pryme_session_token");
-      localStorage.removeItem("pryme_token");
-      localStorage.removeItem("pryme_user_data");
       window.dispatchEvent(new Event("pryme_auth_expired"));
       throw new Error("Session expired. Please sign in again.");
     }
@@ -64,9 +77,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
     if (response.status === 204) return null; 
 
-    // 🧠 160 IQ FIX 2: The Binary Content Inspector
-    // If the Java backend serves a PDF or Image from the Document Vault, 
-    // do NOT parse it as JSON. Convert it to a secure local Object URL!
+    // Binary Content Inspector — PDF/Image from Document Vault
     const contentType = response.headers.get("content-type");
     if (contentType && (contentType.includes("application/pdf") || contentType.includes("image/"))) {
         const blob = await response.blob();
@@ -83,7 +94,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   }
 };
 
-// 🧠 160 IQ FIX 3: Safe null/undefined checking to prevent malformed payloads
+// Safe null/undefined checking to prevent malformed payloads
 const prepareBody = (body: any) => body == null ? undefined : (body instanceof FormData ? body : JSON.stringify(body));
 
 export const PrymeAPI = {
@@ -92,6 +103,16 @@ export const PrymeAPI = {
   // IDENTITY & ACCESS MANAGEMENT (IAM)
   // ==========================================
   
+  /**
+   * 🧠 THE HYDRATION ENDPOINT — The "God Object" Fetcher.
+   * Called on every cold boot by AppInitializer.
+   * Returns the user's identity, role, and permissions array.
+   * If the cookie is invalid/expired, the backend returns 401 → interceptor fires.
+   */
+  getMe: async (): Promise<MeResponse> => {
+    return fetchWithAuth("/auth/me", { method: "GET" });
+  },
+
   signup: async (...args: any[]) => {
     let fullName = "Pryme Client";
     let email, password;
@@ -115,6 +136,8 @@ export const PrymeAPI = {
 
     const res = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/auth/register`, {
       method: "POST",
+      credentials: "include",
+      mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -142,6 +165,8 @@ export const PrymeAPI = {
 
     const res = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/auth/login`, {
       method: "POST",
+      credentials: "include",
+      mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
@@ -155,6 +180,26 @@ export const PrymeAPI = {
   },
 
   logout: async () => fetchWithAuth("/auth/logout", { method: "POST" }),
+
+  // ==========================================
+  // CONFIG & DICTIONARY HYDRATION
+  // ==========================================
+
+  /**
+   * Fetches all backend-managed dictionaries (loan types, banks, etc.)
+   * The frontend NEVER hardcodes these lists.
+   */
+  getDictionaries: async (): Promise<DictionaryMap> => {
+    return fetchWithAuth("/config/dictionaries", { method: "GET" });
+  },
+
+  /**
+   * Fetches field definitions for a given entity type.
+   * Used by the DynamicFormFactory / PolicyFieldEditor to render type-safe inputs.
+   */
+  getFieldDefinitions: async (entityType: string) => {
+    return fetchWithAuth(`/config/field-definitions?entityType=${entityType}`, { method: "GET" });
+  },
 
   // ==========================================
   // CRM & ELEVATION MATRIX
@@ -177,27 +222,32 @@ export const PrymeAPI = {
       }
     };
 
-    return fetchWithAuth(`/leads`, {
+    // 🧠 CLOSED-LOOP FIX: Backend's PublicLeadController lives at /api/v1/public/leads
+    // NOT /api/v1/leads. The SecurityConfig permits /api/v1/public/** without auth.
+    // Idempotency-Key is auto-injected by fetchWithAuth for all POST requests.
+    return fetchWithAuth(`/public/leads`, {
       method: "POST",
-      headers: { "Idempotency-Key": generateSafeUUID() },
       body: JSON.stringify(payload),
     });
   },
 
-  elevateLead: async (leadId: string, userId: string) => fetchWithAuth(`/leads/${leadId}/elevate`, { method: "POST", body: JSON.stringify({ userId }) }),
+  // 🧠 CLOSED-LOOP FIX: Backend ElevationController is at /api/v1/applications/elevate
+  elevateLead: async (leadId: string, userId: string) => fetchWithAuth(`/applications/elevate`, { method: "POST", body: JSON.stringify({ leadId, userId }) }),
   getApplications: async () => fetchWithAuth("/admin/applications", { method: "GET" }),
   updateStatus: async (applicationId: string, status: string) => fetchWithAuth(`/admin/applications/${applicationId}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   assignLead: async (applicationId: string, assigneeId: string) => fetchWithAuth(`/admin/applications/${applicationId}/assign`, { method: "PATCH", body: JSON.stringify({ assigneeId }) }),
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   
   // DOCUMENT VAULT: Upload
+  // 🧠 CLOSED-LOOP FIX: Backend DocumentVaultController uses /documents/initiate-upload
   uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
     try {
       const formData = new FormData();
+      formData.append("applicationId", applicationId);
       formData.append("docType", docType);
       formData.append("file", file);
       
-      const data = await fetchWithAuth(`/applications/${applicationId}/documents`, {
+      const data = await fetchWithAuth(`/documents/initiate-upload`, {
         method: "POST",
         body: formData 
       });
@@ -208,11 +258,24 @@ export const PrymeAPI = {
     }
   },
 
-  // 🧠 160 IQ NEW FEATURE: View Vault Document
-  // This allows you to render <img src={url} /> or <a href={url} download> securely using JWTs
-  viewDocument: async (documentId: string) => fetchWithAuth(`/documents/${documentId}/view`, { method: "GET" }),
+  // 🧠 CLOSED-LOOP FIX: Backend uses /download, not /view
+  viewDocument: async (documentId: string) => fetchWithAuth(`/documents/${documentId}/download`, { method: "GET" }),
 
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
+  
+  // POLICY ENGINE LAYER
+  getPolicyValue: async (entityId: string, fieldKey: string) => {
+    return fetchWithAuth(`/policies/value?entityId=${entityId}&fieldKey=${fieldKey}`, {
+      method: "GET",
+    });
+  },
+  
+  patchPolicy: async (payload: any) => {
+    return fetchWithAuth("/policies", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  }
 };
 
 // Standard REST Export Map

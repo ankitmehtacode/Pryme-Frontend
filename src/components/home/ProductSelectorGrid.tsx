@@ -87,15 +87,31 @@ const products = [
   },
 ];
 
+const spring = { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.7 };
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.05 }
+    transition: { staggerChildren: 0.1 }
   }
 };
 
-const spring = { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.7 };
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: spring }
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: spring }
+};
+
+const headingInitial = { opacity: 0, y: 20 };
+const headingWhileInView = { opacity: 1, y: 0 };
+const headingTransition = { duration: 0.6 };
+const viewportOnce = { once: true, margin: "-50px" };
+const viewportHeading = { once: true };
 
 const ProductSelectorGrid = memo(() => {
   return (
@@ -113,35 +129,23 @@ const ProductSelectorGrid = memo(() => {
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={viewportOnce}
           className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-10 pt-6 relative z-10"
         >
-          {products.map((product, index) => (
+          {products.map((product) => (
             <motion.div 
               key={product.id} 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ ...spring, delay: index * 0.1 }}
+              variants={itemVariants}
             >
               <Link 
                 to={product.href}
                 className="relative flex flex-col items-center cursor-pointer group outline-none"
-                style={{ perspective: "1000px" }} 
               >
                 {/* 🧠 SIZE ADJUSTED to prevent clipping: larger dimensions and object-cover */}
                 <motion.div
-                  className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] aspect-square shrink-0 rounded-2xl md:rounded-[1.5rem]"
-                  initial={{ rotateY: index % 2 === 0 ? -10 : 10, rotateX: 8, y: 0 }}
-                  whileHover={{ 
-                    scale: 1.05, 
-                    y: -6, 
-                    rotateY: 0, 
-                    rotateX: 0,
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={spring}
-                  style={{ transformStyle: "preserve-3d", zIndex: 10 }}
+                  variants={imageVariants}
+                  className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] aspect-square shrink-0 rounded-2xl md:rounded-[1.5rem]
+                    transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1.5 active:scale-95"
                 >
                   
                   {/* The Image Container — bg, overlay and border are all per-product */}
@@ -198,10 +202,10 @@ const ProductSelectorGrid = memo(() => {
       {/* Typography Section */}
       <div className="container mx-auto px-4 text-center mt-10 md:mt-12 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          initial={headingInitial}
+          whileInView={headingWhileInView}
+          viewport={viewportHeading}
+          transition={headingTransition}
         >
           <span className="inline-block text-[9px] font-medium text-[#103783] uppercase tracking-[0.3em] bg-[#103783]/10 border border-[#103783]/20 px-3 py-1 rounded-full mb-3">
             Our Products

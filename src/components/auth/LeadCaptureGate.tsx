@@ -77,7 +77,6 @@ export default function LeadCaptureGate({
     };
 
     localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leadData));
-    localStorage.setItem("pryme_token", `lead_${Date.now()}`);
     localStorage.setItem("pryme_name", leadData.name);
 
     toast({

@@ -80,7 +80,7 @@ const ProcessSection = () => {
             scrollTrigger: {
               trigger: card,
               start: "top 85%",
-              toggleActions: "play none none reverse"
+              toggleActions: "play none none none"
             }
           }
         );
@@ -91,10 +91,10 @@ const ProcessSection = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-32 bg-[#030303] relative overflow-hidden z-10 border-t border-white/5">
+    <section ref={sectionRef} className="py-24 md:py-32 bg-[#030303] relative overflow-hidden z-10 border-t border-white/5" style={{ contain: "content" }}>
       
       {/* 🧠 Premium Ambient Cyber-Glow */}
-      <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2 mix-blend-screen" />
+      <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/10 blur-[50px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2" />
 
       <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-start">
@@ -156,7 +156,7 @@ const ProcessSection = () => {
                   <div className="absolute -left-[22px] lg:-left-[38px] top-12 w-3 h-3 rounded-full border border-white/20 bg-[#030303] z-10 transition-all duration-700 group-hover:bg-cyan-400 group-hover:border-cyan-300 group-hover:shadow-[0_0_25px_6px_rgba(34,211,238,0.9)] group-hover:scale-[1.8]" />
                   
                   {/* Premium Dark Glassmorphic Content Card */}
-                  <div className="flex-1 w-full bg-white/5 backdrop-blur-2xl p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-primary/40 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(16,55,131,0.3)] transition-all duration-500">
+                  <div className="flex-1 w-full bg-white/5 p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-primary/40 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(16,55,131,0.3)] transition-all duration-500">
                     <div className="flex items-center gap-5 mb-4">
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
                         <step.icon className={cn("w-6 h-6", step.color)} />

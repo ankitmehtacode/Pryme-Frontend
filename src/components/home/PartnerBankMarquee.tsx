@@ -44,7 +44,7 @@ const PartnerBankMarquee = memo(() => {
 
         {/* Ambient glow behind the track */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[60%] h-[80px] bg-primary/[0.03] dark:bg-primary/[0.05] blur-[80px] rounded-full" />
+          <div className="w-[60%] h-[80px] bg-primary/[0.03] dark:bg-primary/[0.05] blur-[30px] rounded-full" />
         </div>
 
         {/* Marquee Track */}
@@ -55,13 +55,13 @@ const PartnerBankMarquee = memo(() => {
                 key={`track1-${index}`}
                 className="mx-8 sm:mx-12 flex-shrink-0 flex items-center gap-3 group/item cursor-pointer relative py-3"
               >
-                {/* Hover bloom — soft green radial glow */}
-                <div className="absolute inset-0 -inset-x-8 -inset-y-3 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
+                {/* Hover highlight — no blur, border only */}
+                <div className="absolute inset-0 -inset-x-4 -inset-y-2 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.04] transition-all duration-500 pointer-events-none" />
 
                 <img
                   src={bank.logo}
                   alt={bank.name}
-                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 group-hover/item:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)] transition-all duration-500 ease-out ${
+                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 transition-all duration-500 ease-out ${
                     bank.logo.includes("google") ? "h-[28px] sm:h-[34px] w-auto rounded-md shadow-sm" : "h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px]"
                   }`}
                 />

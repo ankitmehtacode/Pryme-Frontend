@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -141,37 +141,39 @@ const Header = memo(() => {
   const isHomePage = location.pathname === "/";
 
   useGSAP(() => {
+    // PERF FIX: Replaced continuous `onUpdate` callback (fired on every scroll pixel)
+    // with a simple onEnter/onLeaveBack toggle. The old version was calling gsap.to()
+    // on every single scroll event, generating a new tween each time.
     const scrollTrigger = ScrollTrigger.create({
-      start: "top top",
-      end: 100,
-      onUpdate: (self) => {
-        if (self.progress > 0.5) {
-          gsap.to(navContainerRef.current, {
-            width: "90%",
-            maxWidth: "1200px",
-            borderRadius: "24px",
-            y: 12,
-            backgroundColor: "rgba(255, 255, 255, 0.85)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(0,0,0,0.05)",
-            boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)",
-            duration: 0.4,
-            ease: "power2.out"
-          });
-        } else {
-          gsap.to(navContainerRef.current, {
-            width: "100%",
-            maxWidth: "100%",
-            borderRadius: "0px",
-            y: 0,
-            backgroundColor: "transparent",
-            backdropFilter: "blur(0px)",
-            border: "1px solid transparent",
-            boxShadow: "none",
-            duration: 0.4,
-            ease: "power2.out"
-          });
-        }
+      start: 100,
+      end: 101,
+      onEnter: () => {
+        gsap.to(navContainerRef.current, {
+          width: "90%",
+          maxWidth: "1200px",
+          borderRadius: "24px",
+          y: 12,
+          backgroundColor: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(0,0,0,0.05)",
+          boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)",
+          duration: 0.4,
+          ease: "power2.out"
+        });
+      },
+      onLeaveBack: () => {
+        gsap.to(navContainerRef.current, {
+          width: "100%",
+          maxWidth: "100%",
+          borderRadius: "0px",
+          y: 0,
+          backgroundColor: "transparent",
+          backdropFilter: "blur(0px)",
+          border: "1px solid transparent",
+          boxShadow: "none",
+          duration: 0.4,
+          ease: "power2.out"
+        });
       }
     });
     return () => scrollTrigger.kill();

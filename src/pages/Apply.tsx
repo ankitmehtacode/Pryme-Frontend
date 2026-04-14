@@ -4,7 +4,7 @@ import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGa
 import { Helmet } from "react-helmet-async";
 import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole, Sparkles, ChevronRight, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";

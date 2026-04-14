@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import { User, Shield, CreditCard, Bell, LogOut, ChevronRight, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const Profile = () => {
   const { user, signOut } = useAuth();

@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  /* Font import REMOVED — already loaded via <link> in index.html.
+     Duplicate @import caused the browser to download Inter + Space Grotesk twice. */
 
   h1,
   h2,
@@ -26,12 +27,10 @@
     --popover-foreground: 222 47% 11%;
 
     /* Primary: PRYME Deep Blue (#103783) */
-    /* HSL: 216deg, 77%, 30% */
     --primary: 216 77% 30%;
     --primary-foreground: 0 0% 100%;
 
-    /* Accent: Premium Gold (#ffd600) - For Rewards/VIP */
-    /* HSL: 48deg, 100%, 50% */
+    /* Accent: Premium Gold (#ffd600) */
     --accent: 48 100% 50%;
     --accent-foreground: 222 47% 11%;
 
@@ -47,11 +46,11 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    /* Success: Green (remains green for positive states) */
+    /* Success */
     --success: 147 61% 42%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning: Amber */
+    /* Warning */
     --warning: 38 92% 50%;
     --warning-foreground: 222 47% 11%;
 
@@ -59,13 +58,11 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    /* Focus Rings (Pryme Blue) */
+    /* Focus Rings */
     --ring: 216 77% 30%;
 
     --radius: 0.75rem;
   }
-
-
 
   * {
     @apply border-border;
@@ -79,7 +76,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* GPU-accelerated smooth transitions globally */
+  /* Tap highlight removal */
   *,
   *::before,
   *::after {
@@ -91,21 +88,10 @@
     content-visibility: auto;
   }
 
-  /* --- Global Noise Texture (Paper/Cash Feel) --- */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 256px 256px;
-    mix-blend-mode: multiply;
-  }
-
-
+  /* REMOVED: body::before noise texture overlay.
+     It forced every pixel on the page through a mix-blend-mode: multiply
+     compositing pass — catastrophic on low-end GPUs and mobile browsers.
+     The noise was at 3% opacity, imperceptible on most displays. */
 
   /* --- Lenis Scroll Engine Configuration --- */
   html.lenis,
@@ -136,14 +122,17 @@
 
 @layer components {
 
-  /* --- 🧠 200 IQ Glassmorphism System --- */
+  /* --- Glassmorphism System --- */
   .glass-panel {
     @apply bg-white/60 backdrop-blur-xl border border-white/20 shadow-2xl transition-all duration-300;
   }
 
   .glass-card {
     @apply bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-sm transition-all duration-300;
-    will-change: transform, box-shadow;
+    /* REMOVED: will-change: transform, box-shadow;
+       This was pre-promoting EVERY glass card to its own GPU layer even when
+       not animating — exhausting GPU memory on low-RAM devices. The browser's
+       compositor handles hover transitions fine without explicit promotion. */
   }
 
   .glass-card:hover {
@@ -213,7 +202,7 @@
 
 @layer utilities {
 
-  /* --- 🧠 Holographic Typography (For High-Value Stats) --- */
+  /* --- Holographic Typography --- */
   .holographic-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#103783] via-[#9BAFD9] to-[#103783] animate-pulse bg-[length:200%_auto];
   }

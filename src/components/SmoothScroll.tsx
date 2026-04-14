@@ -8,14 +8,43 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * Device capability detection.
+ * Returns true if the device has enough resources to run smooth scrolling
+ * without degrading overall page performance.
+ */
+const isCapableDevice = (): boolean => {
+  if (typeof window === "undefined") return false;
+
+  // Check hardware concurrency (logical CPU cores)
+  const cores = navigator.hardwareConcurrency || 2;
+
+  // Check device memory (GB) — only available in Chromium
+  const memory = (navigator as any).deviceMemory || 4;
+
+  // Check if this is a mobile device via touch + screen width heuristic
+  const isMobile = window.matchMedia("(max-width: 768px)").matches && ("ontouchstart" in window);
+
+  // Skip Lenis on: <4 cores, <4GB RAM, or mobile devices
+  if (cores < 4 || memory < 4 || isMobile) {
+    return false;
+  }
+
+  return true;
+};
+
 const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // 1. Initialize Lenis with Physics-Based Config
+    // On weak devices, don't initialize Lenis at all — native scroll is smoother
+    if (!isCapableDevice()) {
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential easing for "luxury" feel
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
@@ -24,24 +53,23 @@ const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
 
     lenisRef.current = lenis;
 
-    // 2. Sync Lenis scroll events with GSAP ScrollTrigger
-    // This tells ScrollTrigger to update whenever Lenis scrolls
+    // Sync Lenis scroll events with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
-    // 3. Connect GSAP Ticker to Lenis RAF
-    // We define the function separately to ensure we can remove it correctly on unmount
     const update = (time: number) => {
       lenis.raf(time * 1000);
     };
 
     gsap.ticker.add(update);
 
-    // 4. Disable lag smoothing in GSAP to prevent jumps during heavy renders
-    gsap.ticker.lagSmoothing(0);
+    // FIXED: Use lagSmoothing(500, 33) instead of (0).
+    // lagSmoothing(0) forces the browser to NEVER skip frames, causing
+    // compounding jank on weak GPUs. (500, 33) allows GSAP to skip frames
+    // during heavy renders while still feeling smooth at 30fps minimum.
+    gsap.ticker.lagSmoothing(500, 33);
 
-    // 5. Cleanup Function
     return () => {
-      gsap.ticker.remove(update); // Proper cleanup
+      gsap.ticker.remove(update);
       lenis.destroy();
     };
   }, []);

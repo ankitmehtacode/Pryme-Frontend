@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { memo } from "react";
 import { Star } from "lucide-react";
 
 const reviews = [
@@ -44,8 +43,8 @@ const reviews = [
 // Duplicate for infinite scroll effect
 const allReviews = [...reviews, ...reviews];
 
-const ReviewCard = ({ review }: { review: typeof reviews[0] }) => (
-  <div className="w-[320px] md:w-[400px] flex-shrink-0 bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/20 dark:border-slate-800/50 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
+const ReviewCard = memo(({ review }: { review: typeof reviews[0] }) => (
+  <div className="w-[320px] md:w-[400px] flex-shrink-0 bg-white/5 dark:bg-slate-900/50 border border-slate-200/20 dark:border-slate-800/50 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
     <div className="flex gap-1">
       {[...Array(review.rating)].map((_, i) => (
         <Star key={i} className="w-4 h-4 fill-[#103783] text-[#103783]" />
@@ -59,26 +58,14 @@ const ReviewCard = ({ review }: { review: typeof reviews[0] }) => (
       <p className="text-xs text-[#103783] uppercase tracking-wider mt-1">{review.role}</p>
     </div>
   </div>
-);
+));
+ReviewCard.displayName = "ReviewCard";
 
 const CustomerReviews = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Set up scroll-linked animations
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  // Track 1 moves left to right as you scroll down
-  const x1 = useTransform(scrollYProgress, [0, 1], ["-20%", "5%"]);
-  // Track 2 moves right to left as you scroll down
-  const x2 = useTransform(scrollYProgress, [0, 1], ["5%", "-20%"]);
-
   return (
     <section 
-      ref={containerRef}
       className="py-24 overflow-hidden relative bg-[#050505]"
+      style={{ contain: "content" }}
     >
       {/* Background Photo */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -87,11 +74,12 @@ const CustomerReviews = () => {
           alt="" 
           className="w-full h-full object-cover opacity-[0.05]" 
           loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-[#050505]" />
       </div>
-      {/* Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#103783]/5 blur-[120px] rounded-full pointer-events-none" />
+      {/* Background Glow — reduced blur kernel */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#103783]/5 blur-[50px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 mb-16 text-center relative z-10">
         <span className="inline-block text-[10px] md:text-xs font-semibold text-[#103783] uppercase tracking-[0.3em] mb-4">
@@ -102,27 +90,35 @@ const CustomerReviews = () => {
         </h2>
       </div>
 
+      {/* CSS-only marquee tracks — zero JS per frame */}
       <div className="relative z-10 flex flex-col gap-6 md:gap-8">
-        {/* Track 1 (Moves Right) */}
-        <motion.div 
-          style={{ x: x1 }}
-          className="flex gap-6 md:gap-8 w-max pl-4"
-        >
-          {allReviews.map((review, idx) => (
-            <ReviewCard key={`t1-${idx}`} review={review} />
-          ))}
-        </motion.div>
+        {/* Track 1 (Scrolls right) */}
+        <div className="flex overflow-hidden group">
+          <div className="flex gap-6 md:gap-8 shrink-0 animate-[marquee_60s_linear_infinite] group-hover:[animation-play-state:paused] min-w-max pl-4">
+            {allReviews.map((review, idx) => (
+              <ReviewCard key={`t1a-${idx}`} review={review} />
+            ))}
+          </div>
+          <div aria-hidden="true" className="flex gap-6 md:gap-8 shrink-0 animate-[marquee_60s_linear_infinite] group-hover:[animation-play-state:paused] min-w-max pl-6 md:pl-8">
+            {allReviews.map((review, idx) => (
+              <ReviewCard key={`t1b-${idx}`} review={review} />
+            ))}
+          </div>
+        </div>
 
-        {/* Track 2 (Moves Left) */}
-        <motion.div 
-          style={{ x: x2 }}
-          className="flex gap-6 md:gap-8 w-max pl-4 ml-[-20vw]" // Offset starting position
-        >
-          {/* Reverse the array for variety on the second row */}
-          {[...allReviews].reverse().map((review, idx) => (
-            <ReviewCard key={`t2-${idx}`} review={review} />
-          ))}
-        </motion.div>
+        {/* Track 2 (Scrolls left — reverse direction) */}
+        <div className="flex overflow-hidden group">
+          <div className="flex gap-6 md:gap-8 shrink-0 animate-[marquee_55s_linear_infinite_reverse] group-hover:[animation-play-state:paused] min-w-max pl-4">
+            {[...allReviews].reverse().map((review, idx) => (
+              <ReviewCard key={`t2a-${idx}`} review={review} />
+            ))}
+          </div>
+          <div aria-hidden="true" className="flex gap-6 md:gap-8 shrink-0 animate-[marquee_55s_linear_infinite_reverse] group-hover:[animation-play-state:paused] min-w-max pl-6 md:pl-8">
+            {[...allReviews].reverse().map((review, idx) => (
+              <ReviewCard key={`t2b-${idx}`} review={review} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Edge Fades for seamless exiting */}

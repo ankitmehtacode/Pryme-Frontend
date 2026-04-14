@@ -5,8 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppInitializer } from "@/components/AppInitializer";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,13 +30,15 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
         <BrowserRouter
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
-          <AuthProvider>
+          {/* 🧠 ZERO-TRUST: AppInitializer replaces the old AuthProvider.
+              It gates the render tree until /auth/me and /config/dictionaries resolve. */}
+          <AppInitializer>
             <TooltipProvider>
               <Toaster />
               <Sonner />
               {children}
             </TooltipProvider>
-          </AuthProvider>
+          </AppInitializer>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

@@ -32,8 +32,7 @@ const ScrollToTop = memo(() => {
           {/* Pill-shaped sleek button — CRED-inspired */}
           <div className="
             flex items-center justify-center w-9 h-9 rounded-full
-            bg-foreground/[0.07] dark:bg-white/[0.06]
-            backdrop-blur-2xl
+            bg-foreground/[0.08] dark:bg-white/[0.08]
             border border-foreground/[0.06] dark:border-white/[0.08]
             shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.3)]
             hover:bg-foreground/[0.12] dark:hover:bg-white/[0.12]

@@ -51,17 +51,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // 🧠 MEMORY LEAK FIX: Wrapped in useCallback to prevent infinite useEffect loops
   const nukeSession = useCallback(() => {
-    localStorage.removeItem("pryme_session_token");
     localStorage.removeItem("pryme_user_data");
     setUser(null);
   }, []);
 
   // Core verification engine: Validates token presence and mathematical expiry
   const verifyState = useCallback(() => {
-    const token = localStorage.getItem("pryme_session_token");
     const rawData = localStorage.getItem("pryme_user_data");
 
-    if (token && rawData) {
+    if (rawData) {
       try {
         const parsedUser: AuthUser = JSON.parse(rawData);
         const expiryTime = new Date(parsedUser.expiresAt).getTime();
@@ -103,9 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // 🧠 POLYMORPHIC COMPATIBILITY: Passing as a strict object to match the API parser
       const response = await PrymeAPI.login({ email, password, deviceId });
-      
-      // Base64Url Token issued via SecureRandom
-      localStorage.setItem("pryme_session_token", response.token);
       
       const userData: AuthUser = {
         name: response.name || "Pryme Client",

@@ -17,7 +17,7 @@ import prymeLogo from "@/assets/pryme-typo-logo.svg";
 import pryme2Logo from "@/assets/Pryme2.svg";
 
 // 🧠 Closed-Loop Security Context & API
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 // Removed native canvas background for static minimalist layout
 

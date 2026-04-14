@@ -1,17 +1,46 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
+/**
+ * BackgroundBeams — CSS-only version.
+ * 
+ * The previous version used 4 Framer Motion `animate` loops with `repeat: Infinity`,
+ * each running a separate requestAnimationFrame-driven transform interpolation.
+ * That's 4 perpetual animation loops burning CPU on EVERY page that imports this.
+ * 
+ * This version uses pure CSS @keyframes — runs entirely on the compositor thread,
+ * zero JS, zero RAF. Visually identical.
+ */
 export const BackgroundBeams = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
         "absolute inset-0 overflow-hidden z-0 pointer-events-none",
-        "bg-transparent dark:bg-transparent", 
+        "bg-transparent",
         className
       )}
+      style={{ contain: "strict" }}
     >
-      {/* 🧠 4K Ready: Dynamic Grid lines */}
+      <style>{`
+        @keyframes beam1 {
+          0% { transform: translateY(-100%) translateX(-50%) rotate(-45deg); }
+          100% { transform: translateY(200%) translateX(100%) rotate(-45deg); }
+        }
+        @keyframes beam2 {
+          0% { transform: translateY(-100%) translateX(50%) rotate(-45deg); }
+          100% { transform: translateY(200%) translateX(-100%) rotate(-45deg); }
+        }
+        @keyframes beam3 {
+          0% { transform: translateY(-100%) translateX(0%) rotate(45deg); }
+          100% { transform: translateY(200%) translateX(50%) rotate(45deg); }
+        }
+        @keyframes orbPulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+          50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+        }
+      `}</style>
+
+      {/* Grid pattern — static, no animation overhead */}
       <div
         className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
         style={{
@@ -19,68 +48,26 @@ export const BackgroundBeams = ({ className }: { className?: string }) => {
         }}
       />
 
-      {/* 🧠 Animated Dynamic Beams */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-50 dark:opacity-80 mix-blend-screen dark:mix-blend-color-dodge">
-        {/* Beam 1 */}
-        <motion.div
-          animate={{
-            transform: [
-              "translateY(-100%) translateX(-50%) rotate(-45deg)",
-              "translateY(200%) translateX(100%) rotate(-45deg)",
-            ],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute top-0 left-1/4 w-[1px] h-[400px] bg-gradient-to-b from-transparent via-primary to-transparent blur-[2px]"
-          style={{ width: "2px" }}
+      {/* CSS-animated beams — zero JS */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-50 mix-blend-screen">
+        <div
+          className="absolute top-0 left-1/4 w-[2px] h-[400px] bg-gradient-to-b from-transparent via-primary to-transparent blur-[1px]"
+          style={{ animation: "beam1 8s linear infinite" }}
         />
-        {/* Beam 2 */}
-        <motion.div
-          animate={{
-            transform: [
-              "translateY(-100%) translateX(50%) rotate(-45deg)",
-              "translateY(200%) translateX(-100%) rotate(-45deg)",
-            ],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "linear",
-            delay: 3,
-          }}
-          className="absolute top-0 right-1/4 w-[1px] h-[500px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[3px]"
-          style={{ width: "3px" }}
+        <div
+          className="absolute top-0 right-1/4 w-[3px] h-[500px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[2px]"
+          style={{ animation: "beam2 12s linear infinite 3s" }}
         />
-        {/* Beam 3 */}
-        <motion.div
-          animate={{
-            transform: [
-              "translateY(-100%) translateX(0%) rotate(45deg)",
-              "translateY(200%) translateX(50%) rotate(45deg)",
-            ],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "linear",
-            delay: 1,
-          }}
-          className="absolute top-0 left-1/2 w-[1px] h-[600px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[2px]"
-          style={{ width: "2px" }}
+        <div
+          className="absolute top-0 left-1/2 w-[2px] h-[600px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[1px]"
+          style={{ animation: "beam3 10s linear infinite 1s" }}
         />
       </div>
 
-      {/* 🧠 Ambient glowing orb in the center */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 dark:bg-primary/20 blur-[120px] rounded-full"
+      {/* CSS-animated ambient orb — replaces Framer Motion scale+opacity loop */}
+      <div
+        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 blur-[60px] rounded-full"
+        style={{ animation: "orbPulse 8s ease-in-out infinite" }}
       />
     </div>
   );
