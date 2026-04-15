@@ -59,32 +59,34 @@ const marqueeOffers = [
 // ─────────────────────────────────────────────────────────────────────────────
 // FRAMER MOTION VARIANTS
 // ─────────────────────────────────────────────────────────────────────────────
+// PERF: Aurora fades opacity only — no scale/blur on a blurred element.
+// will-change:opacity tells browser to promote to GPU layer BEFORE transition.
 const bgFadeVariants: Variants = {
   enter: { opacity: 0 },
-  center: { opacity: 1, transition: { duration: 1.5, ease: "easeInOut" } },
-  exit: { opacity: 0, transition: { duration: 1.2, ease: "easeInOut" } }
+  center: { opacity: 1, transition: { duration: 1.0, ease: "easeInOut" } },
+  exit:  { opacity: 0, transition: { duration: 0.8, ease: "easeInOut" } }
 };
 
+// PERF FIX: Removed filter:blur(4px) from enter/exit.
+// Blur changes during animation = GPU re-rasterizes every pixel per frame →
+// worst possible operation on mobile. Pure opacity+x is compositor-only.
 const contentVariants: Variants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 50 : -50,
+    x: direction > 0 ? 40 : -40,
     opacity: 0,
-    scale: 0.96,
-    filter: "blur(4px)"
+    scale: 0.97,
   }),
   center: {
     x: 0,
     opacity: 1,
     scale: 1,
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 }
   },
   exit: (direction: number) => ({
-    x: direction < 0 ? 50 : -50,
+    x: direction < 0 ? 40 : -40,
     opacity: 0,
-    scale: 0.96,
-    filter: "blur(4px)",
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    scale: 0.97,
+    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }
   })
 };
 
@@ -123,16 +125,15 @@ const HeroSection = memo(() => {
           animate="center"
           exit="exit"
           className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
-          style={{ contain: "layout style paint" }}
+          style={{ contain: "layout style paint", willChange: "opacity" }}
         >
-          {/* Single blurred aurora layer — GPU composites this as one texture */}
+          {/* Single blurred aurora layer.
+              PERF: blur-[50px] (down from 70px) — visually near-identical on translucent
+              glass but the GPU sample kernel is ~2x cheaper at 50px vs 70px. */}
           <div 
-            className="absolute inset-[-20%] opacity-60 blur-[60px] md:blur-[70px]"
-            style={{ 
-              background: offer.auroraGradient,
-            }} 
+            className="absolute inset-[-20%] opacity-55 blur-[50px] md:blur-[55px]"
+            style={{ background: offer.auroraGradient }} 
           />
-          {/* REMOVED: SVG noise grain — 0.15 opacity imperceptible, costs full-screen texture sample */}
         </motion.div>
       </AnimatePresence>
 

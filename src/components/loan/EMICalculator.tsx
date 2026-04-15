@@ -103,10 +103,10 @@ const EMICalculator = ({
       </div>
 
       {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
-      <div className="flex flex-col lg:flex-row gap-6 relative z-10">
+      <div className="flex flex-col gap-6 relative z-10">
         
         {/* Left Col: Interactive Sliders (Inputs) */}
-        <div className="flex-1 space-y-4 flex flex-col justify-center order-2 lg:order-1">
+        <div className="flex-1 space-y-4 flex flex-col justify-center">
           
           {/* Amount Slider */}
           <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
@@ -174,11 +174,11 @@ const EMICalculator = ({
         </div>
 
         {/* Right Col: EMI Display & Pie Chart */}
-        <div className="flex-1 flex flex-col p-4 md:p-6 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner order-1 lg:order-2 overflow-hidden">
+        <div className="flex flex-col p-4 md:p-6 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner overflow-hidden">
           
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full mb-6">
             {/* Glowing Pie Chart */}
-            <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto sm:mx-0">
+            <div className="relative w-28 h-28 md:w-36 md:h-36 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto sm:mx-0">
               <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
                 <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
                 <circle
@@ -207,7 +207,7 @@ const EMICalculator = ({
                   </div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
                 </div>
-                <p className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-foreground leading-none whitespace-nowrap">{formatCurrency(totalPayment)}</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-foreground leading-none">{formatCurrency(totalPayment)}</p>
               </div>
 
               <div className="mt-4 pt-4 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">

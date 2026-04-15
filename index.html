@@ -24,10 +24,22 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://videos.pexels.com" />
-    <link rel="dns-prefetch" href="http://localhost:8080" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Resource hints for external image domains used on first paint -->
+    <link rel="dns-prefetch" href="https://i.pravatar.cc" />
+    <link rel="dns-prefetch" href="https://s2.googleusercontent.com" />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <link rel="dns-prefetch" href="https://videos.pexels.com" />
+
+    <!--
+      FONT STRATEGY:
+      - Inter: body text (sans-serif in tailwind.config.ts)
+      - Space Grotesk: display headings (display font in tailwind.config.ts + h1/h2/h3 in index.css)
+      - Playfair Display removed — it was never referenced in the design system.
+      - JetBrains Mono NOT loaded here — only used in code blocks; browser falls back to Menlo fine.
+      - display=swap prevents blank text during font download (FOUT over FOIT).
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 
     <link rel="canonical" href="https://www.gopryme.tech" />
 

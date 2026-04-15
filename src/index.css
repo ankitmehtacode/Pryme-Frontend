@@ -189,9 +189,13 @@
     @apply bg-primary text-primary-foreground shadow-lg shadow-blue-700/25 hover:shadow-blue-700/40 hover:bg-[#0c2a66] transition-all duration-300;
   }
 
-  /* --- Infinite Marquee (Bank Logos) --- */
+  /* --- Marquee paint isolation ---
+     contain: layout paint tells the browser this element's animation
+     does NOT affect layout outside its box. Without this, the browser
+     conservatively re-checks layout of ALL siblings on every marquee frame. */
   .marquee {
     @apply flex overflow-hidden w-full;
+    contain: layout paint;
     mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   }
 
@@ -301,5 +305,30 @@
 
   .text-shadow-sm {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACCESSIBILITY + LOW-END DEVICE PERFORMANCE GUARD
+   When "Reduce Motion" is enabled in OS settings (iOS, Android,
+   macOS, Windows), kill ALL infinite animations site-wide.
+   These users either have vestibular disorders OR are on
+   power-saving mode — both cases want zero animation overhead.
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Pause marquee completely — a scrolling element offends
+     users with vestibular disorders more than most effects. */
+  .marquee-content,
+  [class*="animate-marquee"] {
+    animation: none !important;
   }
 }

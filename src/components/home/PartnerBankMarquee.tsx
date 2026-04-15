@@ -55,46 +55,46 @@ const PartnerBankMarquee = memo(() => {
                 key={`track1-${index}`}
                 className="mx-8 sm:mx-12 flex-shrink-0 flex items-center gap-3 group/item cursor-pointer relative py-3"
               >
-                {/* Hover highlight — no blur, border only */}
-                <div className="absolute inset-0 -inset-x-4 -inset-y-2 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.04] transition-all duration-500 pointer-events-none" />
+                {/* PERF: transition-[background-color] only, not transition-all */}
+                <div className="absolute inset-0 -inset-x-4 -inset-y-2 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.04] transition-[background-color] duration-300 pointer-events-none" />
 
                 <img
                   src={bank.logo}
                   alt={bank.name}
-                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 transition-all duration-500 ease-out ${
+                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 transition-[opacity,transform] duration-300 ease-out ${
                     bank.logo.includes("google") ? "h-[28px] sm:h-[34px] w-auto rounded-md shadow-sm" : "h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px]"
                   }`}
                 />
 
-                {/* If it's a web-fetched square favicon, display the bank name next to it to match the horizontal styling of local SVGs */}
                 {bank.logo.includes("google") && (
-                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-500">
+                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-300">
                     {bank.name}
                   </span>
                 )}
               </div>
             ))}
           </div>
+          {/* PERF: aria-hidden duplicate track — blur-2xl removed.
+              Original had blur-2xl on hover on 9 items = up to 9 active GPU blur
+              compositing operations in a scrolling loop. The visual hover effect
+              on track 1 (above) is already sufficient. This track is invisible
+              to screen readers; it exists only to make the marquee loop seamless. */}
           <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-4">
             {banks.map((bank, index) => (
               <div
                 key={`track2-${index}`}
                 className="mx-8 sm:mx-12 flex-shrink-0 flex items-center gap-3 group/item cursor-pointer relative py-3"
               >
-                {/* Hover bloom — soft green radial glow */}
-                <div className="absolute inset-0 -inset-x-8 -inset-y-3 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.07] blur-2xl transition-all duration-700 pointer-events-none" />
-
                 <img
                   src={bank.logo}
-                  alt={bank.name}
-                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-100 group-hover/item:scale-105 group-hover/item:drop-shadow-[0_0_25px_rgba(42,172,100,0.2)] transition-all duration-500 ease-out ${
+                  alt=""
+                  className={`relative object-contain select-none opacity-70 group-hover/item:opacity-95 transition-opacity duration-300 ease-out ${
                     bank.logo.includes("google") ? "h-[28px] sm:h-[34px] w-auto rounded-md shadow-sm" : "h-[32px] sm:h-[42px] w-auto max-w-[150px] sm:max-w-[180px]"
                   }`}
                 />
 
-                {/* If it's a web-fetched square favicon, display the bank name next to it to match the horizontal styling of local SVGs */}
                 {bank.logo.includes("google") && (
-                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-500">
+                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 tracking-tight whitespace-nowrap">
                     {bank.name}
                   </span>
                 )}

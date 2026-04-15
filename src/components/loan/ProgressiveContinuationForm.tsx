@@ -10,23 +10,27 @@ import { PrymeAPI } from "@/lib/api";
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
 interface ProgressiveContinuationFormProps {
+  applicationId?: string | null;
   bankId: string;
   bankName: string;
   loanAmount: number;
   emi: number;
   roi: number;
   productType: string;
+  employmentType?: string;
   onComplete: () => void;
   onCancel: () => void;
 }
 
 export default function ProgressiveContinuationForm({
+  applicationId,
   bankId,
   bankName,
   loanAmount,
   emi,
   roi,
   productType,
+  employmentType,
   onComplete,
   onCancel
 }: ProgressiveContinuationFormProps) {

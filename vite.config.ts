@@ -33,8 +33,13 @@ export default defineConfig({
     exclude: ["optimize_typography.py", "refactor_theme.cjs"],
   },
   build: {
-    // Warn on chunks above 250KB — keeps us honest
-    chunkSizeWarningLimit: 250,
+    // Target modern browsers — no legacy polyfill overhead
+    target: "esnext",
+    // Source maps off in production — they double the data served from the CDN
+    // Enable only when debugging a production issue
+    sourcemap: false,
+    // Warn on chunks above 200KB — tighter than default to catch regressions
+    chunkSizeWarningLimit: 200,
     cssCodeSplit: true,
     rollupOptions: {
       output: {

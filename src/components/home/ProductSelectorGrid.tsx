@@ -141,22 +141,29 @@ const ProductSelectorGrid = memo(() => {
                 to={product.href}
                 className="relative flex flex-col items-center cursor-pointer group outline-none"
               >
-                {/* 🧠 SIZE ADJUSTED to prevent clipping: larger dimensions and object-cover */}
+                {/* PERF: will-change:transform on this wrapper tells the compositor to
+                    pre-promote this element. hover:scale-105 then runs entirely on the
+                    GPU with zero main-thread involvement. */}
                 <motion.div
                   variants={imageVariants}
                   className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] aspect-square shrink-0 rounded-2xl md:rounded-[1.5rem]
                     transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1.5 active:scale-95"
+                  style={{ willChange: "transform" }}
                 >
                   
-                  {/* The Image Container — bg, overlay and border are all per-product */}
+                  {/* PERF: Replaced box-shadow hover transition with a static shadow.
+                      box-shadow transitions are paint-bound (not compositor-accelerated)
+                      and cause a full repaint on every frame during hover on 6 cards.
+                      The card already has hover:scale-105 which reads as "bigger+elevated"
+                      — the shadow delta was imperceptible at this small card size. */}
                   <div
-                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden shadow-[0_15px_30px_-10px_rgba(0,0,0,0.8)] group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,1)] transition-shadow duration-500"
+                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden shadow-[0_12px_24px_-8px_rgba(0,0,0,0.7)]"
                     style={{
                       backgroundColor: product.bg,
                       border: `1px solid ${product.borderColor}`,
                     }}
                   >
-                    {/* Per-card overlay gradient — LAP gets teal-tinted, others get standard dark */}
+                    {/* Per-card overlay gradient */}
                     <div
                       className="absolute inset-0 z-10 pointer-events-none mix-blend-overlay"
                       style={{ background: product.overlay }}
@@ -164,25 +171,24 @@ const ProductSelectorGrid = memo(() => {
                     <img
                       src={product.image}
                       alt={product.label}
-                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0 ${product.imgClass}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 z-0 ${product.imgClass}`}
                       loading="lazy"
                       draggable={false}
                     />
                   </div>
 
-                  {/* Ribbon Tag (Floats safely above without clipping) */}
+                  {/* Ribbon Tag */}
                   {product.tag && (
                     <div 
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300 group-hover:-translate-y-1"
-                      style={{ transform: "translateZ(20px) translateX(-50%)" }} 
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 group-hover:-translate-y-1 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300"
                     >
                       {product.tag}
                     </div>
                   )}
 
-                  {/* Glowing Ring */}
+                  {/* Glowing Ring — opacity-only transition, compositor-safe */}
                   <div 
-                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     style={{
                       border: `2px solid hsla(${product.accent}, 0.8)`,
                       boxShadow: `inset 0 0 20px hsla(${product.accent}, 0.4)`

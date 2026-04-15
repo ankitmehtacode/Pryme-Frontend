@@ -153,7 +153,8 @@ const Header = memo(() => {
           border: "1px solid rgba(0,0,0,0.05)",
           boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)",
           duration: 0.4,
-          ease: "power2.out"
+          ease: "power2.out",
+          overwrite: "auto"
         });
       },
       onLeaveBack: () => {
@@ -167,16 +168,17 @@ const Header = memo(() => {
           border: "1px solid transparent",
           boxShadow: "none",
           duration: 0.4,
-          ease: "power2.out"
+          ease: "power2.out",
+          overwrite: "auto"
         });
-        gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+        gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" });
       },
       onUpdate: (self) => {
         if (self.scroll() > 100) {
           if (self.direction === 1) {
-            gsap.to(headerRef.current, { yPercent: -100, duration: 0.3, ease: "power2.out" });
+            gsap.to(headerRef.current, { yPercent: -100, duration: 0.3, ease: "power2.out", overwrite: "auto" });
           } else {
-            gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+            gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" });
           }
         }
       }
@@ -185,8 +187,8 @@ const Header = memo(() => {
 
   return (
     <>
-      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none">
-        <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
+      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none" style={{ willChange: "transform" }}>
+        <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent" style={{ willChange: "transform, background-color, width, border-radius" }}>
 
           {/* Logo — Icon mark + SVG wordmark lockup */}
           <Link to="/" className="flex items-center gap-1.5 shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>

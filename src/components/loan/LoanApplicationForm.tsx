@@ -788,6 +788,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         lap: "LAP",
         education: "EDUCATIONAL_LOAN",
         auto: "AUTO_LOAN",
+        vehicle: "AUTO_LOAN",
       };
       
       const resolvedType = typeMap[typeParam.toLowerCase()];
@@ -1022,7 +1023,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 3: LOAN REQUIREMENTS (Moved to Top)                       */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-═════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               <div className={cardCn}>
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
@@ -1149,7 +1149,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 1: BASIC KYC                                              */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
 
@@ -1277,7 +1276,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 2: EMPLOYMENT DETAILS                                     */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-═════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               {/* Employment Category Selector */}
               <div className={cardCn}>
@@ -1457,9 +1455,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </div>
+                            </motion.div>
+                          )}
                         </AnimatePresence>
-                      </div>
+                      </motion.div>
+                    )}
 
                     {/* ── PROFESSIONAL PATH ──────────────────────────────── */}
                     {store.basicKYC.employmentType === "PROFESSIONAL" && (
@@ -1584,9 +1584,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </div>
+                            </motion.div>
+                          )}
                         </AnimatePresence>
-                      </div>
+                      </motion.div>
+                    )}
 
                     {/* ── SELF-EMPLOYED / BUSINESS PATH ──────────────────── */}
                     {store.basicKYC.employmentType === "SELF_EMPLOYED" && (
@@ -1773,7 +1775,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                           isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.depreciation || 0 : 0) >= 0}
                                         />
                                       </div>
-                                    </div>
+                                    </motion.div>
+                                  )}
                                 </AnimatePresence>
                               </motion.div>
                             </AnimatePresence>
@@ -1874,9 +1877,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                   isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                                 />
                               </div>
-                            </div>
+                            </motion.div>
+                          )}
                         </AnimatePresence>
-                      </div>
+                      </motion.div>
+                    )}
                   </AnimatePresence>
 
                   {/* ── Conditional Property Selectors based on Loan Type (Moved to Stage 2) ── */}
@@ -1968,7 +1973,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                             </>
                           )}
                         </div>
-                      </div>
+                      </motion.div>
+                    )}
                   </AnimatePresence>
                 </div>
               </div>
@@ -1979,7 +1985,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 4: FINANCIAL FOOTPRINT                                    */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-═════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               {/* ── Universal Financial Footprint Card ──────────────────────── */}
               <div className={cardCn}>
@@ -2089,10 +2094,12 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                               isValid={store.financialFootprint.estimatedPropertyValue >= 100000}
                               error={errors.estimatedPropertyValue}
                             />
-                          </div>
+                          </motion.div>
+                        )}
                       </AnimatePresence>
                     </div>
-                  </div>
+                  </motion.div>
+                )}
 
                 {/* BUSINESS_LOAN → Override */}
                 {store.loanRequirements.loanType === "BUSINESS_LOAN" && (
@@ -2123,7 +2130,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                         onChange={(v) => store.updateFinancialFootprint({ isAbove50Lakhs: v })}
                       />
                     </div>
-                  </div>
+                  </motion.div>
+                )}
               </AnimatePresence>
             </div>
 
@@ -2132,12 +2140,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 5: DOCUMENT VAULT                                         */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-═════════════════════════════════════════════════════════════ */}
-          <DocumentVaultStage
-              store={store}
-              direction={direction}
-              cardCn={cardCn}
-            />
+          {/* Document Vault is wired to Dashboard only */}
         
         </div>
 
@@ -2209,7 +2212,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                  }
                  return false;
                })()
-             }}
+             }
              className="w-full h-14 md:h-16 text-base md:text-lg font-bold rounded-2xl md:rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl transition-all"
              onClick={(e) => { e.preventDefault(); handleFormSubmit(); }}
           >
@@ -2225,4 +2228,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
              )}
           </Button>
         </div>
-;
+
+        {/* Trust Microcopy */}
+        <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group justify-center">
+          <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+          Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
+        </p>
+      </motion.div>
+    </>
+  );
+};
+
+export default LoanApplicationForm;

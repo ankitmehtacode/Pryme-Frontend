@@ -189,7 +189,7 @@ const Index = () => {
               {/* Gradient section divider */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-primary/5 blur-[50px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 blur-[50px] rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, 0, 0)", willChange: "transform" }} />
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">

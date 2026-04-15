@@ -63,16 +63,16 @@ ReviewCard.displayName = "ReviewCard";
 
 const CustomerReviews = () => {
   return (
-    <section 
+    <section
       className="py-24 overflow-hidden relative bg-[#050505]"
       style={{ contain: "content" }}
     >
       {/* Background Photo */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <img 
-          src="https://images.unsplash.com/photo-1560472355-536de3962603?w=1400&h=800&fit=crop&auto=format&q=80" 
-          alt="" 
-          className="w-full h-full object-cover opacity-[0.05]" 
+        <img
+          src="https://images.unsplash.com/photo-1560472355-536de3962603?w=1400&h=800&fit=crop&auto=format&q=80"
+          alt=""
+          className="w-full h-full object-cover opacity-[0.05]"
           loading="lazy"
           decoding="async"
         />

@@ -23,20 +23,24 @@ export const BackgroundBeams = ({ className }: { className?: string }) => {
     >
       <style>{`
         @keyframes beam1 {
-          0% { transform: translateY(-100%) translateX(-50%) rotate(-45deg); }
-          100% { transform: translateY(200%) translateX(100%) rotate(-45deg); }
+          0%   { transform: translateY(-100%) translateX(-50%) rotate(-45deg); }
+          100% { transform: translateY(200%)  translateX(100%) rotate(-45deg); }
         }
         @keyframes beam2 {
-          0% { transform: translateY(-100%) translateX(50%) rotate(-45deg); }
-          100% { transform: translateY(200%) translateX(-100%) rotate(-45deg); }
+          0%   { transform: translateY(-100%) translateX(50%)  rotate(-45deg); }
+          100% { transform: translateY(200%)  translateX(-100%) rotate(-45deg); }
         }
         @keyframes beam3 {
-          0% { transform: translateY(-100%) translateX(0%) rotate(45deg); }
-          100% { transform: translateY(200%) translateX(50%) rotate(45deg); }
+          0%   { transform: translateY(-100%) translateX(0%)   rotate(45deg); }
+          100% { transform: translateY(200%)  translateX(50%)  rotate(45deg); }
         }
+        /* PERF FIX: orbPulse now only animates opacity (compositor-only).
+           The original animated scale on a blur-[60px] div — scale changes force
+           the GPU to re-rasterize the entire blur kernel per frame, 60fps, forever.
+           Opacity-only costs zero rasterization. */
         @keyframes orbPulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-          50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+          0%, 100% { opacity: 0.25; }
+          50%       { opacity: 0.45; }
         }
       `}</style>
 
@@ -48,26 +52,30 @@ export const BackgroundBeams = ({ className }: { className?: string }) => {
         }}
       />
 
-      {/* CSS-animated beams — zero JS */}
+      {/* CSS-animated beams — zero JS.
+          PERF: will-change:transform on each beam pre-promotes them to individual
+          compositor layers so translateY runs entirely off the main thread. */}
       <div className="absolute top-0 left-0 w-full h-full opacity-50 mix-blend-screen">
         <div
           className="absolute top-0 left-1/4 w-[2px] h-[400px] bg-gradient-to-b from-transparent via-primary to-transparent blur-[1px]"
-          style={{ animation: "beam1 8s linear infinite" }}
+          style={{ animation: "beam1 8s linear infinite", willChange: "transform" }}
         />
         <div
           className="absolute top-0 right-1/4 w-[3px] h-[500px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[2px]"
-          style={{ animation: "beam2 12s linear infinite 3s" }}
+          style={{ animation: "beam2 12s linear infinite 3s", willChange: "transform" }}
         />
         <div
           className="absolute top-0 left-1/2 w-[2px] h-[600px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[1px]"
-          style={{ animation: "beam3 10s linear infinite 1s" }}
+          style={{ animation: "beam3 10s linear infinite 1s", willChange: "transform" }}
         />
       </div>
 
-      {/* CSS-animated ambient orb — replaces Framer Motion scale+opacity loop */}
+      {/* Ambient orb — opacity-only animation, blur-[40px] (down from 60px).
+          40px is visually equivalent on a low-opacity background element but
+          the GPU sample kernel is ~2.25x smaller → cheaper composite pass. */}
       <div
-        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 blur-[60px] rounded-full"
-        style={{ animation: "orbPulse 8s ease-in-out infinite" }}
+        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 blur-[40px] rounded-full"
+        style={{ animation: "orbPulse 8s ease-in-out infinite", willChange: "opacity" }}
       />
     </div>
   );
