@@ -51,17 +51,24 @@ export const useAuth = () => {
   );
 
   // ─── SIGN IN ──────────────────────────────────────────────────────────────
-  // Calls the login endpoint, then invalidates the auth query to re-hydrate.
-  // The backend sets the HttpOnly cookie on successful login.
+  // Calls the login endpoint, extracts the embedded MeResponse from the
+  // response, and injects it directly into the React Query cache.
+  // 🧠 160 IQ: Zero /auth/me call. The Vite dev proxy doesn't reliably
+  // forward Set-Cookie headers, so the old flow (login → /auth/me) always
+  // got a 401 on the second call. This eliminates that entirely.
   const signIn = useCallback(
-    async (email: string, password: string): Promise<{ error: Error | null }> => {
+    async (email: string, password: string): Promise<{ error: Error | null; user: MeResponse | null }> => {
       try {
-        await PrymeAPI.login({ email, password });
-        // Re-hydrate the identity from the freshly-set cookie
-        await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
-        return { error: null };
+        const loginResponse = await PrymeAPI.login({ email, password });
+        // The backend now embeds the full MeResponse inside LoginResponse.user
+        const userData: MeResponse = loginResponse.user;
+        if (userData) {
+          // Inject directly into React Query cache — instant hydration, zero latency
+          queryClient.setQueryData(AUTH_QUERY_KEY, userData);
+        }
+        return { error: null, user: userData || null };
       } catch (err) {
-        return { error: err as Error };
+        return { error: err as Error, user: null };
       }
     },
     [queryClient]
@@ -69,14 +76,14 @@ export const useAuth = () => {
 
   // ─── SIGN UP + AUTO-LOGIN ─────────────────────────────────────────────────
   const signUp = useCallback(
-    async (userData: any): Promise<{ error: Error | null }> => {
+    async (userData: any): Promise<{ error: Error | null; user: MeResponse | null }> => {
       try {
         await PrymeAPI.signup(userData);
         const email = userData.email || userData.username;
         const password = userData.password || userData.securityKey || userData.key;
         return await signIn(email, password);
       } catch (err) {
-        return { error: err as Error };
+        return { error: err as Error, user: null };
       }
     },
     [signIn]

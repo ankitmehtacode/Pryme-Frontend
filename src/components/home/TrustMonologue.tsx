@@ -101,17 +101,17 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative bg-slate-50 dark:bg-[#030303] overflow-hidden">
+    <section className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-slate-900 overflow-hidden">
       {/* Background Trust Image */}
       <div className="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=800&fit=crop&auto=format&q=80" 
           alt="" 
-          className="w-full h-full object-cover opacity-[0.03] dark:opacity-[0.08]" 
+          className="w-full h-full object-cover opacity-[0.03] dark:opacity-[0.05]" 
           loading="lazy"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-slate-50/80 to-slate-50 dark:from-[#030303] dark:via-[#030303]/80 dark:to-[#030303]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 via-white/80 to-slate-50/50 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-900" />
       </div>
       
       {/* Ambient Glow — CSS animation only, no Framer Motion re-renders */}

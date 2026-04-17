@@ -57,7 +57,6 @@ import { Link } from "react-router-dom";
 
 // Loan Utility Components (below-the-fold — lazy-loaded)
 const EMICalculator = lazy(() => import("@/components/loan/EMICalculator"));
-const EligibilityScore = lazy(() => import("@/components/loan/EligibilityScore"));
 const PrepaymentCalculator = lazy(() => import("@/components/loan/PrepaymentCalculator"));
 const OffersRewards = lazy(() => import("@/components/loan/OffersRewards"));
 const CibilTips = lazy(() => import("@/components/loan/CibilTips"));
@@ -90,53 +89,7 @@ class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {h
   }
 }
 
-// 🧠 ANIMATED STATS BLOCK: Numbers tick up on scroll-into-view
-const statsData = [
-  { label: "Capital Disbursed", target: 500, suffix: "Cr+", prefix: "₹" },
-  { label: "Avg Approval", target: 24, suffix: "h", prefix: "" },
-  { label: "Success Rate", target: 98, suffix: "%", prefix: "" },
-];
 
-const statVariants = {
-  hidden: { opacity: 0, x: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { type: "spring", stiffness: 200, damping: 25, delay: i * 0.15 }
-  })
-};
-
-const AnimatedStatsBlock = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-
-  const count0 = useAnimatedCounter(statsData[0].target, 2200, true, isInView);
-  const count1 = useAnimatedCounter(statsData[1].target, 1800, true, isInView);
-  const count2 = useAnimatedCounter(statsData[2].target, 2000, true, isInView);
-
-  return (
-    <div
-      ref={ref}
-      className="flex flex-col gap-5 bg-card dark:bg-secondary/20 rounded-[2rem] p-7 md:p-8 border border-border dark:border-white/5 shadow-lg transition-all hover:border-primary/30"
-    >
-      {statsData.map((stat, i) => (
-        <motion.div
-          key={stat.label}
-          custom={i}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={statVariants}
-          className={`flex items-center justify-between ${i < statsData.length - 1 ? "border-b border-border dark:border-white/5 pb-5" : ""}`}
-        >
-          <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-          <p className="text-2xl md:text-3xl font-bold text-foreground tracking-tighter tabular-nums">
-            {stat.prefix}{i === 0 ? count0 : i === 1 ? count1 : count2}<span className="text-primary text-xl">{stat.suffix}</span>
-          </p>
-        </motion.div>
-      ))}
-    </div>
-  );
-};
 
 const Index = () => {
   return (
@@ -167,21 +120,17 @@ const Index = () => {
               <HeroSection />
             </div>
 
-            {/* 🧠 2. THE DYNAMIC PRODUCT GRID (Restored normal layout flow to prevent clipping) */}
+            {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="relative z-20 pt-12 md:pt-16 bg-slate-50 dark:bg-[#0a0a0a]">
+            <div id="products" className="relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#0a0a0a]">
               <ProductSelectorGrid />
+              
+              {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
+              <div className="pt-4 pb-12 w-full transition-all">
+                <PartnerBankMarquee />
+              </div>
             </div>
             </ScrollReveal>
-
-            {/* 🧠 3. STATIC PARTNERSHIP BAR (Authority Anchor) */}
-            <section className="pb-14 md:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
-              {/* Bottom gradient section divider */}
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
-              <ScrollReveal direction="scale" duration={0.6}>
-              <PartnerBankMarquee />
-              </ScrollReveal>
-            </section>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>

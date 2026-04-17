@@ -92,7 +92,7 @@ const Auth = () => {
   const handleLogin = async (data: LoginData) => {
     setIsLoading(true);
     
-    const { error } = await signIn(data.email, data.password);
+    const { error, user: loggedInUser } = await signIn(data.email, data.password);
     
     if (error) {
       toast({
@@ -106,6 +106,19 @@ const Auth = () => {
         title: "Welcome Back",
         description: "Successfully logged into your Pryme account.",
       });
+      // 🧠 CLOSED-LOOP FIX: Navigate directly using the returned user data.
+      // The previous useEffect-only approach failed because React Query's
+      // invalidateQueries resolved before the state update propagated.
+      if (loggedInUser) {
+        const role = (loggedInUser.role || "USER").toUpperCase();
+        if (from) {
+          navigate(from, { replace: true });
+        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }
     }
     
     setIsLoading(false);
@@ -114,7 +127,7 @@ const Auth = () => {
   const handleSignup = async (data: SignupData) => {
     setIsLoading(true);
     
-    const { error } = await signUp({
+    const { error, user: loggedInUser } = await signUp({
       fullName: data.fullName,
       email: data.email,
       password: data.password
@@ -131,6 +144,16 @@ const Auth = () => {
         title: "Account Created",
         description: "Welcome to Pryme! Redirecting to your dashboard...",
       });
+      if (loggedInUser) {
+        const role = (loggedInUser.role || "USER").toUpperCase();
+        if (from) {
+          navigate(from, { replace: true });
+        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }
     }
     
     setIsLoading(false);

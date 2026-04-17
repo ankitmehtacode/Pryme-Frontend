@@ -316,6 +316,14 @@ export const PrymeAPI = {
     fetchWithAuth(`/admin/banks/${id}/visibility`, { method: "PATCH", body: JSON.stringify({ active }) }),
   deleteAdminBank: async (id: string) => fetchWithAuth(`/admin/banks/${id}`, { method: "DELETE" }),
 
+  /** Admin: Product (Offer) CRUD — /api/v1/admin/products */
+  getAdminProducts: async () => fetchWithAuth("/admin/products", { method: "GET" }),
+  createAdminProduct: async (data: any) =>
+    fetchWithAuth("/admin/products", { method: "POST", body: JSON.stringify(data) }),
+  updateAdminProduct: async (id: string, data: any) =>
+    fetchWithAuth(`/admin/products/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteAdminProduct: async (id: string) => fetchWithAuth(`/admin/products/${id}`, { method: "DELETE" }),
+
   /** Admin: Testimonial CRUD — /api/v1/admin/reviews */
   getAdminReviews: async () => fetchWithAuth("/admin/reviews", { method: "GET" }),
   createAdminReview: async (data: any) =>

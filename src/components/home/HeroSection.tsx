@@ -5,7 +5,9 @@ import {
   ChevronRight, ChevronLeft, CheckCircle2,
   TrendingUp, WalletCards, Coins, Landmark, BadgePercent, ShieldCheck,
 } from "lucide-react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, useInView } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { PrymeAPI } from "@/lib/api";
 
 import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
@@ -93,9 +95,27 @@ const contentVariants: Variants = {
 const HeroSection = memo(() => {
   const [[page, direction], setPage] = useState([0, 0]);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const heroRef = useRef<HTMLElement>(null);
+  const isInView = useInView(heroRef, { once: false, margin: "0px 0px 200px 0px" });
 
-  const activeIndex = Math.abs(page % initialOffers.length);
-  const offer = initialOffers[activeIndex];
+  const { data: dynamicOffers = [] } = useQuery({
+    queryKey: ["public_hero_offers"],
+    queryFn: () => PrymeAPI.getHeroOffers().then(res => res.data || res)
+  });
+
+  const activeOffers = dynamicOffers.length > 0 ? dynamicOffers.map((offer: any, i: number) => {
+    const baseVisual = initialOffers[i % initialOffers.length];
+    return {
+      ...baseVisual,
+      title: offer.title || baseVisual.title,
+      bank: offer.lenderName || baseVisual.bank,
+      tag: offer.tag || baseVisual.tag || "HOT RATE",
+      highlights: offer.desc ? offer.desc.split('|').map((s: string) => s.trim()) : baseVisual.highlights
+    };
+  }) : initialOffers;
+
+  const activeIndex = Math.abs(page % activeOffers.length);
+  const offer = activeOffers[activeIndex];
 
   const paginate = useCallback((newDirection: number) => {
     setIsAutoPlaying(false);
@@ -111,30 +131,32 @@ const HeroSection = memo(() => {
   }, [isAutoPlaying]);
 
   return (
-    <section className="relative w-full overflow-hidden flex items-center justify-center px-4 sm:px-6 md:px-10 pt-4 pb-2 md:pt-6 md:pb-4 min-h-[350px] bg-[#fafafa]">
+    <section ref={heroRef} className="relative w-full overflow-hidden flex items-center justify-center px-4 sm:px-6 md:px-10 pt-4 pb-2 md:pt-6 md:pb-4 min-h-[350px] bg-[#fafafa]">
       
       {/* ────────────── OPTIMIZED AURORA BACKGROUND ────────────── */}
       {/* PERF FIX: Replaced 3 independently animating blur-[100px+] div orbs 
           with a single CSS conic-gradient blurred once. This reduces the number
           of compositing layers from 4 to 1 and eliminates per-frame CSS recalc. */}
       <AnimatePresence initial={false}>
-        <motion.div
-          key={page + 'aurora'}
-          variants={bgFadeVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
-          style={{ contain: "layout style paint", willChange: "opacity" }}
-        >
-          {/* Single blurred aurora layer.
-              PERF: blur-[50px] (down from 70px) — visually near-identical on translucent
-              glass but the GPU sample kernel is ~2x cheaper at 50px vs 70px. */}
-          <div 
-            className="absolute inset-[-20%] opacity-55 blur-[50px] md:blur-[55px]"
-            style={{ background: offer.auroraGradient }} 
-          />
-        </motion.div>
+        {isInView && (
+          <motion.div
+            key={page + 'aurora'}
+            variants={bgFadeVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none transform-gpu will-change-transform"
+            style={{ contain: "layout style paint", willChange: "opacity, transform" }}
+          >
+            {/* Single blurred aurora layer.
+                PERF: blur-[50px] (down from 70px) — visually near-identical on translucent
+                glass but the GPU sample kernel is ~2x cheaper at 50px vs 70px. */}
+            <div 
+              className="absolute inset-[-20%] opacity-55 blur-[50px] md:blur-[55px] pointer-events-none transform-gpu"
+              style={{ background: offer.auroraGradient }} 
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* ────────────── LIQUID GLASS CARD ────────────── */}
@@ -142,7 +164,7 @@ const HeroSection = memo(() => {
           60px blur radius forces the GPU to sample a massive kernel per pixel.
           20px is visually near-identical on a translucent card but ~4x cheaper. */}
       <div className="relative z-10 w-full max-w-[1700px] min-h-[300px] sm:min-h-[320px] md:min-h-[330px] lg:min-h-[340px] h-auto rounded-[32px] md:rounded-[40px] overflow-hidden 
-        bg-white/30 backdrop-blur-lg
+        bg-white/30 backdrop-blur-lg transform-gpu
         shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-1px_1px_rgba(255,255,255,0.4),0_32px_100px_rgba(0,0,0,0.1)]
         border-[0.5px] border-white/50
         flex flex-col justify-between"
@@ -151,15 +173,16 @@ const HeroSection = memo(() => {
         <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-80" />
 
         {/* ────────────── BACKGROUND ICONS ────────────── */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0 mask-image-[linear-gradient(to_bottom,black,transparent)]">
+        <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0 mask-image-[linear-gradient(to_bottom,black,transparent)] transform-gpu">
           <AnimatePresence initial={false}>
-            <motion.div
-              key={page + 'svgs'}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 1.5 } }}
-              exit={{ opacity: 0, transition: { duration: 0.8 } }}
-              className="relative w-full h-full"
-            >
+            {isInView && (
+              <motion.div
+                key={page + 'svgs'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 1.5 } }}
+                exit={{ opacity: 0, transition: { duration: 0.8 } }}
+                className="relative w-full h-full transform-gpu pointer-events-none will-change-transform"
+              >
               {offer.bgIcons.map((Icon, idx) => (
                 <Icon 
                   key={idx} 
@@ -172,7 +195,8 @@ const HeroSection = memo(() => {
                   }`} 
                 />
               ))}
-            </motion.div>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -180,18 +204,18 @@ const HeroSection = memo(() => {
         <div className="relative z-10 w-full px-6 py-4 md:px-8 md:py-4 flex items-center justify-between pointer-events-none shrink-0">
           
           {/* LEFT: Eyebrow */}
-          <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0 pointer-events-none">
             <motion.span 
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
               transition={{ duration: 2, ease: [0.22, 1, 0.36, 1], delay: 1 }}
-              className="w-3 sm:w-5 md:w-8 h-[1.5px] bg-slate-800/40 rounded-full origin-left shrink-0" 
+              className="w-3 sm:w-5 md:w-8 h-[1.5px] bg-slate-800/40 rounded-full origin-left shrink-0 transform-gpu will-change-transform" 
             />
             <motion.p 
               initial={{ opacity: 0, filter: "blur(8px)", x: -10 }}
               animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
               transition={{ duration: 3, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-              className="text-[8.5px] sm:text-[9px] md:text-[10px] font-mono tracking-[0.1em] sm:tracking-[0.2em] uppercase text-slate-800/80 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] whitespace-nowrap"
+              className="text-[8.5px] sm:text-[9px] md:text-[10px] font-mono tracking-[0.1em] sm:tracking-[0.2em] uppercase text-slate-800/80 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] whitespace-nowrap transform-gpu will-change-transform"
             >
               Instant Capital. Zero Friction.
             </motion.p>
@@ -237,7 +261,7 @@ const HeroSection = memo(() => {
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <div className="flex items-center gap-1.5 px-2">
-                {initialOffers.map((_, i) => (
+                {activeOffers.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => {
@@ -270,7 +294,7 @@ const HeroSection = memo(() => {
               initial="enter"
               animate="center"
               exit="exit"
-              className="col-start-1 row-start-1 flex flex-col items-center justify-center w-full max-w-5xl place-self-center text-center pointer-events-auto"
+              className="col-start-1 row-start-1 flex flex-col items-center justify-center w-full max-w-5xl place-self-center text-center pointer-events-auto transform-gpu will-change-transform"
             >
               {/* Tag & Bank Header */}
               <div className="flex items-center justify-center gap-3 px-4 py-1.5 mb-2 rounded-full bg-white/40 border border-white/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-lg hover:bg-white/50 transition-all">
@@ -333,13 +357,40 @@ const HeroSection = memo(() => {
           </AnimatePresence>
         </div>
 
-        {/* ────────────── STATIC BANNER ────────────── */}
-        <div className="relative z-30 w-full border-t-[0.5px] border-white/50 bg-white/30 hidden md:flex items-center justify-center mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] py-3 shrink-0">
+        {/* ────────────── MARQUEE ────────────── */}
+        <div className="relative z-30 w-full hero-marquee-bar border-t-[0.5px] border-white/50 bg-white/30 hidden md:block mt-auto shadow-[0_-1px_20px_rgba(0,0,0,0.02)] pt-1 shrink-0">
+          
           <div className="absolute top-0 left-0 w-24 md:w-40 h-full bg-gradient-to-r from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-bl-[32px] md:rounded-bl-[40px]" />
           <div className="absolute top-0 right-0 w-24 md:w-40 h-full bg-gradient-to-l from-white/60 via-white/20 to-transparent z-10 pointer-events-none rounded-br-[32px] md:rounded-br-[40px]" />
-          <p className="text-[11px] md:text-xs font-semibold text-slate-700/90 tracking-wide text-center">
-            Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
-          </p>
+          
+          <div className="hero-marquee-track flex py-2.5 overflow-hidden group transform-gpu">
+            <div className="flex shrink-0 animate-[marquee_40s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2 transform-gpu will-change-transform">
+              {[1, 2, 3, 4].map((i) => (
+                <div 
+                  key={`track1-${i}`} 
+                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/95 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white transition-all duration-300 cursor-default transform-gpu"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0284c7] shadow-[0_0_6px_#0284c7]" />
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">
+                    Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div aria-hidden="true" className="flex shrink-0 animate-[marquee_40s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2 transform-gpu will-change-transform">
+              {[1, 2, 3, 4].map((i) => (
+                <div 
+                  key={`track2-${i}`} 
+                  className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/95 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white transition-all duration-300 cursor-default transform-gpu"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0284c7] shadow-[0_0_6px_#0284c7]" />
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">
+                    Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>
