@@ -39,7 +39,12 @@
       - JetBrains Mono NOT loaded here — only used in code blocks; browser falls back to Menlo fine.
       - display=swap prevents blank text during font download (FOUT over FOIT).
     -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- LCP Asset Preloading (Vite resolves these to hashed URLs on build) -->
+    <link rel="preload" href="/src/assets/Pryme2.svg" as="image" type="image/svg+xml" crossorigin="anonymous" />
+    <link rel="preload" href="/src/assets/pryme-wordmark.svg" as="image" type="image/svg+xml" crossorigin="anonymous" />
 
     <link rel="canonical" href="https://www.gopryme.tech" />
 
