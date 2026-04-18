@@ -35,8 +35,10 @@ const PartnerBankMarquee = memo(() => {
         </p>
       </div>
 
-      {/* Marquee — Free‐floating logos, original brand colours */}
-      <div className="relative flex w-full max-w-[100vw] overflow-hidden py-4">
+      {/* PERF FIX: Replaced max-w-[100vw] with w-full.
+           100vw includes scrollbar width on Windows/Linux (17px) → horizontal overflow.
+           w-full respects the parent's content-box → no overflow ever. */}
+      <div className="relative flex w-full overflow-hidden py-4">
 
         {/* Wide luminous edge fades */}
         <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-r from-slate-50 via-slate-50/80 dark:from-[#030303] dark:via-[#030303]/80 to-transparent z-10 pointer-events-none" />

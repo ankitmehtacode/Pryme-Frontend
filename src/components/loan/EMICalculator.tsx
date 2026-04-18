@@ -103,14 +103,14 @@ const EMICalculator = ({
       </div>
 
       {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
-      <div className="flex flex-col gap-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 relative z-10 w-full items-stretch">
         
         {/* Left Col: Interactive Sliders (Inputs) */}
-        <div className="flex-1 space-y-4 flex flex-col justify-center">
+        <div className="space-y-4 flex flex-col justify-start w-full min-w-0">
           
           {/* Amount Slider */}
           <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 gap-2">
               <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount (₹)</label>
               <input 
                 type="number"
@@ -130,7 +130,7 @@ const EMICalculator = ({
 
           {/* Rate Slider */}
           <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 gap-2">
               <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate (% p.a.)</label>
               <input 
                 type="number"
@@ -151,7 +151,7 @@ const EMICalculator = ({
 
           {/* Tenure Slider */}
           <div className="p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 gap-2">
               <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure (Months)</label>
               <div className="flex items-center gap-2">
                 <input 
@@ -174,11 +174,11 @@ const EMICalculator = ({
         </div>
 
         {/* Right Col: EMI Display & Pie Chart */}
-        <div className="flex flex-col p-4 md:p-6 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner overflow-hidden">
+        <div className="flex flex-col p-4 md:p-5 bg-secondary/30 dark:bg-[#111] rounded-2xl border border-border dark:border-white/5 shadow-inner overflow-hidden w-full justify-between h-full min-w-0">
           
-          <div className="flex flex-col sm:flex-row items-center gap-6 w-full mb-6">
+          <div className="flex flex-col items-center gap-4 w-full mb-4 md:mb-6">
             {/* Glowing Pie Chart */}
-            <div className="relative w-28 h-28 md:w-36 md:h-36 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto sm:mx-0">
+            <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto">
               <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
                 <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
                 <circle
@@ -199,9 +199,9 @@ const EMICalculator = ({
             </div>
 
             {/* Total Payable */}
-            <div className="flex-1 w-full min-w-0 p-5 bg-gradient-to-br from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20 flex flex-col justify-between h-full">
+            <div className="w-full min-w-0 p-4 md:p-5 bg-gradient-to-br from-[#103783]/5 to-amber-500/5 dark:from-[#103783]/10 dark:to-amber-500/10 rounded-xl shadow-sm border border-[#103783]/15 dark:border-[#103783]/20 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-2.5 mb-3">
+                <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#103783] to-amber-500 flex items-center justify-center shadow-sm shrink-0">
                     <span className="text-[10px] font-black text-white leading-none">Σ</span>
                   </div>
@@ -211,9 +211,9 @@ const EMICalculator = ({
               </div>
 
               <div className="mt-4 pt-4 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">
-                <div className="flex-1 flex items-center justify-between min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Per Day Equivalent</p>
-                  <p className="text-sm font-bold text-foreground">{formatShortCurrency(Math.round(emi / 30))}</p>
+                <div className="flex-1 flex items-center justify-between min-w-0 gap-2">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground truncate">Per Day Equivalent</p>
+                  <p className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">{formatShortCurrency(Math.round(emi / 30))}</p>
                 </div>
               </div>
             </div>
@@ -226,7 +226,7 @@ const EMICalculator = ({
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
                 <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
               </div>
-              <p className="text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(amount)}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-2.5">{formatCurrency(amount)}</p>
               <span className="inline-block text-[10px] font-bold text-[#103783] bg-[#103783]/10 px-2.5 py-1 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
             </div>
 
@@ -235,7 +235,7 @@ const EMICalculator = ({
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
               </div>
-              <p className="text-lg font-bold text-foreground leading-none whitespace-nowrap mb-2.5">{formatCurrency(totalInterest)}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-2.5">{formatCurrency(totalInterest)}</p>
               <span className="inline-block text-[10px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
             </div>
           </div>

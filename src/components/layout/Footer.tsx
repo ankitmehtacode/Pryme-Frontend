@@ -57,7 +57,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-slate-950 text-zinc-200 dark:bg-background dark:border-t border-border">
+    <footer className="bg-slate-950 text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
       {/* Trust Badges */}
       <div className="border-b border-white/10 dark:border-border">
         <div className="container mx-auto px-4 py-6">
@@ -90,7 +90,7 @@ const Footer = () => {
             <Link to="/" className="inline-block pointer-events-auto" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               <img src={prymeLogo} alt="PRYME" className="h-10" />
             </Link>
-            <p className="text-sm text-zinc-400 dark:text-muted-foreground leading-relaxed max-w-xs">
+            <p className="text-zinc-400 dark:text-muted-foreground leading-relaxed max-w-xs" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem)' }}>
               Your trusted partner for transparent, secure, and efficient loan processing. Compare rates from 15+ banks and get the best deal.
             </p>
 
@@ -118,11 +118,11 @@ const Footer = () => {
 
           {/* Products */}
           < div >
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Products</h4>
+            <h2 className="font-semibold mb-4 uppercase tracking-wider text-white dark:text-foreground" style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}>Products</h2>
             <ul className="space-y-3">
               {productLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem)' }}>
                     {link.label}
                   </Link>
                 </li>
@@ -132,11 +132,11 @@ const Footer = () => {
 
           {/* Tools */}
           < div >
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Tools</h4>
+            <h2 className="font-semibold mb-4 uppercase tracking-wider text-white dark:text-foreground" style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}>Tools</h2>
             <ul className="space-y-3">
               {toolLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem)' }}>
                     {link.label}
                   </Link>
                 </li>
@@ -146,11 +146,11 @@ const Footer = () => {
 
           {/* Company */}
           < div >
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Company</h4>
+            <h2 className="font-semibold mb-4 uppercase tracking-wider text-white dark:text-foreground" style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}>Company</h2>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-zinc-400 dark:text-muted-foreground hover:text-primary transition-colors" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem)' }}>
                     {link.label}
                   </Link>
                 </li>
@@ -160,7 +160,7 @@ const Footer = () => {
 
           {/* Contact */}
           < div >
-            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-white dark:text-foreground">Contact</h4>
+            <h2 className="font-semibold mb-4 uppercase tracking-wider text-white dark:text-foreground" style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}>Contact</h2>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" />

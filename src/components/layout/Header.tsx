@@ -79,7 +79,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       <div className={cn("absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "opacity-0")} onClick={onClose} />
       <div className={cn("absolute right-0 top-0 h-full w-[300px] bg-white border-l border-border shadow-2xl transition-transform duration-300", isOpen ? "translate-x-0" : "translate-x-full")}>
         <div className="flex items-center justify-between p-5 border-b border-slate-100">
-          <span className="font-medium text-lg">Menu</span>
+          <span className="font-medium" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.125rem)' }}>Menu</span>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-5 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
@@ -187,8 +187,13 @@ const Header = memo(() => {
 
   return (
     <>
-      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none" style={{ willChange: "transform" }}>
-        <div ref={navContainerRef} className="w-full h-20 px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent" style={{ willChange: "transform, background-color, width, border-radius" }}>
+      {/* PERF: Removed will-change from both elements.
+           The header had will-change:transform (1 GPU layer).
+           The nav had will-change on 4 properties (4 layers = VRAM waste).
+           GSAP handles layer promotion internally via its own transforms.
+           Static will-change on GSAP-animated elements is redundant. */}
+      <header ref={headerRef} className="fixed top-0 left-0 w-full z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none">
+        <div ref={navContainerRef} className="w-full h-20 px-4 sm:px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
 
           {/* Logo — Icon mark + SVG wordmark lockup */}
           <Link to="/" className="flex items-center gap-1.5 shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>

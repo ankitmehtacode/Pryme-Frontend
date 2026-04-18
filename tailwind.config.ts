@@ -212,4 +212,9 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  future: {
+    // Crucial for Indian market heavily indexing on mobile devices:
+    // Prevents hover states from sticking on touchscreens
+    hoverOnlyWhenSupported: true,
+  },
 } satisfies Config;

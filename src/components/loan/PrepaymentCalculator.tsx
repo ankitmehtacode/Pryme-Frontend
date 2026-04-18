@@ -1,40 +1,13 @@
 import { useState, useMemo } from "react";
-import { Calculator, TrendingUp, Clock, Zap, CheckCircle2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Calculator, TrendingDown } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
-
-const strategies = [
-  {
-    id: "5-percent",
-    name: "5% Step-Up",
-    description: "Increase your EMI by 5% annually.",
-    savingsMultiplier: 4.24,
-    timeSavedMultiplier: 0.28,
-    icon: TrendingUp,
-  },
-  {
-    id: "13th-emi",
-    name: "The 13th EMI",
-    description: "Pay just 1 extra EMI every year.",
-    savingsMultiplier: 2.9,
-    timeSavedMultiplier: 0.16,
-    icon: Clock,
-  },
-  {
-    id: "combo",
-    name: "PRYME Combo",
-    description: "13th EMI + 5% Annual Step-Up.",
-    savingsMultiplier: 6.56,
-    timeSavedMultiplier: 0.44,
-    icon: Zap,
-  }
-];
 
 const PrepaymentCalculator = () => {
-  const [activeStrategy, setActiveStrategy] = useState(strategies[0].id);
-  const [prepaymentAmount, setPrepaymentAmount] = useState<number>(50000);
-  const [tenure, setTenure] = useState<number>(60); // Default to 5 Years / 60 Months
+  const [loanAmount, setLoanAmount] = useState(2000000);
+  const [interestRate, setInterestRate] = useState(10.5);
+  const [tenureMonths, setTenureMonths] = useState(120);
+  const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
+  const [prepaymentMonth, setPrepaymentMonth] = useState(12);
 
   // Formatting helpers
   const formatCurrency = (value: number) => {
@@ -45,166 +18,185 @@ const PrepaymentCalculator = () => {
     }).format(value);
   };
 
-  const calculateImpact = useMemo(() => {
-    return strategies.map(strategy => {
-      // Dynamic Logic: Savings scale up radically the more tenure remains
-      const tenureFactor = tenure / 60; // Baseline normalized to 60 Months
-      const calculatedSavings = prepaymentAmount * strategy.savingsMultiplier * tenureFactor;
-      const calculatedTimeSaved = Math.max(1, Math.round((prepaymentAmount / 10000) * strategy.timeSavedMultiplier * tenureFactor));
-      
-      return {
-        ...strategy,
-        displaySavings: formatCurrency(calculatedSavings),
-        displayTimeSaved: `${calculatedTimeSaved} Months`
-      };
-    });
-  }, [prepaymentAmount, tenure]);
+  const calculations = useMemo(() => {
+    const monthlyRate = interestRate / 12 / 100;
+
+    // Without Prepayment
+    const emiOriginal =
+      (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) /
+      (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+    const totalOriginal = emiOriginal * tenureMonths;
+    const interestOriginal = totalOriginal - loanAmount;
+
+    // With Prepayment — recalculate after prepayment month
+    let balance = loanAmount;
+    let totalPaidWithPrepayment = 0;
+    let monthsWithPrepayment = 0;
+
+    for (let m = 1; m <= tenureMonths * 2; m++) {
+      if (balance <= 0) break;
+
+      const interestForMonth = balance * monthlyRate;
+      const principalForMonth = Math.min(emiOriginal - interestForMonth, balance);
+      totalPaidWithPrepayment += Math.min(emiOriginal, balance + interestForMonth);
+      balance -= principalForMonth;
+      monthsWithPrepayment = m;
+
+      // Apply prepayment
+      if (m === prepaymentMonth && balance > 0) {
+        const actualPrepayment = Math.min(prepaymentAmount, balance);
+        balance -= actualPrepayment;
+        totalPaidWithPrepayment += actualPrepayment;
+      }
+
+      if (balance <= 0) break;
+    }
+
+    const interestWithPrepayment = totalPaidWithPrepayment - loanAmount;
+    const interestSaved = interestOriginal - interestWithPrepayment;
+    const tenureSaved = tenureMonths - monthsWithPrepayment;
+
+    return {
+      emiOriginal: Math.round(emiOriginal),
+      totalOriginal: Math.round(totalOriginal),
+      interestOriginal: Math.round(interestOriginal),
+      totalWithPrepayment: Math.round(totalPaidWithPrepayment),
+      interestWithPrepayment: Math.round(interestWithPrepayment),
+      interestSaved: Math.max(0, Math.round(interestSaved)),
+      tenureSaved: Math.max(0, tenureSaved),
+      monthsWithPrepayment,
+    };
+  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth]);
+
+  const savingsPercentage = calculations.interestOriginal > 0 
+    ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1) 
+    : "0";
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/30 flex flex-col h-full">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col h-full">
       {/* 🧠 Decorative Ambient Glow */}
-      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-primary/10 dark:bg-[#103783]/10 blur-[50px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-emerald-500/10 blur-[50px] rounded-full pointer-events-none" />
 
-      {/* Header aligned strictly to premium typographic ratios */}
+      {/* Header */}
       <div className="flex items-center gap-3.5 mb-6 relative z-10 w-full shrink-0">
-        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-[#103783]/20 shadow-sm flex items-center justify-center shrink-0">
-          <Calculator className="w-5 h-5 text-primary dark:text-[#103783]" />
+        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
+          <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         </div>
         <div>
           <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">Prepayment Analysis</h3>
-          <p className="text-[9px] font-bold text-[#103783] uppercase tracking-widest bg-[#103783]/10 border border-[#103783]/20 px-2 py-0.5 rounded-sm inline-block leading-none">
+          <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-sm inline-block leading-none">
             REDUCE INTEREST BURDEN
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 relative z-10 w-full h-full">
-        {/* Dynamic Interactive Input Modules */}
-        <div className="space-y-4 flex-1 flex flex-col justify-center">
+      {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 relative z-10 w-full h-full items-stretch">
+        
+        {/* Left Col: 5 Compact Interactive Sliders */}
+        <div className="space-y-3 flex flex-col justify-start w-full min-w-0">
           
-          {/* Lumpsum Amount Module */}
-          <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50 hover:border-[#103783]/30">
-            <div className="flex justify-between items-center mb-4">
-              <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">
-                Yearly Input Amount
-              </label>
-              <div className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none flex items-center gap-1.5 focus:outline-none">
+          {/* Loan Amount */}
+          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Amount</label>
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+                {formatCurrency(loanAmount)}
+              </div>
+            </div>
+            <Slider max={10000000} min={100000} step={50000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+          </div>
+
+          {/* Interest Rate */}
+          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Interest Rate</label>
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+                {interestRate}% <span className="text-[8px] text-muted-foreground">p.a.</span>
+              </div>
+            </div>
+            <Slider max={24} min={6} step={0.25} value={[interestRate]} onValueChange={(val) => setInterestRate(val[0])} className="w-full cursor-pointer py-0.5" />
+          </div>
+
+          {/* Tenure */}
+          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Tenure</label>
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+                {tenureMonths} Mo <span className="text-[8px] text-muted-foreground">({(tenureMonths/12).toFixed(1)} Yrs)</span>
+              </div>
+            </div>
+            <Slider max={360} min={12} step={12} value={[tenureMonths]} onValueChange={(val) => setTenureMonths(val[0])} className="w-full cursor-pointer py-0.5" />
+          </div>
+
+          {/* Prepayment Amount */}
+          <div className="bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepayment Amount</label>
+              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
                 {formatCurrency(prepaymentAmount)}
               </div>
             </div>
-            
-            <Slider
-              defaultValue={[50000]}
-              max={1000000}
-              min={10000}
-              step={10000}
-              value={[prepaymentAmount]}
-              onValueChange={(val) => setPrepaymentAmount(val[0])}
-              className="w-full cursor-pointer py-1"
-            />
-            <div className="flex justify-between mt-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>₹10,000</span>
-              <span>₹10L+</span>
-            </div>
+            <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
           </div>
 
-          {/* 🧠 NEW: Tenure Remaining Module */}
-          <div className="bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-[#103783]/50 hover:border-[#103783]/30">
-            <div className="flex justify-between items-center mb-4">
-              <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">
-                Remaining Tenure
-              </label>
-              <div className="text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none flex items-baseline gap-1.5 focus:outline-none">
-                {tenure} <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">Months</span>
+          {/* Prepayment Month */}
+          <div className="bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepay After Month</label>
+              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
+                Month {prepaymentMonth}
               </div>
             </div>
-            
-            <Slider
-              defaultValue={[60]}
-              max={360}
-              min={12}
-              step={12}
-              value={[tenure]}
-              onValueChange={(val) => setTenure(val[0])}
-              className="w-full cursor-pointer py-1"
-            />
-            <div className="flex justify-between mt-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>1 Year</span>
-              <span>30 Years</span>
-            </div>
+            <Slider max={Math.max(1, tenureMonths - 1)} min={1} step={1} value={[prepaymentMonth]} onValueChange={(val) => setPrepaymentMonth(val[0])} className="w-full cursor-pointer py-0.5" />
           </div>
+
         </div>
 
-        {/* Strategies Output Matrix */}
-        <div className="space-y-3 flex-1 flex flex-col justify-center">
-          {calculateImpact.map((strategy) => {
-            const isActive = activeStrategy === strategy.id;
-            const Icon = strategy.icon;
+        {/* Right Col: Savings Hero & Output Matrix */}
+        <div className="flex flex-col gap-3 justify-between w-full min-w-0 h-full mt-2 lg:mt-0">
+          
+          {/* Savings Hero */}
+          <div className="flex flex-col items-center justify-center p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b9811a_1px,transparent_1px),linear-gradient(to_bottom,#10b9811a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
             
-            return (
-              <div 
-                key={strategy.id}
-                onClick={() => setActiveStrategy(strategy.id)}
-                className={cn(
-                  "relative cursor-pointer rounded-2xl p-4 transition-all duration-300 border focus:outline-none focus:ring-2 focus:ring-[#103783]",
-                  isActive 
-                    ? "bg-secondary dark:bg-black/60 border-primary shadow-lg dark:border-[#103783]/50 dark:shadow-[0_0_15px_rgba(124,58,237,0.15)]" 
-                    : "bg-secondary/30 dark:bg-[#111] border-border dark:border-white/5 hover:border-border dark:hover:border-white/10"
-                )}
-                role="button"
-                aria-pressed={isActive}
-                tabIndex={0}
-              >
-                {isActive && (
-                  <div className="absolute top-4 right-4 text-primary dark:text-[#103783] animate-in fade-in zoom-in duration-300">
-                    <CheckCircle2 className="w-5 h-5 drop-shadow-sm fill-primary/10" />
-                  </div>
-                )}
-                
-                <div className="flex items-start gap-4">
-                  <div className={cn(
-                    "mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-sm",
-                    isActive ? "bg-primary text-primary-foreground dark:bg-[#103783]/20 dark:text-[#103783] border border-transparent dark:border-[#103783]/30" : "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/5 text-muted-foreground"
-                  )}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  
-                  <div className="flex-1 pr-6">
-                    <h4 className={cn("text-base font-bold transition-colors leading-tight mb-1", isActive ? "text-foreground" : "text-foreground/80")}>
-                      {strategy.name}
-                    </h4>
-                    <p className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-3 leading-relaxed">
-                      {strategy.description}
-                    </p>
-                    
-                    <AnimatePresence>
-                      {isActive && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-3 mt-2 border-t border-border dark:border-white/10">
-                            <div>
-                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1">Interest Saved</p>
-                              <p className="text-xl md:text-2xl font-bold text-primary dark:text-[#103783] leading-none drop-shadow-sm">{strategy.displaySavings}</p>
-                            </div>
-                            <div className="hidden sm:block h-10 w-px bg-border dark:bg-white/10" />
-                            <div>
-                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1">Time Trimmed</p>
-                              <p className="text-xl md:text-2xl font-bold text-foreground leading-none">{strategy.displayTimeSaved}</p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5 relative z-10">
+              <TrendingDown className="w-3.5 h-3.5" /> Interest Saved
+            </span>
+            <span className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none drop-shadow-sm mb-2 truncate max-w-full relative z-10">
+              {formatCurrency(calculations.interestSaved)}
+            </span>
+            <span className="text-[9px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-sm border border-emerald-500/20 relative z-10">
+              {savingsPercentage}% Less Interest Overall
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 shrink-0">
+             {/* Tenure Saved */}
+             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+               <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Tenure Trimmed</span>
+               <span className="text-xl font-bold text-foreground leading-none">{calculations.tenureSaved} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
+             </div>
+             
+             {/* New Tenure */}
+             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+               <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">New Total Tenure</span>
+               <span className="text-xl font-bold text-foreground leading-none">{calculations.monthsWithPrepayment} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
+             </div>
+          </div>
+
+          {/* Comparison Matrix */}
+          <div className="grid grid-cols-2 gap-3 shrink-0">
+            <div className="p-3.5 bg-red-50/30 dark:bg-red-500/5 rounded-xl border border-red-200/50 dark:border-red-500/10 flex flex-col justify-center">
+              <p className="text-[8px] font-bold uppercase tracking-wider text-red-500/70 mb-1">Base Interest</p>
+              <p className="text-[13px] xl:text-sm font-bold text-foreground leading-none truncate">{formatCurrency(calculations.interestOriginal)}</p>
+            </div>
+            <div className="p-3.5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl border border-emerald-200/50 dark:border-emerald-500/10 flex flex-col justify-center">
+              <p className="text-[8px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70 mb-1">New Interest</p>
+              <p className="text-[13px] xl:text-sm font-bold text-foreground leading-none truncate">{formatCurrency(calculations.interestWithPrepayment)}</p>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>

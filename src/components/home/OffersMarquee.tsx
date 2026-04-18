@@ -27,7 +27,7 @@ const OffersMarquee = () => {
       <div className="absolute top-0 left-0 w-16 md:w-32 h-full bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none" />
       <div className="absolute top-0 right-0 w-16 md:w-32 h-full bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none" />
 
-      <div className="relative flex w-full max-w-[100vw]">
+      <div className="relative flex w-full">
         <div className="flex w-full group overflow-hidden">
           <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around gap-8 px-4 group-hover:[animation-play-state:paused] h-16">
             {offers.map((offer, index) => {

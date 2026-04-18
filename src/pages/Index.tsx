@@ -155,17 +155,20 @@ const Index = () => {
                   </p>
                 </div>
 
-                {/* Full Width Stack: EMI -> Prepayment -> Rewards */}
+                {/* Full Width Stack: EMI & Prepayment (Side-by-Side) -> Rewards */}
                 <div className="flex flex-col gap-10 md:gap-14 lg:gap-16 items-start w-full">
                   
-                  {/* EMI Calculator */}
-                  <div className="w-full">
-                    <EMICalculator loanAmount={500000} showTerminology={true} />
-                  </div>
-                  
-                  {/* Prepayment Calculator */}
-                  <div className="w-full">
-                    <PrepaymentCalculator />
+                  {/* Grid layout for Calculators side by side on large screens */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-stretch">
+                    {/* EMI Calculator */}
+                    <div className="w-full h-full">
+                      <EMICalculator loanAmount={500000} showTerminology={true} />
+                    </div>
+                    
+                    {/* Prepayment Calculator */}
+                    <div className="w-full h-full">
+                      <PrepaymentCalculator />
+                    </div>
                   </div>
                   
                   {/* Rewards Calculator */}

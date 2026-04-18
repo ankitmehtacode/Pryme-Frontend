@@ -1,6 +1,8 @@
 export default {
   plugins: {
     tailwindcss: {},
-    autoprefixer: {},
+    autoprefixer: {
+      flexbox: "no-2009",
+    },
   },
 };

@@ -33,8 +33,9 @@ export default defineConfig({
     exclude: ["optimize_typography.py", "refactor_theme.cjs"],
   },
   build: {
-    // Target modern browsers — no legacy polyfill overhead
-    target: "esnext",
+    // Target broadly supported environments for the Indian market
+    // Supports Chrome 80+ while avoiding aggressive ESNext transpilation bugs
+    target: ["es2020", "chrome80"],
     // Source maps off in production — they double the data served from the CDN
     // Enable only when debugging a production issue
     sourcemap: false,
