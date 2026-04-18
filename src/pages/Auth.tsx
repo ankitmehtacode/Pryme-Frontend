@@ -106,9 +106,8 @@ const Auth = () => {
         title: "Welcome Back",
         description: "Successfully logged into your Pryme account.",
       });
-      // 🧠 CLOSED-LOOP FIX: Navigate directly using the returned user data.
-      // The previous useEffect-only approach failed because React Query's
-      // invalidateQueries resolved before the state update propagated.
+      // Navigation is now handled by the useEffect above reacting to the hydrated user state, 
+      // but we maintain this declarative fallback just in case.
       if (loggedInUser) {
         const role = (loggedInUser.role || "USER").toUpperCase();
         if (from) {

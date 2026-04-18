@@ -135,7 +135,7 @@ export const useAuth = () => {
 
     // 🧠 CLOSED-LOOP FIX: VITE_API_URL is '/api/v1', so we append '/stream/system-events'
     // relative to that base. Without this fix, the URL was '/api/v1/api/v1/stream/...' → 404
-    const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+    const apiBase = (import.meta.env.VITE_API_URL || "/api/v1").replace(/\/$/, "");
     const eventSource = new EventSource(
       `${apiBase}/stream/system-events`,
       { withCredentials: true }

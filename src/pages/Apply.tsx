@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import LeadCaptureGate, { isLeadCaptured } from "@/components/auth/LeadCaptureGate";
 import { Helmet } from "react-helmet-async";
 import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole, Sparkles, ChevronRight, ShieldCheck } from "lucide-react";
@@ -237,111 +237,81 @@ const Apply = () => {
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-blue-500/5 dark:bg-[#0a1f4d]/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-blue-500/5 dark:bg-[#0a1f4d]/10 blur-[120px] rounded-full pointer-events-none" />
 
-        <Header />
+        {/* 🧠 200 IQ FIX: Minimal Header for Zen Mode */}
+        <div className="w-full absolute top-0 left-0 right-0 p-6 flex justify-center z-50">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
+              <Shield className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight">
+              PRYME
+            </span>
+          </Link>
+        </div>
 
-        <main className="flex-1 w-full pt-20 relative z-10">
+        <main className="flex-1 w-full flex flex-col items-center min-h-[90vh] pt-24 pb-12 relative z-10">
           <AnimatePresence mode="wait">
             {!showComparison ? (
               <motion.section 
                 key="application-form"
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)", transition: { duration: 0.4 } }}
-                className="py-8 md:py-12"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)", y: -20 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full max-w-2xl px-4 flex-1 flex flex-col justify-center my-auto"
               >
-                <div className="container mx-auto px-4 max-w-7xl">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-start">
+                <div className="text-center mb-10">
+                  <motion.div 
+                    initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 dark:bg-[#103783]/10 border border-primary/20 dark:border-[#103783]/30 text-[11px] font-bold text-primary dark:text-[#103783] uppercase tracking-widest mb-4"
+                  >
+                    <LockKeyhole className="w-3.5 h-3.5" /> 256-bit Bank-Grade Security
+                  </motion.div>
+                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
+                    Unlock Your <span className="text-primary dark:text-[#103783] bg-clip-text">Premium Offers</span>
+                  </h1>
+                  <p className="text-base font-medium text-muted-foreground flex items-center justify-center gap-2">
+                    Check eligibility across 15+ lenders with zero impact on your credit score.
+                  </p>
+                </div>
 
-                    {/* ── LEFT COLUMN: Marketing Copy + EMI + Tips ─────────────────── */}
-                    <div 
-                      className="md:col-span-1 lg:col-span-5 space-y-8 md:space-y-10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                      style={{
-                        filter: isFormFocused ? "blur(3px)" : "blur(0px)",
-                        opacity: isFormFocused ? 0.5 : 1,
+                <div 
+                  className="w-full relative"
+                  onFocus={handleFormFocus}
+                  onBlur={handleFormBlur}
+                  tabIndex={-1}
+                  style={{ outline: "none" }}
+                >
+                  <motion.div 
+                    className="relative"
+                    animate={{
+                      boxShadow: isFormFocused 
+                        ? "0 20px 80px -15px rgba(124, 58, 237, 0.15), 0 0 0 1px rgba(124, 58, 237, 0.1)" 
+                        : "0 10px 40px -10px rgba(0,0,0,0.05)",
+                      transform: isFormFocused ? "translateY(-4px)" : "translateY(0px)",
+                    }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ borderRadius: "2rem" }}
+                  >
+                    <motion.div 
+                      className="absolute -inset-px rounded-[2rem] pointer-events-none z-0"
+                      animate={{
+                        opacity: isFormFocused ? 1 : 0,
+                        background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.02) 40%, rgba(124,58,237,0.08) 100%)",
                       }}
-                    >
-                      <div className="max-w-xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card dark:bg-[#0a0a0a] border border-border dark:border-[#103783]/20 shadow-sm mb-6 mt-2">
-                          <LockKeyhole className="w-3.5 h-3.5 text-primary dark:text-[#103783]" />
-                          <span className="text-[10px] font-bold text-muted-foreground dark:text-slate-300 uppercase tracking-widest">
-                            Bank-Grade Security Protocol Active
-                          </span>
-                        </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-6 tracking-tight leading-tight">
-                          Intelligent Loan <span className="text-primary dark:text-[#103783]">Matchmaking.</span>
-                        </h1>
-                        <p className="text-base text-muted-foreground mb-8 font-medium max-w-md leading-relaxed">
-                          Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits and lowest interest rates instantly.
-                        </p>
-                        <div className="flex flex-wrap gap-3">
-                          {features.map((feature) => (
-                            <div key={feature.label} className="flex items-center gap-2 text-[10px] font-bold text-foreground bg-card dark:bg-transparent border border-border dark:border-white/10 px-3 py-2 rounded-full shadow-sm">
-                              <feature.icon className={`w-3.5 h-3.5 ${feature.color}`} />
-                              <span className="tracking-widest uppercase">{feature.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Desktop-only: EMI calculator & CIBIL Tips */}
-                      <div className="hidden lg:block space-y-6">
-                        <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
-                          <EMICalculator loanAmount={loanAmount} showTerminology={false} />
-                        </div>
-                        <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
-                          <CibilTips />
-                        </div>
-                      </div>
+                      transition={{ duration: 0.6 }}
+                    />
+                    <div className="relative bg-card/90 backdrop-blur-3xl dark:bg-[#0c0c0c]/80 border border-border/50 dark:border-white/5 p-6 md:p-10 rounded-[2rem] shadow-xl overflow-hidden z-10 transition-colors duration-500">
+                      <div 
+                        className="absolute top-0 right-0 w-40 h-40 bg-primary/10 dark:bg-[#103783]/20 blur-[70px] rounded-full pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                        style={{ transform: isFormFocused ? 'scale(1.5) translate(-10%, 10%)' : 'scale(1)' }} 
+                      />
+                      <LoanApplicationForm
+                        onAmountChange={setLoanAmount}
+                        onFormSubmit={handleFormSubmit}
+                      />
                     </div>
-
-                    {/* ── RIGHT COLUMN: Form Card ─────────────────────────────────── */}
-                    <div 
-                      className="md:col-span-1 lg:col-span-7 w-full space-y-6 md:space-y-8"
-                      onFocus={handleFormFocus}
-                      onBlur={handleFormBlur}
-                      tabIndex={-1}
-                      style={{ outline: "none" }}
-                    >
-                      <motion.div 
-                        className="relative"
-                        animate={{
-                          boxShadow: isFormFocused 
-                            ? "0 8px 60px -12px rgba(124, 58, 237, 0.12), 0 0 0 1px rgba(124, 58, 237, 0.08)" 
-                            : "0 4px 30px -8px rgba(0,0,0,0.08)",
-                        }}
-                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                        style={{ borderRadius: "2rem" }}
-                      >
-                        <motion.div 
-                          className="absolute -inset-px rounded-[2rem] pointer-events-none z-0"
-                          animate={{
-                            opacity: isFormFocused ? 1 : 0,
-                            background: isFormFocused 
-                              ? "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.02) 40%, rgba(124,58,237,0.08) 100%)"
-                              : "none",
-                          }}
-                          transition={{ duration: 0.6 }}
-                        />
-                        <div className="relative bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 md:p-8 rounded-[2rem] shadow-2xl overflow-hidden z-10">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
-                          <LoanApplicationForm
-                            onAmountChange={setLoanAmount}
-                            onFormSubmit={handleFormSubmit}
-                          />
-                        </div>
-                      </motion.div>
-
-                      {/* Mobile-only: EMI Calculator & CIBIL Tips below form */}
-                      <div className="space-y-6 lg:hidden">
-                        <div className="bg-card dark:bg-[#111] border border-border dark:border-white/5 p-6 rounded-[2rem] shadow-xl">
-                          <EMICalculator loanAmount={loanAmount} showTerminology={false} />
-                        </div>
-                        <div className="bg-amber-50/80 dark:bg-amber-950/30 backdrop-blur-xl border border-amber-200 dark:border-amber-900/50 rounded-[2rem] p-6 shadow-xl">
-                          <CibilTips />
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
+                  </motion.div>
                 </div>
               </motion.section>
             ) : (
@@ -511,8 +481,6 @@ const Apply = () => {
           </AnimatePresence>
 
         </main>
-
-        <Footer />
       </div>
     </>
   );

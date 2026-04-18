@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
         }
 
         const response = await api.get("/applications/me", { signal: abortController.signal });
-        const apps: Application[] = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
+        const apps: Application[] = response?.data?.content ? response.data.content : (Array.isArray(response?.data) ? response.data : []);
         
         setMyApplications(apps);
 
