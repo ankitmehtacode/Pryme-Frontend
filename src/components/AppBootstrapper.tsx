@@ -71,21 +71,7 @@ export const AppBootstrapper = ({ children }: Props) => {
     return () => clearTimeout(timer);
   }, [isDictionaryHydrated]);
 
-  // Gate: Block render until both Auth and Dictionaries resolve (or timeout)
-  const isReady = (!isAuthLoading && isDictionaryHydrated) || forceRelease;
-
-  if (!isReady) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#050508] z-[200]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-          <p className="text-sm text-slate-500 font-medium tracking-wide">
-            Hydrating System Matrix...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // Render the application immediately. Protected routes will handle their own 
+  // granular loading states via the useAuth() hook while hydration occurs in the background.
   return <>{children}</>;
 };

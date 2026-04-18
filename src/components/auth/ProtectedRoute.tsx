@@ -22,7 +22,18 @@ interface ProtectedRouteProps {
  * 4. All checks pass → render Outlet
  */
 export const ProtectedRoute = ({ allowedRoles, requiredPermissions }: ProtectedRouteProps) => {
-  const { isAuthenticated, user, hasPermission } = useAuth();
+  const { isAuthenticated, user, hasPermission, isLoading } = useAuth();
+
+  if (isLoading) {
+    // Elegant fallback while background auth finishes.
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#050508]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   // Rule 1: No valid session → redirect to login
   if (!isAuthenticated || !user) {

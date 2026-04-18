@@ -11,6 +11,14 @@ import cardEducation from "@/assets/card-education.png";
 import cardLap from "@/assets/card-lap.png";
 import cardAuto from "@/assets/card-auto.svg";
 
+const BANK_OFFERS = [
+  "Lowest Interest Rates Starting at 10.15% at Kotak Bank",
+  "Pre-approved Personal Loans up to ₹50 Lakhs from HDFC",
+  "Zero Processing Fee on Auto Loans via SBI",
+  "Instant Disbursal for Business Loans at ICICI",
+  "Home Loan Balance Transfer at 8.45% from Axis Bank"
+];
+
 const products = [
   {
     id: "personal",
@@ -217,13 +225,45 @@ const ProductSelectorGrid = memo(() => {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Our Products
           </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-3 uppercase leading-none">
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-6 uppercase leading-none">
             Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
           </h2>
-          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-lg mx-auto">
-            Competitive rates from 15+ banks. Select your product to get started in minutes.
-          </p>
         </motion.div>
+      </div>
+
+      {/* Infinite Scrolling Offers Ticker */}
+      <div className="w-full overflow-hidden mt-2 relative z-10 bg-primary/5 py-4 border-y border-primary/10">
+        {/* Soft edge gradient masks */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none" />
+
+        <div className="flex w-full group">
+          <div className="flex animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap min-w-max">
+            {BANK_OFFERS.map((offer, idx) => (
+              <span key={idx} className="mx-8 text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 tracking-wider uppercase flex items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-3 animate-pulse" />
+                {offer}
+              </span>
+            ))}
+          </div>
+          <div className="flex animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap min-w-max" aria-hidden="true">
+            {BANK_OFFERS.map((offer, idx) => (
+              <span key={`dup-${idx}`} className="mx-8 text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 tracking-wider uppercase flex items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-3 animate-pulse" />
+                {offer}
+              </span>
+            ))}
+          </div>
+          {/* Third copy needed to guarantee extreme ultrawide screen loop perfection */}
+          <div className="flex animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap min-w-max" aria-hidden="true">
+            {BANK_OFFERS.map((offer, idx) => (
+              <span key={`dup2-${idx}`} className="mx-8 text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 tracking-wider uppercase flex items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-3 animate-pulse" />
+                {offer}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
     </section>
