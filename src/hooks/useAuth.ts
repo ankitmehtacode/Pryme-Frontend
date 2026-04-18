@@ -141,7 +141,15 @@ export const useAuth = () => {
       { withCredentials: true }
     );
 
-    eventSource.addEventListener("SESSION_TERMINATED", () => {
+    eventSource.addEventListener("SESSION_TERMINATED", (event: MessageEvent) => {
+      try {
+        const payload = JSON.parse(event.data);
+        const terminatedSessionId = payload[0];
+        console.warn(`🚨 [SSE Kill Switch]: Exact targeted session termination received for Session ID: ${terminatedSessionId}`);
+      } catch (e) {
+        console.warn("🚨 [SSE Kill Switch]: Session terminated signal received with unparseable or absent payload.");
+      }
+
       queryClient.setQueryData(AUTH_QUERY_KEY, null);
       queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
       toast({
