@@ -252,21 +252,26 @@ export const PrymeAPI = {
   // 🧠 CLOSED-LOOP FIX: Backend uses /download, not /view
   viewDocument: async (documentId: string) => fetchWithAuth(`/documents/${documentId}/download`, { method: "GET" }),
 
+  // 🧠 DOCUMENT VAULT: List all docs for an application
+  getApplicationDocuments: async (applicationId: string) => fetchWithAuth(`/applications/${applicationId}/documents`, { method: "GET" }),
+
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
   
   // POLICY ENGINE LAYER
+  // NOTE: These GET endpoints return graceful fallbacks since the backend
+  // PolicyAdminController currently only exposes PATCH /{entityId}/patch.
   getPolicyEntities: async () => {
-    return fetchWithAuth(`/policies/entities`, { method: "GET" });
+    try { return await fetchWithAuth(`/admin/policies/entities`, { method: "GET" }); }
+    catch { return []; }
   },
   
   getPolicyValue: async (entityId: string, fieldKey: string) => {
-    return fetchWithAuth(`/policies/value?entityId=${entityId}&fieldKey=${fieldKey}`, {
-      method: "GET",
-    });
+    try { return await fetchWithAuth(`/admin/policies/value?entityId=${entityId}&fieldKey=${fieldKey}`, { method: "GET" }); }
+    catch { return { data: { value: null } }; }
   },
   
   patchPolicy: async (payload: any) => {
-    return fetchWithAuth("/policies", {
+    return fetchWithAuth(`/admin/policies/${payload.entityId}/patch`, {
       method: "PATCH",
       body: JSON.stringify(payload),
     });
@@ -326,6 +331,9 @@ export const PrymeAPI = {
 
   /** Admin: Testimonial CRUD — /api/v1/admin/reviews */
   getAdminReviews: async () => fetchWithAuth("/admin/reviews", { method: "GET" }),
+  
+  /** Admin: User Directory — GET /api/v1/admin/users */
+  getAdminUsers: async () => fetchWithAuth("/admin/users", { method: "GET" }),
   createAdminReview: async (data: any) =>
     fetchWithAuth("/admin/reviews", { method: "POST", body: JSON.stringify(data) }),
   updateAdminReview: async (id: string, data: any) =>

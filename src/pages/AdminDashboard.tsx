@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePolicyUpdate } from "@/hooks/usePolicyUpdate";
 import { DynamicPolicyInput } from "@/components/admin/DynamicPolicyInput";
 import { PolicyAuditModal } from "@/components/admin/PolicyAuditModal";
+import { AdminProductModal } from "@/components/admin/AdminProductModal";
 import { FieldMetadata, PolicyPatchPayload } from "@/lib/validations/policySchema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -38,6 +39,65 @@ const MOCK_METADATA_DB: Record<string, FieldMetadata> = {
   "foirAllowed": { fieldKey: "foirAllowed", displayName: "FOIR Allowed", fieldType: "PERCENTAGE", absoluteLowerBound: 0, absoluteUpperBound: 1, allowedValues: null, requiresReason: true, unit: "%" },
   "minBusinessVintageYears": { fieldKey: "minBusinessVintageYears", displayName: "Min Business Vintage", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 50, allowedValues: null, requiresReason: true, unit: "Yrs" },
   "itrRequiredYears": { fieldKey: "itrRequiredYears", displayName: "ITR Required", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 10, allowedValues: null, requiresReason: false, unit: "Yrs" },
+};
+
+// 🧠 DOCUMENT VAULT PANEL: Inline sub-component to fetch & display KYC docs from the backend
+const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
+  const { data: documents = [], isLoading } = useQuery({
+    queryKey: ["app_documents", applicationId],
+    queryFn: async () => {
+      const res = await PrymeAPI.getApplicationDocuments(applicationId);
+      return Array.isArray(res) ? res : [];
+    },
+    enabled: !!applicationId,
+  });
+
+  const handleDownload = async (docId: string, filename: string) => {
+    try {
+      const url = await PrymeAPI.viewDocument(docId);
+      if (typeof url === "string") {
+        window.open(url, "_blank");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Failed to download document.");
+    }
+  };
+
+  if (isLoading) return <div className="flex items-center justify-center p-12 text-slate-500"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading documents...</div>;
+
+  if (documents.length === 0) return (
+    <div className="flex flex-col items-center justify-center p-12 text-center">
+      <FileCheck className="w-10 h-10 text-slate-600 mb-3" />
+      <p className="text-sm text-slate-500 font-medium">No documents uploaded yet.</p>
+      <p className="text-xs text-slate-600 mt-1">Documents will appear here once the applicant uploads KYC.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
+      {documents.map((doc: any) => (
+        <div key={doc.id || doc.documentId} className="flex items-center justify-between p-4 border border-white/[0.06] rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors group">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+              <FileText className="w-4 h-4 text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">{doc.docType || doc.documentType || "Document"}</p>
+              <p className="text-xs text-slate-500">{doc.originalFilename || doc.fileName || "Unknown file"} • {doc.status || "UPLOADED"}</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-blue-400 hover:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => handleDownload(doc.id || doc.documentId, doc.originalFilename || "document")}
+          >
+            <ExternalLink className="w-4 h-4 mr-1" /> View
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const AdminDashboard = () => {
@@ -56,6 +116,7 @@ const AdminDashboard = () => {
   const [activeDrawerTab, setActiveDrawerTab] = useState<"details" | "documents" | "timeline">("details");
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
@@ -85,15 +146,17 @@ const AdminDashboard = () => {
 
   const toggleBankMutation = useMutation({
     mutationFn: ({ id, active }: { id: string; active: boolean }) => PrymeAPI.toggleBankVisibility(id, active),
-    onSuccess: () => { toast({ title: "Bank Updated" }); refetchBanks(); }
+    onSuccess: () => { toast.success("Bank visibility updated."); refetchBanks(); },
+    onError: (error: any) => { toast.error(error.message || "Failed to update bank."); }
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ["admin_users"],
-    // Fallback until the users API is fully implemented
-    queryFn: async () => [
-      { id: "1", email: "admin@gopryme.tech", full_name: "Super Admin", created_at: new Date().toISOString(), role: "SUPER_ADMIN" }
-    ]
+    queryFn: async () => {
+      const res = await PrymeAPI.getAdminUsers();
+      return Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+    },
+    enabled: activeTab === "users"
   });
 
   // ==========================================
@@ -115,11 +178,12 @@ const AdminDashboard = () => {
   const patchMutation = useMutation({
     mutationFn: (payload: PolicyPatchPayload) => PrymeAPI.patchPolicy(payload),
     onSuccess: () => {
-      toast({ title: "Policy Updated", description: "Matrix routing has been updated and audited." });
+      toast.success("Policy updated. Matrix routing has been audited.");
       queryClient.invalidateQueries({ queryKey: ["policy_value", selectedEntity, selectedFieldKey] });
       setIsAuditModalOpen(false);
-      setSelectedFieldKey(null); // Reset UI to safe state
-    }
+      setSelectedFieldKey(null);
+    },
+    onError: (error: any) => { toast.error(error.message || "Policy update failed."); }
   });
 
   const metadataForField = selectedFieldKey ? MOCK_METADATA_DB[selectedFieldKey] : null;
@@ -130,23 +194,23 @@ const AdminDashboard = () => {
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => PrymeAPI.updateStatus(id, status),
     onSuccess: () => {
-      toast({ title: "Pipeline Updated", description: "Lead status successfully synchronized." });
+      toast.success("Pipeline updated. Lead status synchronized.");
       queryClient.invalidateQueries({ queryKey: ["admin_applications"] });
-      if (selectedApp) setSelectedApp(null); // Close drawer on advance
+      if (selectedApp) setSelectedApp(null);
     },
     onError: (error: any) => {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Status update failed.");
     }
   });
 
   const assignMutation = useMutation({
     mutationFn: ({ id, assigneeId }: { id: string; assigneeId: string }) => PrymeAPI.assignLead(id, assigneeId),
     onSuccess: () => {
-      toast({ title: "Lead Assigned", description: "Employee mapped to application." });
+      toast.success("Lead assigned. Employee mapped to application.");
       queryClient.invalidateQueries({ queryKey: ["admin_applications"] });
     },
     onError: (error: any) => {
-      toast({ title: "Assignment Failed", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Assignment failed.");
     }
   });
 
@@ -214,7 +278,7 @@ const AdminDashboard = () => {
   };
 
   const handleExportCSV = () => {
-    if (applications.length === 0) return toast({ title: "Export Failed", description: "No data to export.", variant: "destructive" });
+    if (applications.length === 0) { toast.error("No data to export."); return; }
     const headers = "Application ID,Applicant Name,Loan Type,Amount,CIBIL,Status,Assignee,Date\n";
     const csvRows = applications.map((app: any) => `${app.applicationId},${app.applicant?.name || 'N/A'},${app.loanType},${app.requestedAmount},${app.declaredCibilScore},${app.status},${app.assignee},${new Date(app.createdAt).toISOString()}`).join("\n");
     const blob = new Blob([headers + csvRows], { type: "text/csv" });
@@ -223,6 +287,13 @@ const AdminDashboard = () => {
     a.setAttribute("href", url);
     a.setAttribute("download", `pryme_pipeline_${new Date().getTime()}.csv`);
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    toast.success(`Exported ${applications.length} records to CSV.`);
+  };
+
+  // 🧠 INTELLIGENT PIPELINE ADVANCEMENT: Calculates the next logical stage
+  const getNextStage = (currentStatus: string): string | null => {
+    const flow: Record<string, string> = { NEW: "SUBMITTED", SUBMITTED: "PROCESSING", PROCESSING: "APPROVED" };
+    return flow[currentStatus?.toUpperCase()] || null;
   };
 
   const handleAssignPrompt = (e: React.MouseEvent, appId: string) => {
@@ -467,14 +538,18 @@ const AdminDashboard = () => {
                                     <StatusBadge status={app.status} />
                                   </td>
                                   <td className="px-6 py-4 align-top text-right">
-                                    <Button
-                                      onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: "PROCESSING" }); }}
-                                      disabled={app.status === "PROCESSING" || statusMutation.isPending}
-                                      size="sm"
-                                      className="h-8 bg-primary hover:bg-[#0c2a66] text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      Advance <ArrowUpRight className="w-3 h-3 ml-1" />
-                                    </Button>
+                                    {getNextStage(app.status) ? (
+                                      <Button
+                                        onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: getNextStage(app.status)! }); }}
+                                        disabled={statusMutation.isPending}
+                                        size="sm"
+                                        className="h-8 bg-primary hover:bg-[#0c2a66] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                      >
+                                        → {getNextStage(app.status)} <ArrowUpRight className="w-3 h-3 ml-1" />
+                                      </Button>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-600 font-medium uppercase">Terminal</span>
+                                    )}
                                   </td>
                                 </motion.tr>
                               ))
@@ -524,7 +599,14 @@ const AdminDashboard = () => {
                 <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
                   <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
                     <h3 className="font-semibold text-white">Partner Bank Network</h3>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white"><Plus className="w-4 h-4 mr-2" /> Add Bank</Button>
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+                      const name = window.prompt("Enter bank name:");
+                      if (!name) return;
+                      const logoUrl = window.prompt("Enter logo URL (optional):") || "";
+                      PrymeAPI.createAdminBank({ bankName: name, logoUrl, isActive: true })
+                        .then(() => { toast.success(`${name} added to partner network.`); refetchBanks(); })
+                        .catch((e: any) => toast.error(e.message || "Failed to add bank."));
+                    }}><Plus className="w-4 h-4 mr-2" /> Add Bank</Button>
                   </div>
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Bank Name</th><th className="px-6 py-4">Logo URL</th><th className="px-6 py-4">Status</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
@@ -538,7 +620,22 @@ const AdminDashboard = () => {
                               {b.active ? "Active" : "Inactive"}
                             </button>
                           </td>
-                          <td className="px-6 py-4 text-right"><Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">Edit</Button></td>
+                          <td className="px-6 py-4 text-right flex gap-2 justify-end">
+                            <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300" onClick={() => {
+                              const name = window.prompt("Update bank name:", b.bankName);
+                              if (!name) return;
+                              const logoUrl = window.prompt("Update logo URL:", b.logoUrl || "") || "";
+                              PrymeAPI.updateAdminBank(b.id, { bankName: name, logoUrl, isActive: b.active })
+                                .then(() => { toast.success("Bank updated."); refetchBanks(); })
+                                .catch((e: any) => toast.error(e.message));
+                            }}>Edit</Button>
+                            <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => {
+                              if (!window.confirm(`Delete ${b.bankName}? This is irreversible.`)) return;
+                              PrymeAPI.deleteAdminBank(b.id)
+                                .then(() => { toast.success("Bank deleted."); refetchBanks(); })
+                                .catch((e: any) => toast.error(e.message));
+                            }}>Delete</Button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -550,8 +647,11 @@ const AdminDashboard = () => {
               {activeTab === "offers" && (
                 <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
                   <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
-                    <h3 className="font-semibold text-white">Dynamic Hero Offers</h3>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white"><Plus className="w-4 h-4 mr-2" /> Add Offer</Button>
+                    <h3 className="font-semibold text-white">Dynamic Policy Engines / Offers</h3>
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+                      setSelectedProduct(null);
+                      setIsOfferModalOpen(true);
+                    }}><Plus className="w-4 h-4 mr-2" /> Add Entity</Button>
                   </div>
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Lender</th><th className="px-6 py-4">Campaign</th><th className="px-6 py-4">ROI</th><th className="px-6 py-4">Processing Fee</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
@@ -562,7 +662,18 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4 text-slate-300">{p.campaignName || p.loanType}</td>
                           <td className="px-6 py-4 font-mono text-amber-400">{p.roi}%</td>
                           <td className="px-6 py-4 font-mono text-blue-400">{p.processingFee}%</td>
-                          <td className="px-6 py-4 text-right"><Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">Edit</Button></td>
+                          <td className="px-6 py-4 text-right flex gap-2 justify-end">
+                            <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300" onClick={() => {
+                              setSelectedProduct(p);
+                              setIsOfferModalOpen(true);
+                            }}>Edit</Button>
+                            <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => {
+                              if (!window.confirm(`Delete this offer? This is irreversible.`)) return;
+                              PrymeAPI.deleteAdminProduct(p.id)
+                                .then(() => { toast.success("Product deleted."); refetchProducts(); })
+                                .catch((e: any) => toast.error(e.message));
+                            }}>Delete</Button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -581,9 +692,9 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-xs font-medium text-slate-300">
-                                {u.full_name?.substring(0, 2).toUpperCase() || "US"}
+                                {(u.fullName || u.full_name || "US").substring(0, 2).toUpperCase()}
                               </div>
-                              <div><p className="font-semibold text-white">{u.full_name}</p><p className="text-xs text-slate-500">{u.email}</p></div>
+                              <div><p className="font-semibold text-white">{u.fullName || u.full_name}</p><p className="text-xs text-slate-500">{u.email}</p></div>
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -718,6 +829,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               )}
+              {activeDrawerTab === "documents" && (
+                <DocumentsPanel applicationId={selectedApp.applicationId} />
+              )}
             </div>
 
             <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] grid grid-cols-2 gap-3">
@@ -727,6 +841,29 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      
+      {/* 🧠 DYNAMIC POLICY MODAL */}
+      <AdminProductModal 
+        isOpen={isOfferModalOpen}
+        onClose={() => setIsOfferModalOpen(false)}
+        initialData={selectedProduct}
+        banks={banks}
+        onSubmit={(data) => {
+          const apiCall = selectedProduct?.id 
+            ? PrymeAPI.updateAdminProduct(selectedProduct.id, data)
+            : PrymeAPI.createAdminProduct(data);
+            
+          apiCall
+            .then(() => {
+              toast.success(`Policy Entity ${selectedProduct?.id ? 'updated' : 'created'} successfully.`);
+              setIsOfferModalOpen(false);
+              refetchProducts();
+              // Invalidate policy cache if Matrix Engine depends on it
+              queryClient.invalidateQueries({ queryKey: ["policy_entities"] }); 
+            })
+            .catch((e: any) => toast.error(e.message || "Failed to commit entity to database."));
+        }}
+      />
     </>
   );
 };
