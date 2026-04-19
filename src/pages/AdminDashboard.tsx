@@ -654,12 +654,19 @@ const AdminDashboard = () => {
                     }}><Plus className="w-4 h-4 mr-2" /> Add Entity</Button>
                   </div>
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Lender</th><th className="px-6 py-4">Campaign</th><th className="px-6 py-4">ROI</th><th className="px-6 py-4">Processing Fee</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
+                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Lender</th><th className="px-6 py-4">Campaign</th><th className="px-6 py-4">Status</th><th className="px-6 py-4">ROI</th><th className="px-6 py-4">Processing Fee</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
                     <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {products.length === 0 ? <tr><td colSpan={5} className="p-6 text-center text-slate-500">No products configured.</td></tr> : products.map((p: any) => (
+                      {products.length === 0 ? <tr><td colSpan={6} className="p-6 text-center text-slate-500">No products configured.</td></tr> : products.map((p: any) => (
                         <tr key={p.id} className="hover:bg-white/[0.03] transition-colors">
                           <td className="px-6 py-4 font-semibold text-white">{p.lenderName || "Unknown"}</td>
                           <td className="px-6 py-4 text-slate-300">{p.campaignName || p.loanType}</td>
+                          <td className="px-6 py-4">
+                            {p.active ? (
+                              <span className="px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-semibold border border-green-500/20">Active</span>
+                            ) : (
+                              <span className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold border border-red-500/20">Draft</span>
+                            )}
+                          </td>
                           <td className="px-6 py-4 font-mono text-amber-400">{p.roi}%</td>
                           <td className="px-6 py-4 font-mono text-blue-400">{p.processingFee}%</td>
                           <td className="px-6 py-4 text-right flex gap-2 justify-end">

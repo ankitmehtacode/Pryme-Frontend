@@ -80,6 +80,12 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
       return;
     }
 
+    // Handle boolean for 'active'
+    if (name === "active") {
+      setFormData((prev: any) => ({ ...prev, active: value === "true" }));
+      return;
+    }
+
     setFormData((prev: any) => ({
       ...prev,
       [name]: type === "number" ? parseFloat(value) : value
@@ -156,6 +162,14 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
                     <option value="LOAN_AGAINST_PROPERTY">Loan Against Property (LAP)</option>
                     <option value="BUSINESS_LOAN">Business Loan (BL)</option>
                     <option value="PERSONAL_LOAN">Personal Loan (PL)</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-400">Entity Status</label>
+                  <select name="active" value={formData.active ? "true" : "false"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" style={{ color: formData.active ? "#4ade80" : "#f87171" }}>
+                    <option value="true" className="text-green-400">● Active</option>
+                    <option value="false" className="text-red-400">● Inactive / Draft</option>
                   </select>
                 </div>
               </div>
