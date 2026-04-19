@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import pryme2Logo from "@/assets/Pryme2.svg";
+import prymeWordmark from "@/assets/pryme-wordmark.svg";
 import { PrymeAPI } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -278,10 +280,22 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed h-full z-20">
           <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-800 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25"><ShieldCheck className="w-5 h-5 text-white" /></div>
-              <span className="font-semibold text-white tracking-tight">PRYME<span className="text-slate-500 font-normal ml-1">CRM</span></span>
-            </div>
+            <Link to="/" className="flex items-center gap-2 transition-transform duration-300 hover:scale-[1.02]">
+              <img
+                src={pryme2Logo}
+                alt=""
+                aria-hidden="true"
+                className="h-7 w-auto object-contain"
+              />
+              <div className="flex items-center">
+                <img
+                  src={prymeWordmark}
+                  alt="PRYME"
+                  className="h-[14px] w-auto object-contain brightness-0 invert"
+                />
+                <span className="text-slate-400 font-medium ml-1.5 text-xs tracking-wide uppercase translate-y-[1px] border border-white/10 bg-white/5 px-1.5 py-0.5 rounded">CRM</span>
+              </div>
+            </Link>
           </div>
           <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
             <p className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mb-4">Workspace</p>
