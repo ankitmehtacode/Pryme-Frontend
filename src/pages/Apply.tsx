@@ -258,60 +258,91 @@ const Apply = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)", y: -20 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full max-w-2xl px-4 flex-1 flex flex-col justify-center my-auto"
+                className="w-full max-w-6xl px-4 lg:px-8 flex-1 flex flex-col justify-center my-auto"
               >
-                <div className="text-center mb-10">
-                  <motion.div 
-                    initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 dark:bg-[#103783]/10 border border-primary/20 dark:border-[#103783]/30 text-[11px] font-bold text-primary dark:text-[#103783] uppercase tracking-widest mb-4"
-                  >
-                    <LockKeyhole className="w-3.5 h-3.5" /> 256-bit Bank-Grade Security
-                  </motion.div>
-                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
-                    Unlock Your <span className="text-primary dark:text-[#103783] bg-clip-text">Premium Offers</span>
-                  </h1>
-                  <p className="text-base font-medium text-muted-foreground flex items-center justify-center gap-2">
-                    Check eligibility across 15+ lenders with zero impact on your credit score.
-                  </p>
-                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                  
+                  {/* Left Column: Hero Copy & Value Proposition */}
+                  <div className="text-left lg:pr-8 flex flex-col items-center lg:items-start order-2 lg:order-1 pt-8 lg:pt-0">
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}
+                      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 dark:bg-[#103783]/10 border border-primary/20 dark:border-[#103783]/30 text-[11px] font-bold text-primary dark:text-[#103783] uppercase tracking-widest mb-6"
+                    >
+                      <LockKeyhole className="w-3.5 h-3.5" /> 256-bit Bank-Grade Security
+                    </motion.div>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 text-foreground leading-[1.1] text-center lg:text-left">
+                      Unlock Your <br className="hidden lg:block"/><span className="text-primary dark:text-blue-500 bg-clip-text">Premium Offers</span>
+                    </h1>
+                    <p className="text-lg font-medium text-muted-foreground flex items-center justify-center lg:justify-start gap-2 text-center lg:text-left mb-10 max-w-md">
+                      Instantly check algorithm-matched eligibility across 15+ premier lenders with zero impact on your credit score.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                          <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-foreground mb-1">Zero Footprint</h4>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">Soft pull tech guarantees your CIBIL score remains completely untouched.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-4 items-start">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                          <Sparkles className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-foreground mb-1">AI Routing</h4>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">Our matrix routes your profile directly to banks where approval odds are highest.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                <div 
-                  className="w-full relative"
-                  onFocus={handleFormFocus}
-                  onBlur={handleFormBlur}
-                  tabIndex={-1}
-                  style={{ outline: "none" }}
-                >
-                  <motion.div 
-                    className="relative"
-                    animate={{
-                      boxShadow: isFormFocused 
-                        ? "0 20px 80px -15px rgba(124, 58, 237, 0.15), 0 0 0 1px rgba(124, 58, 237, 0.1)" 
-                        : "0 10px 40px -10px rgba(0,0,0,0.05)",
-                      transform: isFormFocused ? "translateY(-4px)" : "translateY(0px)",
-                    }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ borderRadius: "2rem" }}
+                  {/* Right Column: the Main Engine Form */}
+                  <div 
+                    className="w-full relative order-1 lg:order-2"
+                    onFocus={handleFormFocus}
+                    onBlur={handleFormBlur}
+                    tabIndex={-1}
+                    style={{ outline: "none" }}
                   >
                     <motion.div 
-                      className="absolute -inset-px rounded-[2rem] pointer-events-none z-0"
+                      className="relative"
                       animate={{
-                        opacity: isFormFocused ? 1 : 0,
-                        background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(124,58,237,0.02) 40%, rgba(124,58,237,0.08) 100%)",
+                        boxShadow: isFormFocused 
+                          ? "0 30px 100px -20px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.15)" 
+                          : "0 20px 60px -15px rgba(0,0,0,0.1)",
+                        transform: isFormFocused ? "translateY(-4px)" : "translateY(0px)",
                       }}
-                      transition={{ duration: 0.6 }}
-                    />
-                    <div className="relative bg-card/90 backdrop-blur-3xl dark:bg-[#0c0c0c]/80 border border-border/50 dark:border-white/5 p-6 md:p-10 rounded-[2rem] shadow-xl overflow-hidden z-10 transition-colors duration-500">
-                      <div 
-                        className="absolute top-0 right-0 w-40 h-40 bg-primary/10 dark:bg-[#103783]/20 blur-[70px] rounded-full pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
-                        style={{ transform: isFormFocused ? 'scale(1.5) translate(-10%, 10%)' : 'scale(1)' }} 
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ borderRadius: "2rem" }}
+                    >
+                      <motion.div 
+                        className="absolute -inset-px rounded-[2rem] pointer-events-none z-0"
+                        animate={{
+                          opacity: isFormFocused ? 1 : 0,
+                          background: "linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(124,58,237,0.02) 40%, rgba(124,58,237,0.1) 100%)",
+                        }}
+                        transition={{ duration: 0.6 }}
                       />
-                      <LoanApplicationForm
-                        onAmountChange={setLoanAmount}
-                        onFormSubmit={handleFormSubmit}
-                      />
-                    </div>
-                  </motion.div>
+                      <div className="relative bg-card/90 backdrop-blur-3xl dark:bg-[#0c0c0c]/90 border border-border/50 dark:border-white/10 p-6 md:p-10 rounded-[2rem] shadow-xl overflow-hidden z-10 transition-colors duration-500">
+                        <div 
+                          className="absolute top-0 right-0 w-40 h-40 bg-primary/10 dark:bg-[#103783]/20 blur-[70px] rounded-full pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                          style={{ transform: isFormFocused ? 'scale(1.5) translate(-10%, 10%)' : 'scale(1)' }} 
+                        />
+                        <div className="absolute bottom-0 left-0 w-60 h-60 bg-blue-500/5 dark:bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
+                        
+                        <div className="relative z-10">
+                          <LoanApplicationForm
+                            onAmountChange={setLoanAmount}
+                            onFormSubmit={handleFormSubmit}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
                 </div>
               </motion.section>
             ) : (
