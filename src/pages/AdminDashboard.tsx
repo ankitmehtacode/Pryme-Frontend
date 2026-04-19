@@ -62,7 +62,10 @@ const AdminDashboard = () => {
   // ==========================================
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ["admin_applications"],
-    queryFn: PrymeAPI.getApplications,
+    queryFn: async () => {
+      const res = await PrymeAPI.getApplications();
+      return res?.content ? res.content : (Array.isArray(res) ? res : []);
+    },
     refetchInterval: 15000, // Live-polls the Spring Boot backend every 15s
   });
 
