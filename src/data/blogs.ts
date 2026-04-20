@@ -95,13 +95,5 @@ Experts suggest that if you are planning to take a home loan, this might be an i
     date: "Feb 28, 2024",
     img: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=800&auto=format&fit=crop",
     content: "Major public sector banks have slashed interest rates on EV auto loans to aggressively push green mobility. With additional tax rebates under Section 80EEB, the effective cost of borrowing for an electric car has never been lower.",
-  },
-  {
-    slug: "education-loans-overseas",
-    title: "Education Loans: Everything about covering overseas living costs",
-    cat: "India Today",
-    date: "Feb 22, 2024",
-    img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop",
-    content: "While tuition fees make up the bulk of international education expenses, living costs can be equally daunting. We explore how holistic education loan products are now structured to cover accommodation, laptops, and travel expenses, easing the financial burden on students headed abroad.",
   }
 ];

@@ -316,7 +316,7 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                   value: (() => {
                     if (!data?.productType) return "—";
                     let t = data.productType.replace(/_/g, " ").toLowerCase();
-                    if (["home", "personal", "business", "education", "car"].includes(t)) {
+                    if (["home", "personal", "business", "car"].includes(t)) {
                       t += " loan";
                     } else if (t === "lap") {
                       t = "loan against property";

@@ -15,7 +15,6 @@ export type LoanType =
   | 'LAP'                  // Loan Against Property
   | 'BUSINESS_LOAN'
   | 'PERSONAL_LOAN'
-  | 'EDUCATIONAL_LOAN'
   | 'AUTO_LOAN';
 
 export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
@@ -23,7 +22,6 @@ export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   LAP: 'Loan Against Property',
   BUSINESS_LOAN: 'Business Loan',
   PERSONAL_LOAN: 'Personal Loan',
-  EDUCATIONAL_LOAN: 'Education Loan',
   AUTO_LOAN: 'Auto Loan',
 };
 
@@ -229,17 +227,6 @@ export interface LoanRequirements {
   propertyCategory?: 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL'; // for LAP
   propertyValue?: number;
   propertyCity?: string;
-
-  // Business Loan
-  businessPropertyCategory?: 'COMMERCIAL' | 'INDUSTRIAL';
-  endUse?: string;
-
-  // Education Loan
-  courseName?: string;
-  instituteName?: string;
-  courseCountry?: 'INDIA' | 'ABROAD';
-  courseDurationYears?: number;
-  admissionStatus?: 'CONFIRMED' | 'APPLIED' | 'NOT_YET';
 
   // Auto Loan
   vehicleQuotationPrice?: number;

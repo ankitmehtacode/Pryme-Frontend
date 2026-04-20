@@ -214,7 +214,7 @@ interface DocEntry {
   label: string;
   description: string;
   required: boolean;
-  category: 'identity' | 'income' | 'property' | 'business' | 'education';
+  category: 'identity' | 'income' | 'property' | 'business';
 }
 
 const DocumentCard = ({
@@ -370,15 +370,6 @@ function resolveDocuments(store: ReturnType<typeof useApplicationStore.getState>
     );
   }
 
-  // EDUCATION LOAN
-  if (loanType === 'EDUCATIONAL_LOAN') {
-    docs.push(
-      { id: 'admission_letter', label: 'Admission / Offer Letter', description: 'Confirmed admission or conditional offer from institution', required: true, category: 'education' },
-      { id: 'fee_structure', label: 'Fee Structure', description: 'Detailed semester-wise fee breakdown from institution', required: true, category: 'education' },
-      { id: 'marksheets', label: 'Academic Records', description: 'Last qualifying examination marksheets', required: true, category: 'education' },
-    );
-  }
-
   // AUTO LOAN
   if (loanType === 'AUTO_LOAN') {
     docs.push(
@@ -395,7 +386,6 @@ const CATEGORY_META: Record<DocEntry['category'], { label: string; icon: any; co
   income: { label: 'Income Proof', icon: IndianRupee, color: 'text-blue-500' },
   property: { label: 'Property Documents', icon: Home, color: 'text-amber-500' },
   business: { label: 'Business Documents', icon: BriefcaseBusiness, color: 'text-blue-500' },
-  education: { label: 'Education Documents', icon: GraduationCap, color: 'text-pink-500' },
 };
 
 // ─── DOCUMENT VAULT STAGE (Stage 5) ────────────────────────────────────────
@@ -635,7 +625,6 @@ const PRODUCT_OPTIONS: { value: LoanType; label: string }[] = [
   { value: "PERSONAL_LOAN", label: "Personal Loan" },
   { value: "HOME_LOAN", label: "Home Loan" },
   { value: "BUSINESS_LOAN", label: "Business Loan" },
-  { value: "EDUCATIONAL_LOAN", label: "Education Loan" },
   { value: "LAP", label: "Loan Against Property" },
 ];
 
@@ -786,7 +775,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         business: "BUSINESS_LOAN",
         home: "HOME_LOAN",
         lap: "LAP",
-        education: "EDUCATIONAL_LOAN",
         auto: "AUTO_LOAN",
         vehicle: "AUTO_LOAN",
       };

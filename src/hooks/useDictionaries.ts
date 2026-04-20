@@ -6,7 +6,7 @@ import type { DictionaryMap, DictionaryItem } from "@/types/auth.types";
 // 🧠 DICTIONARY HYDRATION STORE (ZUSTAND)
 // ═══════════════════════════════════════════════════════════════════════════════
 // ALL dropdowns, filters, and form selects consume from this store.
-// NOTHING is hardcoded. If the backend adds "Education Loan" tomorrow,
+// NOTHING is hardcoded. If the backend adds "Auto Loan" tomorrow,
 // the UI reflects it instantly on next app boot without a frontend redeploy.
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -18,7 +18,6 @@ const FALLBACK_DICTIONARIES: DictionaryMap = {
     { value: "LAP", label: "Loan Against Property" },
     { value: "BUSINESS_LOAN", label: "Business Loan" },
     { value: "PERSONAL_LOAN", label: "Personal Loan" },
-    { value: "EDUCATION_LOAN", label: "Education Loan" },
     { value: "AUTO_LOAN", label: "Auto Loan" },
   ],
   bankList: [

@@ -12,7 +12,6 @@ export type LoanType =
   | 'HOME_LOAN'
   | 'LAP'              // Loan Against Property
   | 'BUSINESS_LOAN'
-  | 'EDUCATION_LOAN'
   | 'AUTO_LOAN';
 
 // ─── EMPLOYMENT HIERARCHY (The Critical Pivot Point) ─────────────────────────
@@ -142,13 +141,6 @@ export interface LoanRequirements {
 
   // Business Loan specific
   endUse?: string;                          // What the loan proceeds will be used for
-
-  // Education Loan specific
-  courseName?: string;
-  instituteName?: string;
-  courseCountry?: 'INDIA' | 'ABROAD';
-  courseDurationYears?: number;
-  admissionStatus?: 'CONFIRMED' | 'APPLIED' | 'NOT_YET';
 
   cibilScore: number;                       // 300-900
 }

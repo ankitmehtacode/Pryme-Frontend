@@ -163,28 +163,7 @@ function getBusinessDocs(state: ApplicationState): DocumentItem[] {
     );
   }
 
-  // Education Loan — admission docs
-  if (state.loanRequirements.loanType === 'EDUCATION_LOAN') {
-    docs.push(
-      doc('admission_letter', 'Admission Letter', 'Confirmed admission / offer letter from institute'),
-      doc('fee_structure', 'Fee Structure', 'Detailed fee structure from the institute'),
-      doc('marksheets', 'Academic Marksheets', 'Last qualifying exam marksheets'),
-    );
-  }
-
   return docs;
-}
-
-// ─── EDUCATION LOAN SPECIFIC (additional docs for any employment type) ──────
-
-function getEducationLoanDocs(): DocumentItem[] {
-  return [
-    doc('admission_letter', 'Admission / Offer Letter', 'Confirmed admission or conditional offer from institution'),
-    doc('fee_structure', 'Fee Structure', 'Detailed semester-wise fee breakdown from institution'),
-    doc('marksheets', 'Academic Records', 'Last qualifying examination marksheets'),
-    doc('entrance_scorecard', 'Entrance Exam Score', 'CAT / GRE / GMAT / IELTS scorecard (if applicable)', false),
-    doc('co_applicant_income', 'Co-Applicant Income Proof', 'Parent/guardian salary slips or ITR (co-applicant is mandatory for education loans)'),
-  ];
 }
 
 // ─── MASTER RESOLVER ────────────────────────────────────────────────────────
@@ -208,17 +187,6 @@ export function resolveDocumentMatrix(state: ApplicationState): DocumentItem[] {
     default:
       // No employment selected yet — return only universal docs
       break;
-  }
-
-  // Education loan has extra docs regardless of employment type
-  if (loanType === 'EDUCATION_LOAN') {
-    // Avoid duplicates (business path may already add some)
-    const existingIds = new Set(result.map(d => d.id));
-    for (const doc of getEducationLoanDocs()) {
-      if (!existingIds.has(doc.id)) {
-        result.push(doc);
-      }
-    }
   }
 
   return result;

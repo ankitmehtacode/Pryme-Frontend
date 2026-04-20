@@ -7,7 +7,6 @@ import { BackgroundBeams } from "@/components/ui/BackgroundBeams";
 import cardPersonal from "@/assets/card-personal.png";
 import cardBusiness from "@/assets/card-business.png";
 import cardHome from "@/assets/card-home.png";
-import cardEducation from "@/assets/card-education.png";
 import cardLap from "@/assets/card-lap.png";
 import cardAuto from "@/assets/card-auto.svg";
 
@@ -68,18 +67,6 @@ const products = [
     imgClass: "",
     overlay: "linear-gradient(to top right, rgba(0,0,0,0.3), rgba(0,0,0,0.05), rgba(255,255,255,0.04))",
     borderColor: "rgba(45,160,140,0.25)",
-  },
-  {
-    id: "education",
-    label: "EDUCATION LOAN",
-    image: cardEducation,
-    tag: "100% FUNDING",
-    href: "/apply?type=education",
-    accent: "270, 70%, 60%",
-    bg: "#111",
-    imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
-    borderColor: "rgba(255,255,255,0.1)",
   },
   {
     id: "auto",

@@ -54,6 +54,7 @@ const CustomerReviews = lazy(() => import("@/components/home/CustomerReviews"));
 import { BookOpen, ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { blogs } from "@/data/blogs";
 
 // Loan Utility Components (below-the-fold — lazy-loaded)
 const EMICalculator = lazy(() => import("@/components/loan/EMICalculator"));
@@ -212,11 +213,7 @@ const Index = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {[
-                    { title: "Building a 800+ CIBIL Score", slug: "cibil-score-guide", date: "Mar 10, 2024", img: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=400&auto=format&fit=crop" },
-                    { title: "Home Loans: Resale vs New Construction", slug: "home-loans-resale-vs-new", date: "Mar 08, 2024", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=400&auto=format&fit=crop" },
-                    { title: "MSME Loans for Digital Businesses", slug: "msme-digital-business", date: "Mar 05, 2024", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=400&auto=format&fit=crop" }
-                  ].map((blog, i) => (
+                  {blogs.slice(0, 3).map((blog, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
                       <Link to={`/blogs/${blog.slug}`} className="group block">
                         <div className="rounded-3xl overflow-hidden mb-6 aspect-video relative">

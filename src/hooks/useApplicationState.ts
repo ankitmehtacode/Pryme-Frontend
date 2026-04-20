@@ -312,7 +312,6 @@ export function useApplicationState(initialLoanType?: string): UseApplicationRet
           personal: 'PERSONAL_LOAN',
           home: 'HOME_LOAN',
           business: 'BUSINESS_LOAN',
-          education: 'EDUCATION_LOAN',
           lap: 'LAP',
         };
         fresh.loanRequirements.loanType = typeMap[initType.toLowerCase()] || 'PERSONAL_LOAN';
