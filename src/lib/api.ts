@@ -172,6 +172,19 @@ export const PrymeAPI = {
 
   logout: async () => fetchWithAuth("/auth/logout", { method: "POST" }),
 
+  /**
+   * 🧠 GOOGLE OAUTH — Server-Side Token Verification
+   * Sends the Google Identity Services credential (ID token) to the backend.
+   * The backend verifies with Google, JIT-provisions the user, and returns
+   * a session cookie + LoginResponse identical to password login.
+   */
+  googleSignIn: async (idToken: string) => {
+    return fetchWithAuth("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ idToken }),
+    });
+  },
+
   // ==========================================
   // CONFIG & DICTIONARY HYDRATION
   // ==========================================
@@ -195,6 +208,10 @@ export const PrymeAPI = {
   // ==========================================
   // CRM & ELEVATION MATRIX
   // ==========================================
+  
+  evaluateEligibility: async (payload: any) => {
+    return fetchWithAuth("/public/eligibility/evaluate", { method: "POST", body: JSON.stringify(payload) });
+  },
 
   submitLead: async (formData: any) => {
     const payload = {
@@ -334,6 +351,10 @@ export const PrymeAPI = {
   
   /** Admin: User Directory — GET /api/v1/admin/users */
   getAdminUsers: async () => fetchWithAuth("/admin/users", { method: "GET" }),
+
+  /** Admin: Update user role — PATCH /api/v1/admin/users/{userId}/role (SUPER_ADMIN only) */
+  updateUserRole: async (userId: string, role: string) =>
+    fetchWithAuth(`/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
   createAdminReview: async (data: any) =>
     fetchWithAuth("/admin/reviews", { method: "POST", body: JSON.stringify(data) }),
   updateAdminReview: async (id: string, data: any) =>
@@ -342,6 +363,15 @@ export const PrymeAPI = {
 
   /** Admin: List active sessions for a user — GET /api/v1/auth/sessions/{userId} */
   getActiveSessions: async (userId: string) => fetchWithAuth(`/auth/sessions/${userId}`, { method: "GET" }),
+
+  /** Admin: Eligibility Engine Rules CRUD — /api/v1/admin/eligibility-rules */
+  getEligibilityRules: async () => fetchWithAuth("/admin/eligibility-rules", { method: "GET" }),
+  createEligibilityRule: async (data: any) =>
+    fetchWithAuth("/admin/eligibility-rules", { method: "POST", body: JSON.stringify(data) }),
+  updateEligibilityRule: async (id: string | number, data: any) =>
+    fetchWithAuth(`/admin/eligibility-rules/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteEligibilityRule: async (id: string | number) =>
+    fetchWithAuth(`/admin/eligibility-rules/${id}`, { method: "DELETE" }),
 };
 
 // Standard REST Export Map

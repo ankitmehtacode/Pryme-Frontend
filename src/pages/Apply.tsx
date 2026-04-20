@@ -118,6 +118,127 @@ const Apply = () => {
         console.warn("Silent lead capture sync failed.", error);
     }
 
+    let engineData = [];
+    try {
+        // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
+        let computedAge = 35;
+        if (data.dob) {
+            const birthDate = new Date(data.dob);
+            if (!isNaN(birthDate.getTime())) {
+                computedAge = Math.floor((Date.now() - birthDate.getTime()) / 3.156e+10);
+            }
+        }
+
+        // ── BUG-2 FIX: Resolve surrogate programName from employment path ──
+        // The Java SurrogateIncomeResolver.resolve() switches on programName.
+        // Each path needs its own set of fields from IncomeComputationInput.java:
+        //   programName, pat, depreciation, interestExpense,
+        //   averageBankBalance, bankBalanceSamples,
+        //   gstrTurnover12Months, businessType,
+        //   grossReceipts, profession
+        let incomeInput: any = { programName: null };
+
+        if (data.financialPath === "SALARIED") {
+            // Salaried: No surrogate program needed.
+            // The engine uses data.monthlyIncome directly if programName is null.
+            // But SurrogateIncomeResolver requires a programName, so we skip it
+            // by setting monthlyIncome on the request and using a simple NIP fallback
+            // with the salary as PAT (annualized then /12 = same number).
+            incomeInput = {
+                programName: "NIP",
+                pat: data.monthlyIncome * 12,   // Annual salary as PAT
+                depreciation: null,
+                interestExpense: null,
+            };
+        } else if (data.financialPath === "PROFESSIONAL") {
+            // Professional (CA/CS/Doctor): SENP program
+            incomeInput = {
+                programName: "SENP",
+                grossReceipts: data.annualGrossReceipts || (data.monthlyIncome * 12),
+                profession: data.professionalSubType || "CA",
+            };
+        } else if (data.financialPath === "SELF_EMPLOYED") {
+            // Self-Employed: Program depends on businessSubType
+            const subType = data.businessSubType || "ITR_BASED";
+            switch (subType) {
+                case "GST_BASED":
+                    incomeInput = {
+                        programName: "GST",
+                        gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
+                        businessType: data.businessIndustryType || "Service",
+                    };
+                    break;
+                case "BANKING_PROGRAM":
+                    incomeInput = {
+                        programName: "BANKING",
+                        averageBankBalance: data.averageBankBalance || 0,
+                    };
+                    break;
+                case "CASH_FLOW_PROGRAM":
+                    incomeInput = {
+                        programName: "CASHFLOW",
+                        averageBankBalance: data.averageBankBalance || 0,
+                    };
+                    break;
+                default: // ITR_BASED or fallback
+                    incomeInput = {
+                        programName: "NIP",
+                        pat: data.netProfit || (data.monthlyIncome * 12),
+                        depreciation: data.depreciation || null,
+                        interestExpense: null,
+                    };
+                    break;
+            }
+        } else {
+            // Fallback: use NIP with annualized monthlyIncome
+            incomeInput = {
+                programName: "NIP",
+                pat: data.monthlyIncome * 12,
+                depreciation: null,
+                interestExpense: null,
+            };
+        }
+
+        const payload = {
+            lenderId: null, // Aggregator Mode — evaluate across all lenders
+            // BUG-1 FIX: Raw loanType enum from the store. No transformation.
+            loanType: data.productType || "HOME_LOAN",
+            cibilScore: data.cibilScore || 750,
+            // BUG-3 FIX: Computed age, not hardcoded
+            applicantAge: computedAge,
+            employmentType: data.employmentType?.toUpperCase() || "SALARIED",
+            // BUG-4 FIX: Real property type from form
+            propertyType: data.propertyType || "RESIDENTIAL",
+            cityTier: "TIER_1",
+            loanAmount: data.loanAmount || 0,
+            propertyValue: data.estimatedPropertyValue || data.loanAmount * 1.5 || 0,
+            requestedTenureMonths: (data.loanTenure || 5) * 12,
+            monthlyIncome: data.monthlyIncome || 0,
+            existingEmiTotal: data.eligibleExistingEmi || 0,
+            businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
+            workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
+            idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
+            // BUG-2 FIX: Correct field names matching Java IncomeComputationInput record
+            incomeComputationInput: incomeInput
+        };
+        const engineRes = await PrymeAPI.evaluateEligibility(payload);
+        if (engineRes && Array.isArray(engineRes)) {
+            engineData = engineRes;
+        }
+    } catch (engineError) {
+        console.error("Eligibility Engine evaluation failed:", engineError);
+    }
+
+    setApplicationData({
+      cibilScore: data.cibilScore,
+      monthlyIncome: data.monthlyIncome,
+      productType: data.productType,
+      employmentType: data.employmentType,
+      phone: leadPhone,
+      name: leadName,
+      engineResults: engineData
+    });
+
     setIsAnalyzing(true);
   };
 
@@ -130,6 +251,7 @@ const Apply = () => {
         monthlyIncome: applicationData?.monthlyIncome,
         loanAmount: loanAmount,
         fullName: applicationData?.name || localStorage.getItem("pryme_lead_name") || "Guest",
+        engineResults: applicationData?.engineResults || []
       },
     });
   };

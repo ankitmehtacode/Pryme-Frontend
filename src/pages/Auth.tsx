@@ -19,14 +19,47 @@ import pryme2Logo from "@/assets/Pryme2.svg";
 // 🧠 Closed-Loop Security Context & API
 import { useAuth } from "@/hooks/useAuth";
 
-// Removed native canvas background for static minimalist layout
+// 🧠 Google Identity Services SDK Type Declaration
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+            auto_select?: boolean;
+            itp_support?: boolean;
+          }) => void;
+          renderButton: (parent: HTMLElement, config: {
+            type?: string;
+            theme?: string;
+            size?: string;
+            text?: string;
+            shape?: string;
+            width?: number;
+          }) => void;
+          prompt: () => void;
+        };
+      };
+    };
+  }
+}
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-const signupSchema = loginSchema.extend({
+const signupSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must include at least one uppercase letter")
+    .regex(/[0-9]/, "Must include at least one digit")
+    .regex(/[^A-Za-z0-9]/, "Must include at least one special character"),
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   mobileNumber: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number"),
   confirmPassword: z.string(),
@@ -46,12 +79,14 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 type AuthView = "login" | "signup" | "forgot-password";
 
 const Auth = () => {
-  const { user, signIn, signUp, isLoading: isContextLoading } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, isLoading: isContextLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const googleButtonRef = useRef<HTMLDivElement>(null);
   
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   // Deep Link Recovery & Lead Matrix Capture
   const pendingLeadId = location.state?.leadId || null;
@@ -170,11 +205,107 @@ const Auth = () => {
     }, 1500);
   };
 
+  // 🧠 GOOGLE IDENTITY SERVICES SDK INITIALIZATION
+  // Loads the GIS script once and initializes with our Client ID.
+  // The callback receives a JWT credential from Google which we send
+  // to our backend for server-side verification.
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+
+    const initializeGIS = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+          itp_support: true,
+        });
+
+        // Render the Google button if container exists
+        if (googleButtonRef.current) {
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            text: "continue_with",
+            shape: "pill",
+            width: 320,
+          });
+        }
+      }
+    };
+
+    // If script already loaded (SPA navigation), initialize immediately
+    if (window.google?.accounts?.id) {
+      initializeGIS();
+      return;
+    }
+
+    // Load GIS script dynamically — idempotent (won't double-load)
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeGIS;
+      document.head.appendChild(script);
+    } else {
+      // Script tag exists but may still be loading
+      existingScript.addEventListener("load", initializeGIS);
+    }
+  }, [view]); // Re-initialize when switching between login/signup
+
+  const handleGoogleCredentialResponse = async (response: { credential: string }) => {
+    setIsGoogleLoading(true);
+    
+    const { error, user: loggedInUser } = await signInWithGoogle(response.credential);
+    
+    if (error) {
+      toast({
+        title: "Google Sign-In Failed",
+        description: error.message || "Could not authenticate with Google. Please try again.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Welcome to Pryme",
+        description: "Successfully signed in with Google.",
+      });
+      if (loggedInUser) {
+        const role = (loggedInUser.role || "USER").toUpperCase();
+        if (from) {
+          navigate(from, { replace: true });
+        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }
+    }
+    
+    setIsGoogleLoading(false);
+  };
+
   const handleGoogleSignIn = async () => {
-    toast({
-      title: "Coming Soon",
-      description: "Google OAuth zero-trust integration will be enabled in Phase 2.",
-    });
+    if (!GOOGLE_CLIENT_ID) {
+      toast({
+        title: "Configuration Required",
+        description: "Google OAuth is not configured. Set VITE_GOOGLE_CLIENT_ID in your environment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Trigger the One Tap / popup flow
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt();
+    } else {
+      toast({
+        title: "Loading...",
+        description: "Google Sign-In is initializing. Please try again in a moment.",
+      });
+    }
   };
 
 
@@ -403,6 +534,37 @@ const Auth = () => {
                               Forgot Password?
                             </button>
                           </div>
+
+                          {/* Google Sign-In Divider + Button */}
+                          <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-slate-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-[10px]">
+                              <span className="bg-white/70 backdrop-blur-sm px-4 text-slate-400 font-bold uppercase tracking-widest">or</span>
+                            </div>
+                          </div>
+
+                          {/* Google GIS Rendered Button Container */}
+                          <div ref={googleButtonRef} className="flex justify-center w-full" />
+
+                          {/* Fallback custom Google button (shown if GIS hasn't rendered) */}
+                          {!GOOGLE_CLIENT_ID && (
+                            <button
+                              type="button"
+                              onClick={handleGoogleSignIn}
+                              disabled={isGoogleLoading}
+                              className="w-full h-[42px] flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-slate-300 rounded-full text-[12px] sm:text-[11px] font-bold text-slate-600 hover:text-slate-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                            >
+                              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                              </svg>
+                              {isGoogleLoading ? "Signing in..." : "Continue with Google"}
+                            </button>
+                          )}
                         </form>
                       ) : (
                         <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5 sm:space-y-6">
@@ -481,6 +643,31 @@ const Auth = () => {
                               )}
                             </Button>
                           </div>
+
+                          {/* Google Sign-In Divider + Button */}
+                          <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-slate-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-[10px]">
+                              <span className="bg-white/70 backdrop-blur-sm px-4 text-slate-400 font-bold uppercase tracking-widest">or</span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleGoogleSignIn}
+                            disabled={isGoogleLoading}
+                            className="w-full h-[42px] flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-slate-300 rounded-full text-[12px] sm:text-[11px] font-bold text-slate-600 hover:text-slate-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                            {isGoogleLoading ? "Signing in..." : "Sign up with Google"}
+                          </button>
                         </form>
                       )}
                     </motion.div>

@@ -89,6 +89,25 @@ export const useAuth = () => {
     [signIn]
   );
 
+  // ─── GOOGLE SIGN IN ───────────────────────────────────────────────────
+  // Sends the Google Identity Services credential (ID token) to the backend.
+  // Follows the exact same cache hydration pattern as password signIn.
+  const signInWithGoogle = useCallback(
+    async (idToken: string): Promise<{ error: Error | null; user: MeResponse | null }> => {
+      try {
+        const loginResponse = await PrymeAPI.googleSignIn(idToken);
+        const userData: MeResponse = loginResponse.user;
+        if (userData) {
+          queryClient.setQueryData(AUTH_QUERY_KEY, userData);
+        }
+        return { error: null, user: userData || null };
+      } catch (err) {
+        return { error: err as Error, user: null };
+      }
+    },
+    [queryClient]
+  );
+
   // ─── SIGN OUT ─────────────────────────────────────────────────────────────
   // Calls the backend to invalidate the server-side session,
   // then nukes the React Query cache. Zero localStorage involved.
@@ -178,6 +197,7 @@ export const useAuth = () => {
     hasPermission,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
   };
 };

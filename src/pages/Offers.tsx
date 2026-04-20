@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck, AlertCircle } from "lucide-react";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -149,43 +149,44 @@ export default function Offers() {
     setShowSkeleton(false);
   }, [leadData]);
 
-  // ── Offers Engine ─────────────────────────────────────────────────────
+  // ── Engine Data Mapper ──────────────────────────────────────────────────
   const dynamicOffers = useMemo((): BankOffer[] => {
-    if (!leadData) return [];
+    if (!leadData || !leadData.engineResults || leadData.engineResults.length === 0) return [];
+    
+    // Filter only eligible offers returned by Matrix Engine (Java)
+    const eligibleResults = leadData.engineResults.filter((r: any) => r.eligible === true || r.isEligible === true);
 
-    const baseRate = leadData.cibilScore >= 750 ? 10.25 : leadData.cibilScore >= 650 ? 12.5 : 15.0;
-    const baseOdds = leadData.cibilScore >= 750 ? 98 : leadData.cibilScore >= 650 ? 82 : 45;
+    return eligibleResults.map((er: any, index: number) => {
+      // Map Matrix response onto our UI BankOffer structure
+      const brandColors = [
+        { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo },
+        { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo },
+        { c: "bg-[#97144d]", x: "#97144d", img: axisLogo },
+        { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo }
+      ];
+      
+      const theme = brandColors[index % brandColors.length];
 
-    return [
-      {
-        id: "hdfc", bankName: "HDFC Bank", logoColor: "bg-[#004c8f]", brandHex: "#004c8f",
-        logoUrl: hdfcLogo,
-        interestRate: baseRate, processingFee: 1.5, maxTenure: 5, maxLoanAmount: 5000000,
-        approvalOdds: baseOdds, processingTime: "24–48 hrs",
-        requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16 / ITR"],
-      },
-      {
-        id: "icici", bankName: "ICICI Bank", logoColor: "bg-[#f58220]", brandHex: "#f58220",
-        logoUrl: iciciLogo,
-        interestRate: baseRate + 0.25, processingFee: 1.0, maxTenure: 5, maxLoanAmount: 4000000,
-        approvalOdds: Math.max(10, baseOdds - 5), processingTime: "48–72 hrs",
+      // BUG-6 FIX: roi from Java is decimal (0.0875 = 8.75%). Multiply by 100 for display.
+      // BUG-7 FIX: Java field is `tenureMonths`, not `maxTenureMonths`.
+      // BUG-8 FIX: Java field is `maxEligibleAmount`, not `maxEligibleLoanAmount`.
+      const roiPercent = er.roi ? (er.roi < 1 ? er.roi * 100 : er.roi) : 10.5;
+      return {
+        id: er.productCode || er.lenderId || Math.random().toString(),
+        bankName: er.productName || "Partner Bank",
+        logoColor: theme.c, 
+        brandHex: theme.x,
+        logoUrl: theme.img,
+        interestRate: parseFloat(roiPercent.toFixed(2)),
+        processingFee: 1.0, 
+        maxTenure: (er.tenureMonths || 60) / 12,
+        maxLoanAmount: er.maxEligibleAmount || leadData.loanAmount,
+        approvalOdds: 98,
+        processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
-      },
-      {
-        id: "axis", bankName: "Axis Bank", logoColor: "bg-[#97144d]", brandHex: "#97144d",
-        logoUrl: axisLogo,
-        interestRate: baseRate + 0.5, processingFee: 2.0, maxTenure: 7, maxLoanAmount: 4500000,
-        approvalOdds: Math.max(10, baseOdds + 2), processingTime: "48 hrs",
-        requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16"],
-      },
-      {
-        id: "kotak", bankName: "Kotak Mahindra", logoColor: "bg-[#ed1c24]", brandHex: "#ed1c24",
-        logoUrl: kotakLogo,
-        interestRate: baseRate + 0.75, processingFee: 1.5, maxTenure: 5, maxLoanAmount: 3500000,
-        approvalOdds: Math.max(10, baseOdds - 10), processingTime: "3–5 days",
-        requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)", "Form 16 / ITR", "Address Proof"],
-      },
-    ].sort((a, b) => a.interestRate - b.interestRate);
+        originalEngineResult: er
+      };
+    }).sort((a, b) => a.interestRate - b.interestRate);
   }, [leadData]);
 
   // ── EMI + Comparison Intelligence ─────────────────────────────────────
@@ -193,6 +194,77 @@ export default function Offers() {
     const mr = r / (12 * 100), n = t * 12;
     return Math.round((p * mr * Math.pow(1 + mr, n)) / (Math.pow(1 + mr, n) - 1));
   }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SCENARIO A: PUBLIC PAGE (Missing Context Data)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (!leadData) {
+    return (
+      <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
+        <div className="max-w-md w-full px-6 text-center space-y-6">
+          <div className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+            <Lock className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold font-heading">Secure Data Missing</h2>
+          <p className="text-secondary-foreground text-sm">
+            We need your loan application context to generate personalized offers. 
+            Please start an application to view live matrix matches.
+          </p>
+          <Button onClick={() => navigate("/")} className="w-full h-12" variant="outline">
+            Return Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SCENARIO B: EXCEPTION ZERO-STATE (No Offers Matched Engine Profile)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (!showSkeleton && dynamicOffers.length === 0) {
+    // BUG-9 FIX: Java field is `rejectionReasons`, not `violations`.
+    const rawViolations = leadData.engineResults?.[0]?.rejectionReasons || leadData.engineResults?.[0]?.violations || [];
+
+    return (
+      <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
+        <div className="max-w-md w-full px-6 space-y-6">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="w-12 h-12 text-destructive" />
+            </div>
+            <h2 className="text-2xl font-bold font-heading text-foreground">No Offers Found</h2>
+            <p className="text-secondary-foreground text-sm">
+              We evaluated your profile against our partner network. Unfortunately, we could not find an eligible loan match right now.
+            </p>
+          </div>
+          
+          <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
+             <div className="font-semibold text-foreground flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
+             </div>
+             {rawViolations.length > 0 && (
+               <div className="mb-2 text-destructive/90 bg-destructive/10 p-2 rounded text-xs overflow-hidden">
+                 {rawViolations.join(', ')}
+               </div>
+             )}
+             <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
+               <li>Reduce your existing monthly EMI obligations.</li>
+               <li>Ensure your properties are assessed accurately against FOIR parameters.</li>
+               <li>Apply with a co-applicant to pool higher monthly income.</li>
+             </ul>
+          </div>
+
+          <Button onClick={() => navigate("/")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
+            Review Application
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SCENARIO C: MATCHED OFFERS ENGINE PAGE
+  // ═══════════════════════════════════════════════════════════════════════
 
   const emis = useMemo(() => {
     if (!leadData) return {};

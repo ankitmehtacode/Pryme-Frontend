@@ -863,14 +863,17 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       const fin = store.financialDetails;
       const fp = store.financialFootprint;
 
-      // Bridge to the old Apply.tsx interface with strict null-safety
+      // Bridge to Apply.tsx → EligibilityRequest.
+      // CRITICAL: Pass raw enum values. No transformation. The engine matches on exact strings.
       const data = {
         fullName: store.basicKYC?.fullName ?? "Guest",
         email: store.basicKYC?.email ?? "",
         phone: store.basicKYC?.mobileNumber ?? "",
         panCard: store.basicKYC?.panNumber ?? "",
         dob: store.basicKYC?.dateOfBirth ?? "",
-        productType: store.loanRequirements?.loanType?.toLowerCase().replace('_loan', '').replace('_', '') ?? "personal",
+        // BUG-1 FIX: Raw loanType — no .toLowerCase().replace() mangling.
+        // Engine matches HOME_LOAN, BUSINESS_LOAN, etc. verbatim.
+        productType: store.loanRequirements?.loanType ?? "PERSONAL_LOAN",
         loanAmount: Number(store.loanRequirements?.loanAmount ?? 500000),
         loanTenure: Number(store.loanRequirements?.tenureYears ?? 5),
         cibilScore: Number(store.loanRequirements?.cibilScore ?? 750),
@@ -884,18 +887,32 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         state: store.basicKYC?.state ?? "",
         city: store.basicKYC?.city ?? "",
         employmentType: store.basicKYC?.employmentType ?? "SALARIED",
-        
-        // Phase 5 underwriting variables safely mapped with explicit casts to bypass union constraints
+
+        // Employment path metadata — needed by Apply.tsx to resolve the correct surrogate programName
+        financialPath: fin?.path ?? null,                                       // SALARIED | PROFESSIONAL | SELF_EMPLOYED
+        professionalSubType: fin?.path === "PROFESSIONAL" ? (fin.data as any)?.subType ?? null : null, // CA | CS | DOCTOR | LAWYER
+        businessSubType: fin?.path === "SELF_EMPLOYED" ? (fin.data as any)?.subType ?? null : null,    // ITR_BASED | GST_BASED | BANKING_PROGRAM | CASH_FLOW_PROGRAM
+        businessIndustryType: fin?.path === "SELF_EMPLOYED" ? (fin.data as any)?.industryType ?? null : null,
+
+        // Property type — BUG-4 FIX: pass real value from form, not hardcoded "RESIDENTIAL"
+        propertyType: (store.loanRequirements as any)?.propertyType ?? "RESIDENTIAL",
+
+        // Phase 5 underwriting variables safely mapped
         depreciation: Number((fin?.data as any)?.depreciation ?? 0),
+        netProfit: Number((fin?.data as any)?.netProfit ?? 0),
+        grossSalary: Number((fin?.data as any)?.grossSalary ?? 0),
         isCaCertifiedOrAudited: Boolean((fin?.data as any)?.isCaCertifiedOrAudited ?? false),
         last12MonthsGstTurnover: Number((fin?.data as any)?.last12MonthsGstTurnover ?? 0),
         annualGrossReceipts: Number((fin?.data as any)?.annualGrossReceipts ?? 0),
         totalPracticeYears: Number((fin?.data as any)?.totalPracticeYears ?? 0),
+        businessVintageYears: Number((fin?.data as any)?.vintageYears ?? 0),
+        totalExperienceYears: Number((fin?.data as any)?.totalExperienceYears ?? 0),
+        averageBankBalance: Number((fin?.data as any)?.abbTier ? (fin.data as any).abbTier * 100000 : 0), // ABB tier in lakhs → rupees
         propertyIdentified: Boolean(fp?.propertyIdentified ?? false),
         estimatedPropertyValue: Number(fp?.estimatedPropertyValue ?? 0),
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: Boolean((fp as any)?.hasExistingLoan ?? false),
-        eligibleExistingEmi: Number((fp as any)?.existingEmi ?? 0)
+        eligibleExistingEmi: Number((fp as any)?.existingEmi ?? (fp as any)?.totalExistingEMI ?? 0)
       };
 
       onFormSubmit?.(data);

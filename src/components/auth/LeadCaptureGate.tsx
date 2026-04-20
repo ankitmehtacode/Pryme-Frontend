@@ -59,33 +59,66 @@ export default function LeadCaptureGate({
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
 
+    const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+    if (!GOOGLE_CLIENT_ID) {
+      // No Client ID configured — redirect to auth page instead
+      navigate("/auth");
+      return;
+    }
+
     try {
-      if (typeof window !== "undefined" && (window as any).google?.accounts) {
-        (window as any).google.accounts.id.prompt();
-        return;
+      // Initialize GIS and trigger the One Tap / popup flow
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: async (response: { credential: string }) => {
+            try {
+              // Import PrymeAPI dynamically to avoid circular dependency
+              const { PrymeAPI } = await import("@/lib/api");
+              const loginResponse = await PrymeAPI.googleSignIn(response.credential);
+
+              const leadData: LeadData = {
+                email: loginResponse.user?.email || "user@gmail.com",
+                name: loginResponse.user?.name || "PRYME User",
+                method: "google",
+                capturedAt: new Date().toISOString(),
+              };
+
+              localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leadData));
+              localStorage.setItem("pryme_name", leadData.name);
+
+              toast({
+                title: "Signed in with Google",
+                description: "You now have full access to PRYME.",
+              });
+
+              setIsSubmitting(false);
+              onCaptured();
+            } catch (err: any) {
+              toast({
+                title: "Sign-in Failed",
+                description: err.message || "Could not authenticate with Google.",
+                variant: "destructive",
+              });
+              setIsSubmitting(false);
+            }
+          },
+          auto_select: false,
+        });
+        window.google.accounts.id.prompt();
+      } else {
+        // GIS SDK not yet loaded — load it first
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.onload = () => handleGoogleSignIn(); // Retry after load
+        document.head.appendChild(script);
       }
-    } catch { /* fallback below */ }
-
-    // Demo: simulate Google OAuth returning user data
-    await new Promise((r) => setTimeout(r, 1000));
-
-    const leadData: LeadData = {
-      email: "user@gmail.com",
-      name: "PRYME User",
-      method: "google",
-      capturedAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leadData));
-    localStorage.setItem("pryme_name", leadData.name);
-
-    toast({
-      title: "Signed in with Google",
-      description: "You now have full access to PRYME.",
-    });
-
-    setIsSubmitting(false);
-    onCaptured();
+    } catch {
+      setIsSubmitting(false);
+      navigate("/auth"); // Fallback to full auth page
+    }
   };
 
   const handleGoToAuth = () => {
