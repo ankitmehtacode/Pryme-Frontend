@@ -161,12 +161,12 @@ const HeroSection = memo(() => {
             style={{ contain: "layout style paint", willChange: "opacity" }}
           >
             {/* Single blurred aurora layer.
-                PERF: blur-[50px] (down from 70px) — visually near-identical on translucent
+                PERF: transform-gpu (down from 70px) — visually near-identical on translucent
                 glass but the GPU sample kernel is ~2x cheaper at 50px vs 70px. */}
-            {/* PERF: blur-[40px] (down from 50-55). 40px is visually identical
+            {/* PERF: transform-gpu (down from 50-55). 40px is visually identical
                  on a translucent layer but the GPU sample kernel is ~1.5x cheaper. */}
             <div 
-              className="absolute inset-[-20%] opacity-55 blur-[40px] pointer-events-none transform-gpu"
+              className="absolute inset-[-20%] opacity-55 transform-gpu pointer-events-none transform-gpu"
               style={{ background: offer.auroraGradient }} 
             />
           </motion.div>
@@ -174,7 +174,7 @@ const HeroSection = memo(() => {
       </AnimatePresence>
 
       {/* ────────────── LIQUID GLASS CARD ────────────── */}
-      {/* PERF FIX: Reduced backdrop-blur from [60px] to [20px] (backdrop-blur-xl).
+      {/* PERF FIX: Reduced backdrop-blur from [60px] to [20px] (backdrop-blur-sm).
           60px blur radius forces the GPU to sample a massive kernel per pixel.
           20px is visually near-identical on a translucent card but ~4x cheaper. */}
       {/* PERF: backdrop-blur reduced from lg (12px) to md (8px).
@@ -266,7 +266,7 @@ const HeroSection = memo(() => {
               </div>
               <div className="flex flex-col items-start leading-none">
                 <p className="text-[10px] font-semibold text-slate-800/90 tracking-tight drop-shadow-sm">
-                  <span className="text-slate-900 font-extrabold">10,000+</span> applications processed
+                  <span className="text-[#0a1530] font-extrabold">10,000+</span> applications processed
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="relative flex h-1.5 w-1.5">
@@ -284,7 +284,7 @@ const HeroSection = memo(() => {
             <div className="hidden md:flex items-center gap-1.5 bg-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_20px_rgba(0,0,0,0.05)] border border-white/40 rounded-full p-1.5 hover:bg-white/50 transition-colors">
               <button 
                 onClick={() => paginate(-1)} 
-                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
+                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-[#0a1530] transition-colors shadow-sm"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -304,7 +304,7 @@ const HeroSection = memo(() => {
               </div>
               <button 
                 onClick={() => paginate(1)} 
-                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
+                className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/70 text-slate-600 hover:text-[#0a1530] transition-colors shadow-sm"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -331,14 +331,14 @@ const HeroSection = memo(() => {
                   <Zap className="w-2.5 h-2.5" style={{ color: offer.accentColor }} /> {offer.tag}
                 </div>
                 {offer.logo ? (
-                  <img src={offer.logo} className="h-4 sm:h-5 object-contain opacity-100 filter drop-shadow-sm mix-blend-multiply" alt={offer.bank} />
+                  <img src={offer.logo} className="h-4 sm:h-5 object-contain opacity-100 filter drop-shadow-sm" alt={offer.bank} />
                 ) : (
                   <span className="text-[10px] font-bold text-slate-800 tracking-wider">{offer.bank}</span>
                 )}
               </div>
 
               {/* Headline */}
-              <h2 className="text-[1.35rem] sm:text-2xl md:text-3xl lg:text-[2.25rem] font-extrabold text-slate-900 tracking-tight leading-tight md:leading-[1.05] mb-1.5 md:mb-3 px-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] max-w-3xl">
+              <h2 className="text-[1.35rem] sm:text-2xl md:text-3xl lg:text-[2.25rem] font-extrabold text-[#0a1530] tracking-tight leading-tight md:leading-[1.05] mb-1.5 md:mb-3 px-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] max-w-3xl">
                 {offer.title}
               </h2>
 
@@ -347,7 +347,7 @@ const HeroSection = memo(() => {
                 
                 <div className="hidden sm:flex flex-wrap items-center justify-center gap-2">
                   {offer.highlights.map((h, i) => (
-                    <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 shadow-sm text-slate-900/90 text-[9px] md:text-[10px] font-bold tracking-wide">
+                    <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 shadow-sm text-[#0a1530]/90 text-[9px] md:text-[10px] font-bold tracking-wide">
                       <CheckCircle2 className="w-2.5 h-2.5 shrink-0" style={{ color: offer.accentColor }} />
                       {h}
                     </div>
@@ -359,12 +359,12 @@ const HeroSection = memo(() => {
                 {/* Apply CTA */}
                 <div className="relative inline-block mt-0.5 md:mt-0 group pointer-events-auto">
                   <div 
-                    className="absolute -inset-1.5 rounded-full blur-[10px] opacity-40 group-hover:opacity-70 transition-opacity duration-500" 
+                    className="absolute -inset-1.5 rounded-full transform-gpu opacity-40 group-hover:opacity-70 transition-opacity duration-500" 
                     style={{ backgroundColor: offer.accentColor }} 
                   />
                   <Link 
                     to="/apply"
-                    className="relative overflow-hidden bg-slate-900 text-white px-5 md:px-7 py-1.5 md:py-2 rounded-full font-bold text-[11px] md:text-xs tracking-wide flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                    className="relative overflow-hidden bg-[#0a1530] text-white px-5 md:px-7 py-1.5 md:py-2 rounded-full font-bold text-[11px] md:text-xs tracking-wide flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                   >
                     Apply Now
                     <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
@@ -378,7 +378,7 @@ const HeroSection = memo(() => {
               {/* Tagline */}
               <div className="mt-1.5 md:mt-3 flex items-center justify-center px-4 max-w-lg">
                 <p className="text-[9px] md:text-[10px] text-slate-800/80 font-semibold tracking-wide drop-shadow-[0_1px_10px_rgba(255,255,255,0.6)]">
-                  Compare rates from <span className="text-slate-900 font-extrabold">15+ banks</span>, calculate your EMI, and apply in under <span className="text-slate-900 font-extrabold">5 minutes.</span>
+                  Compare rates from <span className="text-[#0a1530] font-extrabold">15+ banks</span>, calculate your EMI, and apply in under <span className="text-[#0a1530] font-extrabold">5 minutes.</span>
                 </p>
               </div>
               

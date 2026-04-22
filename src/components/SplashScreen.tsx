@@ -111,7 +111,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           </div>
           
           {/* Main Content Squircle */}
-          <div className="absolute inset-[2px] bg-white/80 backdrop-blur-xl rounded-[2.4rem] flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.8)] overflow-hidden">
+          <div className="absolute inset-[2px] bg-white/80 backdrop-blur-sm rounded-[2.4rem] flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.8)] overflow-hidden">
             {/* CSS shimmer — replaces motion.div x animation */}
             <div 
               className="absolute inset-0 w-[250%] h-full bg-gradient-to-r from-transparent via-blue-200/40 to-transparent"
@@ -161,7 +161,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           transition={{ duration: 2.4, ease: [0.25, 1, 0.5, 1] }}
           className="h-full bg-gradient-to-r from-blue-500 via-[#103783] to-cyan-300 relative shadow-[0_0_15px_rgba(59,130,246,0.8)]"
         >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-20 h-[8px] bg-white blur-[4px] rounded-full shadow-[0_0_20px_#fff]" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-20 h-[8px] bg-white transform-gpu rounded-full shadow-[0_0_20px_#fff]" />
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-[2px] bg-white rounded-full" />
         </motion.div>
       </div>

@@ -89,7 +89,7 @@ export function BankComparisonCard({
 
         {/* ── Subtle Brand Glow on Hover ────────────────────── */}
         <div
-          className="absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-multiply dark:mix-blend-screen"
+          className="absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
           style={{
             background: `radial-gradient(120% 100% at 0% 50%, ${brand}0A 0%, transparent 60%)`,
           }}

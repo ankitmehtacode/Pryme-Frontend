@@ -73,13 +73,13 @@ const PrepaymentCalculator = () => {
     : "0";
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col h-full">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col h-full">
       {/* 🧠 Decorative Ambient Glow */}
-      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-emerald-500/10 blur-[50px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-emerald-500/10 transform-gpu rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-3.5 mb-6 relative z-10 w-full shrink-0">
-        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
+        <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
           <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         </div>
         <div>
@@ -97,10 +97,10 @@ const PrepaymentCalculator = () => {
         <div className="space-y-3 flex flex-col justify-start w-full min-w-0">
           
           {/* Loan Amount */}
-          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
             <div className="flex justify-between items-center mb-2">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Amount</label>
-              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {formatCurrency(loanAmount)}
               </div>
             </div>
@@ -108,10 +108,10 @@ const PrepaymentCalculator = () => {
           </div>
 
           {/* Interest Rate */}
-          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
             <div className="flex justify-between items-center mb-2">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Interest Rate</label>
-              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {interestRate}% <span className="text-[8px] text-muted-foreground">p.a.</span>
               </div>
             </div>
@@ -119,10 +119,10 @@ const PrepaymentCalculator = () => {
           </div>
 
           {/* Tenure */}
-          <div className="bg-secondary/20 dark:bg-[#111] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
+          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
             <div className="flex justify-between items-center mb-2">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Tenure</label>
-              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
+              <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {tenureMonths} Mo <span className="text-[8px] text-muted-foreground">({(tenureMonths/12).toFixed(1)} Yrs)</span>
               </div>
             </div>
@@ -173,13 +173,13 @@ const PrepaymentCalculator = () => {
 
           <div className="grid grid-cols-2 gap-3 shrink-0">
              {/* Tenure Saved */}
-             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Tenure Trimmed</span>
                <span className="text-xl font-bold text-foreground leading-none">{calculations.tenureSaved} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
              </div>
              
              {/* New Tenure */}
-             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">New Total Tenure</span>
                <span className="text-xl font-bold text-foreground leading-none">{calculations.monthsWithPrepayment} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
              </div>

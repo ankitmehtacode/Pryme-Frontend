@@ -24,7 +24,7 @@ const BlogDetail = () => {
   if (!blog) return null; // Will redirect in useEffect
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>{blog.title} | PRYME Insights</title>
         <meta name="description" content={blog.title} />
@@ -46,7 +46,7 @@ const BlogDetail = () => {
               <span className="inline-block px-4 py-1.5 rounded-full bg-[#103783]/10 text-[#103783] text-xs font-bold uppercase tracking-widest mb-6 border border-[#103783]/20">
                 {blog.cat}
               </span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#0a1530] leading-tight mb-6">
                 {blog.title}
               </h1>
               <div className="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">

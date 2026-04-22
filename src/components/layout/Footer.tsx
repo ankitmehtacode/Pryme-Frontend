@@ -57,7 +57,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-slate-950 text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
+    <footer className="bg-[#060c1c] text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
       {/* Trust Badges */}
       <div className="border-b border-white/10 dark:border-border">
         <div className="container mx-auto px-4 py-6">

@@ -48,7 +48,7 @@ export const PolicyAuditModal: React.FC<PolicyAuditModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-[#050508] border-slate-800 text-slate-100 sm:max-w-md">
+      <DialogContent className="bg-[#050508] border-[#103783]/20 text-slate-100 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold tracking-tight">
             Matrix Blast Radius
@@ -65,7 +65,7 @@ export const PolicyAuditModal: React.FC<PolicyAuditModalProps> = ({
             <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">
               {metadata.displayName}
             </span>
-            <div className="flex items-center gap-4 bg-slate-950 p-4 rounded-md border border-slate-800 font-mono text-lg">
+            <div className="flex items-center gap-4 bg-slate-950 p-4 rounded-md border border-[#103783]/20 font-mono text-lg">
               <span className="text-red-400 line-through decoration-red-400/50">
                 {oldValue || "empty"}
               </span>
@@ -83,7 +83,7 @@ export const PolicyAuditModal: React.FC<PolicyAuditModalProps> = ({
             <Textarea
               id="reason"
               placeholder="E.g., Approved via internal ticket IT-4029. Adjusting FOIR limits."
-              className="bg-slate-950 border-slate-800 min-h-[100px] text-slate-100 placeholder:text-slate-600 focus-visible:ring-blue-500"
+              className="bg-slate-950 border-[#103783]/20 min-h-[100px] text-slate-100 placeholder:text-slate-600 focus-visible:ring-blue-500"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

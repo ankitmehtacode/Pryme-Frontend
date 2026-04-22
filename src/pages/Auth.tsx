@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2, Code2, TrendingUp, ShieldCheck, Wallet, Sparkles } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2, Code2, TrendingUp, ShieldCheck, Wallet, Sparkles, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Components & Utilities
@@ -87,6 +87,9 @@ const Auth = () => {
   const [view, setView] = useState<AuthView>("login");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showLoginPw, setShowLoginPw] = useState(false);
+  const [showSignupPw, setShowSignupPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
 
   // Deep Link Recovery & Lead Matrix Capture
   const pendingLeadId = location.state?.leadId || null;
@@ -339,7 +342,7 @@ const Auth = () => {
 
       {/* 0.01% TIER GLASSMORPHIC PREMIUM FINTECH BACKGROUND */}
       <div 
-        className="min-h-[100dvh] w-full relative flex items-center justify-center bg-[#F4F7FA] font-sans text-slate-900 p-4 sm:p-6 md:p-8 overflow-hidden"
+        className="min-h-[100dvh] w-full relative flex items-center justify-center bg-[#F4F7FA] font-sans text-[#0a1530] p-4 sm:p-6 md:p-8 overflow-hidden"
       >
         {/* High-End Dotted Mesh SVG Grid with Edge Fading */}
         <div 
@@ -352,26 +355,31 @@ const Auth = () => {
           }}
         />
 
-        {/* Abstract Cinematic Glassmorphic Energy Blobs (Animated via Framer Motion) */}
+        {/* 🧠 PERF FIX: Replaced blur+mix-blend-multiply blobs with radial-gradient.
+             blur() + forces Chrome to rasterize 700px bitmaps
+             on CPU every animation frame. radial-gradient is compositor-native. */}
         <motion.div 
-          className="absolute top-[0%] left-[0%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-gradient-to-br from-[#10B981] to-[#1E4DAB] rounded-full mix-blend-multiply filter blur-[100px] md:blur-[140px] opacity-60"
+          className="absolute top-[0%] left-[0%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] rounded-full pointer-events-none opacity-40"
+          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.6) 0%, rgba(30,77,171,0.3) 50%, transparent 70%)' }}
           animate={{ x: [0, 100, -50, 0], y: [0, -50, 100, 0], scale: [1, 1.1, 0.95, 1] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute bottom-[0%] right-[0%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] bg-gradient-to-tl from-[#103783] to-[#10B981] rounded-full mix-blend-multiply filter blur-[120px] md:blur-[160px] opacity-50"
+          className="absolute bottom-[0%] right-[0%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] rounded-full pointer-events-none opacity-35"
+          style={{ background: 'radial-gradient(circle, rgba(16,55,131,0.6) 0%, rgba(16,185,129,0.3) 50%, transparent 70%)' }}
           animate={{ x: [0, -120, 80, 0], y: [0, 80, -100, 0], scale: [1, 1.15, 0.85, 1] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute top-[25%] left-[30%] w-[350px] md:w-[500px] h-[350px] md:h-[500px] bg-[#DBEAFE] rounded-full mix-blend-multiply filter blur-[80px] md:blur-[100px] opacity-70"
+          className="absolute top-[25%] left-[30%] w-[350px] md:w-[500px] h-[350px] md:h-[500px] rounded-full pointer-events-none opacity-50"
+          style={{ background: 'radial-gradient(circle, rgba(219,234,254,0.7) 0%, rgba(219,234,254,0.2) 50%, transparent 70%)' }}
           animate={{ x: [0, 80, -90, 0], y: [0, 120, -60, 0], scale: [1, 0.9, 1.1, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         
         {/* MAIN SPLIT CARD - Flawless Glassmorphism & Micro-animations */}
         <motion.div 
-          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] sm:rounded-[32px] shadow-[0_24px_60px_rgba(16,55,131,0.15),0_0_0_1px_rgba(255,255,255,0.6)_inset] flex flex-col lg:flex-row overflow-hidden bg-white/10 backdrop-blur-[40px] saturate-[1.2] z-10"
+          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] sm:rounded-[32px] shadow-[0_24px_60px_rgba(16,55,131,0.15),0_0_0_1px_rgba(255,255,255,0.6)_inset] flex flex-col lg:flex-row overflow-hidden bg-white/10 backdrop-transform-gpu saturate-[1.2] z-10"
           initial={{ opacity: 0, scale: 0.96, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }} // Hyper-smooth spring curve
@@ -389,8 +397,8 @@ const Auth = () => {
             />
             
             {/* Elegant Glassmorphic Pryme Overlay with Heavy Fade */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/90 via-[#103783]/70 to-[#10B981]/50 mix-blend-multiply z-0"></div>
-            <div className="absolute inset-0 bg-[#103783]/30 backdrop-blur-[4px] z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/90 via-[#103783]/70 to-[#10B981]/50 z-0"></div>
+            <div className="absolute inset-0 bg-[#103783]/30 backdrop-transform-gpu z-0"></div>
 
             {/* Logo Centralized (White version over dark overlay) */}
             <div className="relative z-10 flex flex-col items-center cursor-pointer mb-2 drop-shadow-2xl" onClick={() => navigate("/")}>
@@ -410,17 +418,17 @@ const Auth = () => {
 
             {/* Subtle Footer Links */}
             <div className="absolute bottom-10 flex gap-6 text-[10px] font-bold text-white/80 uppercase tracking-widest z-10">
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">About</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Privacy</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Terms</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-xl px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">FAQ</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">About</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Privacy</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Terms</span>
+              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">FAQ</span>
             </div>
           </div>
           
           {/* ========================================================= */}
           {/* RIGHT PANEL: Auth Form Overlay */}
           {/* ========================================================= */}
-          <div className="w-full lg:w-1/2 bg-white/70 backdrop-blur-[20px] shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
+          <div className="w-full lg:w-1/2 bg-white/70 backdrop-transform-gpu shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
              
              <div className="w-full max-w-[320px] z-10 flex flex-col w-[100%] items-stretch">
                 {/* Mobile Header (Hidden on LG) */}
@@ -503,12 +511,17 @@ const Auth = () => {
 
                           <div className="space-y-1">
                             <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Password</Label>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                              {...loginForm.register("password")}
-                            />
+                            <div className="relative">
+                              <Input
+                                type={showLoginPw ? "text" : "password"}
+                                placeholder="••••••••"
+                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                                {...loginForm.register("password")}
+                              />
+                              <button type="button" onClick={() => setShowLoginPw(!showLoginPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
+                                {showLoginPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
                             {loginForm.formState.errors.password && (
                               <p className="text-[10px] text-rose-500 mt-1 pl-1">{loginForm.formState.errors.password.message}</p>
                             )}
@@ -610,12 +623,17 @@ const Auth = () => {
 
                           <div className="space-y-1">
                             <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pass</Label>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                              {...signupForm.register("password")}
-                            />
+                            <div className="relative">
+                              <Input
+                                type={showSignupPw ? "text" : "password"}
+                                placeholder="••••••••"
+                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                                {...signupForm.register("password")}
+                              />
+                              <button type="button" onClick={() => setShowSignupPw(!showSignupPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
+                                {showSignupPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
                             {signupForm.formState.errors.password && (
                               <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.password.message}</p>
                             )}
@@ -623,12 +641,17 @@ const Auth = () => {
 
                           <div className="space-y-1">
                             <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Confirm</Label>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                              {...signupForm.register("confirmPassword")}
-                            />
+                            <div className="relative">
+                              <Input
+                                type={showConfirmPw ? "text" : "password"}
+                                placeholder="••••••••"
+                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
+                                {...signupForm.register("confirmPassword")}
+                              />
+                              <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
+                                {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
                             {signupForm.formState.errors.confirmPassword && (
                               <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.confirmPassword.message}</p>
                             )}

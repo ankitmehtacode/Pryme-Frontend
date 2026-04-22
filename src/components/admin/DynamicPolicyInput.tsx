@@ -63,10 +63,10 @@ export const DynamicPolicyInput: React.FC<DynamicPolicyInputProps> = ({
       case "ENUM_LIST":
         return (
           <Select value={value?.toString()} onValueChange={onChange}>
-            <SelectTrigger className="w-full bg-slate-950 border-slate-800 text-slate-100">
+            <SelectTrigger className="w-full bg-slate-950 border-[#103783]/20 text-slate-100">
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
+            <SelectContent className="bg-[#0a1530] border-[#103783]/20 text-slate-100">
               {metadata.options?.map((opt) => (
                 <SelectItem key={opt} value={opt} className="focus:bg-slate-800 focus:text-slate-100">
                   {opt}
@@ -86,7 +86,7 @@ export const DynamicPolicyInput: React.FC<DynamicPolicyInputProps> = ({
               type="number"
               value={value}
               onChange={handleNumericChange}
-              className="pr-8 bg-slate-950 border-slate-800 text-slate-100 focus-visible:ring-blue-500 w-full"
+              className="pr-8 bg-slate-950 border-[#103783]/20 text-slate-100 focus-visible:ring-blue-500 w-full"
               step={metadata.fieldType === "INTEGER" ? "1" : "0.01"}
             />
             {metadata.fieldType === "PERCENTAGE" && (

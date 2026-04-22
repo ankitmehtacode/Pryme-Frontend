@@ -9,7 +9,7 @@ import { Layers, Zap, Clock, TrendingUp } from "lucide-react";
 
 const Services = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>Our Services | PRYME Consulting</title>
         <meta name="description" content="Comprehensive loan comparison and financial matchmaking services." />

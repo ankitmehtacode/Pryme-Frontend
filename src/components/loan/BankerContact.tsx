@@ -26,10 +26,10 @@ const defaultBanker: BankerInfo = {
 
 const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
   return (
-    <div className="bg-white/5 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border border-border rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full flex flex-col">
+    <div className="bg-white/5 dark:bg-[#080d1e]/60 backdrop-blur-sm border border-border rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full flex flex-col">
       
       {/* 🧠 Ambient VIP Glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 transform-gpu rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 relative z-10 pt-2">
@@ -46,10 +46,10 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
       <div className="flex flex-col items-center text-center mb-8 relative z-10">
         <div className="relative mb-5 group cursor-pointer">
           {/* Holographic ring */}
-          <div className="absolute inset-0 bg-primary rounded-full blur-[20px] opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-primary rounded-full transform-gpu opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
           
           {/* Main Avatar */}
-          <div className="w-24 h-24 rounded-full border-2 border-primary bg-white dark:bg-[#111] shadow-2xl flex items-center justify-center relative z-10 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+          <div className="w-24 h-24 rounded-full border-2 border-primary bg-white dark:bg-[#0d1829] shadow-2xl flex items-center justify-center relative z-10 overflow-hidden transition-transform duration-500 group-hover:scale-105">
             {banker.photo ? (
               <img src={banker.photo} alt={banker.name} className="w-full h-full object-cover" />
             ) : (
@@ -58,7 +58,7 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
           </div>
           
           {/* Live 'Online' pulsing dot */}
-          <div className="absolute bottom-1 right-1 w-6 h-6 bg-blue-500 border-[3px] border-white dark:border-[#0a0a0a] rounded-full z-20 shadow-sm flex items-center justify-center">
+          <div className="absolute bottom-1 right-1 w-6 h-6 bg-blue-500 border-[3px] border-white dark:border-[#080d1e] rounded-full z-20 shadow-sm flex items-center justify-center">
              <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
           </div>
         </div>

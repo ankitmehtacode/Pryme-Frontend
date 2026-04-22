@@ -7,7 +7,7 @@ import { Bell, CreditCard, MessageSquare, ShieldCheck, Clock } from "lucide-reac
 
 const Notifications = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>Notifications | PRYME Consulting</title>
       </Helmet>

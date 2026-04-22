@@ -8,7 +8,7 @@ import { Info, Target, Users, ShieldCheck } from "lucide-react";
 
 const About = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>About Us | PRYME Consulting</title>
         <meta name="description" content="Learn about PRYME - India's most advanced loan comparison platform." />

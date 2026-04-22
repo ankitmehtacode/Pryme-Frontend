@@ -56,7 +56,7 @@ const SmartInput = () => {
         />
         
         {/* Inner Content - Glassmorphism */}
-        <div className="relative flex items-center bg-white/90 backdrop-blur-xl rounded-full h-16 transition-colors">
+        <div className="relative flex items-center bg-white/90 backdrop-blur-sm rounded-full h-16 transition-colors">
           
           {/* Search Icon */}
           <div className="pl-6 pr-3 text-slate-400">
@@ -70,7 +70,7 @@ const SmartInput = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onChange={(e) => setValue(e.target.value)}
-            className="w-full bg-transparent py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none text-lg font-medium tracking-tight"
+            className="w-full bg-transparent py-4 text-[#0a1530] placeholder:text-slate-400 focus:outline-none text-lg font-medium tracking-tight"
             placeholder="How much funding do you need?" 
           />
 

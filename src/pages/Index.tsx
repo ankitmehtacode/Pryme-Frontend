@@ -110,7 +110,7 @@ const Index = () => {
 
       {/* Safe Smooth Scrolling wrapper */}
       <SmoothScroll>
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary overflow-hidden">
           
           <Header />
           
@@ -123,7 +123,7 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#0a0a0a]">
+            <div id="products" className="relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#080d1e]">
               <ProductSelectorGrid />
               
               {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
@@ -135,11 +135,11 @@ const Index = () => {
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
-            <section className="py-16 md:py-24 lg:py-32 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="section-contained py-16 md:py-24 lg:py-32 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
-              <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 blur-[50px] rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, 0, 0)", willChange: "transform" }} />
+              <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 transform-gpu rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, 0, 0)", willChange: "transform" }} />
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
@@ -203,7 +203,7 @@ const Index = () => {
               <CustomerReviews />
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
-              <section className="py-16 md:py-20 lg:py-24 container mx-auto px-4">
+              <section className="section-contained py-16 md:py-20 lg:py-24 container mx-auto px-4">
                 <div className="flex flex-col items-center justify-center text-center mb-12">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
                     <BookOpen className="w-4 h-4" />
@@ -235,7 +235,7 @@ const Index = () => {
               </section>
 
               {/* Generic FAQ Accordion */}
-              <section className="py-16 container mx-auto px-4 max-w-3xl">
+              <section className="section-contained py-16 container mx-auto px-4 max-w-3xl">
                 <div className="text-center mb-10">
                   <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Frequently Asked Questions</h2>
                 </div>

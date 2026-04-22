@@ -26,7 +26,7 @@ const products = [
     tag: "CASHBACK",
     href: "/apply?type=personal",
     accent: "148, 62%, 42%",
-    bg: "#111",
+    bg: "#0d1829",
     imgClass: "",
     overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
     borderColor: "rgba(255,255,255,0.1)",
@@ -38,7 +38,7 @@ const products = [
     tag: "LOWEST RATES",
     href: "/apply?type=business",
     accent: "217, 91%, 60%",
-    bg: "#111",
+    bg: "#0d1829",
     imgClass: "",
     overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
     borderColor: "rgba(255,255,255,0.1)",
@@ -50,7 +50,7 @@ const products = [
     tag: "PRE-APPROVED",
     href: "/apply?type=home",
     accent: "48, 100%, 50%",
-    bg: "#111",
+    bg: "#0d1829",
     imgClass: "",
     overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
     borderColor: "rgba(255,255,255,0.1)",
@@ -75,7 +75,7 @@ const products = [
     tag: "INSTANT APPROVAL",
     href: "/apply?type=auto",
     accent: "12, 90%, 55%",
-    bg: "#111",
+    bg: "#0d1829",
     imgClass: "",
     overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
     borderColor: "rgba(255,255,255,0.1)",
@@ -160,7 +160,7 @@ const ProductSelectorGrid = memo(() => {
                   >
                     {/* Per-card overlay gradient */}
                     <div
-                      className="absolute inset-0 z-10 pointer-events-none mix-blend-overlay"
+                      className="absolute inset-0 z-10 pointer-events-none"
                       style={{ background: product.overlay }}
                     />
                     <img

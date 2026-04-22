@@ -9,7 +9,7 @@ import { Gift, Sparkles, Coins, Zap } from "lucide-react";
 
 const RewardsCalculatorPage = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>Rewards Calculator | PRYME Consulting</title>
         <meta name="description" content="Calculate your rewards and perks for your loan application." />
@@ -34,7 +34,7 @@ const RewardsCalculatorPage = () => {
 
             <div className="max-w-5xl mx-auto">
               <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 transform-gpu rounded-full pointer-events-none" />
                 <OffersRewards />
               </div>
               

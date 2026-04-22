@@ -118,13 +118,13 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
   ];
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden h-full flex flex-col transition-all dark:hover:border-[#103783]/30">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden h-full flex flex-col transition-all dark:hover:border-[#103783]/30">
       
       {/* Ambient Glow */}
-      <div className={`absolute top-[-5%] right-[-5%] w-32 h-32 blur-[50px] rounded-full pointer-events-none ${details.bgColor.replace('bg-', 'bg-')}/15`} />
+      <div className={`absolute top-[-5%] right-[-5%] w-32 h-32 transform-gpu rounded-full pointer-events-none ${details.bgColor.replace('bg-', 'bg-')}/15`} />
 
       <div className="flex items-center gap-3.5 mb-6 relative z-10 shrink-0">
-        <div className="w-11 h-11 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/5 flex items-center justify-center shadow-sm shrink-0">
+        <div className="w-11 h-11 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/5 flex items-center justify-center shadow-sm shrink-0">
           <Activity className="w-5 h-5 text-primary dark:text-[#103783]" />
         </div>
         <div>
@@ -166,10 +166,10 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
       </div>
 
       {/* Interactive CIBIL Simulator (Condensed) */}
-      <div className="mb-6 bg-secondary/20 dark:bg-[#111] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 relative z-10 shadow-sm transition-all hover:border-[#103783]/30 shrink-0">
+      <div className="mb-6 bg-secondary/20 dark:bg-[#0d1829] p-4 md:px-5 rounded-2xl border border-border dark:border-white/5 relative z-10 shadow-sm transition-all hover:border-[#103783]/30 shrink-0">
         <div className="flex justify-between items-center mb-4">
           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Simulate CIBIL</span>
-          <span className={cn("text-base font-bold bg-background dark:bg-[#0a0a0a] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none", localCibil >= 750 ? "text-[#103783]" : localCibil >= 650 ? "text-amber-500" : "text-rose-500")}>
+          <span className={cn("text-base font-bold bg-background dark:bg-[#080d1e] px-3.5 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none", localCibil >= 750 ? "text-[#103783]" : localCibil >= 650 ? "text-amber-500" : "text-rose-500")}>
             {localCibil}
           </span>
         </div>
@@ -186,7 +186,7 @@ const EligibilityScore = ({ score: initialScore, cibilScore, monthlyIncome, loan
           Contributing Factors
         </p>
         {factors.map((factor) => (
-          <div key={factor.id} className="flex items-center justify-between p-3 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm">
+          <div key={factor.id} className="flex items-center justify-between p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
             <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">{factor.label}</span>
             <div className="flex items-center gap-2.5">
               

@@ -108,7 +108,7 @@ const CibilTips = () => {
   const isBulbActive = expandedIndex !== null;
 
   return (
-    <div className="bg-card dark:bg-[#0a0a0a] text-card-foreground border border-border dark:border-white/10 rounded-[2rem] p-5 md:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all">
+    <div className="bg-card dark:bg-[#080d1e] text-card-foreground border border-border dark:border-white/10 rounded-[2rem] p-5 md:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all">
       {/* Ambient glow — intensifies when a tip is expanded */}
       <motion.div
         animate={{
@@ -116,7 +116,7 @@ const CibilTips = () => {
           scale: isBulbActive ? 1.3 : 1,
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[-10%] left-[-10%] w-48 h-48 bg-amber-400 blur-[60px] rounded-full pointer-events-none"
+        className="absolute top-[-10%] left-[-10%] w-48 h-48 bg-amber-400 transform-gpu rounded-full pointer-events-none"
       />
 
       {/* Header with Glowing Lightbulb */}
@@ -129,7 +129,7 @@ const CibilTips = () => {
             backgroundColor: isBulbActive ? "rgba(251,191,36,0.15)" : "transparent",
           }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="w-11 h-11 rounded-full bg-secondary dark:bg-[#111] border border-border dark:border-amber-500/20 shadow-sm flex items-center justify-center shrink-0 transition-colors"
+          className="w-11 h-11 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-amber-500/20 shadow-sm flex items-center justify-center shrink-0 transition-colors"
         >
           <motion.div
             animate={{
@@ -171,7 +171,7 @@ const CibilTips = () => {
               "text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all duration-200 outline-none focus:ring-2 focus:ring-primary/30",
               filter === f.key
                 ? "bg-primary dark:bg-[#103783] text-primary-foreground dark:text-white border-primary dark:border-[#103783] shadow-sm"
-                : "bg-secondary/50 dark:bg-[#111] text-muted-foreground border-border dark:border-white/5 hover:border-primary/30 dark:hover:border-white/10"
+                : "bg-secondary/50 dark:bg-[#0d1829] text-muted-foreground border-border dark:border-white/5 hover:border-primary/30 dark:hover:border-white/10"
             )}
           >
             {f.label}
@@ -202,7 +202,7 @@ const CibilTips = () => {
                     "relative cursor-pointer rounded-2xl transition-all duration-300 border overflow-hidden group",
                     isExpanded
                       ? "bg-secondary dark:bg-black/60 border-amber-500/30 dark:border-amber-500/30 shadow-lg dark:shadow-[0_0_15px_rgba(245,158,11,0.08)]"
-                      : "bg-secondary/30 dark:bg-[#111] border-border dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10"
+                      : "bg-secondary/30 dark:bg-[#0d1829] border-border dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10"
                   )}
                   role="button"
                   aria-expanded={isExpanded}
@@ -223,7 +223,7 @@ const CibilTips = () => {
                         "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all shadow-sm",
                         isExpanded
                           ? "bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30"
-                          : "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/5 text-muted-foreground"
+                          : "bg-card dark:bg-[#080d1e] border border-border dark:border-white/5 text-muted-foreground"
                       )}
                     >
                       <Icon className="w-4 h-4" />

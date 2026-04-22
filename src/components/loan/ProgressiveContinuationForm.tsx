@@ -106,10 +106,10 @@ export default function ProgressiveContinuationForm({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={spring}
-      className="w-full bg-card dark:bg-[#111] border-2 border-primary/20 dark:border-[#103783]/30 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden"
+      className="w-full bg-card dark:bg-[#0d1829] border-2 border-primary/20 dark:border-[#103783]/30 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden"
     >
       {/* Background ambient glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 transform-gpu rounded-full pointer-events-none" />
       
       {/* Header / Sunk Cost Anchor */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border dark:border-white/10 pb-6 mb-8 relative z-10">

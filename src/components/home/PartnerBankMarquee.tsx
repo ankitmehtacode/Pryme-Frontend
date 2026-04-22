@@ -46,7 +46,7 @@ const PartnerBankMarquee = memo(() => {
 
         {/* Ambient glow behind the track */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[60%] h-[80px] bg-primary/[0.03] dark:bg-primary/[0.05] blur-[30px] rounded-full" />
+          <div className="w-[60%] h-[80px] bg-primary/[0.03] dark:bg-primary/[0.05] transform-gpu rounded-full" />
         </div>
 
         {/* Marquee Track */}
@@ -69,7 +69,7 @@ const PartnerBankMarquee = memo(() => {
                 />
 
                 {bank.logo.includes("google") && (
-                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-slate-900 tracking-tight whitespace-nowrap transition-colors duration-300">
+                  <span className="text-[17px] sm:text-[20px] font-extrabold text-slate-700/80 group-hover/item:text-[#0a1530] tracking-tight whitespace-nowrap transition-colors duration-300">
                     {bank.name}
                   </span>
                 )}

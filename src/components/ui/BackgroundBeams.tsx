@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * 2. ALL ANIMATIONS USE ONLY transform + opacity:
  *    - Beams: translateY + translateX only (compositor-only, zero layout/paint).
  *    - Orb: opacity only (compositor-only). Previous version animated scale on
- *      a blur-[60px] div — scale on a blurred element forces GPU re-rasterization
+ *      a transform-gpu div — scale on a blurred element forces GPU re-rasterization
  *      of the blur kernel every single frame. That's the single most expensive
  *      CSS animation possible. Now eliminated.
  *
@@ -73,26 +73,26 @@ export const BackgroundBeams = memo(({ className }: { className?: string }) => {
       {/* CSS-animated beams — Layer budget: 3 of 4
           PERF: will-change:transform pre-promotes to compositor layer.
           translateY is compositor-only — zero main-thread cost. */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-50 mix-blend-screen">
+      <div className="absolute top-0 left-0 w-full h-full opacity-50">
         <div
-          className="absolute top-0 left-1/4 w-[2px] h-[400px] bg-gradient-to-b from-transparent via-primary to-transparent blur-[1px] transform-gpu"
+          className="absolute top-0 left-1/4 w-[2px] h-[400px] bg-gradient-to-b from-transparent via-primary to-transparent transform-gpu transform-gpu"
           style={{ animation: "beam1 8s linear infinite", willChange: "transform" }}
         />
         <div
-          className="absolute top-0 right-1/4 w-[3px] h-[500px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[2px] transform-gpu"
+          className="absolute top-0 right-1/4 w-[3px] h-[500px] bg-gradient-to-b from-transparent via-blue-400 to-transparent transform-gpu transform-gpu"
           style={{ animation: "beam2 12s linear infinite 3s", willChange: "transform" }}
         />
         <div
-          className="absolute top-0 left-1/2 w-[2px] h-[600px] bg-gradient-to-b from-transparent via-blue-400 to-transparent blur-[1px] transform-gpu"
+          className="absolute top-0 left-1/2 w-[2px] h-[600px] bg-gradient-to-b from-transparent via-blue-400 to-transparent transform-gpu transform-gpu"
           style={{ animation: "beam3 10s linear infinite 1s", willChange: "transform" }}
         />
       </div>
 
       {/* Ambient orb — Layer 4 of 4 (budget cap).
-          PERF: opacity-only animation. blur-[40px] is applied once and cached
+          PERF: opacity-only animation. transform-gpu is applied once and cached
           by the GPU as a texture. Opacity changes on a cached texture = free. */}
       <div
-        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 blur-[40px] rounded-full transform-gpu"
+        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 transform-gpu rounded-full transform-gpu"
         style={{
           animation: "orbPulse 8s ease-in-out infinite",
           willChange: "opacity",

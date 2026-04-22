@@ -69,15 +69,15 @@ const BankComparisonTable = ({
             variants={itemVariants}
             key={offer.id}
             className={cn(
-              "relative overflow-hidden rounded-[2rem] border backdrop-blur-xl transition-all duration-300 hover:shadow-2xl",
+              "relative overflow-hidden rounded-[2rem] border backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
               offer.recommended 
-                ? "bg-white/90 dark:bg-[#0a0a0a]/90 border-primary shadow-[0_0_30px_rgba(var(--primary),0.15)]" 
+                ? "bg-white/90 dark:bg-[#080d1e]/90 border-primary shadow-[0_0_30px_rgba(var(--primary),0.15)]" 
                 : "bg-white/60 dark:bg-white/5 border-border hover:border-primary/40"
             )}
           >
             {/* 🧠 Premium Ambient Glow for Recommended Card */}
             {offer.recommended && (
-              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[50px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 transform-gpu rounded-full pointer-events-none" />
             )}
 
             <div className="p-5 md:p-8 flex flex-col xl:flex-row items-center gap-6 md:gap-8">

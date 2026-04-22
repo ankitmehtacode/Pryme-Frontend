@@ -104,7 +104,7 @@ const SkeletonCard = ({ isHero, delay }: { isHero?: boolean; delay: number }) =>
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -8 }}
     transition={{ delay }}
-    className={`rounded-[1.75rem] border border-border/30 dark:border-white/[0.04] bg-card dark:bg-[#111] overflow-hidden ${isHero ? "p-8 md:p-10" : "p-6"}`}
+    className={`rounded-[1.75rem] border border-border/30 dark:border-white/[0.04] bg-card dark:bg-[#0d1829] overflow-hidden ${isHero ? "p-8 md:p-10" : "p-6"}`}
   >
     <div className="flex gap-4 items-center mb-6">
       <div className={`${isHero ? "w-14 h-14" : "w-11 h-11"} rounded-2xl bg-secondary/60 dark:bg-white/[0.04] animate-pulse`} />
@@ -323,7 +323,7 @@ export default function Offers() {
 
   if (!leadData) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
         <Helmet><title>Exclusive Offers | PRYME Consulting</title></Helmet>
         <Header />
         <SmoothScroll>
@@ -342,7 +342,7 @@ export default function Offers() {
                   </p>
                 </div>
               </ScrollReveal>
-              <div className="py-12 bg-white/30 dark:bg-white/[0.02] backdrop-blur-xl border-y border-white/30 dark:border-white/[0.06] mb-20"><OffersMarquee /></div>
+              <div className="py-12 bg-white/30 dark:bg-white/[0.02] backdrop-blur-sm border-y border-white/30 dark:border-white/[0.06] mb-20"><OffersMarquee /></div>
               <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                   {[
@@ -352,8 +352,8 @@ export default function Offers() {
                     { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "2x points on all digital spends for 90 days.", color: "from-blue-700/10 to-blue-800/10" },
                   ].map((offer, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                      <div className={`p-8 rounded-[2.5rem] bg-white/50 dark:bg-white/[0.03] backdrop-blur-xl ${offer.color} border border-white/40 dark:border-white/[0.08] flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02] hover:shadow-lg`}>
-                        <div className="w-24 h-24 rounded-3xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-xl flex items-center justify-center shrink-0 shadow-lg border border-white/40 dark:border-white/[0.1]">
+                      <div className={`p-8 rounded-[2.5rem] bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm ${offer.color} border border-white/40 dark:border-white/[0.08] flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02] hover:shadow-lg`}>
+                        <div className="w-24 h-24 rounded-3xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-sm flex items-center justify-center shrink-0 shadow-lg border border-white/40 dark:border-white/[0.1]">
                           <offer.icon className="w-10 h-10 text-primary" />
                         </div>
                         <div className="text-center md:text-left flex-1">
@@ -383,18 +383,17 @@ export default function Offers() {
   const otherOffers = dynamicOffers.slice(1);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] text-foreground flex flex-col font-sans selection:bg-primary/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080d1e] text-foreground flex flex-col font-sans selection:bg-primary/30">
       <Helmet><title>Your Best Loan Option | PRYME</title></Helmet>
       <Header />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">
-        {/* Ambient glow — Dynamic bank brand color */}
+        {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero CPU rasterization */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] blur-[160px] rounded-full pointer-events-none opacity-[0.07]"
-          style={{ background: `radial-gradient(circle, ${heroOffer.brandHex}, transparent 70%)` }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full pointer-events-none opacity-[0.07]"
+          style={{ background: `radial-gradient(circle, ${heroOffer.brandHex} 0%, transparent 70%)` }}
         />
-        {/* Secondary ambient */}
-        <div className="absolute top-[200px] right-0 w-[400px] h-[400px] bg-gradient-to-b from-[#103783]/[0.04] to-transparent blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[200px] right-0 w-[400px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(16,55,131,0.04) 0%, transparent 70%)' }} />
 
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
 
@@ -405,7 +404,7 @@ export default function Offers() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-8 bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl border border-white/40 dark:border-white/[0.08] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
+            className="mb-8 bg-white/60 dark:bg-white/[0.04] backdrop-blur-sm border border-white/40 dark:border-white/[0.08] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
           >
             <div className="flex items-center gap-6 md:gap-8">
               {[
@@ -480,7 +479,7 @@ export default function Offers() {
                   }}
                 />
                 {/* Glass overlay for depth */}
-                <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
+                <div className="absolute inset-0 bg-black/10 backdrop-transform-gpu" />
 
                 {/* Shimmer sweep */}
                 <ShimmerEffect />
@@ -493,7 +492,7 @@ export default function Offers() {
                   {/* ── Top: Identity + Recommended Label ──────────── */}
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-xl flex items-center justify-center shadow-xl ring-2 ring-white/30 p-2 overflow-hidden">
+                      <div className="w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl ring-2 ring-white/30 p-2 overflow-hidden">
                         {heroOffer.logoUrl ? (
                           <img src={heroOffer.logoUrl} alt={heroOffer.bankName} className="w-full h-full object-contain" />
                         ) : (
@@ -515,7 +514,7 @@ export default function Offers() {
                     </div>
 
                     {/* Recommended badge — frosted glass */}
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[11px] font-bold uppercase tracking-wider shrink-0">
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[11px] font-bold uppercase tracking-wider shrink-0">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> Recommended for you
                     </div>
                   </div>
@@ -526,7 +525,7 @@ export default function Offers() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15"
+                      className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
                       <span className="text-[12px] font-bold text-white">
@@ -552,7 +551,7 @@ export default function Offers() {
                         { label: "Tenure", value: `${heroOffer.maxTenure} yrs` },
                         { label: "Processing Fee", value: `${heroOffer.processingFee}%` },
                       ].map((m, i) => (
-                        <div key={i} className="px-3.5 py-2 rounded-xl bg-white/[0.08] backdrop-blur-xl border border-white/[0.1]">
+                        <div key={i} className="px-3.5 py-2 rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.1]">
                           <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 leading-none mb-1">{m.label}</p>
                           <p className="text-sm font-bold text-white/90 tabular-nums leading-none">{m.value}</p>
                         </div>
@@ -584,7 +583,7 @@ export default function Offers() {
                       <Button
                         onClick={() => handleUnlock(heroOffer)}
                         disabled={isLocking !== null}
-                        className="rounded-xl h-14 px-10 text-base font-bold bg-white/95 backdrop-blur-xl text-foreground hover:bg-white shadow-2xl shadow-black/10 hover:shadow-black/15 transition-all hover:scale-[1.02] active:scale-[0.99] border border-white/60 w-full sm:w-auto"
+                        className="rounded-xl h-14 px-10 text-base font-bold bg-white/95 backdrop-blur-sm text-foreground hover:bg-white shadow-2xl shadow-black/10 hover:shadow-black/15 transition-all hover:scale-[1.02] active:scale-[0.99] border border-white/60 w-full sm:w-auto"
                         style={{ color: heroOffer.brandHex }}
                       >
                         {isLocking === heroOffer.id ? (
@@ -676,7 +675,7 @@ export default function Offers() {
       </main>
 
       {/* ── Mobile Sticky CTA (thumb zone) ──────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-card/95 dark:bg-[#111]/95 backdrop-blur-xl border-t border-border dark:border-white/[0.06] px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-card/95 dark:bg-[#0d1829]/95 backdrop-blur-sm border-t border-border dark:border-white/[0.06] px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-foreground truncate">{heroOffer.bankName}</p>

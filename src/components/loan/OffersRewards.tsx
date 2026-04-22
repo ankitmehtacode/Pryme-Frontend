@@ -76,15 +76,15 @@ const OffersRewards = ({ offers = defaultOffers }: { offers?: Offer[] }) => {
   };
 
   return (
-    <div className="bg-white/5 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border border-border rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full">
+    <div className="bg-white/5 dark:bg-[#080d1e]/60 backdrop-blur-sm border border-border rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full">
       
       {/* Ambient Inner Glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 transform-gpu rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 relative z-10">
         <div className="w-12 h-12 rounded-2xl bg-secondary/50 border border-border shadow-inner flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-amber-500/20 animate-pulse mix-blend-overlay" />
+          <div className="absolute inset-0 bg-amber-500/20 animate-pulse" />
           <Gift className="w-6 h-6 text-amber-500 relative z-10" />
         </div>
         <div>

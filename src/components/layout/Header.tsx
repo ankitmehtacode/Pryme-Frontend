@@ -225,7 +225,7 @@ const Header = memo(() => {
                         {productLinks.map((item) => (
                           <Link key={item.href} to={item.href} className="flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group">
                             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><item.icon className="w-5 h-5 text-[#103783]" /></div>
-                            <div><p className="text-sm font-semibold text-slate-900 mb-1">{item.label}</p><p className="text-xs text-slate-500 line-clamp-1">{item.description}</p></div>
+                            <div><p className="text-sm font-semibold text-[#0a1530] mb-1">{item.label}</p><p className="text-xs text-slate-500 line-clamp-1">{item.description}</p></div>
                           </Link>
                         ))}
                       </div>
@@ -239,7 +239,7 @@ const Header = memo(() => {
                       {toolLinks.map((item) => (
                         <Link key={item.href} to={item.href} className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group">
                           <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><item.icon className="w-4 h-4 text-[#103783]" /></div>
-                          <div><p className="text-sm font-semibold text-slate-900">{item.label}</p><p className="text-xs text-slate-500">{item.description}</p></div>
+                          <div><p className="text-sm font-semibold text-[#0a1530]">{item.label}</p><p className="text-xs text-slate-500">{item.description}</p></div>
                         </Link>
                       ))}
                     </div>

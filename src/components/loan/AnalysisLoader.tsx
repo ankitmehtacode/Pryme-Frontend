@@ -219,12 +219,12 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50/90 dark:bg-[#0a0a0a]/95 backdrop-blur-3xl px-6 overflow-hidden"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50/95 dark:bg-[#080d1e]/98 backdrop-blur-md px-6 overflow-hidden"
         >
-          {/* Ambient background glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/[0.08] dark:bg-blue-500/[0.06] blur-[100px] md:blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-indigo-400/[0.06] dark:bg-blue-800/[0.04] blur-[80px] md:blur-[100px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] bg-purple-400/[0.06] dark:bg-blue-700/[0.04] blur-[80px] md:blur-[100px] rounded-full pointer-events-none" />
+          {/* 🧠 PERF FIX: radial-gradient replaces blur-[100-150px] blobs */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.08) 0%, transparent 70%)' }} />
+          <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.06) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)' }} />
 
           <div className="relative z-10 flex flex-col items-center">
             {/* ── Documents + Magnifying Glass Area ─────────────────────── */}

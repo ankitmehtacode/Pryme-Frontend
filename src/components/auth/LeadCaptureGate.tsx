@@ -139,7 +139,7 @@ export default function LeadCaptureGate({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-sm mx-4 bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+          className="relative w-full max-w-sm mx-4 bg-[#080d1e] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
         >
           {/* Top accent */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-800" />
@@ -171,7 +171,7 @@ export default function LeadCaptureGate({
             <Button
               onClick={handleGoogleSignIn}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-3 bg-white text-slate-900 hover:bg-slate-100 border-0 rounded-xl h-12 text-sm font-semibold shadow-lg cursor-pointer mb-4"
+              className="w-full flex items-center justify-center gap-3 bg-white text-[#0a1530] hover:bg-slate-100 border-0 rounded-xl h-12 text-sm font-semibold shadow-lg cursor-pointer mb-4"
               size="lg"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -189,7 +189,7 @@ export default function LeadCaptureGate({
                 <div className="w-full border-t border-white/10"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-[#0a0a0a] px-4 text-slate-500">or</span>
+                <span className="bg-[#080d1e] px-4 text-slate-500">or</span>
               </div>
             </div>
 

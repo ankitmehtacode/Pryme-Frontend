@@ -173,6 +173,12 @@ const AdminDashboard = () => {
     onError: (error: any) => { toast.error(error.message || "Failed to update bank."); }
   });
 
+  const toggleProductMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => PrymeAPI.updateAdminProduct(id, data),
+    onSuccess: () => { toast.success("Product visibility updated."); refetchProducts(); },
+    onError: (error: any) => { toast.error(error.message || "Failed to update product."); }
+  });
+
   const { data: allUsers = [], refetch: refetchUsers } = useQuery({
     queryKey: ["admin_users"],
     queryFn: async () => {
@@ -403,7 +409,7 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050508] relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-blue-500/10 blur-[100px] animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-blue-500/10 transform-gpu animate-pulse" />
         <div className="flex flex-col items-center gap-5 relative z-10">
           <div className="relative"><Loader2 className="w-10 h-10 text-blue-500 animate-spin" /><div className="absolute inset-0 w-10 h-10 rounded-full bg-blue-500/20 animate-ping" /></div>
           <p className="text-slate-400 font-medium text-sm tracking-widest uppercase">Synchronizing CRM Matrix</p>
@@ -496,7 +502,7 @@ const AdminDashboard = () => {
                   <p className="text-sm text-slate-500 mt-1.5">Intelligent workflow and pipeline management.</p>
                 </div>
                 <div className="flex gap-2">
-                  {activeTab === "applications" && <Button onClick={handleExportCSV} className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 shadow-sm transition-transform active:scale-95">Export CSV</Button>}
+                  {activeTab === "applications" && <Button onClick={handleExportCSV} className="bg-[#0a1530] dark:bg-white text-white dark:text-[#0a1530] hover:bg-slate-800 dark:hover:bg-slate-200 shadow-sm transition-transform active:scale-95">Export CSV</Button>}
                 </div>
               </div>
 
@@ -555,7 +561,7 @@ const AdminDashboard = () => {
                   {crmView === "list" && (
                     <div className="flex-1 overflow-auto relative">
                       {statusMutation.isPending || assignMutation.isPending ? (
-                        <div className="absolute inset-0 z-50 bg-black/20 backdrop-blur-[1px] flex items-center justify-center">
+                        <div className="absolute inset-0 z-50 bg-black/20 backdrop-transform-gpu flex items-center justify-center">
                           <Loader2 className="w-6 h-6 text-primary animate-spin" />
                         </div>
                       ) : null}
@@ -764,11 +770,9 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4 font-semibold text-white">{p.lenderName || "Unknown"}</td>
                           <td className="px-6 py-4 text-slate-300">{p.campaignName || p.loanType}</td>
                           <td className="px-6 py-4">
-                            {p.active ? (
-                              <span className="px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-semibold border border-green-500/20">Active</span>
-                            ) : (
-                              <span className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold border border-red-500/20">Draft</span>
-                            )}
+                            <button onClick={() => toggleProductMutation.mutate({ id: p.id, data: { ...p, active: !p.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", p.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20")}>
+                              {p.active ? "Active" : "Draft"}
+                            </button>
                           </td>
                           <td className="px-6 py-4 font-mono text-amber-400">{p.roi < 1 ? (p.roi * 100).toFixed(2) : p.roi}%</td>
                           <td className="px-6 py-4 font-mono text-blue-400">{p.processingFee < 1 ? (p.processingFee * 100).toFixed(2) : p.processingFee || 0}%</td>
@@ -989,7 +993,9 @@ const AdminDashboard = () => {
                                   </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                  <StatusBadge status={rule.active ? "ACTIVE" : "INACTIVE"} />
+                                  <button onClick={() => updateEligibilityRuleMutation.mutate({ id: rule.id, data: { ...rule, active: !rule.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", rule.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20")}>
+                                    {rule.active ? "ACTIVE" : "INACTIVE"}
+                                  </button>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                   <Button 

@@ -108,9 +108,9 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-      <div className="bg-[#13131a] border border-slate-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-[#13131a] border border-[#103783]/20 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <div className="px-6 py-4 border-b border-[#103783]/20 flex justify-between items-center bg-slate-900/50">
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">
               {initialData ? "Edit Policy Entity (Product)" : "Add New Policy Entity"}
@@ -128,11 +128,11 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
             
             {/* Core Identification */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-blue-500 border-b border-slate-800 pb-2">Core Identity & Partner</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-blue-500 border-b border-[#103783]/20 pb-2">Core Identity & Partner</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Partner Bank / Lender *</label>
-                  <select required name="lenderId" value={formData.lenderId} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50">
+                  <select required name="lenderId" value={formData.lenderId} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50">
                     <option value="" disabled>-- Select Active Partner --</option>
                     {banks.map((b) => (
                       <option key={b.id} value={b.id}>{b.bankName}</option>
@@ -142,22 +142,22 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
                 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Policy Code (Unique) *</label>
-                  <input required type="text" name="productCode" value={formData.productCode} onChange={handleChange} maxLength={20} placeholder="e.g. HDFC_BL_001" pattern="^[A-Z0-9_]+$" title="Only uppercase letters, numbers, and underscores allowed" className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
+                  <input required type="text" name="productCode" value={formData.productCode} onChange={handleChange} maxLength={20} placeholder="e.g. HDFC_BL_001" pattern="^[A-Z0-9_]+$" title="Only uppercase letters, numbers, and underscores allowed" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Friendly Product Name *</label>
-                  <input required type="text" name="productName" value={formData.productName} onChange={handleChange} maxLength={200} placeholder="e.g. Business Loan Top Up" className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
+                  <input required type="text" name="productName" value={formData.productName} onChange={handleChange} maxLength={200} placeholder="e.g. Business Loan Top Up" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Campaign / Display Name</label>
-                  <input type="text" name="campaignName" value={formData.campaignName} onChange={handleChange} maxLength={100} placeholder="e.g. HDFC Diwali Mega Offer" className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
+                  <input type="text" name="campaignName" value={formData.campaignName} onChange={handleChange} maxLength={100} placeholder="e.g. HDFC Diwali Mega Offer" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Standard Loan Type *</label>
-                  <select required name="loanType" value={formData.loanType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50">
+                  <select required name="loanType" value={formData.loanType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50">
                     <option value="HOME_LOAN">Home Loan (HL)</option>
                     <option value="LOAN_AGAINST_PROPERTY">Loan Against Property (LAP)</option>
                     <option value="BUSINESS_LOAN">Business Loan (BL)</option>
@@ -167,7 +167,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
                 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400">Entity Status</label>
-                  <select name="active" value={formData.active ? "true" : "false"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" style={{ color: formData.active ? "#4ade80" : "#f87171" }}>
+                  <select name="active" value={formData.active ? "true" : "false"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50" style={{ color: formData.active ? "#4ade80" : "#f87171" }}>
                     <option value="true" className="text-green-400">● Active</option>
                     <option value="false" className="text-red-400">● Inactive / Draft</option>
                   </select>
@@ -177,58 +177,58 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
 
             {/* Matrix Rule Thresholds */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-amber-500 border-b border-slate-800 pb-2">Matrix Policy Thresholds</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-amber-500 border-b border-[#103783]/20 pb-2">Matrix Policy Thresholds</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-900/30 p-4 border border-slate-800 rounded-xl">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-900/30 p-4 border border-[#103783]/20 rounded-xl">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min CIBIL Score</label>
-                  <input required type="number" name="minCibil" value={formData.minCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="minCibil" value={formData.minCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max CIBIL Score</label>
-                  <input required type="number" name="maxCibil" value={formData.maxCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="maxCibil" value={formData.maxCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max FOIR / EMI ratio (%)</label>
-                  <input required type="number" name="maxEmiNmiRatio" value={formData.maxEmiNmiRatio} onChange={handleChange} min={10} max={100} step="0.5" className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-pink-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="maxEmiNmiRatio" value={formData.maxEmiNmiRatio} onChange={handleChange} min={10} max={100} step="0.5" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-pink-400 outline-none focus:border-blue-500" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min Loan Amount (₹)</label>
-                  <input required type="number" name="minLoanAmount" value={formData.minLoanAmount} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-green-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="minLoanAmount" value={formData.minLoanAmount} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-green-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max Loan Amount (₹)</label>
-                  <input required type="number" name="maxLoanAmount" value={formData.maxLoanAmount} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-green-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="maxLoanAmount" value={formData.maxLoanAmount} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-green-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min Tenure (Months)</label>
-                  <input required type="number" name="minTenureMonths" value={formData.minTenureMonths} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
+                  <input required type="number" name="minTenureMonths" value={formData.minTenureMonths} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max Tenure (Months)</label>
-                  <input required type="number" name="maxTenureMonths" value={formData.maxTenureMonths} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
+                  <input required type="number" name="maxTenureMonths" value={formData.maxTenureMonths} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
                 </div>
               </div>
             </div>
 
             {/* Pricing Parameters */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-emerald-500 border-b border-slate-800 pb-2">Pricing & Margins</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-emerald-500 border-b border-[#103783]/20 pb-2">Pricing & Margins</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Base ROI (%) *</label>
-                  <input required type="number" step="0.01" name="roi" value={formData.roi} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
+                  <input required type="number" step="0.01" name="roi" value={formData.roi} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Processing Fee (%)</label>
-                  <input required type="number" step="0.01" name="processingFee" value={formData.processingFee} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
+                  <input required type="number" step="0.01" name="processingFee" value={formData.processingFee} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-slate-200 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Interest Type</label>
-                  <select name="interestType" value={formData.interestType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
+                  <select name="interestType" value={formData.interestType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
                     <option value="REDUCING">Reducing</option>
                     <option value="FLAT">Flat</option>
                   </select>
@@ -248,7 +248,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-slate-800 bg-slate-900/50 flex justify-end gap-3 rounded-b-xl">
+        <div className="px-6 py-4 border-t border-[#103783]/20 bg-slate-900/50 flex justify-end gap-3 rounded-b-xl">
           <Button variant="ghost" onClick={onClose} className="text-slate-400 hover:text-white">Cancel</Button>
           <Button type="submit" form="product-form" className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-none">
             <Save className="w-4 h-4 mr-2" />

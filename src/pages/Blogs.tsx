@@ -10,7 +10,7 @@ import { blogs } from "@/data/blogs";
 
 const Blogs = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>Insights & News | PRYME Consulting</title>
         <meta name="description" content="Financial literacy, loan tips, and credit insights from PRYME." />
@@ -51,7 +51,7 @@ const Blogs = () => {
                       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 uppercase tracking-widest font-medium">
                         <Clock className="w-3 h-3" /> {blog.date}
                       </div>
-                      <h3 className="text-xl font-semibold text-slate-900 mb-6 group-hover:text-[#103783] transition-colors leading-tight line-clamp-3">
+                      <h3 className="text-xl font-semibold text-[#0a1530] mb-6 group-hover:text-[#103783] transition-colors leading-tight line-clamp-3">
                         {blog.title}
                       </h3>
                       <div className="mt-auto">

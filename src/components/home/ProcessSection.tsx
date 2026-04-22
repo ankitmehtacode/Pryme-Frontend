@@ -95,7 +95,7 @@ const ProcessSection = () => {
       
       {/* 🧠 Premium Ambient Cyber-Glow */}
       {/* Ambient glow — reduced blur from 50px for GPU savings on mobile */}
-      <div className="absolute top-1/2 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/10 blur-[40px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute top-1/2 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/10 transform-gpu rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2" />
 
       <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         <div className="flex flex-col items-center mb-16 relative z-10 w-full text-center">

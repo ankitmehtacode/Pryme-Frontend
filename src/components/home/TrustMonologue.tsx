@@ -36,7 +36,7 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           whileInView="show"
           viewport={viewportOnce}
           variants={cardVariants}
-          className="relative group bg-white/5 dark:bg-slate-900/50 rounded-2xl border border-slate-200/20 dark:border-slate-800 p-6 transition-all duration-500 cursor-help text-center z-10
+          className="relative group bg-white/5 dark:bg-slate-900/50 rounded-2xl border border-slate-200/20 dark:border-[#103783]/20 p-6 transition-all duration-500 cursor-help text-center z-10
             hover:border-[#103783]/30 hover:bg-white/10 hover:shadow-[0_20px_60px_-15px_rgba(16,55,131,0.2)]"
         >
           {/* Card glow on hover — CSS only */}
@@ -49,14 +49,14 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           </div>
           
           <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-2 text-base">{feature.title}</h3>
+            <h3 className="font-semibold text-[#0a1530] dark:text-white mb-2 text-base">{feature.title}</h3>
             <p className="text-sm text-slate-400 leading-relaxed font-medium">
               {feature.description}
             </p>
           </div>
         </motion.div>
       </TooltipTrigger>
-      <TooltipContent className="max-w-xs bg-slate-900 text-white border-slate-700">
+      <TooltipContent className="max-w-xs bg-[#0a1530] text-white border-slate-700">
         <p className="text-sm">{feature.tooltip}</p>
       </TooltipContent>
     </Tooltip>
@@ -101,7 +101,7 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-slate-900 overflow-hidden">
+    <section className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-[#0a1530] overflow-hidden">
       {/* Background Trust Image */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -116,7 +116,7 @@ export default function TrustMonologue() {
       
       {/* Ambient Glow — CSS animation only, no Framer Motion re-renders */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/10 md:bg-[#103783]/20 blur-[50px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/10 md:bg-[#103783]/20 transform-gpu rounded-full pointer-events-none"
       />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -133,7 +133,7 @@ export default function TrustMonologue() {
               <Shield className="w-4 h-4" />
               Your Privacy Protected
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-slate-900 dark:text-white tracking-tight mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-[#0a1530] dark:text-white tracking-tight mb-8">
               Why Trust Us?
             </h2>
             <motion.div

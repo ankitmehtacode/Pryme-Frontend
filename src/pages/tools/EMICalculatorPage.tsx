@@ -9,7 +9,7 @@ import { Calculator, TrendingDown, Percent, Calendar } from "lucide-react";
 
 const EMICalculatorPage = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>EMI Calculator | PRYME Consulting</title>
         <meta name="description" content="Calculate your monthly loan payments with precision." />

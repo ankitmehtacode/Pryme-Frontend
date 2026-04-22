@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole, Sparkles, ChevronRight, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import prymeLogo from "@/assets/pryme-typo-logo.svg";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";
@@ -354,20 +355,21 @@ const Apply = () => {
         data={applicationData}
       />
 
-      {/* 🧠 UI FIX: Changed hardcoded black `#0a0a0a` to semantic adaptive `bg-slate-50 dark:bg-[#0a0a0a]` */}
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-blue-500/5 dark:bg-[#0a1f4d]/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] bg-blue-500/5 dark:bg-[#0a1f4d]/10 blur-[120px] rounded-full pointer-events-none" />
+      {/* 🧠 UI FIX: Changed hardcoded black `#080d1e` to semantic adaptive `bg-slate-50 dark:bg-[#080d1e]` */}
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
+        {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero rasterization cost */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)' }} />
+        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%)' }} />
 
         {/* 🧠 200 IQ FIX: Minimal Header for Zen Mode */}
         <div className="w-full absolute top-0 left-0 right-0 p-6 flex justify-center z-50">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight">
-              PRYME
-            </span>
+            <img 
+              src={prymeLogo} 
+              alt="Pryme Logo" 
+              className="h-7 sm:h-8 w-auto group-hover:scale-105 transition-transform duration-300" 
+              style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }}
+            />
           </Link>
         </div>
 
@@ -407,7 +409,7 @@ const Apply = () => {
                   style={{ outline: "none" }}
                 >
                   <motion.div 
-                    className="relative bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-white/[0.08] shadow-2xl overflow-hidden z-10 transition-colors duration-500"
+                    className="relative bg-white dark:bg-[#0a1224] border border-slate-200 dark:border-white/[0.08] shadow-2xl overflow-hidden z-10 transition-colors duration-500"
                     animate={{
                       boxShadow: isFormFocused 
                         ? "0 25px 50px -12px rgba(16, 55, 131, 0.15), 0 0 0 1px rgba(16, 55, 131, 0.1)" 
@@ -445,7 +447,7 @@ const Apply = () => {
                   {/* ── SECTION A: Psychological Anchors (Top Fold) ────────────────── */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                     {/* Main Approval Anchor */}
-                    <div className="lg:col-span-2 bg-gradient-to-br from-primary/10 to-transparent dark:from-[#103783]/10 border border-primary/20 dark:border-[#103783]/20 p-6 md:p-8 rounded-[2rem] shadow-lg relative overflow-hidden backdrop-blur-xl flex flex-col justify-center">
+                    <div className="lg:col-span-2 bg-gradient-to-br from-primary/10 to-transparent dark:from-[#103783]/10 border border-primary/20 dark:border-[#103783]/20 p-6 md:p-8 rounded-[2rem] shadow-lg relative overflow-hidden backdrop-blur-sm flex flex-col justify-center">
                       <div className="absolute top-0 right-0 p-6 opacity-20">
                         <CheckCircle className="w-24 h-24 text-primary dark:text-[#103783]" />
                       </div>
@@ -473,7 +475,7 @@ const Apply = () => {
 
                     {/* Secondary Anchors */}
                     <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                      <div className="bg-card/60 dark:bg-slate-900/40 border border-border p-6 rounded-[2rem] shadow-sm backdrop-blur-xl flex flex-col justify-center">
+                      <div className="bg-card/60 dark:bg-slate-900/40 border border-border p-6 rounded-[2rem] shadow-sm backdrop-blur-sm flex flex-col justify-center">
                         <div className="w-10 h-10 rounded-[1rem] bg-amber-500/10 flex items-center justify-center mb-4">
                           <TrendingUp className="w-5 h-5 text-amber-500" />
                         </div>
@@ -481,7 +483,7 @@ const Apply = () => {
                         <p className="text-xl font-bold text-foreground">₹{(loanAmount * 0.9).toLocaleString('en-IN')} – ₹{(loanAmount * 1.5).toLocaleString('en-IN')}</p>
                       </div>
 
-                      <div className="bg-card/60 dark:bg-slate-900/40 border border-border p-6 rounded-[2rem] shadow-sm backdrop-blur-xl flex flex-col justify-center">
+                      <div className="bg-card/60 dark:bg-slate-900/40 border border-border p-6 rounded-[2rem] shadow-sm backdrop-blur-sm flex flex-col justify-center">
                         <div className="w-10 h-10 rounded-[1rem] bg-emerald-500/10 flex items-center justify-center mb-4">
                           <CheckCircle className="w-5 h-5 text-emerald-500" />
                         </div>
@@ -561,7 +563,7 @@ const Apply = () => {
                           onApplyDirect={handleApplyDirect}
                           onApplyWithPyrme={handleApplyWithPyrme}
                         />
-                        <div className="p-4 bg-secondary/50 dark:bg-slate-900 border-t border-border flex items-start gap-3">
+                        <div className="p-4 bg-secondary/50 dark:bg-[#0a1530] border-t border-border flex items-start gap-3">
                           <Info className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
                           <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide leading-relaxed">
                             Offers are sorted by interest rate. The "Recommended" badge indicates the mathematically best rate available based on your entered parameters. Final rates are subject to physical document verification.
@@ -573,10 +575,10 @@ const Apply = () => {
 
                   {applicationData && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl h-full">
+                      <div className="bg-card/60 backdrop-blur-sm border border-border/50 rounded-[2rem] p-6 shadow-xl h-full">
                         <RequiredDocuments productType={applicationData.productType} />
                       </div>
-                      <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-[2rem] p-6 shadow-xl h-full flex flex-col justify-center">
+                      <div className="bg-card/60 backdrop-blur-sm border border-border/50 rounded-[2rem] p-6 shadow-xl h-full flex flex-col justify-center">
                         <BankerContact />
                       </div>
                     </div>

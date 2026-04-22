@@ -101,7 +101,7 @@ const StyledSelect = ({
         )}
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="bg-card dark:bg-[#111] border-border dark:border-white/[0.06] rounded-xl">
+      <SelectContent className="bg-card dark:bg-[#0d1829] border-border dark:border-white/[0.06] rounded-xl">
         {children}
       </SelectContent>
     </Select>
@@ -466,11 +466,11 @@ const DocumentVaultStage = ({
     >
       {/* Header Card */}
       <div className={cardCn}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
               <FolderOpen className="w-5 h-5 text-primary dark:text-[#103783]" />
             </div>
             <div>
@@ -697,21 +697,8 @@ function validateStage3(store: ReturnType<typeof useApplicationStore.getState>):
   return errors;
 }
 
-function validateStage4(store: ReturnType<typeof useApplicationStore.getState>): ValidationErrors {
-  const errors: ValidationErrors = {};
-  const fp = store.financialFootprint;
-  if (!fp.panNumber || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(fp.panNumber.toUpperCase())) errors.panNumber = "Invalid PAN format (e.g. ABCDE1234F)";
-  if (!fp.primaryBankName || fp.primaryBankName.trim().length < 2) errors.primaryBankName = "Enter your primary bank name";
-  if (fp.totalExistingEMI < 0) errors.totalExistingEMI = "EMI cannot be negative";
-
-  // Conditional: property value required if property identified on HOME_LOAN/LAP
-  const lt = store.loanRequirements.loanType;
-  if ((lt === 'HOME_LOAN' || lt === 'LAP') && fp.propertyIdentified) {
-    if (!fp.estimatedPropertyValue || fp.estimatedPropertyValue < 100000) {
-      errors.estimatedPropertyValue = "Enter estimated property value (min ₹1 Lakh)";
-    }
-  }
-  return errors;
+function validateStage4(_store: ReturnType<typeof useApplicationStore.getState>): ValidationErrors {
+  return {};
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -798,6 +785,16 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   const formEndRef = useRef<HTMLDivElement>(null);
   const [isBottomVisible, setIsBottomVisible] = useState(false);
+
+  // ── Co-Applicant Local State ──────────────────────────────────────────────
+  const [coApplicant, setCoApplicant] = useState({
+    fullName: '', mobileNumber: '', email: '', dateOfBirth: '',
+    state: '', city: '', pinCode: '',
+    employmentType: '' as string,
+    companyName: '', designation: '', netMonthlySalary: '',
+    totalExperience: '', currentCompanyYears: '',
+  });
+  const updateCoApplicant = (patch: Partial<typeof coApplicant>) => setCoApplicant(prev => ({ ...prev, ...patch }));
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
@@ -949,7 +946,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   // ── Style tokens ──────────────────────────────────────────────────────────
 
-  const cardCn = "bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-primary/10 dark:hover:border-white/[0.08]";
+  const cardCn = "bg-card dark:bg-[#080d1e] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-primary/10 dark:hover:border-white/[0.08]";
 
   // ═════════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -1030,10 +1027,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
                     <IndianRupee className="w-5 h-5 text-primary dark:text-[#103783]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Loan Details</h3>
@@ -1155,10 +1152,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* STAGE 1: BASIC KYC                                              */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
                   <User className="w-5 h-5 text-primary dark:text-[#103783]" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground tracking-tight">Verify Identity</h3>
@@ -1284,10 +1281,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           <div className={cardCn}>
               {/* Employment Category Selector */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-primary dark:text-[#103783]" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground tracking-tight">Employment & Income</h3>
@@ -1986,159 +1983,125 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             </div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
-          
-          {/* ═════════════════════════════════════════════════════════════════ */}
-          {/* STAGE 4: FINANCIAL FOOTPRINT                                    */}
+          {/* CO-APPLICANT SECTION                                             */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
-              {/* ── Universal Financial Footprint Card ──────────────────────── */}
-              <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 blur-[60px] rounded-full pointer-events-none" />
+            <ToggleSwitch
+              label="Adding a Co-Applicant?"
+              description="A co-applicant can increase your loan eligibility"
+              icon={UserPlus}
+              checked={store.financialFootprint.hasCoApplicant}
+              onChange={(v) => store.updateFinancialFootprint({ hasCoApplicant: v })}
+            />
 
-                <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#111] border border-border dark:border-white/[0.06] flex items-center justify-center">
-                    <FileSearch className="w-5 h-5 text-primary dark:text-[#103783]" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">Financial Footprint</h3>
-                </div>
-
-                <div className="space-y-5 relative z-10">
-                  {/* PAN (moved here from Stage 1 for lower initial friction) */}
-                  <ValidatedInput
-                    label="PAN Card Number"
-                    placeholder="ABCDE1234F"
-                    icon={CreditCard}
-                    value={store.financialFootprint.panNumber}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateFinancialFootprint({ panNumber: e.target.value.toUpperCase() })}
-                    isValid={/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(store.financialFootprint.panNumber)}
-                    error={errors.panNumber}
-                    style={{ textTransform: "uppercase", letterSpacing: "0.15em" }}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <ValidatedInput
-                      label="Current Monthly EMI (₹)"
-                      type="number"
-                      placeholder="15000"
-                      icon={HandCoins}
-                      value={store.financialFootprint.totalExistingEMI || ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateFinancialFootprint({ totalExistingEMI: Number(e.target.value) })}
-                      isValid={store.financialFootprint.totalExistingEMI >= 0}
-                      error={errors.totalExistingEMI}
-                    />
-                    <ValidatedInput
-                      label="Primary Bank Account"
-                      placeholder="HDFC Bank"
-                      icon={Landmark}
-                      value={store.financialFootprint.primaryBankName}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateFinancialFootprint({ primaryBankName: e.target.value })}
-                      isValid={store.financialFootprint.primaryBankName.length >= 2}
-                      error={errors.primaryBankName}
-                    />
-                  </div>
-
-                  {/* Co-Applicant Toggle */}
-                  <ToggleSwitch
-                    label="Adding a Co-Applicant?"
-                    description="A co-applicant can increase your loan eligibility"
-                    icon={UserPlus}
-                    checked={store.financialFootprint.hasCoApplicant}
-                    onChange={(v) => store.updateFinancialFootprint({ hasCoApplicant: v })}
-                  />
-                </div>
-              </div>
-
-              {/* ── Conditional Overrides ───────────────────────────────────── */}
-              <AnimatePresence mode="wait">
-
-                {/* HOME_LOAN / LAP → Property Toggle */}
-                {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
-                  <motion.div
-                    key="property-override"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                    className={cardCn}
-                  >
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                        <Home className="w-4 h-4 text-amber-500" />
+            <AnimatePresence>
+              {store.financialFootprint.hasCoApplicant && (
+                <motion.div
+                  key="co-applicant-form"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 pt-6 border-t border-border dark:border-white/[0.06] space-y-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-[#103783]/10 flex items-center justify-center">
+                        <UserPlus className="w-4 h-4 text-primary dark:text-[#103783]" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-foreground">Property Details</h4>
-                        <p className="text-[11px] text-muted-foreground/60">Required for {store.loanRequirements.loanType === 'HOME_LOAN' ? 'Home Loan' : 'Loan Against Property'}</p>
+                        <h4 className="text-sm font-bold text-foreground">Co-Applicant Details</h4>
+                        <p className="text-[11px] text-muted-foreground/60">Same details as primary applicant</p>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <ToggleSwitch
-                        label="Have you identified a property?"
-                        description="If yes, we'll need the estimated value"
-                        icon={Home}
-                        checked={store.financialFootprint.propertyIdentified}
-                        onChange={(v) => store.updateFinancialFootprint({ propertyIdentified: v })}
+                    {/* Identity */}
+                    <ValidatedInput
+                      label="Full Name (as per PAN)"
+                      placeholder="Co-Applicant Name"
+                      icon={User}
+                      value={coApplicant.fullName}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ fullName: e.target.value })}
+                      isValid={coApplicant.fullName.length >= 3}
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <ValidatedInput
+                        label="Mobile Number"
+                        type="tel"
+                        placeholder="9876543210"
+                        icon={Phone}
+                        value={coApplicant.mobileNumber}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                        isValid={/^[6-9]\d{9}$/.test(coApplicant.mobileNumber)}
                       />
-
-                      <AnimatePresence>
-                        {store.financialFootprint.propertyIdentified && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden"
-                          >
-                            <ValidatedInput
-                              label="Estimated Property Value (₹)"
-                              type="number"
-                              placeholder="5000000"
-                              icon={IndianRupee}
-                              value={store.financialFootprint.estimatedPropertyValue || ""}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateFinancialFootprint({ estimatedPropertyValue: Number(e.target.value) })}
-                              isValid={store.financialFootprint.estimatedPropertyValue >= 100000}
-                              error={errors.estimatedPropertyValue}
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* BUSINESS_LOAN → Override */}
-                {store.loanRequirements.loanType === "BUSINESS_LOAN" && (
-                  <motion.div
-                    key="business-override"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                    className={cardCn}
-                  >
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                        <BriefcaseBusiness className="w-4 h-4 text-blue-500" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground">Business Loan Override</h4>
-                        <p className="text-[11px] text-muted-foreground/60">Additional verification for higher limits</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <ToggleSwitch
-                        label="Is requested limit above ₹50 Lakhs?"
-                        description="Higher limits require additional underwriting"
-                        icon={IndianRupee}
-                        checked={store.financialFootprint.isAbove50Lakhs}
-                        onChange={(v) => store.updateFinancialFootprint({ isAbove50Lakhs: v })}
+                      <ValidatedInput
+                        label="Email Address"
+                        type="email"
+                        placeholder="co-applicant@email.com"
+                        icon={Mail}
+                        value={coApplicant.email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ email: e.target.value })}
+                        isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coApplicant.email)}
                       />
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <ValidatedInput
+                        label="Date of Birth"
+                        type="date"
+                        icon={Calendar}
+                        value={coApplicant.dateOfBirth}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ dateOfBirth: e.target.value })}
+                        isValid={!!coApplicant.dateOfBirth}
+                      />
+                      <ValidatedInput
+                        label="PIN Code"
+                        placeholder="400001"
+                        icon={MapPin}
+                        value={coApplicant.pinCode}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ pinCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                        isValid={/^\d{6}$/.test(coApplicant.pinCode)}
+                      />
+                    </div>
+
+                    {/* Employment */}
+                    <PillSelector
+                      label="Employment Type"
+                      icon={Briefcase}
+                      options={[
+                        { value: 'SALARIED', label: 'Salaried', icon: Briefcase },
+                        { value: 'SELF_EMPLOYED', label: 'Business', icon: BriefcaseBusiness },
+                        { value: 'PROFESSIONAL', label: 'Professional', icon: GraduationCap },
+                      ]}
+                      value={coApplicant.employmentType || null}
+                      onChange={(v) => updateCoApplicant({ employmentType: v })}
+                    />
+
+                    {coApplicant.employmentType && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <ValidatedInput
+                          label={coApplicant.employmentType === 'SALARIED' ? 'Company Name' : coApplicant.employmentType === 'PROFESSIONAL' ? 'Practice / Firm Name' : 'Business Name'}
+                          placeholder={coApplicant.employmentType === 'SALARIED' ? 'Infosys Ltd' : coApplicant.employmentType === 'PROFESSIONAL' ? 'Dr. Mehta Clinic' : 'Mehta Enterprises'}
+                          icon={Building2}
+                          value={coApplicant.companyName}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ companyName: e.target.value })}
+                          isValid={coApplicant.companyName.length >= 2}
+                        />
+                        <ValidatedInput
+                          label="Net Monthly Income (₹)"
+                          type="number"
+                          placeholder="50000"
+                          icon={IndianRupee}
+                          value={coApplicant.netMonthlySalary}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ netMonthlySalary: e.target.value })}
+                          isValid={Number(coApplicant.netMonthlySalary) >= 10000}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
           

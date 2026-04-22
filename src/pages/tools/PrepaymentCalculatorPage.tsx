@@ -97,7 +97,7 @@ const PrepaymentCalculatorPage = () => {
       : "0";
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>Prepayment Calculator | PRYME Consulting</title>
         <meta
@@ -135,13 +135,13 @@ const PrepaymentCalculatorPage = () => {
               {/* Calculator Card */}
               <div className="lg:col-span-8">
                 <div className="bg-card text-card-foreground rounded-2xl md:rounded-[2.5rem] border border-border p-4 md:p-8 shadow-2xl">
-                  <div className="bg-card text-card-foreground border border-border dark:bg-[#0a0a0a] dark:border-emerald-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
+                  <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-emerald-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
                     {/* Ambient glow */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-emerald-500/5 dark:bg-emerald-500/10 blur-[60px] rounded-full pointer-events-none" />
+                    <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-emerald-500/5 dark:bg-emerald-500/10 transform-gpu rounded-full pointer-events-none" />
 
                     {/* Header */}
                     <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">
-                      <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-emerald-50 dark:bg-[#111] shadow-sm flex items-center justify-center border border-emerald-200 dark:border-emerald-500/20 shrink-0">
+                      <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-emerald-50 dark:bg-[#0d1829] shadow-sm flex items-center justify-center border border-emerald-200 dark:border-emerald-500/20 shrink-0">
                         <TrendingDown className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
@@ -156,7 +156,7 @@ const PrepaymentCalculatorPage = () => {
 
                     {/* Savings Hero */}
                     <div className="flex flex-col md:flex-row items-stretch gap-3 md:gap-4 p-3 md:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-xl md:rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 mb-4 md:mb-6 relative z-10">
-                      <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 bg-white dark:bg-[#0a0a0a] rounded-xl border border-emerald-200/50 dark:border-emerald-500/10">
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 bg-white dark:bg-[#080d1e] rounded-xl border border-emerald-200/50 dark:border-emerald-500/10">
                         <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
                           Interest Saved
                         </span>
@@ -168,7 +168,7 @@ const PrepaymentCalculatorPage = () => {
                         </span>
                       </div>
                       <div className="flex flex-row md:flex-col gap-3 md:gap-3">
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
                           <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                             Tenure Saved
                           </span>
@@ -179,7 +179,7 @@ const PrepaymentCalculatorPage = () => {
                             </span>
                           </span>
                         </div>
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#0a0a0a] rounded-xl border border-border dark:border-white/5">
+                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
                           <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                             Monthly EMI
                           </span>
@@ -220,12 +220,12 @@ const PrepaymentCalculatorPage = () => {
                     {/* Sliders */}
                     <div className="space-y-3 md:space-y-4 relative z-10">
                       {/* Loan Amount */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
                         <div className="flex justify-between items-center mb-3 md:mb-4">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Loan Amount
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
+                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
                             {formatCurrency(loanAmount)}
                           </span>
                         </div>
@@ -248,12 +248,12 @@ const PrepaymentCalculatorPage = () => {
                       </div>
 
                       {/* Interest Rate */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
                         <div className="flex justify-between items-center mb-3 md:mb-4">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Interest Rate
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
+                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
                             {interestRate}%{" "}
                             <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest ml-1">
                               p.a.
@@ -279,12 +279,12 @@ const PrepaymentCalculatorPage = () => {
                       </div>
 
                       {/* Tenure */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#111] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
                         <div className="flex justify-between items-center mb-3 md:mb-4">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Loan Tenure
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#0a0a0a] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1 leading-none">
+                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1 leading-none">
                             {tenureMonths} Mo{" "}
                             <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
                               ({(tenureMonths / 12).toFixed(1)} Yrs)
@@ -402,7 +402,7 @@ const PrepaymentCalculatorPage = () => {
                               ].map((item) => (
                                 <div
                                   key={item.term}
-                                  className="p-3 bg-secondary/30 dark:bg-[#111] rounded-xl border border-border dark:border-white/5 shadow-sm"
+                                  className="p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm"
                                 >
                                   <p className="text-xs font-bold text-foreground mb-1 uppercase tracking-wide">
                                     {item.term}

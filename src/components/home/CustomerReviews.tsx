@@ -44,7 +44,7 @@ const reviews = [
 const allReviews = [...reviews, ...reviews];
 
 const ReviewCard = memo(({ review }: { review: typeof reviews[0] }) => (
-  <div className="w-[320px] md:w-[400px] flex-shrink-0 bg-white/5 dark:bg-slate-900/50 border border-slate-200/20 dark:border-slate-800/50 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
+  <div className="w-[320px] md:w-[400px] flex-shrink-0 bg-white/5 dark:bg-slate-900/50 border border-slate-200/20 dark:border-[#103783]/20/50 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
     <div className="flex gap-1">
       {[...Array(review.rating)].map((_, i) => (
         <Star key={i} className="w-4 h-4 fill-[#103783] text-[#103783]" />
@@ -79,7 +79,7 @@ const CustomerReviews = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-[#050505]" />
       </div>
       {/* Background Glow — reduced blur kernel */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#103783]/5 blur-[50px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 mb-16 text-center relative z-10">
         <span className="inline-block text-[10px] md:text-xs font-semibold text-[#103783] uppercase tracking-[0.3em] mb-4">

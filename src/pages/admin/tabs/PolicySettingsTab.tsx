@@ -45,10 +45,10 @@ const PolicyFieldEditor = ({
   const valueToDisplay = localValue !== undefined ? localValue : data?.value;
   const isDirty = data?.value !== undefined && String(localValue) !== String(data?.value);
 
-  if (isLoading) return <div className="h-[72px] w-full animate-pulse bg-slate-900 rounded-lg border border-slate-800/50" />;
+  if (isLoading) return <div className="h-[72px] w-full animate-pulse bg-[#0a1530] rounded-lg border border-[#103783]/20/50" />;
 
   return (
-    <div className={`flex items-end gap-4 p-5 rounded-lg border transition-colors ${isDirty ? 'bg-blue-950/20 border-blue-900/50' : 'bg-[#0A0A0F] border-slate-800/50'}`}>
+    <div className={`flex items-end gap-4 p-5 rounded-lg border transition-colors ${isDirty ? 'bg-blue-950/20 border-blue-900/50' : 'bg-[#0A0A0F] border-[#103783]/20/50'}`}>
       <div className="flex-1">
         <DynamicPolicyInput
           metadata={metadata}
@@ -113,8 +113,8 @@ export const PolicySettingsTab = () => {
   return (
     <div className="flex flex-col md:flex-row h-full min-h-[70vh] gap-6 p-6">
       {/* LEFT COLUMN: Entity Selector */}
-      <div className="w-full md:w-1/3 flex flex-col gap-4 border-r border-slate-800 pr-6">
-        <div className="flex items-center gap-2 pb-4 border-b border-slate-800">
+      <div className="w-full md:w-1/3 flex flex-col gap-4 border-r border-[#103783]/20 pr-6">
+        <div className="flex items-center gap-2 pb-4 border-b border-[#103783]/20">
           <FileText className="w-5 h-5 text-blue-500" />
           <h2 className="text-lg font-bold text-slate-100 tracking-tight">Policy Matrix</h2>
         </div>
@@ -132,7 +132,7 @@ export const PolicySettingsTab = () => {
                 className={`text-left p-4 rounded-lg border transition-all duration-200 ${
                   selectedEntity?.id === entity.id
                     ? "bg-blue-600/10 border-blue-500/30 text-blue-400"
-                    : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+                    : "bg-[#0a1530] border-[#103783]/20 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
                 }`}
               >
                 <div className="text-sm font-semibold">{entity.name}</div>
@@ -149,13 +149,13 @@ export const PolicySettingsTab = () => {
       {/* RIGHT COLUMN: Field Editors */}
       <div className="w-full md:w-2/3 flex flex-col gap-4">
         {!selectedEntity ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-800 rounded-xl bg-slate-900/20">
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-[#103783]/20 rounded-xl bg-slate-900/20">
             <Activity className="w-10 h-10 mb-4 opacity-50 text-blue-500" />
             <p>Select a bank/product combination to view and modify its matrix parameters.</p>
           </div>
         ) : (
           <>
-            <div className="pb-4 border-b border-slate-800 flex justify-between items-center">
+            <div className="pb-4 border-b border-[#103783]/20 flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-bold text-slate-100">{selectedEntity.name}</h3>
                 <p className="text-sm text-slate-500">Modify active parameters below. Changes are audited.</p>
@@ -167,7 +167,7 @@ export const PolicySettingsTab = () => {
                 <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
               </div>
             ) : fieldDefinitions?.length === 0 ? (
-              <Alert className="bg-slate-900 border-slate-800">
+              <Alert className="bg-[#0a1530] border-[#103783]/20">
                 <AlertTitle className="text-slate-200 font-semibold">No Definitions</AlertTitle>
                 <AlertDescription className="text-slate-400">
                   No configurable fields found for {selectedEntity.entityType}.
