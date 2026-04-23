@@ -88,8 +88,6 @@ const EMICalculator = ({
   return (
     <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full min-w-0 w-full", className)}>
       
-      {/* 🧠 Ambient Glow Engine */}
-      <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-primary/5 dark:bg-[#103783]/10 transform-gpu rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10 shrink-0">

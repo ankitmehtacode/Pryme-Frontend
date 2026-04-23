@@ -446,7 +446,6 @@ const Dashboard: React.FC = () => {
                 className="pt-24 px-4 md:px-8 max-w-6xl mx-auto"
               >
                 <div className="bg-[#0a1530] text-white rounded-3xl p-8 mb-8 shadow-2xl relative overflow-hidden border border-[#103783]/20">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 transform-gpu rounded-full pointer-events-none" />
                   <div className="flex justify-between items-end mb-4 relative z-10">
                     <div>
                       <h1 className="text-3xl font-bold tracking-tight mb-2">Application Pipeline</h1>
@@ -488,7 +487,6 @@ const Dashboard: React.FC = () => {
 
                   <div className="lg:col-span-8">
                     <motion.div key={currentStage} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-card rounded-2xl shadow-sm border border-border p-8 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 transform-gpu rounded-full pointer-events-none" />
                       
                       {currentStage === 1 && (
                         <div className="space-y-6 relative z-10">

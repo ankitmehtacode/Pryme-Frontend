@@ -34,7 +34,6 @@ const RewardsCalculatorPage = () => {
 
             <div className="max-w-5xl mx-auto">
               <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 transform-gpu rounded-full pointer-events-none" />
                 <OffersRewards />
               </div>
               

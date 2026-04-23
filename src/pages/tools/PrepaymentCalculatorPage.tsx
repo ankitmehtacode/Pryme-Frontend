@@ -136,8 +136,6 @@ const PrepaymentCalculatorPage = () => {
               <div className="lg:col-span-8">
                 <div className="bg-card text-card-foreground rounded-2xl md:rounded-[2.5rem] border border-border p-4 md:p-8 shadow-2xl">
                   <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-emerald-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
-                    {/* Ambient glow */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-emerald-500/5 dark:bg-emerald-500/10 transform-gpu rounded-full pointer-events-none" />
 
                     {/* Header */}
                     <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">

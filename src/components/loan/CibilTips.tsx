@@ -116,7 +116,6 @@ const CibilTips = () => {
           scale: isBulbActive ? 1.3 : 1,
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[-10%] left-[-10%] w-48 h-48 bg-amber-400 transform-gpu rounded-full pointer-events-none"
       />
 
       {/* Header with Glowing Lightbulb */}

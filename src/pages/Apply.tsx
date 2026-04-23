@@ -357,9 +357,6 @@ const Apply = () => {
 
       {/* 🧠 UI FIX: Changed hardcoded black `#080d1e` to semantic adaptive `bg-slate-50 dark:bg-[#080d1e]` */}
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
-        {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero rasterization cost */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)' }} />
-        <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%)' }} />
 
         {/* 🧠 200 IQ FIX: Minimal Header for Zen Mode */}
         <div className="w-full absolute top-0 left-0 right-0 p-6 flex justify-center z-50">

@@ -28,8 +28,6 @@ const BankerContact = ({ banker = defaultBanker }: BankerContactProps) => {
   return (
     <div className="bg-white/5 dark:bg-[#080d1e]/60 backdrop-blur-sm border border-border rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full flex flex-col">
       
-      {/* 🧠 Ambient VIP Glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 transform-gpu rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 relative z-10 pt-2">

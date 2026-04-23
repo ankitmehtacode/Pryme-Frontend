@@ -48,7 +48,7 @@ const Services = () => {
               ].map((item, i) => (
                 <ScrollReveal key={i} direction="up" delay={i * 0.1}>
                   <div className="p-8 rounded-[2rem] bg-card text-card-foreground border border-border shadow-xl overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+
                     <div className="relative z-10">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
                         <item.icon className="w-6 h-6 text-primary" />

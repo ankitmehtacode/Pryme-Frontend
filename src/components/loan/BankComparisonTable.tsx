@@ -77,7 +77,6 @@ const BankComparisonTable = ({
           >
             {/* 🧠 Premium Ambient Glow for Recommended Card */}
             {offer.recommended && (
-              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 transform-gpu rounded-full pointer-events-none" />
             )}
 
             <div className="p-5 md:p-8 flex flex-col xl:flex-row items-center gap-6 md:gap-8">

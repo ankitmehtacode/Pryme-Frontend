@@ -466,7 +466,6 @@ const DocumentVaultStage = ({
     >
       {/* Header Card */}
       <div className={cardCn}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
         <div className="flex items-center justify-between mb-5 relative z-10">
           <div className="flex items-center gap-3">
@@ -1027,7 +1026,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
@@ -1152,7 +1150,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* STAGE 1: BASIC KYC                                              */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
@@ -1281,7 +1278,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           <div className={cardCn}>
               {/* Employment Category Selector */}
               <div className={cardCn}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 dark:bg-[#103783]/5 transform-gpu rounded-full pointer-events-none" />
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
