@@ -75,9 +75,7 @@ const BankComparisonTable = ({
                 : "bg-white/60 dark:bg-white/5 border-border hover:border-primary/40"
             )}
           >
-            {/* 🧠 Premium Ambient Glow for Recommended Card */}
-            {offer.recommended && (
-            )}
+
 
             <div className="p-5 md:p-8 flex flex-col xl:flex-row items-center gap-6 md:gap-8">
               
