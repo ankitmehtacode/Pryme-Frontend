@@ -126,22 +126,7 @@ const AdminDashboard = () => {
 
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
-  // 🧠 Filtered data per entity — driven by dropdown
-  const filteredBanks = useMemo(() => {
-    if (bankStatusFilter === "all") return banks;
-    return banks.filter((b: any) => bankStatusFilter === "active" ? b.active : !b.active);
-  }, [banks, bankStatusFilter]);
 
-  const filteredProducts = useMemo(() => {
-    if (productStatusFilter === "all") return products;
-    // LoanProduct Java entity uses `isActive` but Jackson may serialize as `active` or `isActive`
-    return products.filter((p: any) => productStatusFilter === "active" ? (p.active ?? p.isActive) : !(p.active ?? p.isActive));
-  }, [products, productStatusFilter]);
-
-  const filteredEligibilityRules = useMemo(() => {
-    if (ruleStatusFilter === "all") return eligibilityRules;
-    return eligibilityRules.filter((r: any) => ruleStatusFilter === "active" ? (r.active ?? r.isActive) : !(r.active ?? r.isActive));
-  }, [eligibilityRules, ruleStatusFilter]);
 
   // ==========================================
   // 🧠 REACT QUERY: REAL-TIME DATA ENGINE
@@ -220,6 +205,23 @@ const AdminDashboard = () => {
     queryFn: () => PrymeAPI.getEligibilityRules().then(res => res.data || res),
     enabled: activeTab === "settings"
   });
+
+  // 🧠 Filtered data per entity — driven by dropdown
+  // NOTE: These must be declared AFTER the useQuery hooks that provide banks/products/eligibilityRules
+  const filteredBanks = useMemo(() => {
+    if (bankStatusFilter === "all") return banks;
+    return banks.filter((b: any) => bankStatusFilter === "active" ? b.active : !b.active);
+  }, [banks, bankStatusFilter]);
+
+  const filteredProducts = useMemo(() => {
+    if (productStatusFilter === "all") return products;
+    return products.filter((p: any) => productStatusFilter === "active" ? (p.active ?? p.isActive) : !(p.active ?? p.isActive));
+  }, [products, productStatusFilter]);
+
+  const filteredEligibilityRules = useMemo(() => {
+    if (ruleStatusFilter === "all") return eligibilityRules;
+    return eligibilityRules.filter((r: any) => ruleStatusFilter === "active" ? (r.active ?? r.isActive) : !(r.active ?? r.isActive));
+  }, [eligibilityRules, ruleStatusFilter]);
 
   const [isEligibilityModalOpen, setIsEligibilityModalOpen] = useState(false);
   const [editingEligibilityRule, setEditingEligibilityRule] = useState<any>(null);
