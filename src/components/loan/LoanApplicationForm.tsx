@@ -2194,10 +2194,12 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
 
         {/* Trust Microcopy */}
-        <p className="text-[10.5px] text-muted-foreground/60 font-medium flex items-center gap-1.5 text-center mt-2 group justify-center">
-          <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors" />
-          Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
-        </p>
+        <div className="flex items-center justify-center gap-1.5 mt-3 px-2 group">
+          <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+          <p className="text-[10.5px] text-muted-foreground/60 font-medium text-center leading-tight">
+            Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
+          </p>
+        </div>
       </motion.div>
     </>
   );

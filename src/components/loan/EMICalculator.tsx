@@ -175,7 +175,7 @@ const EMICalculator = ({
           
           <div className="flex flex-col items-center gap-4 w-full mb-4 md:mb-6">
             {/* Glowing Pie Chart */}
-            <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto">
+            <div className="relative w-[110px] h-[110px] md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto">
               <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
                 <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
                 <circle
@@ -190,7 +190,7 @@ const EMICalculator = ({
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-[#103783] mb-1">Monthly EMI</span>
+                <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider md:tracking-widest text-[#103783] mb-0.5 md:mb-1 whitespace-nowrap">Monthly EMI</span>
                 <span className="text-xl font-bold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
               </div>
             </div>
