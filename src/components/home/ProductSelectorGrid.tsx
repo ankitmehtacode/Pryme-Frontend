@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/BackgroundBeams";
 
 // Assets safely imported from local directory
-import cardPersonal from "@/assets/card-personal.png";
-import cardBusiness from "@/assets/card-business.png";
-import cardHome from "@/assets/card-home.png";
-import cardLap from "@/assets/card-lap.png";
-import cardAuto from "@/assets/card-auto.svg";
+// Assets safely imported from local directory
+import product1 from "@/assets/products/product-1.jpg"; // Car -> Auto
+import product2 from "@/assets/products/product-2.jpg"; // Wallet -> Personal
+import product3 from "@/assets/products/product-3.jpg"; // House -> Home
+import product4 from "@/assets/products/product-4.jpg"; // Briefcase -> Business
+import product5 from "@/assets/products/product-5.png"; // Building/House -> LAP
 
-const BANK_OFFERS = [
+export const BANK_OFFERS = [
   "Lowest Interest Rates Starting at 10.15% at Kotak Bank",
   "Pre-approved Personal Loans up to ₹50 Lakhs from HDFC",
   "Zero Processing Fee on Auto Loans via SBI",
@@ -22,63 +23,62 @@ const products = [
   {
     id: "personal",
     label: "PERSONAL LOAN",
-    image: cardPersonal,
+    image: product2,
     tag: "CASHBACK",
     href: "/apply?type=personal",
     accent: "148, 62%, 42%",
-    bg: "#0d1829",
+    bg: "transparent",
     imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
-    borderColor: "rgba(255,255,255,0.1)",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
   },
   {
     id: "business",
     label: "BUSINESS LOAN",
-    image: cardBusiness,
+    image: product4,
     tag: "LOWEST RATES",
     href: "/apply?type=business",
     accent: "217, 91%, 60%",
-    bg: "#0d1829",
+    bg: "transparent",
     imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
-    borderColor: "rgba(255,255,255,0.1)",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
   },
   {
     id: "home",
     label: "HOME LOAN",
-    image: cardHome,
+    image: product3,
     tag: "PRE-APPROVED",
     href: "/apply?type=home",
     accent: "48, 100%, 50%",
-    bg: "#0d1829",
+    bg: "transparent",
     imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
-    borderColor: "rgba(255,255,255,0.1)",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
   },
   {
     id: "lap",
     label: "LOAN AGAINST PROPERTY",
-    image: cardLap,
+    image: product5,
     tag: "HIGH VALUE",
     href: "/apply?type=lap",
-    // Teal — matches bg baked into the image for seamless card edges
     accent: "174, 45%, 38%",
-    bg: "#0d3330",
+    bg: "transparent",
     imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.3), rgba(0,0,0,0.05), rgba(255,255,255,0.04))",
-    borderColor: "rgba(45,160,140,0.25)",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
   },
   {
     id: "auto",
     label: "AUTO LOAN",
-    image: cardAuto,
+    image: product1,
     tag: "INSTANT APPROVAL",
     href: "/apply?type=auto",
     accent: "12, 90%, 55%",
-    bg: "#0d1829",
+    bg: "transparent",
     imgClass: "",
-    overlay: "linear-gradient(to top right, rgba(0,0,0,0.8), rgba(0,0,0,0.2), rgba(255,255,255,0.1))",
-    borderColor: "rgba(255,255,255,0.1)",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
   },
 ];
 
@@ -141,7 +141,7 @@ const ProductSelectorGrid = memo(() => {
                     GPU with zero main-thread involvement. */}
                 <motion.div
                   variants={imageVariants}
-                  className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] aspect-square shrink-0 rounded-2xl md:rounded-[1.5rem]
+                  className="relative w-[140px] h-[105px] sm:w-[160px] sm:h-[120px] md:w-[180px] md:h-[135px] lg:w-[200px] lg:h-[150px] aspect-[4/3] shrink-0 rounded-2xl md:rounded-[1.5rem]
                     transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1.5 active:scale-95"
                   style={{ willChange: "transform" }}
                 >
@@ -152,7 +152,7 @@ const ProductSelectorGrid = memo(() => {
                       The card already has hover:scale-105 which reads as "bigger+elevated"
                       — the shadow delta was imperceptible at this small card size. */}
                   <div
-                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden shadow-[0_12px_24px_-8px_rgba(0,0,0,0.7)]"
+                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden"
                     style={{
                       backgroundColor: product.bg,
                       border: `1px solid ${product.borderColor}`,
@@ -166,7 +166,7 @@ const ProductSelectorGrid = memo(() => {
                     <img
                       src={product.image}
                       alt={product.label}
-                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 z-0 ${product.imgClass}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass}`}
                       loading="lazy"
                       draggable={false}
                     />

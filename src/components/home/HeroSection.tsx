@@ -13,6 +13,8 @@ import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 import unionLogo from "@/assets/union-bank-of-india.svg";
 
+import { BANK_OFFERS } from "./ProductSelectorGrid";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────────────
@@ -45,17 +47,6 @@ const initialOffers = [
     accentColor: "#10b981",   
     bgIcons: [BadgePercent, Landmark]
   }
-];
-
-const marqueeOffers = [
-  { text: "Zero Processing Fee IDBI", color: "#0284c7" },
-  { text: "10.15%* on Union Bank", color: "#10b981" },
-  { text: "Pre-Approved ₹50L Axis", color: "#ec4899" },
-  { text: "Public Trust via Union", color: "#059669" },
-  { text: "Zero Documentation", color: "#103783" },
-  { text: "4hr Disbursal", color: "#06b6d4" },
-  { text: "No Pre-closure Fee", color: "#f59e0b" },
-  { text: "Salary A/C Special", color: "#ec4899" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -394,27 +385,27 @@ const HeroSection = memo(() => {
           
           <div className="hero-marquee-track flex py-2.5 overflow-hidden group transform-gpu">
             <div className="flex shrink-0 animate-[marquee_40s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2 transform-gpu will-change-transform">
-              {[1, 2, 3, 4].map((i) => (
+              {BANK_OFFERS.map((offer, i) => (
                 <div 
                   key={`track1-${i}`} 
                   className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/95 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white transition-all duration-300 cursor-default transform-gpu"
                 >
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0284c7] shadow-[0_0_6px_#0284c7]" />
-                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">
-                    Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide uppercase">
+                    {offer}
                   </span>
                 </div>
               ))}
             </div>
             <div aria-hidden="true" className="flex shrink-0 animate-[marquee_40s_linear_infinite] group-hover:[animation-play-state:paused] min-w-full justify-around gap-3 md:gap-4 px-1.5 md:px-2 transform-gpu will-change-transform">
-              {[1, 2, 3, 4].map((i) => (
+              {BANK_OFFERS.map((offer, i) => (
                 <div 
                   key={`track2-${i}`} 
                   className="flex-shrink-0 flex items-center gap-2 md:gap-2.5 px-3 md:px-5 py-2 rounded-full border-[0.5px] border-white/60 bg-white/95 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-white transition-all duration-300 cursor-default transform-gpu"
                 >
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0284c7] shadow-[0_0_6px_#0284c7]" />
-                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide">
-                    Competitive rates from <span className="font-extrabold text-[#103783]">15+ banks</span>. Select your product to get started within minutes.
+                  <span className="text-[10px] md:text-[11px] font-bold text-slate-700/90 tracking-wide uppercase">
+                    {offer}
                   </span>
                 </div>
               ))}

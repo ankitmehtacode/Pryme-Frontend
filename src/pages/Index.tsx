@@ -127,7 +127,7 @@ const Index = () => {
               <ProductSelectorGrid />
               
               {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
-              <div className="pt-4 pb-12 w-full transition-all">
+              <div className="pt-4 pb-2 md:pb-4 w-full transition-all">
                 <PartnerBankMarquee />
               </div>
             </div>
@@ -135,11 +135,11 @@ const Index = () => {
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
-            <section className="section-contained py-16 md:py-24 lg:py-32 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="section-contained py-12 md:py-16 lg:py-20 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
-              <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 transform-gpu rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, 0, 0)", willChange: "transform" }} />
+              <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 transform-gpu rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, -30%, 0)", willChange: "transform" }} />
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">

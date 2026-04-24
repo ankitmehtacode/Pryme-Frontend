@@ -4,7 +4,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 
-// Ensure GSAP plugin is registered safely
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -12,167 +11,213 @@ if (typeof window !== "undefined") {
 const steps = [
   { 
     icon: FileText, 
+    num: "01",
     title: "Digital Application", 
-    desc: "COMPLETE OUR INTELLIGENT FEW MINUTE FORM",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20"
+    desc: "Complete our intelligent form in under 5 minutes — no branch visits, no paperwork.",
   },
   { 
     icon: UserCheck, 
+    num: "02",
     title: "Instant Eligibility", 
-    desc: "Our Powerful engine calculates your eligibility in Real Time.",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20"
+    desc: "Our engine calculates your eligibility across 15+ banks in real time.",
   },
   { 
     icon: Zap, 
-    title: "Smart Approval", 
-    desc: "Get sanctions from multiple banking partners QUICKLY tailored to your profile.",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-    border: "border-amber-500/20"
+    num: "03",
+    title: "Smart Matching", 
+    desc: "Get pre-approved offers from multiple banking partners tailored to your profile.",
   },
   { 
     icon: Banknote, 
+    num: "04",
     title: "Rapid Disbursal", 
-    desc: "Efficient processing designed to get you funds sooner.",
-    color: "text-blue-400",
-    bg: "bg-blue-700/10",
-    border: "border-blue-700/20"
+    desc: "Choose your best offer and receive funds — often within 48 hours.",
   }
 ];
 
 const ProcessSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const lineContainerRef = useRef<HTMLDivElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // 1. The Timeline Line Animation
-      gsap.fromTo(lineRef.current, 
-        { height: "0%" },
-        {
-          height: "100%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: triggerRef.current,
-            start: "top center",
-            end: "bottom center",
-            scrub: 0.5,
-          }
-        }
-      );
+    let ctx = gsap.context(() => {});
 
-      // 2. Card Stagger Animation (Upgraded ease)
-      const cards = gsap.utils.toArray(".process-card");
-      cards.forEach((card: any) => {
-        gsap.fromTo(card,
-          { opacity: 0, x: 50, scale: 0.95 },
-          {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.8,
-            ease: "expo.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 85%",
-              toggleActions: "play none none none"
+    // Ensure DOM is fully painted
+    const timer = setTimeout(() => {
+      ctx.add(() => {
+        // 1. Animate Cards In
+        gsap.utils.toArray<HTMLElement>(".process-card").forEach((card) => {
+          gsap.fromTo(card,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1, y: 0,
+              duration: 0.5,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none none",
+              }
             }
-          }
-        );
-      });
-    }, sectionRef);
+          );
+        });
 
-    return () => ctx.revert();
+        // 2. Precision Alignment Function
+        const alignTimeline = () => {
+          const dots = document.querySelectorAll('.process-dot');
+          const track = trackRef.current;
+          const lineContainer = lineContainerRef.current;
+          
+          if (!track || !lineContainer || dots.length < 2) return;
+          
+          const firstDot = dots[0] as HTMLElement;
+          const lastDot = dots[dots.length - 1] as HTMLElement;
+          
+          // Use offsetTop instead of getBoundingClientRect to avoid scroll position bugs
+          // We need the dot's position relative to the track container
+          
+          // Function to get offset relative to a parent
+          const getRelativeOffset = (element: HTMLElement, parent: HTMLElement) => {
+            let offset = 0;
+            let current = element;
+            while (current && current !== parent && current !== document.body) {
+              offset += current.offsetTop;
+              current = current.offsetParent as HTMLElement;
+            }
+            return offset;
+          };
+
+          const firstDotY = getRelativeOffset(firstDot, track) + (firstDot.offsetHeight / 2);
+          const lastDotY = getRelativeOffset(lastDot, track) + (lastDot.offsetHeight / 2);
+          const distance = lastDotY - firstDotY;
+
+          // Set the line container to exactly match the dot-to-dot distance
+          gsap.set(lineContainer, {
+            top: firstDotY,
+            height: distance
+          });
+        };
+
+        // Align immediately
+        alignTimeline();
+
+        // 3. Scroll Animation using scaleY
+        if (lineContainerRef.current && progressFillRef.current && trackRef.current) {
+          gsap.fromTo(progressFillRef.current,
+            { scaleY: 0 },
+            {
+              scaleY: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: trackRef.current,
+                start: "top 55%",
+                end: "bottom 55%",
+                scrub: 0.1,
+                onRefresh: alignTimeline // Re-align if layout changes (resize)
+              }
+            }
+          );
+        }
+        
+        ScrollTrigger.refresh();
+      });
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-32 bg-[#030303] relative overflow-hidden z-10 border-t border-white/5" style={{ contain: "content" }}>
-      
-      {/* 🧠 Premium Ambient Cyber-Glow */}
-      {/* Ambient glow — reduced blur from 50px for GPU savings on mobile */}
-      <div className="absolute top-1/2 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/10 transform-gpu rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2" />
-
+    <section ref={sectionRef} className="py-24 md:py-32 bg-[#030303] relative z-10 border-t border-white/5" style={{ contain: "content" }}>
       <div className="container mx-auto px-4 relative z-10 max-w-7xl">
-        <div className="flex flex-col items-center mb-16 relative z-10 w-full text-center">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-xs font-semibold text-primary uppercase tracking-[0.3em] mb-6 shadow-sm">
-            THE PROCESS
+        
+        {/* Header */}
+        <div className="flex flex-col items-center mb-20 text-center">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#103783]/30 bg-[#103783]/10 text-xs font-semibold text-[#9BAFD9] uppercase tracking-[0.3em] mb-6">
+            The Process
           </span>
-          <h2 className="font-medium text-white mb-6 leading-[1.1] tracking-tighter" style={{ fontSize: 'clamp(1.5rem, 4vw, 3rem)' }}>
-            Simple. Fast. <br className="sm:hidden" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-primary animate-gradient bg-[length:200%_auto]">
-              Transparent.
+          <h2 className="font-semibold text-white mb-5 leading-[1.1] tracking-tight" style={{ fontSize: 'clamp(1.75rem, 4vw, 3.25rem)' }}>
+            Four steps to your
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#9BAFD9]">
+              best loan offer.
             </span>
           </h2>
-          <p className="text-slate-200 max-w-2xl leading-relaxed mb-10 font-normal" style={{ fontSize: 'clamp(0.938rem, 2vw, 1.125rem)' }}>
-            We've removed the complexity of traditional banking. 
-            No branch visits, no waiting rooms, just a streamlined digital process.
+          <p className="text-slate-400 max-w-xl leading-relaxed" style={{ fontSize: 'clamp(0.938rem, 2vw, 1.063rem)' }}>
+            No branch visits. No waiting rooms. Just a streamlined
+            digital process from application to disbursal.
           </p>
-
-          <div className="rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden relative max-w-md w-full">
-            <img 
-              src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop&auto=format&q=80" 
-              alt="Business professionals reviewing financial documents" 
-              className="w-full h-32 object-cover opacity-60"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-[#030303]/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <p className="text-sm text-slate-300 font-medium leading-relaxed">
-                Join thousands of <strong className="text-white">USERS</strong> who've secured better rates through PRYME.
-              </p>
-            </div>
-          </div>
         </div>
 
+        {/* Timeline */}
         <div className="flex flex-col items-center relative w-full">
-          {/* Right Side: GSAP Timeline Track */}
-          <div ref={triggerRef} className="w-full max-w-4xl relative pl-8 lg:pl-16">
+          {/* This is the master track container */}
+          <div ref={trackRef} className="w-full max-w-3xl relative pl-12 lg:pl-20">
             
-            {/* The Vertical Track Background (Glass Groove) */}
-            <div className="absolute left-[15px] lg:left-[31px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-transparent via-white/10 to-transparent">
-              {/* 🧠 Neon Comet Line (Powered by GSAP) */}
+            {/* The line container - perfectly positioned by JS */}
+            <div 
+              ref={lineContainerRef}
+              className="absolute left-[23px] lg:left-[39px] w-[1px] z-0"
+              style={{ top: 0, height: '100%' }} // Initial defaults, overwritten by alignTimeline
+            >
+              {/* Static background track */}
+              <div className="absolute inset-0 bg-white/[0.05]" />
+              
+              {/* Animated fill track */}
               <div 
-                ref={lineRef} 
-                className="w-full relative overflow-visible rounded-full bg-gradient-to-b from-transparent via-blue-500/80 to-cyan-400" 
+                ref={progressFillRef}
+                className="absolute inset-0 origin-top will-change-transform"
+                style={{ transform: 'scaleY(0)' }}
               >
-                {/* Comet Head Glowing Core */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-8 bg-cyan-200 rounded-full shadow-[0_0_20px_5px_rgba(34,211,238,0.9),0_0_40px_10px_rgba(59,130,246,0.6)] blur-[0.5px]" />
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[3px] h-12 bg-gradient-to-t from-transparent to-cyan-300 blur-sm opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#103783] via-[#4a6db5] to-[#9BAFD9]" />
+                {/* Glowing comet head */}
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[5px] h-3 bg-[#9BAFD9] rounded-full shadow-[0_0_8px_2px_rgba(155,175,217,0.6)]" />
               </div>
             </div>
 
-            <div className="space-y-12 md:space-y-16">
+            {/* Steps Container */}
+            <div className="relative z-10 flex flex-col space-y-8 md:space-y-12">
               {steps.map((step, idx) => (
-                <div key={idx} className="process-card relative flex flex-col sm:flex-row items-start gap-6 sm:gap-8 group">
+                <div key={idx} className="process-card relative group">
                   
-                  {/* Elegant Neon Pulse Node - Centered to box */}
-                  <div className="absolute -left-[22px] lg:-left-[38px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-white/20 bg-[#030303] z-10 transition-all duration-700 group-hover:bg-cyan-400 group-hover:border-cyan-300 group-hover:shadow-[0_0_25px_6px_rgba(34,211,238,0.9)] group-hover:scale-[1.8]" />
-                  
-                  {/* Premium Dark Glassmorphic Content Card */}
-                  <div className="flex-1 w-full bg-white/5 p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-primary/40 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(16,55,131,0.3)] transition-all duration-500">
-                    <div className="flex items-center gap-5 mb-4">
-                      <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110", step.bg, step.border)}>
-                        <step.icon className={cn("w-6 h-6", step.color)} />
-                      </div>
-                      <h3 className="font-semibold text-white tracking-tight" style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)' }}>
-                        {step.title}
-                      </h3>
+                  {/* Dot */}
+                  <div className="process-dot absolute -left-[34px] lg:-left-[50px] top-1/2 -translate-y-1/2 z-10">
+                    <div className="w-[18px] h-[18px] rounded-full border border-white/10 bg-[#030303] flex items-center justify-center transition-all duration-500 group-hover:border-[#9BAFD9]/40 group-hover:shadow-[0_0_12px_rgba(155,175,217,0.25)]">
+                      <div className="w-[7px] h-[7px] rounded-full bg-white/15 transition-colors duration-500 group-hover:bg-[#9BAFD9]" />
                     </div>
-                    <p className="text-slate-300 leading-relaxed font-medium pl-0 sm:pl-0" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.938rem)' }}>
-                      {step.desc}
-                    </p>
                   </div>
                   
+                  {/* Card content */}
+                  <div className={cn(
+                    "w-full p-6 md:p-8 rounded-2xl border transition-all duration-400",
+                    "bg-[#030303]/80 backdrop-blur-sm border-white/[0.06]",
+                    "hover:bg-white/[0.04] hover:border-[#103783]/25 shadow-sm"
+                  )}>
+                    <div className="flex items-start gap-5">
+                      <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#103783] to-[#9BAFD9] tabular-nums shrink-0 leading-none pt-0.5">
+                        {step.num}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5 mb-2">
+                          <step.icon className="w-4 h-4 text-[#9BAFD9] shrink-0" />
+                          <h3 className="font-semibold text-white tracking-tight" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
+                            {step.title}
+                          </h3>
+                        </div>
+                        <p className="text-slate-400 leading-relaxed" style={{ fontSize: 'clamp(0.813rem, 1.5vw, 0.938rem)' }}>
+                          {step.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
     </section>
