@@ -669,11 +669,12 @@ const EMPLOYMENT_OPTIONS: { value: EmploymentType; label: string; icon: any }[] 
   { value: "SELF_EMPLOYED", label: "Business", icon: BriefcaseBusiness },
 ];
 
-const PRODUCT_OPTIONS: { value: LoanType; label: string }[] = [
-  { value: "PERSONAL_LOAN", label: "Personal Loan" },
-  { value: "HOME_LOAN", label: "Home Loan" },
-  { value: "BUSINESS_LOAN", label: "Business Loan" },
-  { value: "LAP", label: "Loan Against Property" },
+const PRODUCT_OPTIONS: { value: LoanType; label: string; icon: any }[] = [
+  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: HandCoins },
+  { value: "HOME_LOAN", label: "Home Loan", icon: Home },
+  { value: "BUSINESS_LOAN", label: "Business Loan", icon: BriefcaseBusiness },
+  { value: "LAP", label: "Loan Against Property", icon: Landmark },
+  { value: "AUTO_LOAN", label: "Auto Loan", icon: CreditCard },
 ];
 
 // ─── STEP METADATA ──────────────────────────────────────────────────────────
@@ -754,6 +755,7 @@ function validateStage2(store: ReturnType<typeof useApplicationStore.getState>):
 function validateStage3(store: ReturnType<typeof useApplicationStore.getState>): ValidationErrors {
   const errors: ValidationErrors = {};
   const lr = store.loanRequirements;
+  if (!lr.loanType) errors.loanType = "Select a loan product";
   if (!lr.loanAmount || lr.loanAmount < 50000) errors.loanAmount = "Minimum loan amount is ₹50,000";
   if (!lr.tenureYears || lr.tenureYears < 1) errors.tenure = "Select a tenure";
   return errors;
@@ -903,17 +905,85 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     store.setStage(Math.max(store.currentStage - 1, 1) as StageNumber);
   }, [store]);
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // ── Submit (200 IQ: validates ALL stages → scroll-to-first-error) ──────────
 
-  const handleSubmit = useCallback(() => {
+  // Maps error field keys → the DOM section id that contains them
+  const ERROR_SECTION_MAP: Record<string, string> = {
+    // Stage 3 — Loan Details
+    loanType: 'section-loan-details',
+    loanAmount: 'section-loan-details',
+    tenure: 'section-loan-details',
+    // Stage 1 — Identity
+    fullName: 'section-identity',
+    mobileNumber: 'section-identity',
+    email: 'section-identity',
+    dateOfBirth: 'section-identity',
+    state: 'section-identity',
+    city: 'section-identity',
+    pinCode: 'section-identity',
+    religion: 'section-identity',
+    // Stage 2 — Employment
+    employmentType: 'section-employment',
+    subType: 'section-employment',
+    companyType: 'section-employment',
+    companyName: 'section-employment',
+    designation: 'section-employment',
+    netMonthlySalary: 'section-employment',
+    totalExperienceYears: 'section-employment',
+    currentCompanyYears: 'section-employment',
+    practiceName: 'section-employment',
+    practiceYears: 'section-employment',
+    netMonthlyIncome: 'section-employment',
+    businessName: 'section-employment',
+  };
+
+  const STAGE_LABELS_FRIENDLY: Record<string, string> = {
+    'section-loan-details': 'Loan Details',
+    'section-identity': 'Identity & KYC',
+    'section-employment': 'Employment & Income',
+  };
+
+  const handleFormSubmit = useCallback(() => {
     try {
-      // Validate Stage 3 before allowing submission
-      const validationErrors = validateStage3(useApplicationStore.getState());
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        toast({ title: "Incomplete Details", description: "Please complete your loan requirements.", variant: "destructive" });
+      const currentState = useApplicationStore.getState();
+
+      // Validate all 3 stages in visual order (Loan Details → Identity → Employment)
+      const stage3Errors = validateStage3(currentState);
+      const stage1Errors = validateStage1(currentState);
+      const stage2Errors = validateStage2(currentState);
+
+      // Merge all errors (stage order preserved by insertion)
+      const allErrors: ValidationErrors = { ...stage3Errors, ...stage1Errors, ...stage2Errors };
+
+      if (Object.keys(allErrors).length > 0) {
+        setErrors(allErrors);
+
+        // Find the first error key and resolve its section
+        const firstErrorKey = Object.keys(allErrors)[0];
+        const targetSectionId = ERROR_SECTION_MAP[firstErrorKey] || 'section-loan-details';
+        const sectionLabel = STAGE_LABELS_FRIENDLY[targetSectionId] || 'form';
+
+        // Scroll to the section with the first error
+        const el = document.getElementById(targetSectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Flash highlight effect — add and remove a ring animation
+          el.classList.add('ring-2', 'ring-red-500/40', 'ring-offset-2', 'ring-offset-background');
+          setTimeout(() => {
+            el.classList.remove('ring-2', 'ring-red-500/40', 'ring-offset-2', 'ring-offset-background');
+          }, 2500);
+        }
+
+        toast({
+          title: `Missing fields in ${sectionLabel}`,
+          description: allErrors[firstErrorKey],
+          variant: 'destructive',
+        });
         return;
       }
+
+      // All validations passed
       setErrors({});
       store.completeStage(3 as StageNumber);
 
@@ -1087,7 +1157,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 3: LOAN REQUIREMENTS (Moved to Top)                       */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          <div className={cardCn}>
+          <div id="section-loan-details" className={cn(cardCn, 'transition-all duration-500')}>
               <div className={cardCn}>
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -1098,6 +1168,28 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                 </div>
 
                 <div className="space-y-5 relative z-10">
+                  {/* 🧠 200 IQ: Loan Product Selector — pre-filled from URL query but always editable */}
+                  <StyledSelect
+                    label="Loan Product"
+                    icon={Landmark}
+                    value={store.loanRequirements.loanType || undefined}
+                    onValueChange={(v) => store.updateLoanRequirements({ loanType: v as LoanType })}
+                    placeholder="Select your loan type"
+                    error={errors.loanType}
+                  >
+                    {PRODUCT_OPTIONS.map((opt) => {
+                      const OptIcon = opt.icon;
+                      return (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          <span className="flex items-center gap-2">
+                            <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
+                            {opt.label}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </StyledSelect>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
                       label="Loan Amount (₹)"
@@ -1212,7 +1304,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* STAGE 1: BASIC KYC                                              */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          <div className={cardCn}>
+          <div id="section-identity" className={cn(cardCn, 'transition-all duration-500')}>
 
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
@@ -1244,12 +1336,42 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                       isValid={/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber)}
                       error={errors.mobileNumber}
                     />
-                    {/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber) && (
-                      <div className="flex animate-in fade-in slide-in-from-top-1 items-center gap-2 mt-1">
-                        <Input type="text" placeholder="Enter OTP" className="w-1/2 h-10 bg-white/50 border-slate-200 focus:border-primary/50" maxLength={6} />
-                        <Button type="button" variant="outline" className="w-1/2 h-10 border-primary text-primary hover:bg-primary hover:text-white transition-colors">
-                          Verify OTP
-                        </Button>
+                    {/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber) && !store.basicKYC.mobileVerified && (
+                      <div className="animate-in fade-in slide-in-from-top-1 mt-1 space-y-2">
+                        {/* Verify Now / Verify Later toggle */}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 h-9 text-xs font-semibold border-primary/30 text-primary hover:bg-primary hover:text-white transition-all"
+                            onClick={() => {
+                              toast({ title: "OTP Sent", description: `A 6-digit OTP has been sent to ${store.basicKYC.mobileNumber}` });
+                            }}
+                          >
+                            <Phone className="w-3 h-3 mr-1.5" /> Verify Now
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="flex-1 h-9 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all"
+                            onClick={() => {
+                              // Skip verification — mark as not verified but allow progression
+                              store.updateBasicKYC({ mobileVerified: false });
+                              toast({ title: "Skipped", description: "You can verify your mobile later from your profile." });
+                            }}
+                          >
+                            Verify Later
+                          </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground/50 ml-0.5">Verification is optional. You can proceed without it.</p>
+                      </div>
+                    )}
+                    {store.basicKYC.mobileVerified && (
+                      <div className="flex items-center gap-1.5 mt-1 animate-in fade-in">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-[11px] font-semibold text-primary">Mobile Verified</span>
                       </div>
                     )}
                   </div>
@@ -1340,7 +1462,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className={cardCn}>
               {/* Employment Category Selector */}
-              <div className={cardCn}>
+              <div id="section-employment" className={cn(cardCn, 'transition-all duration-500')}>
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
