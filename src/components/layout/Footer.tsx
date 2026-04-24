@@ -70,7 +70,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-[#060a18] text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
-      
+
       {/* Brand gradient accent stripe */}
       <div className="h-[2px] bg-gradient-to-r from-transparent via-[#103783] to-transparent" />
 
@@ -91,7 +91,7 @@ const Footer = () => {
       {/* Main Footer Grid */}
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6">
-          
+
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-2 space-y-5">
             <Link to="/" className="inline-block" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
@@ -130,8 +130,8 @@ const Footer = () => {
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.label}>
-                  <Link 
-                    to={link.href} 
+                  <Link
+                    to={link.href}
                     onClick={() => handleLinkClick(link.href)}
                     className="text-zinc-500 hover:text-[#9BAFD9] transition-colors text-sm"
                   >
@@ -148,8 +148,8 @@ const Footer = () => {
             <ul className="space-y-2.5">
               {toolLinks.map((link) => (
                 <li key={link.label}>
-                  <Link 
-                    to={link.href} 
+                  <Link
+                    to={link.href}
                     onClick={() => handleLinkClick(link.href)}
                     className="text-zinc-500 hover:text-[#9BAFD9] transition-colors text-sm"
                   >
@@ -166,8 +166,8 @@ const Footer = () => {
             <ul className="space-y-2.5">
               {companyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link 
-                    to={link.href} 
+                  <Link
+                    to={link.href}
                     onClick={() => handleLinkClick(link.href)}
                     className="text-zinc-500 hover:text-[#9BAFD9] transition-colors text-sm"
                   >
@@ -214,7 +214,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <p className="text-[11px] text-zinc-600">
-                © {currentYear} PRYME Consulting Pvt. Ltd. All rights reserved. CIN: U74999MH2024PTC123456 GOPRYME FINTECH PVT LTD, CIN: U70200MP2026PTC081776
+                © {currentYear} GOPRYME FINTECH Pvt. Ltd. All rights reserved. CIN: U70200MP2026PTC081776
               </p>
               <div className="flex flex-wrap gap-4">
                 {legalLinks.map((link) => (
