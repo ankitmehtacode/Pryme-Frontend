@@ -610,6 +610,55 @@ const STATE_CITIES: Record<string, string[]> = {
   "Delhi": ["New Delhi", "Central Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi", "North East Delhi", "North West Delhi", "South East Delhi", "South West Delhi", "Shahdara", "Dwarka", "Rohini", "Lajpat Nagar", "Karol Bagh", "Connaught Place", "Chandni Chowk", "Saket", "Vasant Kunj", "Mehrauli"]
 };
 
+const STATE_PIN_PREFIXES: Record<string, string[]> = {
+  "Andhra Pradesh": ["51", "52", "53"],
+  "Arunachal Pradesh": ["79"],
+  "Assam": ["78"],
+  "Bihar": ["80", "81", "82", "83", "84", "85"],
+  "Chhattisgarh": ["49"],
+  "Goa": ["40"],
+  "Gujarat": ["36", "37", "38", "39"],
+  "Haryana": ["12", "13"],
+  "Himachal Pradesh": ["17"],
+  "Jharkhand": ["81", "82", "83"],
+  "Karnataka": ["56", "57", "58", "59"],
+  "Kerala": ["67", "68", "69"],
+  "Madhya Pradesh": ["45", "46", "47", "48"],
+  "Maharashtra": ["40", "41", "42", "43", "44"],
+  "Manipur": ["79"],
+  "Meghalaya": ["79"],
+  "Mizoram": ["79"],
+  "Nagaland": ["79"],
+  "Odisha": ["75", "76", "77"],
+  "Punjab": ["14", "15", "16"],
+  "Rajasthan": ["30", "31", "32", "33", "34"],
+  "Sikkim": ["73"],
+  "Tamil Nadu": ["60", "61", "62", "63", "64"],
+  "Telangana": ["50", "51"],
+  "Tripura": ["79"],
+  "Uttar Pradesh": ["20", "21", "22", "23", "24", "25", "26", "27", "28"],
+  "Uttarakhand": ["24", "25", "26"], 
+  "West Bengal": ["70", "71", "72", "73", "74"],
+  "Delhi": ["11"]
+};
+
+// Top tier city specific prefixes for ultra-accurate validation
+const CITY_PIN_PREFIXES: Record<string, string[]> = {
+  "Indore": ["452", "453"],
+  "Bhopal": ["462"],
+  "Mumbai": ["400", "401"],
+  "Pune": ["411", "412"],
+  "Bengaluru": ["560"],
+  "Chennai": ["600"],
+  "Hyderabad": ["500", "501", "502"],
+  "Kolkata": ["700"],
+  "Ahmedabad": ["380", "382"],
+  "Jaipur": ["302", "303"],
+  "Lucknow": ["226"],
+  "New Delhi": ["110"],
+  "Surat": ["394", "395"],
+};
+
 const RELIGIONS = [
   "Hinduism", "Islam", "Christianity", "Sikhism", "Buddhism", "Jainism", "Other"
 ];
@@ -648,7 +697,21 @@ function validateStage1(store: ReturnType<typeof useApplicationStore.getState>):
   if (!k.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
   if (!k.state) errors.state = "Select your state";
   if (!k.city) errors.city = "Select your city";
-  if (!k.pinCode || !/^\d{6}$/.test(k.pinCode)) errors.pinCode = "Enter a valid 6-digit PIN code";
+  
+  if (!k.pinCode || !/^\d{6}$/.test(k.pinCode)) {
+    errors.pinCode = "Enter a valid 6-digit PIN code";
+  } else if (k.city && CITY_PIN_PREFIXES[k.city]) {
+    const validPrefixes = CITY_PIN_PREFIXES[k.city];
+    if (!validPrefixes.some(prefix => k.pinCode.startsWith(prefix))) {
+      errors.pinCode = `PIN code for ${k.city} must start with ${validPrefixes.join(' or ')}`;
+    }
+  } else if (k.state && STATE_PIN_PREFIXES[k.state]) {
+    const validPrefixes = STATE_PIN_PREFIXES[k.state];
+    if (!validPrefixes.some(prefix => k.pinCode.startsWith(prefix))) {
+      errors.pinCode = `Invalid PIN code for ${k.state} (must start with ${validPrefixes.join(', ')})`;
+    }
+  }
+
   return errors;
 }
 
