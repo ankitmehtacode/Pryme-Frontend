@@ -9,9 +9,9 @@ const CONTACT_EMAIL = "hello@gopryme.in";
 const COMPANY_ADDRESS_NODE = (
   <span className="block leading-relaxed">
     <strong className="font-semibold text-white dark:text-foreground">Pryme Headquarters</strong><br />
-    4th Floor, Above Mr. DIY Showroom,<br />
-    Ranjeet Hanuman Main Road, Mhow Naka Square,<br />
-    Indore, Madhya Pradesh, 452009, India
+    204, Ranjeet Hanuman Main Road,<br />
+    Near BATA showroom, Mahu Naka,<br />
+    Indore, Madhya Pradesh
   </span>
 );
 
