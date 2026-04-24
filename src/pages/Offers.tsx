@@ -307,6 +307,7 @@ export default function Offers() {
     if (!leadData) return;
     setIsLocking(offer.id);
     try {
+      localStorage.setItem("pryme_target_bank", offer.bankName);
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Create your account to track it.` });
       navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: leadData.leadId } });

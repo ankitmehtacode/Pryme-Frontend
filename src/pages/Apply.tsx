@@ -284,7 +284,8 @@ const Apply = () => {
 
         if (pendingLeadId && isUuid(pendingLeadId) && isUuid(user.id)) {
             try {
-                const elevationRes = await PrymeAPI.elevateLead(pendingLeadId, user.id);
+                const targetBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
+                const elevationRes = await PrymeAPI.elevateLead(pendingLeadId, user.id, targetBank);
                 if (elevationRes?.applicationId) {
                     setActiveApplicationId(elevationRes.applicationId);
                     localStorage.removeItem("pryme_pending_lead_id");

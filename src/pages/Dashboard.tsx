@@ -122,8 +122,10 @@ const Dashboard: React.FC = () => {
         const pendingLead = localStorage.getItem("pryme_pending_lead_id");
         if (pendingLead) {
           try {
-            await PrymeAPI.elevateLead(pendingLead, (user as any).id || (user as any).name);
+            const selectedBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
+            await PrymeAPI.elevateLead(pendingLead, (user as any).id || (user as any).name, selectedBank);
             localStorage.removeItem("pryme_pending_lead_id");
+            localStorage.removeItem("pryme_target_bank");
           } catch (e) {
             console.warn("Lead elevation skipped or failed.", e);
           }

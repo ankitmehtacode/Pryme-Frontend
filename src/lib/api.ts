@@ -240,10 +240,16 @@ export const PrymeAPI = {
   },
 
   // 🧠 CLOSED-LOOP FIX: Backend ElevationController is at /api/v1/applications/elevate
-  elevateLead: async (leadId: string, userId: string) => fetchWithAuth(`/applications/elevate`, { method: "POST", body: JSON.stringify({ leadId, userId }) }),
+  elevateLead: async (leadId: string, userId: string, selectedBank?: string) => fetchWithAuth(`/applications/elevate`, { method: "POST", body: JSON.stringify({ leadId, userId, selectedBank }) }),
   getApplications: async () => fetchWithAuth("/admin/applications", { method: "GET" }),
   updateStatus: async (applicationId: string, status: string) => fetchWithAuth(`/admin/applications/${applicationId}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   assignLead: async (applicationId: string, assigneeId: string) => fetchWithAuth(`/admin/applications/${applicationId}/assign`, { method: "PATCH", body: JSON.stringify({ assigneeId }) }),
+  
+  // 🧠 USER PROFILE MANAGEMENT
+  getProfile: async () => fetchWithAuth("/users/profile", { method: "GET" }),
+  updateProfile: async (data: any) => fetchWithAuth("/users/profile", { method: "PUT", body: JSON.stringify(data) }),
+  initiateAvatarUpload: async (contentType: string) => fetchWithAuth("/users/profile/avatar/initiate-upload", { method: "POST", body: JSON.stringify({ contentType }) }),
+
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   
   // DOCUMENT VAULT: Upload
