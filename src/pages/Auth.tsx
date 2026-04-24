@@ -90,6 +90,9 @@ const Auth = () => {
   const [showLoginPw, setShowLoginPw] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+  
+  // Silicon Valley Grade UX: Password Shake State
+  const [isLoginShaking, setIsLoginShaking] = useState(false);
 
   // Deep Link Recovery & Lead Matrix Capture
   const pendingLeadId = location.state?.leadId || null;
@@ -133,11 +136,31 @@ const Auth = () => {
     const { error, user: loggedInUser } = await signIn(data.email, data.password);
     
     if (error) {
-      toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
+      const errorMessage = error.message?.toLowerCase() || "";
+      const isAuthError = errorMessage.includes("credential") || 
+                          errorMessage.includes("password") || 
+                          errorMessage.includes("invalid") ||
+                          errorMessage.includes("incorrect") ||
+                          errorMessage.includes("401");
+
+      if (isAuthError) {
+        // 200 IQ UX: Inline context-aware error with micro-interaction (shake)
+        loginForm.setError("password", { 
+          type: "manual", 
+          message: "Incorrect password. Please double-check and try again." 
+        });
+        
+        // Trigger haptic-like shake animation
+        setIsLoginShaking(true);
+        setTimeout(() => setIsLoginShaking(false), 600);
+      } else {
+        toast({
+          title: "Login Failed",
+          description: error.message || "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
+      
       loginForm.setValue("password", ""); 
     } else {
       toast({
@@ -511,20 +534,46 @@ const Auth = () => {
 
                           <div className="space-y-1">
                             <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Password</Label>
-                            <div className="relative">
+                            <motion.div 
+                              className="relative"
+                              animate={isLoginShaking ? { x: [-5, 5, -5, 5, -3, 3, 0], transition: { duration: 0.4 } } : {}}
+                            >
                               <Input
                                 type={showLoginPw ? "text" : "password"}
                                 placeholder="••••••••"
-                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                                {...loginForm.register("password")}
+                                className={cn(
+                                  "h-10 sm:h-9 w-full border-0 border-b rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]",
+                                  loginForm.formState.errors.password 
+                                    ? "border-rose-500/50 focus-visible:border-rose-500 text-rose-600" 
+                                    : "border-[#103783]/10 hover:border-[#103783]/30 focus-visible:border-[#10B981]"
+                                )}
+                                {...loginForm.register("password", {
+                                  onChange: () => {
+                                    if (loginForm.formState.errors.password) {
+                                      loginForm.clearErrors("password");
+                                    }
+                                  }
+                                })}
                               />
-                              <button type="button" onClick={() => setShowLoginPw(!showLoginPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowLoginPw(!showLoginPw)} className={cn("absolute right-1 top-1/2 -translate-y-1/2 p-1 transition-colors", loginForm.formState.errors.password ? "text-rose-400 hover:text-rose-600" : "text-slate-400 hover:text-[#103783]")} tabIndex={-1}>
                                 {showLoginPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
-                            </div>
-                            {loginForm.formState.errors.password && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{loginForm.formState.errors.password.message}</p>
-                            )}
+                            </motion.div>
+                            <AnimatePresence>
+                              {loginForm.formState.errors.password && (
+                                <motion.div 
+                                  initial={{ opacity: 0, height: 0, y: -5 }} 
+                                  animate={{ opacity: 1, height: "auto", y: 0 }} 
+                                  exit={{ opacity: 0, height: 0, y: -5 }}
+                                  className="text-[10px] text-rose-500 mt-1.5 pl-1 font-bold flex items-center gap-1"
+                                >
+                                  <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                  </svg>
+                                  {loginForm.formState.errors.password.message}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
 
                           <div className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group">
