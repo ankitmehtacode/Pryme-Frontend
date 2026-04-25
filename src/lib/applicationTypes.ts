@@ -229,7 +229,8 @@ export interface LoanRequirements {
   propertyCity?: string;
 
   // Auto Loan
-  vehicleQuotationPrice?: number;
+  vehicleOnRoadPrice?: number;    // On-road price of vehicle (ex-showroom + RTO + insurance)
+  vehicleQuotationPrice?: number; // Dealer quotation / proforma invoice price
 }
 
 // ─── FINANCIAL FOOTPRINT (Stage 4 — Universal + Conditional Overrides) ──────

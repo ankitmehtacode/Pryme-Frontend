@@ -42,7 +42,21 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   }
 
   try {
-    const response = await fetch(normalizedUrl, { ...options, headers, credentials: "include", mode: "cors" });
+    // 🧠 TIMEOUT GUARD: Prevents indefinite hangs when the backend is unreachable.
+    // Without this, a connection timeout on api.gopryme.tech:443 causes fetch to hang
+    // forever → React Query's isLoading never transitions → infinite spinners.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max
+
+    const response = await fetch(normalizedUrl, {
+      ...options,
+      headers,
+      credentials: "include",
+      mode: "cors",
+      signal: options.signal || controller.signal,
+    });
+
+    clearTimeout(timeoutId);
 
     // 🧠 GLOBAL INTERCEPTOR: The "Dead Session" Guillotine
     // ZERO localStorage. We dispatch a custom event that useAuth listens to.
@@ -95,6 +109,9 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     return await response.json();
 
   } catch (error: any) {
+    if (error.name === "AbortError") {
+      throw new Error("Request timed out: The PRYME server did not respond in time. Please try again.");
+    }
     if (error.message.includes("Failed to fetch")) {
       throw new Error("Network offline: Could not connect to the PRYME secure server.");
     }

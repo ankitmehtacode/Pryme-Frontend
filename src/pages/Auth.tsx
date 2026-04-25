@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
-import pryme2Logo from "@/assets/Pryme2.svg";
+// pryme2Logo removed — loading gate eliminated (Auth is a public page)
 
 // 🧠 Closed-Loop Security Context & API
 import { useAuth } from "@/hooks/useAuth";
@@ -79,7 +79,7 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 type AuthView = "login" | "signup" | "forgot-password";
 
 const Auth = () => {
-  const { user, signIn, signUp, signInWithGoogle, isLoading: isContextLoading } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const googleButtonRef = useRef<HTMLDivElement>(null);
@@ -337,23 +337,11 @@ const Auth = () => {
 
 
 
-  if (isContextLoading) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F4F7FA] relative overflow-hidden">
-        <motion.div 
-          animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }} 
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="relative z-10 flex flex-col items-center"
-        >
-          <img src={pryme2Logo} className="w-20 h-auto sm:w-28 drop-shadow-xl mb-10" alt="Pryme Logo" />
-          <div className="flex flex-col items-center gap-3">
-             <Loader2 className="w-5 h-5 text-[#103783] animate-spin" />
-             <p className="text-[10px] sm:text-[11px] font-extrabold text-[#103783] tracking-[0.3em] uppercase">Authenticating</p>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
+  // 🧠 SILICON VALLEY GRADE FIX: The Auth page is a PUBLIC page.
+  // NEVER block rendering on isContextLoading. If the backend is unreachable,
+  // the React Query fetch hangs indefinitely → isLoading stays true → infinite spinner.
+  // The useEffect above already handles redirecting authenticated users to /dashboard
+  // once hydration completes. Rendering the form immediately is the correct UX.
 
   return (
     <>

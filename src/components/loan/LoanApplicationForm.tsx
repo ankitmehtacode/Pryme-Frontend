@@ -1921,9 +1921,18 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                                 <AnimatePresence>
                                   
                 {store.loanRequirements.loanType === "AUTO_LOAN" && (
-                  <div className="grid grid-cols-1 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
-                      label="Vehicle Quotation Price (₹)"
+                      label="On Road Price of Vehicle (₹)"
+                      type="number"
+                      placeholder="1050000"
+                      icon={IndianRupee}
+                      value={store.loanRequirements.vehicleOnRoadPrice || ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleOnRoadPrice: Number(e.target.value) })}
+                      isValid={(store.loanRequirements.vehicleOnRoadPrice || 0) > 100000}
+                    />
+                    <ValidatedInput
+                      label="Quotation of Vehicle (₹)"
                       type="number"
                       placeholder="850000"
                       icon={IndianRupee}
