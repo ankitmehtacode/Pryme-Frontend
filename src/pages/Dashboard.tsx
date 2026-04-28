@@ -5,7 +5,7 @@ import {
   FileText, Search, CheckCircle, CreditCard, Clock,
   AlertCircle, Building2, TrendingUp, Activity,
   ShieldCheck, ChevronRight, ArrowRight, Wallet,
-  UploadCloud, CheckCircle2, Circle, Loader2
+  UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -769,6 +769,28 @@ const Dashboard: React.FC = () => {
                                       <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Assignee</p>
                                       <p className="text-sm font-medium text-foreground">{app.assignee || "Evaluating"}</p>
                                     </div>
+                                  </div>
+                                  <div className="pt-2 border-t border-border/50">
+                                    <Button 
+                                      variant="ghost" 
+                                      className="w-full justify-between hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
+                                      onClick={() => {
+                                        setActiveApplication(app);
+                                        // 🧠 SILICON VALLEY FEATURE: Re-hydrate the form allowing post-submission edits
+                                        if (app.metadata) {
+                                          try {
+                                            const parsedMeta = typeof app.metadata === "string" ? JSON.parse(app.metadata) : app.metadata;
+                                            setFormData(prev => ({ ...prev, ...parsedMeta }));
+                                          } catch(e) { console.error(e); }
+                                        }
+                                        setViewState("FUNNEL");
+                                        setCurrentStage(1);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                      }}
+                                    >
+                                      <span className="flex items-center"><Edit2 className="w-4 h-4 mr-2" /> Update Information / Documents</span>
+                                      <ChevronRight className="w-4 h-4" />
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
