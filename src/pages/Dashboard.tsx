@@ -20,7 +20,7 @@ import { toast } from "@/hooks/use-toast";
 
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
-import { getDocumentsForLoanType, ProductType, EmploymentType } from "@/lib/documentData";
+import { getDocumentsForLoanType, groupDocumentsByCategory, ProductType, EmploymentType } from "@/lib/documentData";
 
 // --- Types & Interfaces ---
 interface ApplicationDoc {
@@ -236,8 +236,8 @@ const Dashboard: React.FC = () => {
     };
   }, [user, authLoading, isAdmin, navigate]);
   
-  const { incomeDocs, propertyDocs } = useMemo(() => {
-    if (!activeApplication && viewState !== "FUNNEL") return { incomeDocs: [], propertyDocs: [] };
+  const { docGroups } = useMemo(() => {
+    if (!activeApplication && viewState !== "FUNNEL") return { docGroups: [] };
     
     let parsed: Record<string, any> = {};
     try {
@@ -266,8 +266,11 @@ const Dashboard: React.FC = () => {
     const allDocs = getDocumentsForLoanType(targetLoan, targetEmp) || [];
 
     return {
-      incomeDocs: allDocs.filter(d => d.category === "Income").map(d => ({ id: d.id, name: d.label, required: !d.optional })),
-      propertyDocs: allDocs.filter(d => d.category === "Property").map(d => ({ id: d.id, name: d.label, required: !d.optional }))
+      docGroups: groupDocumentsByCategory(allDocs).map(g => ({
+        category: g.category,
+        displayName: g.displayName,
+        docs: g.docs.map(d => ({ id: d.id, name: d.label, required: !d.optional }))
+      }))
     };
   }, [activeApplication, viewState]);
 
@@ -582,93 +585,51 @@ const Dashboard: React.FC = () => {
                             </div>
                           </div>
 
-                          {incomeDocs.length > 0 && (
-                            <div>
-                              <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">Financial & Income</h4>
-                              <div className="space-y-3">
-                                {incomeDocs.map((doc) => {
-                                  const isUploading = uploadingDocs[doc.id];
-                                  // 🧠 CHECK BOTH KEYS: Local React ID OR Backend Sanitized DocType
-                                  const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
+                          <div className="space-y-8">
+                            {docGroups.map((group) => (
+                              <div key={group.category}>
+                                <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">{group.displayName}</h4>
+                                <div className="space-y-3">
+                                  {group.docs.map((doc) => {
+                                    const isUploading = uploadingDocs[doc.id];
+                                    const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
 
-                                  return (
-                                    <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
-                                      <div className="flex flex-col">
-                                        <span className="font-medium text-foreground text-sm">
-                                          {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (Max 10MB)</span>
+                                    return (
+                                      <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
+                                        <div className="flex flex-col">
+                                          <span className="font-medium text-foreground text-sm">
+                                            {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
+                                          </span>
+                                          <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (Max 10MB)</span>
+                                        </div>
+                                        <div>
+                                          <input 
+                                            title={`Upload ${doc.name}`}
+                                            type="file" 
+                                            id={`upload-${doc.id}`} 
+                                            className="hidden" 
+                                            accept=".pdf,.jpg,.jpeg,.png"
+                                            onChange={(e) => handleFileUpload(doc, e)}
+                                            disabled={isUploading}
+                                          />
+                                          {isUploaded ? (
+                                            <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
+                                              <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
+                                            </Button>
+                                          ) : (
+                                            <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
+                                              {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                                              {isUploading ? "Encrypting..." : "Upload"}
+                                            </Label>
+                                          )}
+                                        </div>
                                       </div>
-                                      <div>
-                                        <input 
-                                          title={`Upload ${doc.name}`}
-                                          type="file" 
-                                          id={`upload-${doc.id}`} 
-                                          className="hidden" 
-                                          accept=".pdf,.jpg,.jpeg,.png"
-                                          onChange={(e) => handleFileUpload(doc, e)}
-                                          disabled={isUploading}
-                                        />
-                                        {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
-                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
-                                          </Button>
-                                        ) : (
-                                          <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
-                                            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
-                                            {isUploading ? "Encrypting..." : "Upload"}
-                                          </Label>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          )}
-
-                          {propertyDocs.length > 0 && (
-                            <div className="pt-4">
-                              <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">Property Records</h4>
-                              <div className="space-y-3">
-                                {propertyDocs.map((doc) => {
-                                  const isUploading = uploadingDocs[doc.id];
-                                  const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
-
-                                  return (
-                                    <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
-                                      <div className="flex flex-col">
-                                        <span className="font-medium text-foreground text-sm">
-                                          {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <input 
-                                          title={`Upload ${doc.name}`}
-                                          type="file" 
-                                          id={`upload-${doc.id}`} 
-                                          className="hidden" 
-                                          accept=".pdf,.jpg,.jpeg,.png"
-                                          onChange={(e) => handleFileUpload(doc, e)}
-                                          disabled={isUploading}
-                                        />
-                                        {isUploaded ? (
-                                          <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
-                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
-                                          </Button>
-                                        ) : (
-                                          <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
-                                            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
-                                            {isUploading ? "Encrypting..." : "Upload"}
-                                          </Label>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
+                            ))}
+                          </div>
                         </div>
                       )}
 
