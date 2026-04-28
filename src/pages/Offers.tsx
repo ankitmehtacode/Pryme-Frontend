@@ -192,38 +192,53 @@ export default function Offers() {
   // ── EMI + Comparison Intelligence ─────────────────────────────────────
   function calcEMI(p: number, r: number, t: number) {
     const mr = r / (12 * 100), n = t * 12;
+    if (mr === 0) return Math.round(p / n);
     return Math.round((p * mr * Math.pow(1 + mr, n)) / (Math.pow(1 + mr, n) - 1));
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // SCENARIO A: PUBLIC PAGE (Missing Context Data)
-  // ═══════════════════════════════════════════════════════════════════════
-  if (!leadData) {
-    return (
-      <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
-        <div className="max-w-md w-full px-6 text-center space-y-6">
-          <div className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-            <Lock className="w-10 h-10 text-primary" />
-          </div>
-          <h2 className="text-2xl font-bold font-heading">Secure Data Missing</h2>
-          <p className="text-secondary-foreground text-sm">
-            We need your loan application context to generate personalized offers. 
-            Please start an application to view live matrix matches.
-          </p>
-          <Button onClick={() => navigate("/")} className="w-full h-12" variant="outline">
-            Return Home
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // 🧠 RULES OF HOOKS FIX: ALL useMemo/useCallback hooks MUST run
+  // unconditionally before any early returns. React requires hooks
+  // to be called in the same order on every render.
+
+  const emis = useMemo(() => {
+    if (!leadData || dynamicOffers.length === 0) return {};
+    const m: Record<string, number> = {};
+    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure); });
+    return m;
+  }, [dynamicOffers, leadData]);
+
+  const totalRepayments = useMemo(() => {
+    if (!leadData || dynamicOffers.length === 0) return {};
+    const m: Record<string, number> = {};
+    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure) * o.maxTenure * 12; });
+    return m;
+  }, [dynamicOffers, leadData]);
+
+  const savingsVsNext = useMemo(() => {
+    if (dynamicOffers.length < 2 || !leadData) return { emiDiff: 0, totalDiff: 0, comparedTo: "" };
+    const hero = dynamicOffers[0], next = dynamicOffers[1];
+    return {
+      emiDiff: (emis[next.id] || 0) - (emis[hero.id] || 0),
+      totalDiff: (totalRepayments[next.id] || 0) - (totalRepayments[hero.id] || 0),
+      comparedTo: next.bankName,
+    };
+  }, [dynamicOffers, emis, totalRepayments, leadData]);
+
+  const heroValueScore = useMemo(() => {
+    if (!dynamicOffers.length) return 0;
+    const hero = dynamicOffers[0];
+    let score = 50;
+    score += Math.min(25, hero.approvalOdds / 4);
+    if (hero.interestRate <= 11) score += 15;
+    if (hero.processingTime.includes("24")) score += 10;
+    return Math.min(97, Math.round(score));
+  }, [dynamicOffers]);
 
   // ═══════════════════════════════════════════════════════════════════════
   // SCENARIO B: EXCEPTION ZERO-STATE (No Offers Matched Engine Profile)
   // ═══════════════════════════════════════════════════════════════════════
-  if (!showSkeleton && dynamicOffers.length === 0) {
-    // BUG-9 FIX: Java field is `rejectionReasons`, not `violations`.
-    const rawViolations = leadData.engineResults?.[0]?.rejectionReasons || leadData.engineResults?.[0]?.violations || [];
+  if (leadData && !showSkeleton && dynamicOffers.length === 0) {
+    const rawViolations = (leadData as any).engineResults?.[0]?.rejectionReasons || (leadData as any).engineResults?.[0]?.violations || [];
 
     return (
       <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
@@ -261,46 +276,6 @@ export default function Offers() {
       </div>
     );
   }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // SCENARIO C: MATCHED OFFERS ENGINE PAGE
-  // ═══════════════════════════════════════════════════════════════════════
-
-  const emis = useMemo(() => {
-    if (!leadData) return {};
-    const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure); });
-    return m;
-  }, [dynamicOffers, leadData]);
-
-  const totalRepayments = useMemo(() => {
-    if (!leadData) return {};
-    const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure) * o.maxTenure * 12; });
-    return m;
-  }, [dynamicOffers, leadData]);
-
-  // Savings vs next best
-  const savingsVsNext = useMemo(() => {
-    if (dynamicOffers.length < 2 || !leadData) return { emiDiff: 0, totalDiff: 0, comparedTo: "" };
-    const hero = dynamicOffers[0], next = dynamicOffers[1];
-    return {
-      emiDiff: (emis[next.id] || 0) - (emis[hero.id] || 0),
-      totalDiff: (totalRepayments[next.id] || 0) - (totalRepayments[hero.id] || 0),
-      comparedTo: next.bankName,
-    };
-  }, [dynamicOffers, emis, totalRepayments, leadData]);
-
-  // Value score for hero
-  const heroValueScore = useMemo(() => {
-    if (!dynamicOffers.length) return 0;
-    const hero = dynamicOffers[0];
-    let score = 50;
-    score += Math.min(25, hero.approvalOdds / 4);
-    if (hero.interestRate <= 11) score += 15;
-    if (hero.processingTime.includes("24")) score += 10;
-    return Math.min(97, Math.round(score));
-  }, [dynamicOffers]);
 
   // ── Handlers ──────────────────────────────────────────────────────────
   const handleUnlock = async (offer: BankOffer) => {
