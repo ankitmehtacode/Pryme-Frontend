@@ -329,7 +329,44 @@ const Dashboard: React.FC = () => {
     const newProgress = (newStage - 1) * 25;
     
     try {
-      await api.patch(`/applications/${activeApplication.applicationId}`, {
+      let targetAppId = activeApplication.applicationId;
+      
+      // 🧠 JIT BACKEND SYNC: If this is a synthetic frontend application (from a lost lead),
+      // we must recreate the lead on the backend and elevate it before we can PATCH progress.
+      if (targetAppId.startsWith("pending-")) {
+        console.log("Synthesizing lost application context into backend...");
+        const cachedAppStr = localStorage.getItem("pryme_pending_application");
+        const cachedApp = cachedAppStr ? JSON.parse(cachedAppStr) : {};
+        
+        // 1. Submit a fresh lead with whatever data we can scrape together
+        const leadRes = await PrymeAPI.submitLead({
+           fullName: user?.name || "Pryme Client",
+           phone: "9999999999", // Fallback required by backend validation
+           loanAmount: activeApplication.requestedAmount || cachedApp.loanAmount || 100000,
+           loanType: activeApplication.loanType || cachedApp.loanType || "PERSONAL_LOAN",
+           cibilScore: cachedApp.cibilScore || 0,
+           monthlyIncome: cachedApp.monthlyIncome || 0,
+           ...cachedApp
+        });
+        
+        const newLeadId = leadRes?.lead?.id || leadRes?.data?.lead?.id;
+        if (!newLeadId) throw new Error("Backend failed to generate recovery lead.");
+        
+        // 2. Elevate the fresh lead
+        const selectedBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
+        const elevateRes = await PrymeAPI.elevateLead(newLeadId, user?.id || "", selectedBank);
+        
+        targetAppId = elevateRes?.application?.applicationId || elevateRes?.data?.application?.applicationId;
+        if (!targetAppId) throw new Error("Backend failed to elevate recovery lead.");
+        
+        // 3. Update the frontend context
+        setActiveApplication(prev => prev ? { ...prev, applicationId: targetAppId } : null);
+        
+        // Cleanup old synthetic data
+        localStorage.removeItem("pryme_pending_application");
+      }
+
+      await api.patch(`/applications/${targetAppId}`, {
          metadata: formData,
          completionPercentage: newProgress
       });
@@ -340,7 +377,7 @@ const Dashboard: React.FC = () => {
       console.error("Sync Error:", error);
       toast({ 
         title: "Sync Error", 
-        description: error.response?.data?.message || "Failed to synchronise progress. Please check connection.", 
+        description: error.response?.data?.message || error.message || "Failed to synchronise progress. Please check connection.", 
         variant: "destructive" 
       });
     } finally {
