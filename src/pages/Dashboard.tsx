@@ -307,7 +307,7 @@ const Dashboard: React.FC = () => {
     setIsSaving(true);
     
     const newStage = currentStage + 1;
-    const newProgress = (newStage - 1) * 50;
+    const newProgress = Math.min(currentStage * 50, 100);
     
     try {
       let targetAppId = activeApplication.applicationId;
@@ -508,18 +508,52 @@ const Dashboard: React.FC = () => {
                 exit={{ opacity: 0 }}
                 className="pt-24 px-4 md:px-8 max-w-6xl mx-auto"
               >
-                <div className="bg-[#0a1530] text-white rounded-3xl p-8 mb-8 shadow-2xl relative overflow-hidden border border-[#103783]/20">
-                  <div className="flex justify-between items-end mb-4 relative z-10">
-                    <div>
-                      <h1 className="text-3xl font-bold tracking-tight mb-2">Application Pipeline</h1>
-                      <p className="text-slate-400 font-mono text-sm">ID: {activeApplication?.applicationId || "Initializing..."}</p>
+                <div className="relative rounded-[2rem] p-8 md:p-10 mb-10 overflow-hidden shadow-2xl border border-white/10 bg-slate-900">
+                  {/* Glassmorphism Backgrounds */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-indigo-600/10 to-transparent opacity-60 mix-blend-overlay"></div>
+                  <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
+                  <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
+                  
+                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+                    <div className="flex items-center gap-5">
+                      <div className="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shadow-inner">
+                        <Target className="w-8 h-8 text-blue-400" />
+                      </div>
+                      <div>
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 drop-shadow-sm">
+                          Application Funnel
+                        </h1>
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                            ID: {activeApplication?.applicationId || "Initializing..."}
+                          </span>
+                          <span className="text-sm font-medium text-slate-400">
+                            Target: <span className="text-slate-200">{activeApplication?.targetBank || "Pryme Aggregator"}</span>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-4xl font-bold text-blue-500">{((currentStage - 1) * 50) || 5}%</span>
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Captured</p>
+                    
+                    <div className="text-left md:text-right w-full md:w-auto">
+                      <div className="flex items-end md:justify-end gap-2 mb-1">
+                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 leading-none">
+                          {Math.min((currentStage - 1) * 50 || 5, 100)}%
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Progress Captured</p>
                     </div>
                   </div>
-                  <Progress value={(currentStage - 1) * 50} className="h-2 bg-slate-800 [&>div]:bg-blue-500 relative z-10" />
+                  
+                  <div className="relative z-10 h-3 w-full bg-slate-950/50 rounded-full overflow-hidden border border-white/5 backdrop-blur-sm">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min((currentStage - 1) * 50 || 5, 100)}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
+                      <div className="absolute inset-0 w-full h-full opacity-30" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)' }}></div>
+                    </motion.div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -635,14 +669,14 @@ const Dashboard: React.FC = () => {
 
                       <div className="mt-10 pt-6 border-t border-border flex justify-end relative z-10">
                         <Button 
-                          onClick={currentStage === 4 ? handleFinalSubmit : handleNextStage} 
+                          onClick={currentStage === 2 ? handleFinalSubmit : handleNextStage} 
                           disabled={isSaving}
                           className="h-12 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 disabled:opacity-70 transition-all"
                         >
                           {isSaving ? (
-                            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {currentStage === 4 ? "Securing Data..." : "Saving..."}</>
+                            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {currentStage === 2 ? "Securing Data..." : "Saving..."}</>
                           ) : (
-                            <>{currentStage === 4 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-5 h-5 ml-2" /></>
+                            <>{currentStage === 2 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-5 h-5 ml-2" /></>
                           )}
                         </Button>
                       </div>
