@@ -254,9 +254,18 @@ const Dashboard: React.FC = () => {
 
     const formatEnumString = (str: string) => {
       if (!str) return str;
-      if (str === "LAP" || str === "SEP" || str === "SENP") return str;
-      if (str === "SELF_EMPLOYED_PROFESSIONAL") return "SEP";
-      if (str === "SELF_EMPLOYED_NON_PROFESSIONAL") return "SENP";
+      
+      const s = str.toUpperCase().replace(/ /g, '_');
+      if (s === "LAP" || s === "LOAN_AGAINST_PROPERTY") return "LAP";
+      if (s === "SEP" || s === "SELF_EMPLOYED_PROFESSIONAL") return "SEP";
+      if (s === "SENP" || s === "SELF_EMPLOYED_NON_PROFESSIONAL") return "SENP";
+      if (s === "SALARIED") return "Salaried";
+      if (s === "HOME_LOAN") return "Home Loan";
+      if (s === "PERSONAL_LOAN") return "Personal Loan";
+      if (s === "BUSINESS_LOAN") return "Business Loan";
+      if (s === "AUTO_LOAN" || s === "CAR_LOAN") return "Auto Loan";
+
+      // Fallback
       return str.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
     };
 
@@ -508,49 +517,51 @@ const Dashboard: React.FC = () => {
                 exit={{ opacity: 0 }}
                 className="pt-24 px-4 md:px-8 max-w-6xl mx-auto"
               >
-                <div className="relative rounded-[2rem] p-8 md:p-10 mb-10 overflow-hidden shadow-2xl border border-white/10 bg-slate-900">
-                  {/* Glassmorphism Backgrounds */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-indigo-600/10 to-transparent opacity-60 mix-blend-overlay"></div>
-                  <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
-                  <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
+                <div className="relative rounded-[2.5rem] p-8 md:p-12 mb-10 overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-white/40 dark:border-white/10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl">
+                  {/* Subtle Glowing Orbs */}
+                  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                  <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
                   
-                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
-                    <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shadow-inner">
-                        <Target className="w-8 h-8 text-blue-400" />
+                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                      <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-white/80 to-white/30 dark:from-white/10 dark:to-white/5 backdrop-blur-xl border border-white/50 dark:border-white/10 flex items-center justify-center shadow-lg">
+                        <Target className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 drop-shadow-sm">
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-3">
                           Application Funnel
                         </h1>
-                        <div className="flex items-center gap-3">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100/80 dark:bg-blue-500/10 text-blue-800 dark:text-blue-300 border border-blue-200/50 dark:border-blue-500/20 backdrop-blur-md">
                             ID: {activeApplication?.applicationId || "Initializing..."}
                           </span>
-                          <span className="text-sm font-medium text-slate-400">
-                            Target: <span className="text-slate-200">{activeApplication?.targetBank || "Pryme Aggregator"}</span>
+                          <span className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center">
+                            Routing to: <span className="text-slate-900 dark:text-slate-200 font-bold ml-1">{activeApplication?.targetBank || "Pryme Aggregator"}</span>
                           </span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="text-left md:text-right w-full md:w-auto">
-                      <div className="flex items-end md:justify-end gap-2 mb-1">
-                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 leading-none">
-                          {Math.min((currentStage - 1) * 50 || 5, 100)}%
+                    <div className="flex flex-col items-start md:items-end w-full md:w-auto bg-white/40 dark:bg-black/20 p-5 rounded-2xl border border-white/50 dark:border-white/5 backdrop-blur-lg">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-none">
+                          {Math.min(currentStage === 1 ? 5 : (currentStage - 1) * 50, 100)}
                         </span>
+                        <span className="text-2xl font-bold text-slate-400 dark:text-slate-500">%</span>
                       </div>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Progress Captured</p>
+                      <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Completion</p>
                     </div>
                   </div>
                   
-                  <div className="relative z-10 h-3 w-full bg-slate-950/50 rounded-full overflow-hidden border border-white/5 backdrop-blur-sm">
+                  {/* Premium Progress Track */}
+                  <div className="relative z-10 h-4 w-full bg-slate-200/50 dark:bg-slate-950/50 rounded-full overflow-hidden border border-white/60 dark:border-white/5 backdrop-blur-md shadow-inner">
                     <motion.div 
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full"
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full relative overflow-hidden"
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.min((currentStage - 1) * 50 || 5, 100)}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      animate={{ width: `${Math.min(currentStage === 1 ? 5 : (currentStage - 1) * 50, 100)}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
                     >
+                      {/* Glass Shimmer Effect */}
                       <div className="absolute inset-0 w-full h-full opacity-30" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)' }}></div>
                     </motion.div>
                   </div>
@@ -783,6 +794,15 @@ const Dashboard: React.FC = () => {
                                             setFormData(prev => ({ ...prev, ...parsedMeta }));
                                           } catch(e) { console.error(e); }
                                         }
+
+                                        if (app.documents && app.documents.length > 0) {
+                                          const loadedDocs: Record<string, boolean> = {};
+                                          app.documents.forEach((d) => {
+                                            if (d.docType) loadedDocs[d.docType] = true;
+                                          });
+                                          setUploadedDocs(loadedDocs);
+                                        }
+
                                         setViewState("FUNNEL");
                                         setCurrentStage(1);
                                         window.scrollTo({ top: 0, behavior: "smooth" });
