@@ -97,15 +97,13 @@ const Profile = () => {
         body: file
       });
 
-      // 3. The documentId is the S3 key. We can construct the public URL or just save the documentId
-      // For now, let's assume the bucket is public or we serve it via CloudFront.
-      // If we are locally mocking with dummy-s3-upload, we just use a placeholder or the URL
-      const fileUrl = data.uploadUrl.includes("dummy-s3") 
-        ? URL.createObjectURL(file) // fake it locally for UX
-        : data.uploadUrl.split("?")[0]; 
+      // 3. For RBI compliance, we NEVER store or use the public S3 URL.
+      // We only store the documentId (the S3 key). The backend will generate
+      // a short-lived presigned GET URL when fetching the profile.
+      const documentId = data.documentId;
 
       // 4. Update Profile
-      const updatedProfile = { ...profileData, profilePictureUrl: fileUrl };
+      const updatedProfile = { ...profileData, profilePictureUrl: documentId };
       await PrymeAPI.updateProfile(updatedProfile);
       setProfileData(updatedProfile);
 
