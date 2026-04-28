@@ -338,12 +338,21 @@ const Dashboard: React.FC = () => {
         const cachedAppStr = localStorage.getItem("pryme_pending_application");
         const cachedApp = cachedAppStr ? JSON.parse(cachedAppStr) : {};
         
+        // 🧠 NORMALIZE LOAN TYPE: Backend explicitly strictly requires lowercase
+        // values: personal, business, home, education, lap
+        const rawLoanType = String(activeApplication.loanType || cachedApp.loanType || "personal").toLowerCase();
+        let normalizedLoanType = "personal";
+        if (rawLoanType.includes("business")) normalizedLoanType = "business";
+        else if (rawLoanType.includes("home")) normalizedLoanType = "home";
+        else if (rawLoanType.includes("education")) normalizedLoanType = "education";
+        else if (rawLoanType.includes("lap")) normalizedLoanType = "lap";
+        
         // 1. Submit a fresh lead with whatever data we can scrape together
         const leadRes = await PrymeAPI.submitLead({
            fullName: user?.name || "Pryme Client",
            phone: "9999999999", // Fallback required by backend validation
            loanAmount: activeApplication.requestedAmount || cachedApp.loanAmount || 100000,
-           loanType: activeApplication.loanType || cachedApp.loanType || "PERSONAL_LOAN",
+           loanType: normalizedLoanType,
            cibilScore: cachedApp.cibilScore || 0,
            monthlyIncome: cachedApp.monthlyIncome || 0,
            ...cachedApp
