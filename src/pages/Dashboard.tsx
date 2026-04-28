@@ -349,13 +349,14 @@ const Dashboard: React.FC = () => {
         
         // 1. Submit a fresh lead with whatever data we can scrape together
         const leadRes = await PrymeAPI.submitLead({
+           ...cachedApp, // Spread first so our explicit overrides win
            fullName: user?.name || "Pryme Client",
            phone: "9999999999", // Fallback required by backend validation
            loanAmount: activeApplication.requestedAmount || cachedApp.loanAmount || 100000,
            loanType: normalizedLoanType,
+           productType: normalizedLoanType, // 🧠 FIX: submitLead prefers productType over loanType
            cibilScore: cachedApp.cibilScore || 0,
-           monthlyIncome: cachedApp.monthlyIncome || 0,
-           ...cachedApp
+           monthlyIncome: cachedApp.monthlyIncome || 0
         });
         
         const newLeadId = leadRes?.lead?.id || leadRes?.data?.lead?.id;
