@@ -161,10 +161,8 @@ const Dashboard: React.FC = () => {
 
           if (progress < 100) {
             setViewState("FUNNEL");
-            if (progress < 25) setCurrentStage(1);
-            else if (progress < 50) setCurrentStage(2);
-            else if (progress < 75) setCurrentStage(3);
-            else setCurrentStage(4); 
+            if (progress < 50) setCurrentStage(1);
+            else setCurrentStage(2); 
             
             if (primaryApp.metadata) {
               let parsedMeta: Partial<DashboardFormData> = {};
@@ -293,26 +291,6 @@ const Dashboard: React.FC = () => {
           return false;
         }
         break;
-      case 2:
-        if (!formData.companyName || !formData.designation || !formData.workExperience || !formData.officeEmail) {
-          toast({ title: "Incomplete Professional Data", description: "Please complete all fields in this section.", variant: "destructive" });
-          return false;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.officeEmail)) {
-          toast({ title: "Invalid Email", description: "Please provide a valid official email address.", variant: "destructive" });
-          return false;
-        }
-        break;
-      case 3:
-        if (!formData.monthlyEMI || !formData.existingBank || !formData.coApplicant || !formData.loanPurpose) {
-          toast({ title: "Incomplete Financial Data", description: "Please complete all fields in this section.", variant: "destructive" });
-          return false;
-        }
-        if (isNaN(Number(formData.monthlyEMI)) || Number(formData.monthlyEMI) < 0) {
-          toast({ title: "Invalid EMI Amount", description: "Monthly EMI must be a valid number.", variant: "destructive" });
-          return false;
-        }
-        break;
       default:
         break;
     }
@@ -326,7 +304,7 @@ const Dashboard: React.FC = () => {
     setIsSaving(true);
     
     const newStage = currentStage + 1;
-    const newProgress = (newStage - 1) * 25;
+    const newProgress = (newStage - 1) * 50;
     
     try {
       let targetAppId = activeApplication.applicationId;
@@ -508,9 +486,7 @@ const Dashboard: React.FC = () => {
 
   const stages = [
     { id: 1, label: "Identity Matrix", desc: "Basic KYC Verification" },
-    { id: 2, label: "Professional Data", desc: "Employment & Income" },
-    { id: 3, label: "Financial Overview", desc: "Liabilities & Declarations" },
-    { id: 4, label: "Document Vault", desc: "Secure File Ingestion" },
+    { id: 2, label: "Document Vault", desc: "Secure File Ingestion" },
   ];
 
   return (
@@ -536,11 +512,11 @@ const Dashboard: React.FC = () => {
                       <p className="text-slate-400 font-mono text-sm">ID: {activeApplication?.applicationId || "Initializing..."}</p>
                     </div>
                     <div className="text-right">
-                      <span className="text-4xl font-bold text-blue-500">{((currentStage - 1) * 25) || 5}%</span>
+                      <span className="text-4xl font-bold text-blue-500">{((currentStage - 1) * 50) || 5}%</span>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Captured</p>
                     </div>
                   </div>
-                  <Progress value={(currentStage - 1) * 25} className="h-2 bg-slate-800 [&>div]:bg-blue-500 relative z-10" />
+                  <Progress value={(currentStage - 1) * 50} className="h-2 bg-slate-800 [&>div]:bg-blue-500 relative z-10" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -597,59 +573,11 @@ const Dashboard: React.FC = () => {
                       )}
 
                       {currentStage === 2 && (
-                        <div className="space-y-6 relative z-10">
-                          <h2 className="text-xl font-bold border-b border-border pb-4">2. Professional Matrix</h2>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="companyName">Company Name *</Label>
-                              <Input id="companyName" value={formData.companyName} onChange={(e) => handleInputChange("companyName", e.target.value)} className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="designation">Designation *</Label>
-                              <Input id="designation" value={formData.designation} onChange={(e) => handleInputChange("designation", e.target.value)} className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="workExperience">Work Experience (Yrs) *</Label>
-                              <Input id="workExperience" type="number" min="0" step="0.5" value={formData.workExperience} onChange={(e) => handleInputChange("workExperience", e.target.value)} className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="officeEmail">Official Email ID *</Label>
-                              <Input id="officeEmail" type="email" value={formData.officeEmail} onChange={(e) => handleInputChange("officeEmail", e.target.value)} className="bg-background" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {currentStage === 3 && (
-                        <div className="space-y-6 relative z-10">
-                          <h2 className="text-xl font-bold border-b border-border pb-4">3. Financial Overview</h2>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="monthlyEMI">Total Existing EMIs (Monthly) *</Label>
-                              <Input id="monthlyEMI" type="number" min="0" value={formData.monthlyEMI} onChange={(e) => handleInputChange("monthlyEMI", e.target.value)} className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="existingBank">Primary Salary Bank *</Label>
-                              <Input id="existingBank" value={formData.existingBank} onChange={(e) => handleInputChange("existingBank", e.target.value)} className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="coApplicant">Co-Applicant Added? *</Label>
-                              <Input id="coApplicant" value={formData.coApplicant} onChange={(e) => handleInputChange("coApplicant", e.target.value)} placeholder="Yes / No" className="bg-background" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="loanPurpose">End Purpose *</Label>
-                              <Input id="loanPurpose" value={formData.loanPurpose} onChange={(e) => handleInputChange("loanPurpose", e.target.value)} className="bg-background" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {currentStage === 4 && (
                         <div className="space-y-8 relative z-10">
                           <div className="flex items-center gap-3 mb-6 border-b border-border pb-4">
                             <div className="bg-blue-500/10 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500"/></div>
                             <div>
-                              <h2 className="text-xl font-bold">4. Document Vault</h2>
+                              <h2 className="text-xl font-bold">2. Document Vault</h2>
                               <p className="text-sm text-muted-foreground">Final step. Securely upload documents to initiate underwriting.</p>
                             </div>
                           </div>
