@@ -98,6 +98,15 @@ const Auth = () => {
   const pendingLeadId = location.state?.leadId || null;
   const from = location.state?.from || null;
 
+  // 🧠 RELAY FIX: Persist lead handoff to localStorage so Dashboard.tsx
+  // can pick it up during boot. Without this, the leadId from Offers → Auth
+  // is lost because Auth navigates to /dashboard without forwarding state.
+  useEffect(() => {
+    if (pendingLeadId) {
+      localStorage.setItem("pryme_pending_lead_id", pendingLeadId);
+    }
+  }, [pendingLeadId]);
+
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",

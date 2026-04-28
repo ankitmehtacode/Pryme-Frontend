@@ -252,7 +252,9 @@ const Apply = () => {
         monthlyIncome: applicationData?.monthlyIncome,
         loanAmount: loanAmount,
         fullName: applicationData?.name || localStorage.getItem("pryme_lead_name") || "Guest",
-        engineResults: applicationData?.engineResults || []
+        engineResults: applicationData?.engineResults || [],
+        // 🧠 RELAY FIX: Pass leadId so Offers.tsx can forward it to Auth.tsx
+        leadId: localStorage.getItem("pryme_pending_lead_id") || undefined,
       },
     });
   };

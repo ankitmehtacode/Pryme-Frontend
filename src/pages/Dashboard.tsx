@@ -120,14 +120,23 @@ const Dashboard: React.FC = () => {
 
       try {
         const pendingLead = localStorage.getItem("pryme_pending_lead_id");
+        const selectedBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
+        let elevationSucceeded = false;
+
         if (pendingLead) {
           try {
-            const selectedBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
-            await PrymeAPI.elevateLead(pendingLead, (user as any).id || (user as any).name, selectedBank);
+            await PrymeAPI.elevateLead(pendingLead, user.id, selectedBank);
+            elevationSucceeded = true;
+          } catch (e: any) {
+            // 🧠 409 CONFLICT: Lead was already elevated — still a success path
+            if (e?.message?.includes("409") || e?.message?.includes("already")) {
+              elevationSucceeded = true;
+            }
+            console.warn("Lead elevation skipped or failed:", e);
+          } finally {
+            // Always clean up — stale IDs cause infinite retry loops
             localStorage.removeItem("pryme_pending_lead_id");
             localStorage.removeItem("pryme_target_bank");
-          } catch (e) {
-            console.warn("Lead elevation skipped or failed.", e);
           }
         }
 
@@ -174,7 +183,33 @@ const Dashboard: React.FC = () => {
             setViewState("DASHBOARD");
           }
         } else {
-          setViewState("EMPTY");
+          // 🧠 RELAY FIX: If there's a cached pending application from the /apply flow,
+          // scaffold a synthetic FUNNEL so the user sees the form immediately instead of
+          // a dead-end "No Active Instruments" screen. This handles the case where
+          // lead elevation failed but the user clearly came from the loan application flow.
+          const cachedApp = localStorage.getItem("pryme_pending_application");
+          if (cachedApp) {
+            try {
+              const parsed = JSON.parse(cachedApp);
+              // Create a synthetic application so the FUNNEL renders
+              const scaffold: Application = {
+                applicationId: "pending-" + Date.now(),
+                status: "DRAFT",
+                loanType: parsed.loanType || "PERSONAL_LOAN",
+                requestedAmount: parsed.loanAmount || 0,
+                completionPercentage: 0,
+                createdAt: new Date().toISOString(),
+              };
+              setMyApplications([scaffold]);
+              setActiveApplication(scaffold);
+              setCurrentStage(1);
+              setViewState("FUNNEL");
+            } catch (e) {
+              setViewState("EMPTY");
+            }
+          } else {
+            setViewState("EMPTY");
+          }
         }
       } catch (error: any) {
         if (error.name === "CanceledError" || error.message === "canceled") return;

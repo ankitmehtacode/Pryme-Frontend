@@ -285,7 +285,10 @@ export default function Offers() {
       localStorage.setItem("pryme_target_bank", offer.bankName);
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Create your account to track it.` });
-      navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: leadData.leadId } });
+      // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
+      // Read from the actual source of truth where Apply.tsx:116 saved it.
+      const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
+      navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
     } catch {
       toast({ title: "Connection Error", description: "Please try again.", variant: "destructive" });
       setIsLocking(null);
