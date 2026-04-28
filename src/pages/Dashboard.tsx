@@ -260,10 +260,10 @@ const Dashboard: React.FC = () => {
       if (s === "SEP" || s === "SELF_EMPLOYED_PROFESSIONAL") return "SEP";
       if (s === "SENP" || s === "SELF_EMPLOYED_NON_PROFESSIONAL") return "SENP";
       if (s === "SALARIED") return "Salaried";
-      if (s === "HOME_LOAN") return "Home Loan";
-      if (s === "PERSONAL_LOAN") return "Personal Loan";
-      if (s === "BUSINESS_LOAN") return "Business Loan";
-      if (s === "AUTO_LOAN" || s === "CAR_LOAN") return "Auto Loan";
+      if (s === "HOME_LOAN" || s === "HOME") return "Home Loan";
+      if (s === "PERSONAL_LOAN" || s === "PERSONAL") return "Personal Loan";
+      if (s === "BUSINESS_LOAN" || s === "BUSINESS") return "Business Loan";
+      if (s === "AUTO_LOAN" || s === "CAR_LOAN" || s === "AUTO") return "Auto Loan";
 
       // Fallback
       return str.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -390,13 +390,10 @@ const Dashboard: React.FC = () => {
     
     // 🧠 STRICT SUBMISSION CHECK: Ensure all mandatory documents are marked as uploaded 
     // Checks against both local ID and backend sanitized DocType format
-    const requiredIncomeDocs = incomeDocs.filter(d => d.required);
-    const missingIncomeDocs = requiredIncomeDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
-    
-    const requiredPropertyDocs = propertyDocs.filter(d => d.required);
-    const missingPropertyDocs = requiredPropertyDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
+    const allRequiredDocs = docGroups.flatMap(group => group.docs).filter(d => d.required);
+    const missingDocs = allRequiredDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
 
-    if (missingIncomeDocs || missingPropertyDocs) {
+    if (missingDocs) {
       toast({ 
         title: "Missing Documents", 
         description: "Please upload all mandatory documents before submission.", 
