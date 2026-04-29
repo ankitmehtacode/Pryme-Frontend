@@ -291,7 +291,8 @@ export const PrymeAPI = {
       const s3Response = await fetch(uploadUrl, {
         method: "PUT",
         headers: {
-            "Content-Type": file.type
+            "Content-Type": file.type,
+            "x-amz-server-side-encryption": "AES256"
         },
         body: file
       });
