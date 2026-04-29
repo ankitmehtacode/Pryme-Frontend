@@ -270,19 +270,37 @@ export const PrymeAPI = {
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   
   // DOCUMENT VAULT: Upload
-  // 🧠 CLOSED-LOOP FIX: Backend DocumentVaultController uses /documents/initiate-upload
+  // 🧠 ZERO-TRUST S3 INGESTION: Creates a DB record first, then streams directly to S3
   uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
     try {
-      const formData = new FormData();
-      formData.append("applicationId", applicationId);
-      formData.append("docType", docType);
-      formData.append("file", file);
+      // 1. Initialize Document metadata matrix
+      const payload = {
+        applicationId,
+        docType,
+        contentType: file.type,
+        filename: file.name,
+        fileSize: file.size
+      };
       
-      const data = await fetchWithAuth(`/documents/initiate-upload`, {
+      const { uploadUrl, documentId } = await fetchWithAuth(`/documents/initiate-upload`, {
         method: "POST",
-        body: formData 
+        body: JSON.stringify(payload)
       });
-      return { data, error: null };
+
+      // 2. Stream directly to S3 / Dummy Gateway
+      const s3Response = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+            "Content-Type": file.type
+        },
+        body: file
+      });
+
+      if (!s3Response.ok) {
+         throw new Error("Failed to securely stream document to vault.");
+      }
+
+      return { data: { documentId }, error: null };
     } catch (error: any) {
       console.error("Document vault encryption failed:", error);
       return { data: null, error: { message: error.message || "Network stream disrupted." } };
