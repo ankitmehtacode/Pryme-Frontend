@@ -46,7 +46,9 @@ const EMP_TYPES = [
 // fallback rate and generates valid SpEL. Zero side effects, unit-testable.
 
 export function compileRulesToSpel(rules: PricingRule[], fallbackRoi: number): string {
-  const validRules = rules.filter(r => r.roi > 0);
+  // Fix: Don't strictly require > 0, just require it to be a number.
+  // This prevents silent filtering if the ROI is 0 or negative due to UI math.
+  const validRules = rules.filter(r => r.roi !== null && !isNaN(r.roi));
 
   if (validRules.length === 0) {
     return String(fallbackRoi);
@@ -119,7 +121,7 @@ export const PricingMatrixBuilder: React.FC<PricingMatrixBuilderProps> = ({
 
   // ── Seed fallback from baseRate prop ─────────────────────────────────────
   useEffect(() => {
-    if (baseRate && baseRate > 0) {
+    if (baseRate !== undefined && baseRate !== null) {
       setFallbackRoi(baseRate);
     }
   }, [baseRate]);
@@ -127,12 +129,16 @@ export const PricingMatrixBuilder: React.FC<PricingMatrixBuilderProps> = ({
   // ── CRUD Operations ──────────────────────────────────────────────────────
 
   const addRule = () => {
+    // If the base rate is fractional (e.g. 0.12), subtracting 0.5 makes it negative.
+    // Instead, subtract a small fraction if < 1, or just duplicate the fallback.
+    const defaultRoi = fallbackRoi < 1 ? Math.max(0, fallbackRoi - 0.01) : Math.max(0, fallbackRoi - 0.5);
+
     const newRule: PricingRule = {
       id: genId(),
       empType: "ANY",
       minCibil: 750,
       maxAmount: null,
-      roi: fallbackRoi > 0 ? fallbackRoi - 0.5 : 8.0,
+      roi: defaultRoi,
     };
     const updated = [...rules, newRule];
     setRules(updated);
