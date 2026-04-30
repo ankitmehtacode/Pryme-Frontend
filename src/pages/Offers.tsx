@@ -237,47 +237,7 @@ export default function Offers() {
   // ═══════════════════════════════════════════════════════════════════════
   // SCENARIO B: EXCEPTION ZERO-STATE (No Offers Matched Engine Profile)
   // ═══════════════════════════════════════════════════════════════════════
-  if (leadData && !showSkeleton && dynamicOffers.length === 0) {
-    const rawViolations = (leadData as any).engineResults?.[0]?.rejectionReasons || (leadData as any).engineResults?.[0]?.violations || [];
-
-    return (
-      <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
-        <div className="max-w-md w-full px-6 space-y-6">
-          <div className="text-center space-y-4">
-            <div className="mx-auto w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center">
-              <AlertCircle className="w-12 h-12 text-destructive" />
-            </div>
-            <h2 className="text-2xl font-bold font-heading text-foreground">No Offers Found</h2>
-            <p className="text-secondary-foreground text-sm">
-              We evaluated your profile against our partner network. Unfortunately, we could not find an eligible loan match right now.
-            </p>
-          </div>
-          
-          <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
-             <div className="font-semibold text-foreground flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
-             </div>
-             {rawViolations.length > 0 && (
-               <div className="mb-2 text-destructive/90 bg-destructive/10 p-2 rounded text-xs overflow-hidden">
-                 {rawViolations.join(', ')}
-               </div>
-             )}
-             <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
-               <li>Reduce your existing monthly EMI obligations.</li>
-               <li>Ensure your properties are assessed accurately against FOIR parameters.</li>
-               <li>Apply with a co-applicant to pool higher monthly income.</li>
-             </ul>
-          </div>
-
-          <Button onClick={() => navigate("/")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
-            Review Application
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Handlers ──────────────────────────────────────────────────────────
+  // ── Handlers (must be declared before any early returns to avoid conditional hook-like patterns) ──
   const handleUnlock = async (offer: BankOffer) => {
     if (!leadData) return;
     setIsLocking(offer.id);
@@ -297,7 +257,7 @@ export default function Offers() {
   };
 
   // ═══════════════════════════════════════════════════════════════════════
-  // SCENARIO A: PUBLIC PAGE
+  // SCENARIO A: PUBLIC PAGE (no lead data — direct URL navigation)
   // ═══════════════════════════════════════════════════════════════════════
 
   if (!leadData) {
@@ -355,7 +315,72 @@ export default function Offers() {
   }
 
   // ═══════════════════════════════════════════════════════════════════════
-  // SCENARIO B: DECISION UI
+  // SCENARIO B: ZERO-STATE (leadData exists but no eligible offers)
+  // 🧠 CRASH-FIX: This guard MUST run before accessing dynamicOffers[0].
+  //    Previously, when showSkeleton was true AND dynamicOffers was empty,
+  //    this guard was skipped and the Decision UI accessed heroOffer.brandHex
+  //    on undefined — causing the production crash.
+  //    Fix: Check dynamicOffers.length === 0 regardless of showSkeleton state.
+  // ═══════════════════════════════════════════════════════════════════════
+  if (dynamicOffers.length === 0) {
+    // Still in skeleton phase — show loading shimmer, don't crash
+    if (showSkeleton) {
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080d1e] text-foreground flex flex-col font-sans">
+          <Header />
+          <main className="flex-1 pt-24 md:pt-28 pb-24">
+            <div className="container mx-auto px-4 max-w-6xl space-y-4">
+              <SkeletonCard isHero delay={0} />
+              <SkeletonCard delay={0.1} />
+              <SkeletonCard delay={0.15} />
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // Skeleton done, still no offers → show rejection UI
+    const rawViolations = (leadData as any).engineResults?.[0]?.rejectionReasons || (leadData as any).engineResults?.[0]?.violations || [];
+
+    return (
+      <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
+        <div className="max-w-md w-full px-6 space-y-6">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="w-12 h-12 text-destructive" />
+            </div>
+            <h2 className="text-2xl font-bold font-heading text-foreground">No Offers Found</h2>
+            <p className="text-secondary-foreground text-sm">
+              We evaluated your profile against our partner network. Unfortunately, we could not find an eligible loan match right now.
+            </p>
+          </div>
+          
+          <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
+             <div className="font-semibold text-foreground flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
+             </div>
+             {rawViolations.length > 0 && (
+               <div className="mb-2 text-destructive/90 bg-destructive/10 p-2 rounded text-xs overflow-hidden">
+                 {rawViolations.join(', ')}
+               </div>
+             )}
+             <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
+               <li>Reduce your existing monthly EMI obligations.</li>
+               <li>Ensure your properties are assessed accurately against FOIR parameters.</li>
+               <li>Apply with a co-applicant to pool higher monthly income.</li>
+             </ul>
+          </div>
+
+          <Button onClick={() => navigate("/")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
+            Review Application
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SCENARIO C: DECISION UI — heroOffer is GUARANTEED to exist here
   // ═══════════════════════════════════════════════════════════════════════
 
   const heroOffer = dynamicOffers[0];
