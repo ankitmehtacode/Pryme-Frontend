@@ -1026,6 +1026,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         // Property type — BUG-4 FIX: pass real value from form, not hardcoded "RESIDENTIAL"
         propertyType: (store.loanRequirements as any)?.propertyType ?? "RESIDENTIAL",
 
+        // 🧠 PIPELINE FIX: Forward employment-specific fields for Admin Dashboard visibility
+        pinCode: store.basicKYC?.pinCode ?? "",
+        companyName: (fin?.data as any)?.companyName ?? (fin?.data as any)?.practiceName ?? (fin?.data as any)?.businessName ?? "",
+        designation: (fin?.data as any)?.designation ?? "",
+        officialEmail: (fin?.data as any)?.officialEmail ?? "",
+        loanPurpose: store.loanRequirements?.purpose ?? "",
+        existingBank: fp?.primaryBankName ?? "",
+        hasCoApplicant: fp?.hasCoApplicant ?? false,
+
         // Phase 5 underwriting variables safely mapped
         depreciation: Number((fin?.data as any)?.depreciation ?? 0),
         netProfit: Number((fin?.data as any)?.netProfit ?? 0),

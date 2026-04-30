@@ -231,19 +231,44 @@ export const PrymeAPI = {
   },
 
   submitLead: async (formData: any) => {
+    // 🧠 PIPELINE FIX: Forward ALL form fields into metadata so Admin Dashboard
+    // can display every detail the user provided. Previously only 5 fields were sent.
     const payload = {
       userName: formData.fullName || formData.userName,
       phone: formData.phone,
       loanAmount: formData.loanAmount,
       loanType: formData.productType || formData.loanType,
-      cibilScore: formData.cibilScore,
-      monthlyIncome: formData.monthlyIncome,
       metadata: {
+        // Core identity
         email: formData.email,
-        panCard: formData.panCard,
-        occupation: formData.occupation,
+        panNumber: formData.panCard || formData.panNumber,
+        dob: formData.dob,
         city: formData.city,
-        state: formData.state
+        state: formData.state,
+        pinCode: formData.pinCode,
+
+        // Financial
+        cibilScore: formData.cibilScore,
+        monthlyIncome: formData.monthlyIncome,
+        monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
+        grossSalary: formData.grossSalary || 0,
+
+        // Employment
+        employmentType: formData.employmentType,
+        financialPath: formData.financialPath,
+        occupation: formData.occupation,
+        companyName: formData.companyName,
+        designation: formData.designation,
+        officialEmail: formData.officialEmail,
+        workExperience: formData.totalExperienceYears || formData.workExperience,
+        businessVintageYears: formData.businessVintageYears,
+
+        // Loan details
+        loanPurpose: formData.loanPurpose,
+        propertyType: formData.propertyType,
+        coApplicant: formData.hasCoApplicant ? "Yes" : "No",
+        existingBank: formData.existingBank,
+        currentCity: formData.city,
       }
     };
 
