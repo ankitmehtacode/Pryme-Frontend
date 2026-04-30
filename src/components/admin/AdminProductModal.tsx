@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PricingMatrixBuilder } from "@/components/admin/PricingMatrixBuilder";
 
 export interface AdminProductModalProps {
   isOpen: boolean;
@@ -28,7 +29,8 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
     minLoanAmount: 100000,
     maxLoanAmount: 50000000,
     maxEmiNmiRatio: 65, // UI displays 65%
-    active: true // Corrected from isActive
+    active: true, // Corrected from isActive
+    roiComputationLogic: ""
   });
 
   useEffect(() => {
@@ -58,7 +60,8 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
           minLoanAmount: 100000,
           maxLoanAmount: 50000000,
           maxEmiNmiRatio: 65,
-          active: true
+          active: true,
+          roiComputationLogic: ""
         });
       }
     }
@@ -234,6 +237,19 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
                   </select>
                 </div>
               </div>
+            </div>
+
+            {/* 🧠 DYNAMIC ROI PRICING MATRIX */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-cyan-500 border-b border-[#103783]/20 pb-2">Dynamic ROI Matrix (Optional)</h3>
+              <p className="text-[11px] text-slate-500 -mt-2">
+                Define tiered interest rates based on CIBIL, employment, and loan amount. When configured, this overrides the static Base ROI above.
+              </p>
+              <PricingMatrixBuilder
+                value={formData.roiComputationLogic || ""}
+                onChange={(spel) => setFormData((prev: any) => ({ ...prev, roiComputationLogic: spel }))}
+                baseRate={formData.roi}
+              />
             </div>
             
             <div className="bg-blue-900/10 border border-blue-900/30 p-3 rounded-lg flex gap-3 text-blue-400">
