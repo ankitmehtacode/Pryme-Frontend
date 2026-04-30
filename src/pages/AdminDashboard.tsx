@@ -80,8 +80,9 @@ const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
 
   const handleDownload = async (docId: string, filename: string, action: 'view' | 'download' = 'view') => {
     try {
-      const url = await PrymeAPI.viewDocument(docId);
-      if (typeof url === "string") {
+      const res = await PrymeAPI.viewDocument(docId);
+      const url = typeof res === "string" ? res : (res?.url || res?.data?.url);
+      if (url) {
         if (action === 'view') {
           window.open(url, "_blank");
         } else {
@@ -447,7 +448,7 @@ const AdminDashboard = () => {
   const handleExportCSV = () => {
     if (applications.length === 0) { toast.error("No data to export."); return; }
     const headers = "Application ID,Applicant Name,Loan Type,Amount,CIBIL,Status,Assignee,Date\n";
-    const csvRows = applications.map((app: any) => `${app.applicationId},${app.applicant?.name || 'N/A'},${app.loanType},${app.requestedAmount},${app.declaredCibilScore},${app.status},${app.assignedTo || 'UNASSIGNED'},${new Date(app.createdAt).toISOString()}`).join("\n");
+    const csvRows = applications.map((app: any) => `${app.applicationId},${app.applicant?.fullName || app.applicant?.name || 'N/A'},${app.loanType},${app.requestedAmount},${app.declaredCibilScore},${app.status},${app.assignedTo || 'UNASSIGNED'},${new Date(app.createdAt).toISOString()}`).join("\n");
     const blob = new Blob([headers + csvRows], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1275,11 +1276,30 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
-                      <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
-                      <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white uppercase">{selectedApp.loanType}</p></div>
-                      <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore === -1 ? "text-slate-400" : (selectedApp.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400"))}>{selectedApp.declaredCibilScore === -1 ? "No History" : selectedApp.declaredCibilScore}</p></div>
-                      <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
+                    <div className="space-y-4">
+                      <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
+                        <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
+                        <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white uppercase">{selectedApp.loanType}</p></div>
+                        <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore === -1 ? "text-slate-400" : (selectedApp.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400"))}>{selectedApp.declaredCibilScore === -1 ? "No History" : selectedApp.declaredCibilScore}</p></div>
+                        <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.fullName || selectedApp.applicant?.name || 'Unknown'}</p></div>
+                        {selectedApp.applicant?.email && <div><p className="text-xs text-slate-500 mb-1">Email</p><p className="font-semibold text-white truncate">{selectedApp.applicant.email}</p></div>}
+                        {selectedApp.applicant?.phoneNumber && <div><p className="text-xs text-slate-500 mb-1">Phone</p><p className="font-semibold text-white truncate">{selectedApp.applicant.phoneNumber}</p></div>}
+                        {selectedApp.applicant?.city && <div><p className="text-xs text-slate-500 mb-1">Location</p><p className="font-semibold text-white truncate">{selectedApp.applicant.city}{selectedApp.applicant.state ? `, ${selectedApp.applicant.state}` : ''}</p></div>}
+                      </div>
+
+                      {selectedApp.metadata && Object.keys(selectedApp.metadata).length > 0 && (
+                        <div className="p-5 border border-white/[0.06] rounded-xl bg-white/[0.02]">
+                          <h4 className="text-sm font-medium text-slate-300 mb-4 border-b border-white/[0.06] pb-2">Application Form Details</h4>
+                          <div className="grid grid-cols-2 gap-6">
+                            {Object.entries(selectedApp.metadata).map(([key, value]) => (
+                              <div key={key}>
+                                <p className="text-xs text-slate-500 mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                                <p className="font-semibold text-white truncate">{String(value)}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
