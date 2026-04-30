@@ -185,11 +185,11 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-900/30 p-4 border border-[#103783]/20 rounded-xl">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min CIBIL Score</label>
-                  <input required type="number" name="minCibil" value={formData.minCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="minCibil" value={formData.minCibil} onChange={handleChange} min={-1} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max CIBIL Score</label>
-                  <input required type="number" name="maxCibil" value={formData.maxCibil} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
+                  <input required type="number" name="maxCibil" value={formData.maxCibil} onChange={handleChange} min={-1} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-400 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Max FOIR / EMI ratio (%)</label>

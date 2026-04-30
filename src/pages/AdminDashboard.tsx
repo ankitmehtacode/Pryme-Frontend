@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,8 @@ import {
   Activity, BarChart3, Mail, Calendar, Plus,
   Percent, ExternalLink, Shield, Link as LinkIcon,
   X, Loader2, MessageCircle, FileCheck, History,
-  Sparkles, LayoutList, Wallet, Moon, Sun, ArrowUpRight, UserPlus
+  Sparkles, LayoutList, Wallet, Moon, Sun, ArrowUpRight, UserPlus,
+  Trash2, Upload, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,9 @@ const MOCK_METADATA_DB: Record<string, FieldMetadata> = {
 
 // 🧠 DOCUMENT VAULT PANEL: Inline sub-component to fetch & display KYC docs from the backend
 const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["app_documents", applicationId],
     queryFn: async () => {
@@ -53,50 +57,97 @@ const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
     enabled: !!applicationId,
   });
 
-  const handleDownload = async (docId: string, filename: string) => {
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const docType = file.name.split('.')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
+      return await PrymeAPI.uploadApplicationDocument(applicationId, docType, file);
+    },
+    onSuccess: () => {
+      toast.success("Document uploaded successfully.");
+      queryClient.invalidateQueries({ queryKey: ["app_documents", applicationId] });
+    },
+    onError: (e: any) => toast.error(e.message || "Failed to upload document.")
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (docId: string) => fetchWithAuth(`/documents/${docId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      toast.success("Document deleted.");
+      queryClient.invalidateQueries({ queryKey: ["app_documents", applicationId] });
+    },
+    onError: (e: any) => toast.error(e.message || "Failed to delete document.")
+  });
+
+  const handleDownload = async (docId: string, filename: string, action: 'view' | 'download' = 'view') => {
     try {
       const url = await PrymeAPI.viewDocument(docId);
       if (typeof url === "string") {
-        window.open(url, "_blank");
+        if (action === 'view') {
+          window.open(url, "_blank");
+        } else {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
       }
     } catch (e: any) {
-      toast.error(e.message || "Failed to download document.");
+      toast.error(e.message || "Failed to access document.");
     }
   };
 
   if (isLoading) return <div className="flex items-center justify-center p-12 text-slate-500"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading documents...</div>;
 
-  if (documents.length === 0) return (
-    <div className="flex flex-col items-center justify-center p-12 text-center">
-      <FileCheck className="w-10 h-10 text-slate-600 mb-3" />
-      <p className="text-sm text-slate-500 font-medium">No documents uploaded yet.</p>
-      <p className="text-xs text-slate-600 mt-1">Documents will appear here once the applicant uploads KYC.</p>
-    </div>
-  );
-
   return (
-    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
-      {documents.map((doc: any) => (
-        <div key={doc.id || doc.documentId} className="flex items-center justify-between p-4 border border-white/[0.06] rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors group">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-              <FileText className="w-4 h-4 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white">{doc.docType || doc.documentType || "Document"}</p>
-              <p className="text-xs text-slate-500">{doc.originalFilename || doc.fileName || "Unknown file"} • {doc.status || "UPLOADED"}</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-blue-400 hover:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() => handleDownload(doc.id || doc.documentId, doc.originalFilename || "document")}
-          >
-            <ExternalLink className="w-4 h-4 mr-1" /> View
-          </Button>
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+      <div className="flex justify-between items-center pb-2 border-b border-white/[0.06]">
+        <h3 className="text-sm font-medium text-slate-300">Application Documents</h3>
+        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => {
+          if (e.target.files && e.target.files[0]) {
+            uploadMutation.mutate(e.target.files[0]);
+          }
+        }} />
+        <Button size="sm" variant="outline" className="h-8 border-white/[0.08]" onClick={() => fileInputRef.current?.click()} disabled={uploadMutation.isPending}>
+          {uploadMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Upload className="w-4 h-4 mr-1" />}
+          Upload
+        </Button>
+      </div>
+
+      {documents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 text-center bg-white/[0.02] rounded-xl border border-white/[0.06]">
+          <FileCheck className="w-8 h-8 text-slate-600 mb-2" />
+          <p className="text-sm text-slate-500 font-medium">No documents found.</p>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {documents.map((doc: any) => (
+            <div key={doc.id || doc.documentId} className="flex items-center justify-between p-3 border border-white/[0.06] rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors group">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                  <FileText className="w-4 h-4 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{doc.docType || doc.documentType || "Document"}</p>
+                  <p className="text-xs text-slate-500">{doc.originalFilename || doc.fileName || "Unknown file"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="sm" className="h-8 text-blue-400 hover:text-blue-300 px-2" onClick={() => handleDownload(doc.id || doc.documentId, doc.originalFilename || "document", "view")}>
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" className="h-8 text-green-400 hover:text-green-300 px-2" onClick={() => handleDownload(doc.id || doc.documentId, doc.originalFilename || "document", "download")}>
+                  <Download className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" className="h-8 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(doc.id || doc.documentId)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -119,6 +170,8 @@ const AdminDashboard = () => {
 
   // Modal & Drawer States
   const [selectedApp, setSelectedApp] = useState<any | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editProfileData, setEditProfileData] = useState<any>({});
   const [activeDrawerTab, setActiveDrawerTab] = useState<"details" | "documents" | "timeline">("details");
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -295,7 +348,7 @@ const AdminDashboard = () => {
   // 🧠 MUTATIONS: OPTIMISTIC PIPELINE UPDATES
   // ==========================================
   const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => PrymeAPI.updateStatus(id, status),
+    mutationFn: ({ id, status, version }: { id: string; status: string; version?: number }) => PrymeAPI.updateStatus(id, status, version),
     onSuccess: () => {
       toast.success("Pipeline updated. Lead status synchronized.");
       queryClient.invalidateQueries({ queryKey: ["admin_applications"] });
@@ -304,6 +357,17 @@ const AdminDashboard = () => {
     onError: (error: any) => {
       toast.error(error.message || "Status update failed.");
     }
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: any }) => PrymeAPI.updateLeadProfile(id, payload),
+    onSuccess: (data: any) => {
+      toast.success("Lead profile updated successfully.");
+      queryClient.invalidateQueries({ queryKey: ["admin_applications"] });
+      setSelectedApp(data.application || data);
+      setIsEditingProfile(false);
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to update profile")
   });
 
   const assignMutation = useMutation({
@@ -337,7 +401,7 @@ const AdminDashboard = () => {
         app.loanType?.toLowerCase().includes(searchStr) ||
         app.applicant?.name?.toLowerCase().includes(searchStr);
 
-      const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignee !== "UNASSIGNED");
+      const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignedTo !== null && app.assignedTo !== undefined);
       return matchesSearch && matchesQueue;
     });
   }, [applications, searchQuery, leadFilter]);
@@ -383,7 +447,7 @@ const AdminDashboard = () => {
   const handleExportCSV = () => {
     if (applications.length === 0) { toast.error("No data to export."); return; }
     const headers = "Application ID,Applicant Name,Loan Type,Amount,CIBIL,Status,Assignee,Date\n";
-    const csvRows = applications.map((app: any) => `${app.applicationId},${app.applicant?.name || 'N/A'},${app.loanType},${app.requestedAmount},${app.declaredCibilScore},${app.status},${app.assignee},${new Date(app.createdAt).toISOString()}`).join("\n");
+    const csvRows = applications.map((app: any) => `${app.applicationId},${app.applicant?.name || 'N/A'},${app.loanType},${app.requestedAmount},${app.declaredCibilScore},${app.status},${app.assignedTo || 'UNASSIGNED'},${new Date(app.createdAt).toISOString()}`).join("\n");
     const blob = new Blob([headers + csvRows], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -399,12 +463,9 @@ const AdminDashboard = () => {
     return flow[currentStatus?.toUpperCase()] || null;
   };
 
+  // (Logic moved to inline Dropdown)
   const handleAssignPrompt = (e: React.MouseEvent, appId: string) => {
     e.stopPropagation();
-    const empId = window.prompt("Enter the exact Employee UUID from the IAM system to assign this lead:");
-    if (empId && empId.trim().length > 0) {
-      assignMutation.mutate({ id: appId, assigneeId: empId.trim() });
-    }
   };
 
   // 🧠 CLOSED-LOOP: Uses useAuth().signOut() to properly clear React Query cache + cookie
@@ -440,6 +501,7 @@ const AdminDashboard = () => {
   }
 
   const isSuperAdmin = authUser?.role === "SUPER_ADMIN";
+  const isEmployee = authUser?.role === "EMPLOYEE";
 
   const sidebarItems = [
     { id: "overview", label: "Analytics Overview", icon: BarChart3 }, { id: "applications", label: "CRM Pipeline", icon: LayoutGrid },
@@ -625,21 +687,30 @@ const AdminDashboard = () => {
                                     <div className="space-y-1">
                                       <p className="font-medium text-white">{app.applicant?.name || 'Unknown'}</p>
                                       <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span>CIBIL: <strong className={app.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400"}>{app.declaredCibilScore}</strong></span>
+                                        <span>CIBIL: <strong className={app.declaredCibilScore === -1 ? "text-slate-400" : (app.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400")}>{app.declaredCibilScore === -1 ? "N/A" : app.declaredCibilScore}</strong></span>
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="px-6 py-4 align-top">
-                                    {app.assignee === "UNASSIGNED" ? (
-                                      <Button size="sm" variant="outline" onClick={(e) => handleAssignPrompt(e, app.applicationId)} className="h-7 text-[10px] bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20">
-                                        <UserPlus className="w-3 h-3 mr-1" /> Assign Lead
-                                      </Button>
-                                    ) : (
-                                      <span className="inline-flex items-center gap-2 text-xs font-medium text-slate-300">
-                                        <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[9px]">{app.assignee?.charAt(0).toUpperCase() || "A"}</div>
-                                        {app.assignee}
-                                      </span>
-                                    )}
+                                  <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
+                                    <Select
+                                      value={app.assignedTo || "UNASSIGNED"}
+                                      onValueChange={(val) => {
+                                        assignMutation.mutate({ id: app.applicationId || app.id, assigneeId: val === "UNASSIGNED" ? "" : val });
+                                      }}
+                                      disabled={isEmployee}
+                                    >
+                                      <SelectTrigger className={cn("w-[150px] h-8 text-xs font-medium border focus:ring-blue-500/50 outline-none transition-colors", !app.assignedTo ? "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20" : "bg-white/[0.04] text-slate-300 border-white/[0.08]")}>
+                                        <SelectValue placeholder="Assign Lead" />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+                                        <SelectItem value="UNASSIGNED" className="text-xs text-slate-400">Unassigned</SelectItem>
+                                        {teamMembers.map((tm: any) => (
+                                          <SelectItem key={tm.id} value={tm.id} className="text-xs">
+                                            {tm.fullName || tm.full_name || tm.email}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
                                   </td>
                                   <td className="px-6 py-4 align-top">
                                     <StatusBadge status={app.status} />
@@ -647,7 +718,7 @@ const AdminDashboard = () => {
                                   <td className="px-6 py-4 align-top text-right">
                                     {getNextStage(app.status) ? (
                                       <Button
-                                        onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: getNextStage(app.status)! }); }}
+                                        onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: getNextStage(app.status)!, version: app.version }); }}
                                         disabled={statusMutation.isPending}
                                         size="sm"
                                         className="h-8 bg-primary hover:bg-[#0c2a66] text-white opacity-0 group-hover:opacity-100 transition-opacity"
@@ -688,7 +759,9 @@ const AdminDashboard = () => {
                                   </div>
                                   <p className="text-lg font-semibold text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
                                   <div className="flex justify-between items-center text-xs text-slate-500">
-                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore >= 750 ? "text-blue-400" : "")}><Activity className="w-3 h-3" /> {app.declaredCibilScore}</span>
+                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore === -1 ? "text-slate-400" : (app.declaredCibilScore >= 750 ? "text-blue-400" : ""))}>
+                                      <Activity className="w-3 h-3" /> {app.declaredCibilScore === -1 ? "N/A" : app.declaredCibilScore}
+                                    </span>
                                   </div>
                                 </div>
                               ))}
@@ -882,9 +955,9 @@ const AdminDashboard = () => {
                     <span className="text-xs text-slate-500 font-medium">{users.length} registered customers</span>
                   </div>
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Customer</th><th className="px-6 py-4">Email</th><th className="px-6 py-4">Location</th><th className="px-6 py-4">Joined</th><th className="px-6 py-4">System UUID</th></tr></thead>
+                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Customer</th><th className="px-6 py-4">Email</th><th className="px-6 py-4">Location</th><th className="px-6 py-4">Joined</th><th className="px-6 py-4">System UUID</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
                     <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {users.length === 0 ? <tr><td colSpan={5} className="p-8 text-center text-slate-500">No registered customers yet.</td></tr> : users.map((u: any) => (
+                      {users.length === 0 ? <tr><td colSpan={6} className="p-8 text-center text-slate-500">No registered customers yet.</td></tr> : users.map((u: any) => (
                         <tr key={u.id} className="hover:bg-white/[0.03] transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
@@ -898,6 +971,26 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4 text-slate-500 text-xs">{u.city ? `${u.city}, ${u.state || ''}` : '—'}</td>
                           <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
                           <td className="px-6 py-4 text-slate-600 font-mono text-[10px]">{u.id}</td>
+                          <td className="px-6 py-4 text-right">
+                            {(isSuperAdmin || authUser?.role === "ADMIN") && (
+                              <Select
+                                onValueChange={(newRole) => {
+                                  if (newRole !== u.role) {
+                                    roleMutation.mutate({ userId: u.id, role: newRole });
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none ml-auto">
+                                  <SelectValue placeholder="Add to Team" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+                                  {isSuperAdmin && <SelectItem value="SUPER_ADMIN" className="focus:bg-amber-500/10 focus:text-amber-400 text-xs">Super Admin</SelectItem>}
+                                  <SelectItem value="ADMIN" className="focus:bg-blue-500/10 focus:text-blue-400 text-xs">Admin</SelectItem>
+                                  <SelectItem value="EMPLOYEE" className="focus:bg-green-500/10 focus:text-green-400 text-xs">Employee</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -949,7 +1042,7 @@ const AdminDashboard = () => {
                             </td>
                             <td className="px-6 py-4 text-slate-400 text-xs">{u.email}</td>
                             <td className="px-6 py-4">
-                              {isSuperAdmin && !isCurrentUser ? (
+                              {(isSuperAdmin || authUser?.role === "ADMIN") && !isCurrentUser ? (
                                 <Select
                                   defaultValue={u.role}
                                   onValueChange={(newRole) => {
@@ -962,7 +1055,7 @@ const AdminDashboard = () => {
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                                    <SelectItem value="SUPER_ADMIN" className="focus:bg-amber-500/10 focus:text-amber-400 text-xs">Super Admin</SelectItem>
+                                    {isSuperAdmin && <SelectItem value="SUPER_ADMIN" className="focus:bg-amber-500/10 focus:text-amber-400 text-xs">Super Admin</SelectItem>}
                                     <SelectItem value="ADMIN" className="focus:bg-blue-500/10 focus:text-blue-400 text-xs">Admin</SelectItem>
                                     <SelectItem value="EMPLOYEE" className="focus:bg-green-500/10 focus:text-green-400 text-xs">Employee</SelectItem>
                                   </SelectContent>
@@ -1136,16 +1229,59 @@ const AdminDashboard = () => {
             <div className="p-6 flex-1 overflow-y-auto bg-[#0a0a10]">
               {activeDrawerTab === "details" && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-white font-medium">Application Overview</h3>
+                    {!isEditingProfile && !isEmployee && (
+                      <Button size="sm" variant="outline" className="h-8 border-white/[0.08] text-slate-300 hover:text-white" onClick={() => {
+                        setEditProfileData({
+                          fullName: selectedApp.applicant?.name || "",
+                          loanType: selectedApp.loanType || "",
+                          requestedAmount: selectedApp.requestedAmount || 0,
+                          declaredCibilScore: selectedApp.declaredCibilScore || 0
+                        });
+                        setIsEditingProfile(true);
+                      }}>
+                        Edit Details
+                      </Button>
+                    )}
+                  </div>
+
                   <div className="p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex gap-3 items-start">
                     <Sparkles className="w-5 h-5 text-indigo-400 mt-0.5" />
                     <div><h4 className="text-sm font-medium text-indigo-300">AI Risk Insight</h4><p className="text-xs text-indigo-400/80 mt-1">Applicant's declared CIBIL is {selectedApp.declaredCibilScore >= 750 ? "excellent for this product tier." : "under the optimal threshold."}</p></div>
                   </div>
-                  <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
-                    <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
-                    <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white uppercase">{selectedApp.loanType}</p></div>
-                    <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400")}>{selectedApp.declaredCibilScore}</p></div>
-                    <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
-                  </div>
+
+                  {isEditingProfile ? (
+                    <div className="p-5 border border-blue-500/30 rounded-xl space-y-4 bg-blue-500/5">
+                      <div>
+                        <label className="text-xs text-slate-400 mb-1 block">Applicant Name</label>
+                        <input type="text" value={editProfileData.fullName} onChange={e => setEditProfileData({ ...editProfileData, fullName: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">Requested Amount</label>
+                          <input type="number" value={editProfileData.requestedAmount} onChange={e => setEditProfileData({ ...editProfileData, requestedAmount: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">CIBIL Score (-1 for No History)</label>
+                          <input type="number" min="-1" max="900" value={editProfileData.declaredCibilScore} onChange={e => setEditProfileData({ ...editProfileData, declaredCibilScore: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 pt-2">
+                        <Button size="sm" variant="ghost" onClick={() => setIsEditingProfile(false)} className="text-slate-400">Cancel</Button>
+                        <Button size="sm" onClick={() => updateProfileMutation.mutate({ id: selectedApp.applicationId, payload: editProfileData })} disabled={updateProfileMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                          {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
+                      <div><p className="text-xs text-slate-500 mb-1">Requested Amount</p><p className="font-semibold text-white">{formatCurrency(selectedApp.requestedAmount)}</p></div>
+                      <div><p className="text-xs text-slate-500 mb-1">Product Line</p><p className="font-semibold text-white uppercase">{selectedApp.loanType}</p></div>
+                      <div><p className="text-xs text-slate-500 mb-1">CIBIL Score</p><p className={cn("font-semibold", selectedApp.declaredCibilScore === -1 ? "text-slate-400" : (selectedApp.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400"))}>{selectedApp.declaredCibilScore === -1 ? "No History" : selectedApp.declaredCibilScore}</p></div>
+                      <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedApp.applicant?.name || 'Unknown'}</p></div>
+                    </div>
+                  )}
                 </div>
               )}
               {activeDrawerTab === "documents" && (
@@ -1154,8 +1290,8 @@ const AdminDashboard = () => {
             </div>
 
             <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] grid grid-cols-2 gap-3">
-              <Button disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "REJECTED" })} variant="outline" className="w-full text-red-400 border-red-500/20 hover:bg-red-500/10 active:scale-95 transition-all bg-transparent">Reject Lead</Button>
-              <Button disabled={statusMutation.isPending || selectedApp.status === "APPROVED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "APPROVED" })} className="w-full bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white shadow-lg shadow-blue-500/25 active:scale-95 transition-all">Mark Approved</Button>
+              <Button disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "REJECTED", version: selectedApp.version })} variant="outline" className="w-full text-red-400 border-red-500/20 hover:bg-red-500/10 active:scale-95 transition-all bg-transparent">Reject Lead</Button>
+              <Button disabled={statusMutation.isPending || selectedApp.status === "APPROVED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "APPROVED", version: selectedApp.version })} className="w-full bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white shadow-lg shadow-blue-500/25 active:scale-95 transition-all">Mark Approved</Button>
             </div>
           </div>
         </div>

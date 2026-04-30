@@ -259,7 +259,8 @@ export const PrymeAPI = {
   // 🧠 CLOSED-LOOP FIX: Backend ElevationController is at /api/v1/applications/elevate
   elevateLead: async (leadId: string, userId: string, selectedBank?: string) => fetchWithAuth(`/applications/elevate`, { method: "POST", body: JSON.stringify({ leadId, userId, selectedBank }) }),
   getApplications: async () => fetchWithAuth("/admin/applications", { method: "GET" }),
-  updateStatus: async (applicationId: string, status: string) => fetchWithAuth(`/admin/applications/${applicationId}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  updateStatus: async (applicationId: string, status: string, version?: number) => fetchWithAuth(`/admin/applications/${applicationId}/status`, { method: "PATCH", body: JSON.stringify({ status, version }) }),
+  updateLeadProfile: async (applicationId: string, payload: any) => fetchWithAuth(`/admin/applications/${applicationId}/profile`, { method: "PATCH", body: JSON.stringify(payload) }),
   assignLead: async (applicationId: string, assigneeId: string) => fetchWithAuth(`/admin/applications/${applicationId}/assign`, { method: "PATCH", body: JSON.stringify({ assigneeId }) }),
   
   // 🧠 USER PROFILE MANAGEMENT

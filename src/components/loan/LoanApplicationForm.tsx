@@ -1070,6 +1070,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   const cibilScore = store.loanRequirements.cibilScore;
   const cibilUi = useMemo(() => {
+    if (cibilScore === -1) return { color: "text-slate-500", bg: "bg-slate-500/10", border: "border-slate-500/20", label: "No History" };
     if (cibilScore >= 750) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Excellent" };
     if (cibilScore >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
     if (cibilScore >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
@@ -1247,7 +1248,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                               onBlur={() => {
                                 const parsed = parseInt(cibilInputVal, 10);
                                 let val;
-                                if (parsed === -1 || parsed === 0) val = parsed;
+                                if (parsed === -1 || parsed === 0) val = -1;
                                 else val = Math.min(900, Math.max(300, parsed));
                                 
                                 if (!isNaN(val)) store.updateLoanRequirements({ cibilScore: val });
@@ -1274,7 +1275,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                               animate={{ y: 0, opacity: 1 }}
                               className={`text-2xl font-semibold tabular-nums border-b border-dashed border-current/40 group-hover/edit:border-current pb-0.5 transition-colors ${cibilUi.color}`}
                             >
-                              {cibilScore}
+                              {cibilScore === -1 ? "N/A" : cibilScore}
                             </motion.span>
                             <Edit2 className={`w-3.5 h-3.5 opacity-40 group-hover/edit:opacity-100 transition-opacity ${cibilUi.color}`} />
                           </button>
@@ -1284,16 +1285,37 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                         </span>
                       </div>
                     </div>
-                    <Slider
-                      value={[cibilScore]}
-                      onValueChange={(v) => store.updateLoanRequirements({ cibilScore: v[0] })}
-                      min={300} max={900} step={10}
-                      className="cursor-pointer mb-2"
-                    />
-                    <div className="flex justify-between text-[10px] font-medium text-muted-foreground/50 uppercase tracking-widest mt-2">
-                      <span>300</span>
-                      <span>900</span>
+                    <div className="flex items-center justify-between mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+                        <input
+                          type="checkbox"
+                          className="rounded border-primary/30 text-primary focus:ring-primary/50"
+                          checked={cibilScore === -1}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              store.updateLoanRequirements({ cibilScore: -1 });
+                            } else {
+                              store.updateLoanRequirements({ cibilScore: 750 });
+                            }
+                          }}
+                        />
+                        I don't have a credit history (New to Credit)
+                      </label>
                     </div>
+                    {cibilScore !== -1 && (
+                      <>
+                        <Slider
+                          value={[cibilScore]}
+                          onValueChange={(v) => store.updateLoanRequirements({ cibilScore: v[0] })}
+                          min={300} max={900} step={10}
+                          className="cursor-pointer mb-2"
+                        />
+                        <div className="flex justify-between text-[10px] font-medium text-muted-foreground/50 uppercase tracking-widest mt-2">
+                          <span>300</span>
+                          <span>900</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
