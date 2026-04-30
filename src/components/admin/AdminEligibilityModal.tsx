@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SpelBuilder } from "./SpelBuilder";
 
 export interface AdminEligibilityModalProps {
   isOpen: boolean;
@@ -216,14 +217,18 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
             <div className="space-y-4">
               <h3 className="text-sm font-semibold uppercase tracking-widest text-purple-500 border-b border-[#103783]/20 pb-2">Policy & Property Deviations</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">Deviation Formulae</label>
-                  <textarea name="deviationFormulae" value={formData.deviationFormulae} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Deviation applied if LTV > 85%..." />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">Conditions</label>
-                  <textarea name="conditions" value={formData.conditions} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Mandatory co-applicant if CIBIL < 700" />
-                </div>
+                <SpelBuilder
+                  label="Deviation Formulae"
+                  value={formData.deviationFormulae}
+                  onChange={(val) => setFormData((prev: any) => ({ ...prev, deviationFormulae: val }))}
+                  placeholder="e.g. Deviation applied if LTV > 85%..."
+                />
+                <SpelBuilder
+                  label="Conditions"
+                  value={formData.conditions}
+                  onChange={(val) => setFormData((prev: any) => ({ ...prev, conditions: val }))}
+                  placeholder="e.g. Mandatory co-applicant if CIBIL < 700"
+                />
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Property Type</label>
                   <input type="text" name="propertyType" value={formData.propertyType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. Plot, Flat" />
