@@ -23,6 +23,8 @@ export interface PricingRule {
   id: string;
   empType: "ANY" | "SALARIED" | "SEP";
   minCibil: number | null;
+  maxCibil: number | null;
+  minAmount: number | null;
   maxAmount: number | null;
   roi: number;
 }
@@ -68,12 +70,18 @@ export function compileRulesToSpel(rules: PricingRule[], fallbackRoi: number): s
       conditions.push(`#empType == '${rule.empType}'`);
     }
 
-    // CIBIL minimum threshold
+    // CIBIL thresholds
     if (rule.minCibil !== null && rule.minCibil > 0) {
       conditions.push(`#cibil >= ${rule.minCibil}`);
     }
+    if (rule.maxCibil !== null && rule.maxCibil > 0) {
+      conditions.push(`#cibil <= ${rule.maxCibil}`);
+    }
 
-    // Loan amount ceiling
+    // Loan amount thresholds
+    if (rule.minAmount !== null && rule.minAmount > 0) {
+      conditions.push(`#loanAmount >= ${rule.minAmount}`);
+    }
     if (rule.maxAmount !== null && rule.maxAmount > 0) {
       conditions.push(`#loanAmount <= ${rule.maxAmount}`);
     }
@@ -136,7 +144,9 @@ export const PricingMatrixBuilder: React.FC<PricingMatrixBuilderProps> = ({
     const newRule: PricingRule = {
       id: genId(),
       empType: "ANY",
-      minCibil: 750,
+      minCibil: null,
+      maxCibil: null,
+      minAmount: null,
       maxAmount: null,
       roi: defaultRoi,
     };
@@ -213,89 +223,122 @@ export const PricingMatrixBuilder: React.FC<PricingMatrixBuilderProps> = ({
 
       {/* Rules Table */}
       {rules.length > 0 && (
-        <div className="bg-[#0d0d14] border border-[#103783]/20 rounded-xl overflow-hidden">
-          {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_1fr_100px_48px] gap-2 px-4 py-2.5 bg-slate-900/50 border-b border-[#103783]/20 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-            <span>Employment</span>
-            <span>Min CIBIL</span>
-            <span>Max Loan Amount</span>
-            <span className="text-center">ROI %</span>
-            <span></span>
-          </div>
-
-          {/* Rule Rows */}
-          {rules.map((rule, idx) => (
-            <div
-              key={rule.id}
-              className="grid grid-cols-[1fr_1fr_1fr_100px_48px] gap-2 px-4 py-3 border-b border-[#103783]/10 hover:bg-white/[0.02] transition-colors items-center group"
-            >
-              {/* Employment Type */}
-              <select
-                value={rule.empType}
-                onChange={(e) =>
-                  updateRule(rule.id, { empType: e.target.value as PricingRule["empType"] })
-                }
-                className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs text-slate-200 outline-none focus:border-blue-500"
-              >
-                {EMP_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Min CIBIL */}
-              <input
-                type="number"
-                min={300}
-                max={900}
-                placeholder="e.g. 750"
-                value={rule.minCibil ?? ""}
-                onChange={(e) =>
-                  updateRule(rule.id, {
-                    minCibil: e.target.value ? parseInt(e.target.value) : null,
-                  })
-                }
-                className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500"
-              />
-
-              {/* Max Loan Amount */}
-              <input
-                type="number"
-                min={0}
-                placeholder="e.g. 5000000"
-                value={rule.maxAmount ?? ""}
-                onChange={(e) =>
-                  updateRule(rule.id, {
-                    maxAmount: e.target.value ? parseFloat(e.target.value) : null,
-                  })
-                }
-                className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500"
-              />
-
-              {/* ROI */}
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="50"
-                value={rule.roi}
-                onChange={(e) =>
-                  updateRule(rule.id, { roi: parseFloat(e.target.value) || 0 })
-                }
-                className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-green-400 outline-none focus:border-blue-500 text-center"
-              />
-
-              {/* Delete */}
-              <button
-                type="button"
-                onClick={() => removeRule(rule.id)}
-                className="p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+        <div className="bg-[#0d0d14] border border-[#103783]/20 rounded-xl overflow-x-auto custom-scrollbar">
+          <div className="min-w-[800px]">
+            {/* Table Header */}
+            <div className="grid grid-cols-[1.5fr_1fr_1fr_1.2fr_1.2fr_80px_32px] gap-2 px-4 py-2.5 bg-slate-900/50 border-b border-[#103783]/20 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              <span>Employment</span>
+              <span>Min CIBIL</span>
+              <span>Max CIBIL</span>
+              <span>Min Amount</span>
+              <span>Max Amount</span>
+              <span className="text-center">ROI %</span>
+              <span></span>
             </div>
-          ))}
+
+            {/* Rule Rows */}
+            {rules.map((rule, idx) => (
+              <div
+                key={rule.id}
+                className="grid grid-cols-[1.5fr_1fr_1fr_1.2fr_1.2fr_80px_32px] gap-2 px-4 py-3 border-b border-[#103783]/10 hover:bg-white/[0.02] transition-colors items-center group"
+              >
+                {/* Employment Type */}
+                <select
+                  value={rule.empType}
+                  onChange={(e) =>
+                    updateRule(rule.id, { empType: e.target.value as PricingRule["empType"] })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs text-slate-200 outline-none focus:border-blue-500 w-full"
+                >
+                  {EMP_TYPES.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Min CIBIL */}
+                <input
+                  type="number"
+                  min={300}
+                  max={900}
+                  placeholder="Min"
+                  value={rule.minCibil ?? ""}
+                  onChange={(e) =>
+                    updateRule(rule.id, {
+                      minCibil: e.target.value ? parseInt(e.target.value) : null,
+                    })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500 w-full"
+                />
+
+                {/* Max CIBIL */}
+                <input
+                  type="number"
+                  min={300}
+                  max={900}
+                  placeholder="Max"
+                  value={rule.maxCibil ?? ""}
+                  onChange={(e) =>
+                    updateRule(rule.id, {
+                      maxCibil: e.target.value ? parseInt(e.target.value) : null,
+                    })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500 w-full"
+                />
+
+                {/* Min Loan Amount */}
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Min (₹)"
+                  value={rule.minAmount ?? ""}
+                  onChange={(e) =>
+                    updateRule(rule.id, {
+                      minAmount: e.target.value ? parseFloat(e.target.value) : null,
+                    })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500 w-full"
+                />
+
+                {/* Max Loan Amount */}
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Max (₹)"
+                  value={rule.maxAmount ?? ""}
+                  onChange={(e) =>
+                    updateRule(rule.id, {
+                      maxAmount: e.target.value ? parseFloat(e.target.value) : null,
+                    })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 outline-none focus:border-blue-500 w-full"
+                />
+
+                {/* ROI */}
+                <input
+                  type="number"
+                  step="0.01"
+                  min="-50"
+                  max="50"
+                  value={rule.roi}
+                  onChange={(e) =>
+                    updateRule(rule.id, { roi: parseFloat(e.target.value) || 0 })
+                  }
+                  className="bg-slate-900 border border-[#103783]/30 rounded-lg px-2 py-1.5 text-xs font-mono text-green-400 outline-none focus:border-blue-500 text-center w-full"
+                />
+
+                {/* Delete */}
+                <button
+                  type="button"
+                  onClick={() => removeRule(rule.id)}
+                  className="p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
