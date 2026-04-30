@@ -48,7 +48,7 @@ const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
     queryKey: ["app_documents", applicationId],
     queryFn: async () => {
       const res = await PrymeAPI.getApplicationDocuments(applicationId);
-      return Array.isArray(res) ? res : [];
+      return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
     },
     enabled: !!applicationId,
   });
