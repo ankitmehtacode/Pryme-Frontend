@@ -142,13 +142,19 @@ const AdminDashboard = () => {
 
   const { data: banks = [], refetch: refetchBanks } = useQuery({
     queryKey: ["admin_banks"],
-    queryFn: () => PrymeAPI.getAdminBanks().then(res => res.data || res),
+    queryFn: async () => {
+      const res = await PrymeAPI.getAdminBanks();
+      return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
+    },
     enabled: activeTab === "banks"
   });
 
   const { data: products = [], refetch: refetchProducts } = useQuery({
     queryKey: ["admin_products"],
-    queryFn: () => PrymeAPI.getAdminProducts().then(res => res.data || res),
+    queryFn: async () => {
+      const res = await PrymeAPI.getAdminProducts();
+      return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
+    },
     enabled: activeTab === "offers"
   });
 
@@ -202,7 +208,10 @@ const AdminDashboard = () => {
   // ==========================================
   const { data: eligibilityRules = [], refetch: refetchEligibilityRules } = useQuery({
     queryKey: ["eligibility_rules"],
-    queryFn: () => PrymeAPI.getEligibilityRules().then(res => res.data || res),
+    queryFn: async () => {
+      const res = await PrymeAPI.getEligibilityRules();
+      return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
+    },
     enabled: activeTab === "settings"
   });
 
