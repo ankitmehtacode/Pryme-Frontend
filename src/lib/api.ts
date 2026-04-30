@@ -270,7 +270,9 @@ export const PrymeAPI = {
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   
   // DOCUMENT VAULT: Upload
-  // 🧠 ZERO-TRUST S3 INGESTION: Creates a DB record first, then streams directly to S3
+  // 🧠 EDGE-ENFORCED S3 POST POLICY: Creates a DB record, gets a signed POST policy,
+  // then streams directly to S3 with cryptographic content-length-range enforcement.
+  // If the file exceeds 5MB, AWS S3 rejects it AT THE EDGE — our backend never sees it.
   uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
     try {
       // 1. Initialize Document metadata matrix
@@ -282,25 +284,33 @@ export const PrymeAPI = {
         fileSize: file.size
       };
       
-      const { uploadUrl, documentId } = await fetchWithAuth(`/documents/initiate-upload`, {
+      // 🧠 POST Policy endpoint — returns { endpoint, fields, documentId, expiresAt }
+      const policyResponse = await fetchWithAuth(`/documents/initiate-secure-upload`, {
         method: "POST",
         body: JSON.stringify(payload)
       });
 
-      // 2. Stream directly to S3 / Dummy Gateway
-      const s3Response = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: {
-            "Content-Type": file.type
-        },
-        body: file
+      // 2. Build FormData with all signed policy fields — file MUST be LAST (AWS S3 POST requirement)
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(policyResponse.fields as Record<string, string>)) {
+        formData.append(key, value);
+      }
+      formData.append("file", file); // 🧠 CRITICAL: file is always the LAST field
+
+      // 3. POST directly to S3 — content-length-range enforced at the AWS edge
+      const s3Response = await fetch(policyResponse.endpoint, {
+        method: "POST",
+        body: formData
+        // 🧠 NO Content-Type header — the browser auto-generates the multipart boundary
       });
 
       if (!s3Response.ok) {
-         throw new Error("Failed to securely stream document to vault.");
+         const errorText = await s3Response.text().catch(() => "Unknown S3 error");
+         console.error("S3 POST policy upload rejected:", s3Response.status, errorText);
+         throw new Error("Upload rejected by secure vault. File may exceed 5MB limit.");
       }
 
-      return { data: { documentId }, error: null };
+      return { data: { documentId: policyResponse.documentId }, error: null };
     } catch (error: any) {
       console.error("Document vault encryption failed:", error);
       return { data: null, error: { message: error.message || "Network stream disrupted." } };
