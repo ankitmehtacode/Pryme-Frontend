@@ -312,6 +312,7 @@ export const PrymeAPI = {
 
   // 🧠 DOCUMENT VAULT: List all docs for an application
   getApplicationDocuments: async (applicationId: string) => fetchWithAuth(`/applications/${applicationId}/documents`, { method: "GET" }),
+  deleteApplicationDocument: async (applicationId: string, docType: string) => fetchWithAuth(`/documents/${applicationId}/${docType}`, { method: "DELETE" }),
 
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
   

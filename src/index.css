@@ -307,6 +307,53 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
+  /* --- Document Vault Redesign --- */
+  .doc-card-pending {
+    @apply border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-[#103783]/30 transition-all duration-300;
+  }
+  
+  .doc-card-dragover {
+    @apply border-2 border-dashed border-[#103783] bg-[#103783]/5 scale-[1.02] shadow-lg shadow-[#103783]/10 transition-all duration-200;
+  }
+
+  .doc-card-uploading {
+    @apply border-2 border-solid border-[#103783]/20 bg-white shadow-md transition-all duration-300;
+  }
+
+  .doc-card-secured {
+    @apply border-2 border-solid border-emerald-500/30 bg-emerald-50/30 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  @keyframes checkmark-draw {
+    0% {
+      stroke-dashoffset: 48;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+  }
+
+  .animate-checkmark {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: checkmark-draw 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    animation-delay: 0.1s;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 55, 131, 0.1); }
+    50% { box-shadow: 0 0 0 8px rgba(16, 55, 131, 0.05); }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
   /* ─── CHROME COMPOSITOR PERFORMANCE ─────────────────────────────
      contain: layout paint on sections tells Chrome's compositor
      that paint changes inside don't affect siblings — eliminating

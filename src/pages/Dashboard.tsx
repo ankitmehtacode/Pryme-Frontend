@@ -5,7 +5,7 @@ import {
   FileText, Search, CheckCircle, CreditCard, Clock,
   AlertCircle, Building2, TrendingUp, Activity,
   ShieldCheck, ChevronRight, ArrowRight, Wallet,
-  UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target
+  UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -97,6 +97,8 @@ const Dashboard: React.FC = () => {
   
   const [uploadingDocs, setUploadingDocs] = useState<Record<string, boolean>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
+  const [dragOverDocId, setDragOverDocId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
@@ -479,6 +481,48 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleRemoveDocument = async (doc: { id: string; name: string }) => {
+    if (!activeApplication?.applicationId) return;
+    
+    setUploadingDocs(prev => ({ ...prev, [doc.id]: true }));
+    try {
+      const { error } = await PrymeAPI.deleteApplicationDocument(activeApplication.applicationId, normalizeDocName(doc.name));
+      if (error) {
+         toast({ title: "Delete Failed", description: error.message || "Failed to remove document.", variant: "destructive" });
+      } else {
+         setUploadedDocs(prev => {
+            const next = { ...prev };
+            delete next[doc.id];
+            delete next[normalizeDocName(doc.name)];
+            return next;
+         });
+         setConfirmDeleteId(null);
+         toast({ title: "Document Removed", description: `${doc.name} was successfully removed.` });
+      }
+    } catch (err) {
+      toast({ title: "Delete Error", description: "Failed to communicate with vault.", variant: "destructive" });
+    } finally {
+      setUploadingDocs(prev => ({ ...prev, [doc.id]: false }));
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverDocId(id);
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverDocId(null);
+  };
+  const onDrop = (e: React.DragEvent, doc: { id: string; name: string; required: boolean }) => {
+    e.preventDefault();
+    setDragOverDocId(null);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const pseudoEvent = { target: { files: e.dataTransfer.files, value: '' } } as any;
+      handleFileUpload(doc, pseudoEvent);
+    }
+  };
+
   if (authLoading || isDataLoading || viewState === "LOADING") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -628,23 +672,59 @@ const Dashboard: React.FC = () => {
                           </div>
 
                           <div className="space-y-8">
-                            {docGroups.map((group) => (
-                              <div key={group.category}>
-                                <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase mb-4">{group.displayName}</h4>
-                                <div className="space-y-3">
+                            {docGroups.map((group) => {
+                              const categoryColors: Record<string, string> = {
+                                "Identity Documents": "bg-blue-500",
+                                "Income Documents": "bg-emerald-500",
+                                "Property Documents": "bg-amber-500",
+                                "Financial Documents": "bg-purple-500",
+                                "Business Proof": "bg-indigo-500",
+                                "Additional Documents": "bg-slate-500"
+                              };
+                              const badgeColor = categoryColors[group.displayName] || "bg-blue-500";
+                              
+                              const totalDocs = group.docs.length;
+                              const securedDocs = group.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length;
+
+                              return (
+                              <div key={group.category} className="relative pl-6">
+                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${badgeColor} rounded-full opacity-60`}></div>
+                                <div className="flex justify-between items-center mb-4">
+                                  <h4 className="text-sm font-bold tracking-wider text-foreground uppercase">{group.displayName}</h4>
+                                  <span className="text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded-md">{securedDocs} / {totalDocs} Uploaded</span>
+                                </div>
+                                <div className="space-y-4">
                                   {group.docs.map((doc) => {
                                     const isUploading = uploadingDocs[doc.id];
                                     const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
+                                    const isDragging = dragOverDocId === doc.id;
+                                    const isConfirmingDelete = confirmDeleteId === doc.id;
+
+                                    let cardClass = "doc-card-pending";
+                                    if (isDragging) cardClass = "doc-card-dragover";
+                                    if (isUploading) cardClass = "doc-card-uploading animate-pulse-glow";
+                                    if (isUploaded) cardClass = "doc-card-secured";
 
                                     return (
-                                      <div key={doc.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-background hover:border-blue-500/50 transition-all">
-                                        <div className="flex flex-col">
-                                          <span className="font-medium text-foreground text-sm">
-                                            {doc.name} {doc.required && <span className="text-red-500 ml-1">*</span>}
-                                          </span>
-                                          <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (Max 10MB)</span>
+                                      <div 
+                                        key={doc.id} 
+                                        className={`group relative flex items-center justify-between p-5 rounded-xl ${cardClass}`}
+                                        onDragOver={(e) => onDragOver(e, doc.id)}
+                                        onDragLeave={onDragLeave}
+                                        onDrop={(e) => onDrop(e, doc)}
+                                      >
+                                        <div className="flex flex-col gap-1 z-10">
+                                          <div className="flex items-center gap-2">
+                                            {isUploaded && <CheckCircle2 className="w-5 h-5 text-emerald-500 animate-checkmark" />}
+                                            <span className={`font-semibold text-sm ${isUploaded ? 'text-emerald-900' : 'text-foreground'}`}>
+                                              {doc.name} {doc.required && !isUploaded && <span className="text-red-500 ml-1">*</span>}
+                                            </span>
+                                          </div>
+                                          {!isUploaded && <span className="text-xs text-muted-foreground">PDF, JPG, PNG up to 10MB</span>}
+                                          {isUploaded && <span className="text-xs text-emerald-600/80 font-medium">Secured with AES-256</span>}
                                         </div>
-                                        <div>
+                                        
+                                        <div className="z-10 flex items-center gap-3">
                                           <input 
                                             title={`Upload ${doc.name}`}
                                             type="file" 
@@ -652,16 +732,43 @@ const Dashboard: React.FC = () => {
                                             className="hidden" 
                                             accept=".pdf,.jpg,.jpeg,.png"
                                             onChange={(e) => handleFileUpload(doc, e)}
-                                            disabled={isUploading}
+                                            disabled={isUploading || isUploaded}
                                           />
-                                          {isUploaded ? (
-                                            <Button variant="outline" size="sm" className="bg-blue-500/10 text-blue-800 border-blue-500/20 hover:bg-blue-500/20 cursor-default pointer-events-none">
-                                              <CheckCircle2 className="w-4 h-4 mr-2" /> Secured
-                                            </Button>
-                                          ) : (
-                                            <Label htmlFor={`upload-${doc.id}`} className={cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer", isUploading && "opacity-70 pointer-events-none")}>
-                                              {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
-                                              {isUploading ? "Encrypting..." : "Upload"}
+                                          
+                                          {isUploading && (
+                                            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm">
+                                              <Loader2 className="w-4 h-4 animate-spin" /> Encrypting
+                                            </div>
+                                          )}
+
+                                          {isUploaded && !isUploading && (
+                                            <div className="flex items-center gap-2">
+                                              {isConfirmingDelete ? (
+                                                <div className="flex items-center bg-white shadow-sm border border-red-100 rounded-lg p-1 animate-in fade-in zoom-in duration-200">
+                                                  <span className="text-xs font-medium text-red-600 px-2">Remove?</span>
+                                                  <Button size="sm" variant="ghost" className="h-7 hover:bg-red-50 text-red-600 px-2" onClick={() => handleRemoveDocument(doc)}>Yes</Button>
+                                                  <Button size="sm" variant="ghost" className="h-7 hover:bg-slate-100 px-2" onClick={() => setConfirmDeleteId(null)}>No</Button>
+                                                </div>
+                                              ) : (
+                                                <Button 
+                                                  variant="ghost" 
+                                                  size="icon" 
+                                                  className="h-8 w-8 text-emerald-600/50 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                                  onClick={() => setConfirmDeleteId(doc.id)}
+                                                >
+                                                  <X className="w-4 h-4" />
+                                                </Button>
+                                              )}
+                                            </div>
+                                          )}
+
+                                          {!isUploaded && !isUploading && (
+                                            <Label 
+                                              htmlFor={`upload-${doc.id}`} 
+                                              className="inline-flex items-center justify-center rounded-lg text-sm font-semibold transition-all focus-visible:outline-none border border-border bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 shadow-sm h-10 px-4 cursor-pointer"
+                                            >
+                                              <UploadCloud className="w-4 h-4 mr-2 text-blue-500" />
+                                              Browse Files
                                             </Label>
                                           )}
                                         </div>
@@ -670,7 +777,7 @@ const Dashboard: React.FC = () => {
                                   })}
                                 </div>
                               </div>
-                            ))}
+                            )})}
                           </div>
                         </div>
                       )}
