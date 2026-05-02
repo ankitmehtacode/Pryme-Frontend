@@ -110,10 +110,27 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
   } catch (error: any) {
     if (error.name === "AbortError") {
-      throw new Error("Request timed out: The PRYME server did not respond in time. Please try again.");
+      throw new Error("Request timed out: The PRYME server did not respond within 15 seconds. Please check your connection and try again.");
     }
-    if (error.message.includes("Failed to fetch")) {
-      throw new Error("Network offline: Could not connect to the PRYME secure server.");
+
+    // 🧠 DIAGNOSTIC SPLIT: "Failed to fetch" is thrown by the browser for TWO
+    // completely different reasons, and the fix for each is different:
+    //   1. CORS rejection → the response arrived but the browser blocked it
+    //   2. True network failure → the request never left the device
+    // We cannot distinguish these reliably from the error alone, so we use
+    // navigator.onLine as a heuristic. If the device reports online, it's
+    // overwhelmingly likely to be a CORS issue in production.
+    if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError") || error.message?.includes("Load failed")) {
+      // On mobile, flaky connections often fail once then succeed — retry once
+      if (!options._isRetry && navigator.onLine) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchWithAuth(endpoint, { ...options, _isRetry: true } as any);
+      }
+
+      if (!navigator.onLine) {
+        throw new Error("You appear to be offline. Please check your internet connection and try again.");
+      }
+      throw new Error("Could not connect to the PRYME server. This may be a temporary issue — please try again in a moment.");
     }
     throw error;
   }
