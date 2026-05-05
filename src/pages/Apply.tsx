@@ -219,6 +219,8 @@ const Apply = () => {
             businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
             workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
             idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
+            // GEO-FENCE: Pass pinCode to engine for Indore-only validation
+            pinCode: data.pinCode || "",
             // BUG-2 FIX: Correct field names matching Java IncomeComputationInput record
             incomeComputationInput: incomeInput
         };
