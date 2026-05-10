@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -31,9 +31,20 @@ import { usePolicyUpdate } from "@/hooks/usePolicyUpdate";
 import { DynamicPolicyInput } from "@/components/admin/DynamicPolicyInput";
 import { PolicyAuditModal } from "@/components/admin/PolicyAuditModal";
 import { AdminProductModal } from "@/components/admin/AdminProductModal";
+import { AdminBankModal } from "@/components/admin/AdminBankModal";
 import { AdminEligibilityModal } from "@/components/admin/AdminEligibilityModal";
 import { FieldMetadata, PolicyPatchPayload } from "@/lib/validations/policySchema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Lazy-loaded tab components
+const OverviewTab = lazy(() => import("./admin/tabs/OverviewTab"));
+const ApplicationsTab = lazy(() => import("./admin/tabs/ApplicationsTab"));
+const LeadsTab = lazy(() => import("./admin/tabs/LeadsTab"));
+const BanksTab = lazy(() => import("./admin/tabs/BanksTab"));
+const OffersTab = lazy(() => import("./admin/tabs/OffersTab"));
+const UsersTab = lazy(() => import("./admin/tabs/UsersTab"));
+const CompanyTab = lazy(() => import("./admin/tabs/CompanyTab"));
+const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
 
 const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
 
@@ -167,7 +178,7 @@ const AdminDashboard = () => {
   // 🧠 Active/Inactive filter states for entity management
   const [bankStatusFilter, setBankStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [productStatusFilter, setProductStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [ruleStatusFilter, setRuleStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [ruleStatusFilter, setRuleStatusFilter] = useState<"all" | "active" | "inactive">("active");
 
   // Modal & Drawer States
   const [selectedApp, setSelectedApp] = useState<any | null>(null);
@@ -177,6 +188,8 @@ const AdminDashboard = () => {
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [editingBank, setEditingBank] = useState<any | null>(null);
 
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
@@ -396,11 +409,18 @@ const AdminDashboard = () => {
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app: any) => {
-      const searchStr = searchQuery.toLowerCase();
+      const searchStr = searchQuery.toLowerCase().trim();
+      if (!searchStr) {
+        const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignedTo !== null && app.assignedTo !== undefined);
+        return matchesQueue;
+      }
       const matchesSearch =
         app.applicationId?.toLowerCase().includes(searchStr) ||
         app.loanType?.toLowerCase().includes(searchStr) ||
-        app.applicant?.name?.toLowerCase().includes(searchStr);
+        app.applicant?.name?.toLowerCase().includes(searchStr) ||
+        app.applicant?.fullName?.toLowerCase().includes(searchStr) ||
+        app.applicant?.email?.toLowerCase().includes(searchStr) ||
+        app.applicant?.phoneNumber?.toLowerCase().includes(searchStr);
 
       const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignedTo !== null && app.assignedTo !== undefined);
       return matchesSearch && matchesQueue;
@@ -567,8 +587,8 @@ const AdminDashboard = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search Matrix..."
-                  className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all w-64 text-white placeholder:text-slate-600"
+                  placeholder="Search by name, ref ID, or email…"
+                  className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all w-72 text-white placeholder:text-slate-600"
                 />
               </div>
               <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]">
@@ -591,613 +611,90 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* OVERVIEW TAB */}
-              {activeTab === "overview" && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[{ label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-blue-500/20 to-blue-500/0" }, { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0" }, { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-blue-700/20 to-blue-700/0" }, { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0" }].map((metric, i) => (
-                      <div key={i} className="relative bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group cursor-default overflow-hidden">
-                        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${metric.glow} rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                        <div className="flex justify-between items-start mb-4 relative z-10"><div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-blue-500/30 group-hover:bg-blue-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" /></div></div>
-                        <p className="text-sm font-medium text-slate-500 relative z-10">{metric.label}</p><p className="text-2xl font-semibold text-white mt-1 relative z-10">{metric.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06] flex items-center justify-center min-h-[300px] text-slate-500">
-                      {/* Simplified chart placeholder to maintain aesthetic without needing complex date math */}
-                      <p className="flex items-center gap-2"><BarChart3 className="w-5 h-5" /> Historical Trend Engine Active</p>
-                    </div>
-                    <div className="bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06] flex flex-col"><h3 className="font-semibold text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]">
-                      {portfolioData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">
-                              {portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                            </Pie>
-                            <RechartsTooltip contentStyle={{ backgroundColor: '#0d0d14', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }} formatter={(value) => [`${value}%`, 'Share']} />
-                            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="h-full flex items-center justify-center text-slate-500 text-sm">No data available</div>
-                      )}
-                    </div></div>
-                  </div>
-                </div>
-              )}
+              {/* MAIN CONTENT AREA */}
+              <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-blue-500 animate-spin" /></div>}>
+                {activeTab === "overview" && (
+                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} />
+                )}
 
-              {/* 🧠 THE MASTER CRM: APPLICATIONS TAB */}
-              {activeTab === "applications" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col h-[calc(100vh-180px)] relative animate-in fade-in slide-in-from-bottom-2">
-
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
-                    <div className="flex gap-2">
-                      <Button onClick={() => setLeadFilter("all")} variant={leadFilter === "all" ? "default" : "outline"} size="sm" className={cn("h-8 text-xs font-medium shadow-sm transition-all", leadFilter === "all" && "bg-primary text-primary-foreground", leadFilter !== "all" && "border-white/[0.08] text-slate-400 hover:bg-white/[0.06] bg-transparent")}>All Leads</Button>
-                      <Button onClick={() => setLeadFilter("queue")} variant={leadFilter === "queue" ? "default" : "ghost"} size="sm" className={cn("h-8 text-xs font-medium transition-all", leadFilter === "queue" && "bg-primary text-primary-foreground", leadFilter !== "queue" && "text-slate-500 hover:text-slate-200")}>Active Queue</Button>
-                    </div>
-                    <div className="flex bg-white/[0.04] p-1 rounded-lg border border-white/[0.06]">
-                      <button onClick={() => setCrmView("list")} className={cn("p-1.5 rounded-md transition-all", crmView === "list" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutList className="w-4 h-4" /></button>
-                      <button onClick={() => setCrmView("kanban")} className={cn("p-1.5 rounded-md transition-all", crmView === "kanban" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutGrid className="w-4 h-4" /></button>
-                    </div>
-                  </div>
-
-                  {/* VIEW 1: List View */}
-                  {crmView === "list" && (
-                    <div className="flex-1 overflow-auto relative">
-                      {statusMutation.isPending || assignMutation.isPending ? (
-                        <div className="absolute inset-0 z-50 bg-black/20 backdrop-transform-gpu flex items-center justify-center">
-                          <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                        </div>
-                      ) : null}
-
-                      <table className="w-full text-left border-collapse">
-                        <thead className="sticky top-0 bg-[#0d0d14] shadow-[0_1px_0_0_rgba(255,255,255,0.04)] z-10">
-                          <tr className="text-[11px] uppercase tracking-wider text-slate-500 font-medium">
-                            <th className="px-6 py-4">Ref ID</th>
-                            <th className="px-6 py-4">Client Data</th>
-                            <th className="px-6 py-4">Assignment</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4 text-right">Quick Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.04] text-sm">
-                          <AnimatePresence>
-                            {filteredApplications.length === 0 ? (
-                              <tr><td colSpan={5} className="p-12 text-center text-slate-500">No applications found in the database.</td></tr>
-                            ) : (
-                              filteredApplications.map((app: any, idx: number) => (
-                                <motion.tr
-                                  key={app.id}
-                                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                  onClick={() => setSelectedApp(app)}
-                                  className="hover:bg-white/[0.03] transition-colors group cursor-pointer"
-                                >
-                                  <td className="px-6 py-4 align-top">
-                                    <div className="flex items-start gap-3">
-                                      <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-medium text-xs mt-1 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                        {app.loanType?.substring(0, 2).toUpperCase() || "LN"}
-                                      </div>
-                                      <div>
-                                        <p className="font-mono text-xs text-slate-400 mt-1">{app.applicationId}</p>
-                                        <p className="font-semibold text-slate-200 mt-1">{formatCurrency(app.requestedAmount)}</p>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 align-top">
-                                    <div className="space-y-1">
-                                      <p className="font-medium text-white">{app.applicant?.name || 'Unknown'}</p>
-                                      <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span>CIBIL: <strong className={app.declaredCibilScore === -1 ? "text-slate-400" : (app.declaredCibilScore >= 750 ? "text-blue-400" : "text-amber-400")}>{app.declaredCibilScore === -1 ? "N/A" : app.declaredCibilScore}</strong></span>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
-                                    <Select
-                                      value={app.assignedTo || "UNASSIGNED"}
-                                      onValueChange={(val) => {
-                                        assignMutation.mutate({ id: app.applicationId || app.id, assigneeId: val === "UNASSIGNED" ? "" : val });
-                                      }}
-                                      disabled={isEmployee}
-                                    >
-                                      <SelectTrigger className={cn("w-[150px] h-8 text-xs font-medium border focus:ring-blue-500/50 outline-none transition-colors", !app.assignedTo ? "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20" : "bg-white/[0.04] text-slate-300 border-white/[0.08]")}>
-                                        <SelectValue placeholder="Assign Lead" />
-                                      </SelectTrigger>
-                                      <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                                        <SelectItem value="UNASSIGNED" className="text-xs text-slate-400">Unassigned</SelectItem>
-                                        {teamMembers.map((tm: any) => (
-                                          <SelectItem key={tm.id} value={tm.id} className="text-xs">
-                                            {tm.fullName || tm.full_name || tm.email}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </td>
-                                  <td className="px-6 py-4 align-top">
-                                    <StatusBadge status={app.status} />
-                                  </td>
-                                  <td className="px-6 py-4 align-top text-right">
-                                    {getNextStage(app.status) ? (
-                                      <Button
-                                        onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: getNextStage(app.status)!, version: app.version }); }}
-                                        disabled={statusMutation.isPending}
-                                        size="sm"
-                                        className="h-8 bg-primary hover:bg-[#0c2a66] text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                      >
-                                        → {getNextStage(app.status)} <ArrowUpRight className="w-3 h-3 ml-1" />
-                                      </Button>
-                                    ) : (
-                                      <span className="text-[10px] text-slate-600 font-medium uppercase">Terminal</span>
-                                    )}
-                                  </td>
-                                </motion.tr>
-                              ))
-                            )}
-                          </AnimatePresence>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* VIEW 2: Kanban Board */}
-                  {crmView === "kanban" && (
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden p-6 bg-[#050508]/50">
-                      <div className="flex gap-6 h-full items-start w-max">
-                        {pipelineStages.map((stage) => (
-                          <div key={stage} className="w-80 flex flex-col max-h-full">
-                            <div className="flex items-center justify-between mb-4 px-2">
-                              <h3 className="text-sm font-medium text-slate-300">{stage}</h3>
-                              <span className="text-xs font-semibold bg-white/[0.06] text-slate-400 px-2 py-0.5 rounded-full border border-white/[0.06]">
-                                {filteredApplications.filter((a: any) => a.status === stage).length}
-                              </span>
-                            </div>
-                            <div className="flex-1 overflow-y-auto space-y-3 p-2">
-                              {filteredApplications.filter((a: any) => a.status === stage).map((app: any) => (
-                                <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#103783' : 'rgba(255,255,255,0.08)' }}>
-                                  <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-mono text-slate-500">{app.applicationId}</span>
-                                    <span className="text-[10px] bg-white/[0.06] text-slate-300 px-1.5 py-0.5 rounded font-medium border border-white/[0.06] uppercase">{app.loanType}</span>
-                                  </div>
-                                  <p className="text-lg font-semibold text-white mb-3">{formatCurrency(app.requestedAmount)}</p>
-                                  <div className="flex justify-between items-center text-xs text-slate-500">
-                                    <span className={cn("flex items-center gap-1 font-medium", app.declaredCibilScore === -1 ? "text-slate-400" : (app.declaredCibilScore >= 750 ? "text-blue-400" : ""))}>
-                                      <Activity className="w-3 h-3" /> {app.declaredCibilScore === -1 ? "N/A" : app.declaredCibilScore}
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* RAW LEADS TAB */}
-              {activeTab === "leads" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col h-[calc(100vh-180px)] relative animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
-                    <h3 className="font-semibold text-white">Raw Inquiries (Initial Capture)</h3>
-                  </div>
-                  <div className="flex-1 overflow-auto relative">
-                    {isLoadingLeads ? (
-                      <div className="absolute inset-0 z-50 bg-black/20 backdrop-transform-gpu flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                      </div>
-                    ) : null}
-                    <table className="w-full text-left border-collapse">
-                      <thead className="sticky top-0 bg-[#0d0d14] shadow-[0_1px_0_0_rgba(255,255,255,0.04)] z-10">
-                        <tr className="text-[11px] uppercase tracking-wider text-slate-500 font-medium">
-                          <th className="px-6 py-4">Ref ID / Date</th>
-                          <th className="px-6 py-4">Client Data</th>
-                          <th className="px-6 py-4">Loan Needs</th>
-                          <th className="px-6 py-4">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/[0.04] text-sm">
-                        <AnimatePresence>
-                          {rawLeads.length === 0 && !isLoadingLeads ? (
-                            <tr><td colSpan={4} className="p-12 text-center text-slate-500">No raw inquiries found.</td></tr>
-                          ) : (
-                            rawLeads.map((lead: any) => (
-                              <motion.tr
-                                key={lead.id}
-                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                className="hover:bg-white/[0.03] transition-colors"
-                              >
-                                <td className="px-6 py-4 align-top">
-                                  <p className="font-mono text-xs text-slate-400">{lead.id}</p>
-                                  <p className="text-[10px] text-slate-500 mt-1">{new Date(lead.createdAt).toLocaleString()}</p>
-                                </td>
-                                <td className="px-6 py-4 align-top">
-                                  <p className="font-medium text-white">{lead.userName || 'Anonymous'}</p>
-                                  <p className="text-xs text-slate-400 mt-1">{lead.phone || 'No Phone'}</p>
-                                </td>
-                                <td className="px-6 py-4 align-top">
-                                  <p className="font-semibold text-slate-200">{formatCurrency(lead.loanAmount)}</p>
-                                  <p className="text-[10px] bg-white/[0.06] text-slate-300 px-1.5 py-0.5 rounded font-medium border border-white/[0.06] uppercase inline-block mt-1">{lead.loanType}</p>
-                                </td>
-                                <td className="px-6 py-4 align-top">
-                                  <StatusBadge status={lead.status || 'NEW'} />
-                                </td>
-                              </motion.tr>
-                            ))
-                          )}
-                        </AnimatePresence>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* PARTNER BANKS TAB */}
-              {activeTab === "banks" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-semibold text-white">Partner Bank Network</h3>
-                      <Select value={bankStatusFilter} onValueChange={(v: any) => setBankStatusFilter(v)}>
-                        <SelectTrigger className="w-[120px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                          <SelectItem value="all" className="text-xs">All ({banks.length})</SelectItem>
-                          <SelectItem value="active" className="text-xs text-green-400">Active</SelectItem>
-                          <SelectItem value="inactive" className="text-xs text-slate-400">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
-                      const name = window.prompt("Enter bank name:");
-                      if (!name) return;
-                      const logoUrl = window.prompt("Enter logo URL (optional):") || "";
-                      PrymeAPI.createAdminBank({ bankName: name, logoUrl, isActive: true })
-                        .then(() => { toast.success(`${name} added to partner network.`); refetchBanks(); })
-                        .catch((e: any) => toast.error(e.message || "Failed to add bank."));
-                    }}><Plus className="w-4 h-4 mr-2" /> Add Bank</Button>
-                  </div>
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Bank Name</th><th className="px-6 py-4">Logo URL</th><th className="px-6 py-4">Status</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
-                    <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {filteredBanks.length === 0 ? <tr><td colSpan={4} className="p-6 text-center text-slate-500">{bankStatusFilter === "all" ? "No banks configured." : `No ${bankStatusFilter} banks.`}</td></tr> : filteredBanks.map((b: any) => (
-                        <tr key={b.id} className="hover:bg-white/[0.03] transition-colors">
-                          <td className="px-6 py-4 font-semibold text-white">{b.bankName}</td>
-                          <td className="px-6 py-4 text-slate-500 text-xs truncate max-w-[200px]">{b.logoUrl || "No Logo"}</td>
-                          <td className="px-6 py-4">
-                            <button onClick={() => toggleBankMutation.mutate({ id: b.id, active: !b.active })} className={cn("px-2 py-1 text-xs font-medium rounded-md border", b.active ? "bg-green-500/15 text-green-400 border-green-500/25" : "bg-slate-500/15 text-slate-400 border-slate-500/25")}>
-                              {b.active ? "Active" : "Inactive"}
-                            </button>
-                          </td>
-                          <td className="px-6 py-4 text-right flex gap-2 justify-end">
-                            <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300" onClick={() => {
-                              const name = window.prompt("Update bank name:", b.bankName);
-                              if (!name) return;
-                              const logoUrl = window.prompt("Update logo URL:", b.logoUrl || "") || "";
-                              PrymeAPI.updateAdminBank(b.id, { bankName: name, logoUrl, isActive: b.active })
-                                .then(() => { toast.success("Bank updated."); refetchBanks(); })
-                                .catch((e: any) => toast.error(e.message));
-                            }}>Edit</Button>
-                            <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => {
-                              if (!window.confirm(`Delete ${b.bankName}? This is irreversible.`)) return;
-                              PrymeAPI.deleteAdminBank(b.id)
-                                .then(() => { toast.success("Bank deleted."); refetchBanks(); })
-                                .catch((e: any) => toast.error(e.message));
-                            }}>Delete</Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* OFFERS TAB */}
-              {activeTab === "offers" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-semibold text-white">Dynamic Policy Engines / Offers</h3>
-                      <Select value={productStatusFilter} onValueChange={(v: any) => setProductStatusFilter(v)}>
-                        <SelectTrigger className="w-[120px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                          <SelectItem value="all" className="text-xs">All ({products.length})</SelectItem>
-                          <SelectItem value="active" className="text-xs text-green-400">Active</SelectItem>
-                          <SelectItem value="inactive" className="text-xs text-slate-400">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
-                      setSelectedProduct(null);
-                      setIsOfferModalOpen(true);
-                    }}><Plus className="w-4 h-4 mr-2" /> Add Entity</Button>
-                  </div>
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Lender</th><th className="px-6 py-4">Campaign</th><th className="px-6 py-4">Status</th><th className="px-6 py-4">ROI</th><th className="px-6 py-4">Processing Fee</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
-                    <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {filteredProducts.length === 0 ? <tr><td colSpan={6} className="p-6 text-center text-slate-500">{productStatusFilter === "all" ? "No products configured." : `No ${productStatusFilter} products.`}</td></tr> : filteredProducts.map((p: any) => (
-                        <tr key={p.id} className="hover:bg-white/[0.03] transition-colors">
-                          <td className="px-6 py-4 font-semibold text-white">{p.lenderName || "Unknown"}</td>
-                          <td className="px-6 py-4 text-slate-300">{p.campaignName || p.loanType}</td>
-                          <td className="px-6 py-4">
-                            <button onClick={() => toggleProductMutation.mutate({ id: p.id, data: { ...p, active: !p.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", p.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20")}>
-                              {p.active ? "Active" : "Draft"}
-                            </button>
-                          </td>
-                          <td className="px-6 py-4 font-mono text-amber-400">{p.roi < 1 ? (p.roi * 100).toFixed(2) : p.roi}%</td>
-                          <td className="px-6 py-4 font-mono text-blue-400">{p.processingFee < 1 ? (p.processingFee * 100).toFixed(2) : p.processingFee || 0}%</td>
-                          <td className="px-6 py-4 text-right flex gap-2 justify-end">
-                            <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300" onClick={() => {
-                              setSelectedProduct(p);
-                              setIsOfferModalOpen(true);
-                            }}>Edit</Button>
-                            <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => {
-                              if (!window.confirm(`Delete this offer? This is irreversible.`)) return;
-                              PrymeAPI.deleteAdminProduct(p.id)
-                                .then(() => { toast.success("Product deleted."); refetchProducts(); })
-                                .catch((e: any) => toast.error(e.message));
-                            }}>Delete</Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* USERS TAB — Customers Only (role === USER) */}
-              {activeTab === "users" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
-                    <h3 className="font-semibold text-white">Customer Directory</h3>
-                    <span className="text-xs text-slate-500 font-medium">{users.length} registered customers</span>
-                  </div>
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]"><tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold"><th className="px-6 py-4">Customer</th><th className="px-6 py-4">Email</th><th className="px-6 py-4">Location</th><th className="px-6 py-4">Joined</th><th className="px-6 py-4">System UUID</th><th className="px-6 py-4 text-right">Actions</th></tr></thead>
-                    <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {users.length === 0 ? <tr><td colSpan={6} className="p-8 text-center text-slate-500">No registered customers yet.</td></tr> : users.map((u: any) => (
-                        <tr key={u.id} className="hover:bg-white/[0.03] transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xs font-medium text-blue-400">
-                                {(u.fullName || u.full_name || "US").substring(0, 2).toUpperCase()}
-                              </div>
-                              <p className="font-semibold text-white">{u.fullName || u.full_name}</p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-slate-400 text-xs">{u.email}</td>
-                          <td className="px-6 py-4 text-slate-500 text-xs">{u.city ? `${u.city}, ${u.state || ''}` : '—'}</td>
-                          <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
-                          <td className="px-6 py-4 text-slate-600 font-mono text-[10px]">{u.id}</td>
-                          <td className="px-6 py-4 text-right">
-                            {(isSuperAdmin || authUser?.role === "ADMIN") && (
-                              <Select
-                                onValueChange={(newRole) => {
-                                  if (newRole !== u.role) {
-                                    roleMutation.mutate({ userId: u.id, role: newRole });
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className="w-[120px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none ml-auto">
-                                  <SelectValue placeholder="Add to Team" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                                  {isSuperAdmin && <SelectItem value="SUPER_ADMIN" className="focus:bg-amber-500/10 focus:text-amber-400 text-xs">Super Admin</SelectItem>}
-                                  <SelectItem value="ADMIN" className="focus:bg-blue-500/10 focus:text-blue-400 text-xs">Admin</SelectItem>
-                                  <SelectItem value="EMPLOYEE" className="focus:bg-green-500/10 focus:text-green-400 text-xs">Employee</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* COMPANY TAB — Team Members (SUPER_ADMIN / ADMIN / EMPLOYEE) */}
-              {activeTab === "company" && (
-                <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-                  <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
-                    <h3 className="font-semibold text-white">Team Members</h3>
-                    <span className="text-xs text-slate-500 font-medium">{teamMembers.length} team members{!isSuperAdmin && " • Role changes require SUPER_ADMIN"}</span>
-                  </div>
-                  {roleMutation.isPending && (
-                    <div className="px-6 py-2 bg-blue-500/10 border-b border-blue-500/20 flex items-center gap-2 text-xs text-blue-400 font-medium">
-                      <Loader2 className="w-3 h-3 animate-spin" /> Updating role in database...
-                    </div>
-                  )}
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.04]">
-                      <tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                        <th className="px-6 py-4">Member</th>
-                        <th className="px-6 py-4">Email</th>
-                        <th className="px-6 py-4">Role</th>
-                        <th className="px-6 py-4">Joined</th>
-                        <th className="px-6 py-4">System UUID</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.04] text-sm">
-                      {teamMembers.length === 0 ? <tr><td colSpan={5} className="p-8 text-center text-slate-500">No team members found.</td></tr> : teamMembers.map((u: any) => {
-                        const isCurrentUser = authUser?.id === u.id;
-                        return (
-                          <tr key={u.id} className="hover:bg-white/[0.03] transition-colors">
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border",
-                                  u.role === "SUPER_ADMIN" ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
-                                  u.role === "ADMIN" ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
-                                  "bg-green-500/10 border-green-500/20 text-green-400"
-                                )}>
-                                  {(u.fullName || u.full_name || "TM").substring(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                  <p className="font-semibold text-white">{u.fullName || u.full_name}</p>
-                                  {isCurrentUser && <span className="text-[10px] text-blue-400 font-medium">You</span>}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-slate-400 text-xs">{u.email}</td>
-                            <td className="px-6 py-4">
-                              {(isSuperAdmin || authUser?.role === "ADMIN") && !isCurrentUser ? (
-                                <Select
-                                  defaultValue={u.role}
-                                  onValueChange={(newRole) => {
-                                    if (newRole !== u.role) {
-                                      roleMutation.mutate({ userId: u.id, role: newRole });
-                                    }
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[160px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                                    {isSuperAdmin && <SelectItem value="SUPER_ADMIN" className="focus:bg-amber-500/10 focus:text-amber-400 text-xs">Super Admin</SelectItem>}
-                                    <SelectItem value="ADMIN" className="focus:bg-blue-500/10 focus:text-blue-400 text-xs">Admin</SelectItem>
-                                    <SelectItem value="EMPLOYEE" className="focus:bg-green-500/10 focus:text-green-400 text-xs">Employee</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <span className={cn("inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold border",
-                                  u.role === "SUPER_ADMIN" ? "bg-amber-500/15 text-amber-400 border-amber-500/25" :
-                                  u.role === "ADMIN" ? "bg-blue-500/15 text-blue-400 border-blue-500/25" :
-                                  "bg-green-500/15 text-green-400 border-green-500/25"
-                                )}>{u.role.replace('_', ' ')}</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
-                            <td className="px-6 py-4 text-slate-600 font-mono text-[10px]">{u.id}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* 🧠 ENGINE RULES TAB: Eligibility Mapping UI */}
-              {activeTab === "settings" && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6">
-                  
-                  {/* Header & Actions */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] shadow-xl">
-                    <div>
-                      <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-blue-500" /> Matrix Engine Rules
-                      </h3>
-                      <p className="text-sm text-slate-400 mt-1">
-                        Configure advanced eligibility criteria. These rules directly drive the real-time routing logic for user "See My Offers" matches.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Select value={ruleStatusFilter} onValueChange={(v: any) => setRuleStatusFilter(v)}>
-                        <SelectTrigger className="w-[130px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-                          <SelectItem value="all" className="text-xs">All ({eligibilityRules.length})</SelectItem>
-                          <SelectItem value="active" className="text-xs text-green-400">Active</SelectItem>
-                          <SelectItem value="inactive" className="text-xs text-slate-400">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {(isSuperAdmin || authUser?.role === "ADMIN") && (
-                        <Button
-                          onClick={() => { setEditingEligibilityRule(null); setIsEligibilityModalOpen(true); }}
-                          className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-none whitespace-nowrap"
-                        >
-                          <Plus className="w-4 h-4 mr-2" /> Add Rule
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Rules Datatable */}
-                  <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] shadow-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left">
-                        <thead>
-                          <tr className="border-b border-white/[0.06] bg-slate-900/40 text-[10px] uppercase tracking-widest text-slate-400">
-                            <th className="px-6 py-4 font-semibold">Bank / Product</th>
-                            <th className="px-6 py-4 font-semibold">Base Criteria</th>
-                            <th className="px-6 py-4 font-semibold">Limits (LTV/FOIR)</th>
-                            <th className="px-6 py-4 font-semibold">Exceptions</th>
-                            <th className="px-6 py-4 font-semibold">Status</th>
-                            <th className="px-6 py-4 text-right font-semibold">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.06]">
-                          {filteredEligibilityRules.length === 0 ? (
-                            <tr>
-                              <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                                <div className="flex flex-col items-center gap-3">
-                                  <Settings className="w-8 h-8 text-slate-600 mb-2" />
-                                  <p>{ruleStatusFilter === "all" ? "No engine rules defined." : `No ${ruleStatusFilter} rules.`}</p>
-                                  {ruleStatusFilter === "all" && (isSuperAdmin || authUser?.role === "ADMIN") && (
-                                    <Button variant="link" onClick={() => { setEditingEligibilityRule(null); setIsEligibilityModalOpen(true); }} className="text-blue-500">
-                                      Create the first rule
-                                    </Button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          ) : (
-                            filteredEligibilityRules.map((rule: any) => (
-                              <tr key={rule.id} className="hover:bg-white/[0.02] transition-colors">
-                                <td className="px-6 py-4">
-                                  <div className="font-semibold text-slate-200">{rule.bankName || 'Any Bank'}</div>
-                                  <div className="text-xs text-slate-500 mt-0.5">{rule.productCode}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="text-sm text-slate-300">Min Age: {rule.minAge} | Inc: ₹{rule.minIncome?.toLocaleString()}</div>
-                                  <div className="text-xs text-slate-500 mt-0.5">{rule.employmentType} ({rule.incomeType})</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="text-sm text-emerald-400 font-mono">
-                                    {(rule.ltvAllowed ? rule.ltvAllowed * 100 : 0)}% / {(rule.foirMax ? rule.foirMax * 100 : 0)}%
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="text-xs text-slate-400 max-w-[200px] truncate" title={rule.conditions}>
-                                    {rule.conditions || "-"}
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <button onClick={() => updateEligibilityRuleMutation.mutate({ id: rule.id, data: { ...rule, active: !rule.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", rule.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20")}>
-                                    {rule.active ? "ACTIVE" : "INACTIVE"}
-                                  </button>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline" 
-                                    className="border-white/10 text-slate-300 hover:bg-white/5 hover:text-white"
-                                    onClick={() => { setEditingEligibilityRule(rule); setIsEligibilityModalOpen(true); }}
-                                  >
-                                    Edit
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  
-                  {/* The Eligibility Rule Modal */}
-                  <AdminEligibilityModal 
-                    isOpen={isEligibilityModalOpen}
-                    onClose={() => { setIsEligibilityModalOpen(false); setEditingEligibilityRule(null); }}
-                    initialData={editingEligibilityRule}
-                    onSubmit={handleEligibilitySubmit}
+                {activeTab === "applications" && (
+                  <ApplicationsTab 
+                    leadFilter={leadFilter} setLeadFilter={setLeadFilter}
+                    crmView={crmView} setCrmView={setCrmView}
+                    statusMutation={statusMutation} assignMutation={assignMutation}
+                    filteredApplications={filteredApplications} pipelineStages={pipelineStages}
+                    setSelectedApp={setSelectedApp} formatCurrency={formatCurrency}
+                    getNextStage={getNextStage} teamMembers={teamMembers}
+                    StatusBadge={StatusBadge} isEmployee={isEmployee}
                   />
+                )}
 
-                </div>
-              )}
+                {activeTab === "leads" && (
+                  <LeadsTab 
+                    isLoadingLeads={isLoadingLeads} rawLeads={rawLeads} 
+                    formatCurrency={formatCurrency} StatusBadge={StatusBadge} 
+                  />
+                )}
+
+                {activeTab === "banks" && (
+                  <BanksTab 
+                    bankStatusFilter={bankStatusFilter} setBankStatusFilter={setBankStatusFilter}
+                    banks={banks} filteredBanks={filteredBanks}
+                    toggleBankMutation={toggleBankMutation} refetchBanks={refetchBanks}
+                    onAddBank={() => { setEditingBank(null); setIsBankModalOpen(true); }}
+                    onEditBank={(bank) => { setEditingBank(bank); setIsBankModalOpen(true); }}
+                    onDeleteBank={(bank) => {
+                      if (!window.confirm(`Delete ${bank.bankName}? This is irreversible.`)) return;
+                      PrymeAPI.deleteAdminBank(bank.id)
+                        .then(() => { toast.success("Bank deleted."); refetchBanks(); })
+                        .catch((e: any) => toast.error(e.message));
+                    }}
+                  />
+                )}
+
+                {activeTab === "offers" && (
+                  <>
+                    <OffersTab 
+                      productStatusFilter={productStatusFilter} setProductStatusFilter={setProductStatusFilter}
+                      products={products} filteredProducts={filteredProducts}
+                      setSelectedProduct={setSelectedProduct} setIsOfferModalOpen={setIsOfferModalOpen}
+                      toggleProductMutation={toggleProductMutation} refetchProducts={refetchProducts}
+                    />
+                  </>
+                )}
+
+                {activeTab === "users" && (
+                  <UsersTab 
+                    users={users} isSuperAdmin={isSuperAdmin} 
+                    authUser={authUser} roleMutation={roleMutation} 
+                  />
+                )}
+
+                {activeTab === "company" && (
+                  <CompanyTab 
+                    teamMembers={teamMembers} isSuperAdmin={isSuperAdmin} 
+                    authUser={authUser} roleMutation={roleMutation} 
+                  />
+                )}
+
+                {activeTab === "settings" && (
+                  <>
+                    <SettingsTab 
+                      ruleStatusFilter={ruleStatusFilter} setRuleStatusFilter={setRuleStatusFilter}
+                      eligibilityRules={eligibilityRules} filteredEligibilityRules={filteredEligibilityRules}
+                      isSuperAdmin={isSuperAdmin} authUser={authUser}
+                      setEditingEligibilityRule={setEditingEligibilityRule} setIsEligibilityModalOpen={setIsEligibilityModalOpen}
+                      updateEligibilityRuleMutation={updateEligibilityRuleMutation}
+                    />
+                    <AdminEligibilityModal 
+                      isOpen={isEligibilityModalOpen}
+                      onClose={() => { setIsEligibilityModalOpen(false); setEditingEligibilityRule(null); }}
+                      initialData={editingEligibilityRule}
+                      onSubmit={handleEligibilitySubmit}
+                    />
+                  </>
+                )}
+              </Suspense>
 
             </div>
           </div>
@@ -1337,6 +834,27 @@ const AdminDashboard = () => {
               queryClient.invalidateQueries({ queryKey: ["policy_entities"] }); 
             })
             .catch((e: any) => toast.error(e.message || "Failed to commit entity to database."));
+        }}
+      />
+
+      {/* 🧠 BANK PARTNER MODAL — Logo Upload + Crop */}
+      <AdminBankModal
+        isOpen={isBankModalOpen}
+        onClose={() => { setIsBankModalOpen(false); setEditingBank(null); }}
+        initialData={editingBank}
+        onSubmit={(data) => {
+          const apiCall = editingBank?.id
+            ? PrymeAPI.updateAdminBank(editingBank.id, data)
+            : PrymeAPI.createAdminBank(data);
+
+          apiCall
+            .then(() => {
+              toast.success(`${data.bankName} ${editingBank?.id ? 'updated' : 'added to partner network'}.`);
+              setIsBankModalOpen(false);
+              setEditingBank(null);
+              refetchBanks();
+            })
+            .catch((e: any) => toast.error(e.message || "Failed to save bank."));
         }}
       />
     </>

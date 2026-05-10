@@ -297,6 +297,9 @@ export interface ApplicationState {
     cibilPullAuthorized: boolean;
     dataSharingAuthorized: boolean;
   };
+
+  // Global validation state
+  validationErrors: Record<string, string>;
 }
 
 // ─── STORE ACTIONS (Zustand interface) ──────────────────────────────────────
@@ -317,6 +320,11 @@ export interface ApplicationActions {
   updateDocuments: (docs: DocumentItem[]) => void;
   setDocumentStatus: (docId: string, status: DocumentStatus, fileUrl?: string, fileName?: string) => void;
   setConsent: (field: keyof ApplicationState['consent'], value: boolean) => void;
+
+  // Validation
+  setValidationErrors: (errors: Record<string, string>) => void;
+  setValidationError: (field: string, error: string | null) => void;
+  clearValidationErrors: () => void;
 
   // Lifecycle
   resetApplication: () => void;

@@ -2,6 +2,48 @@ import React, { useState, useEffect } from "react";
 import { X, Save, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpelBuilder } from "./SpelBuilder";
+import { PricingMatrixBuilder } from "@/components/admin/PricingMatrixBuilder";
+
+const PROPERTY_OPTIONS = [
+  "RESIDENTIAL", "FLAT", "HOME", "VILLA", "APARTMENT", "BUILDER_FLOOR", "ROW_HOUSE", "PENTHOUSE",
+  "COMMERCIAL", "HOSPITAL", "HOSTEL", "RESTAURANTS", "HOTEL", "MARRIAGE_GARDEN", "SCHOOL", "SHOP", "WAREHOUSE", "GODOWN", "OFFICE",
+  "INDUSTRIAL", "FACTORIES", "WAREHOUSES", "DISTRIBUTION_CENTER", "R_AND_D_FACILITY", "FLEX_SPACES",
+  "PLOT", "LAND", "GRAM_PANCHAYAT"
+];
+
+const MultiSelect = ({ label, options, value, onChange }: { label: string, options: string[], value: string, onChange: (val: string) => void }) => {
+  const selected = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
+  
+  const toggleOption = (opt: string) => {
+    if (selected.includes(opt)) {
+      onChange(selected.filter(o => o !== opt).join(','));
+    } else {
+      onChange([...selected, opt].join(','));
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-[11px] font-semibold text-slate-400">{label}</label>
+      <div className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg p-2 h-24 overflow-y-auto custom-scrollbar flex flex-wrap content-start gap-1.5">
+        {options.map(opt => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggleOption(opt)}
+            className={`text-[10px] px-2 py-1 rounded-md border transition-colors ${
+              selected.includes(opt) 
+                ? 'bg-blue-600 border-blue-500 text-white' 
+                : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:border-slate-500'
+            }`}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export interface AdminEligibilityModalProps {
   isOpen: boolean;
@@ -22,13 +64,16 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     maxAge: 65,
     minIncome: 25000,
     incomeType: "STANDARD",
+    surrogate: "",
     workExpYears: 2,
     itrRequiredYears: 2,
     ltvAllowed: 80,
+    ltvComputationLogic: "",
     foirMax: 65,
+    foirComputationLogic: "",
     deviationFormulae: "",
     conditions: "",
-    emiNotObligated: false,
+    emiNotObligated: "NO",
     propertyType: "RESIDENTIAL",
     negativeProperty: "",
     profileRestrictions: "",
@@ -42,7 +87,9 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
         setFormData({ 
           ...initialData,
           ltvAllowed: initialData.ltvAllowed ? Number((initialData.ltvAllowed * 100).toFixed(2)) : 80,
-          foirMax: initialData.foirMax ? Number((initialData.foirMax * 100).toFixed(2)) : 65
+          ltvComputationLogic: initialData.ltvComputationLogic || "",
+          foirMax: initialData.foirMax ? Number((initialData.foirMax * 100).toFixed(2)) : 65,
+          foirComputationLogic: initialData.foirComputationLogic || ""
         });
       } else {
         setFormData({
@@ -57,10 +104,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
           workExpYears: 2,
           itrRequiredYears: 2,
           ltvAllowed: 80,
+          ltvComputationLogic: "",
           foirMax: 65,
+          foirComputationLogic: "",
           deviationFormulae: "",
           conditions: "",
-          emiNotObligated: false,
+          emiNotObligated: "NO",
+     surrogate: "",
           propertyType: "RESIDENTIAL",
           negativeProperty: "",
           profileRestrictions: "",
@@ -82,7 +132,7 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     }
     
     if (name === "emiNotObligated") {
-      setFormData((prev: any) => ({ ...prev, emiNotObligated: value === "true" }));
+      setFormData((prev: any) => ({ ...prev, emiNotObligated: value }));
       return;
     }
 
@@ -157,8 +207,8 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   <label className="text-[11px] font-semibold text-slate-400">Employment Type</label>
                   <select name="employmentType" value={formData.employmentType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
                     <option value="SALARIED">Salaried</option>
-                    <option value="SELF_EMPLOYED">Self Employed</option>
-                    <option value="BUSINESS">Business</option>
+                    <option value="SELF_EMPLOYED_PROFESSIONAL">Self Employed, Professional</option>
+                    <option value="SELF_EMPLOYED_NON_PROFESSIONAL">Self Employed, Non-Professional</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -178,7 +228,14 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Surrogate</label>
-                  <input type="text" name="incomeType" value={formData.incomeType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. Standard" />
+                  <select name="surrogate" value={formData.surrogate || ""} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
+                    <option value="">None (Universal)</option>
+                    <option value="ITR">ITR</option>
+                    <option value="BANKING">Banking / ABB</option>
+                    <option value="GST">GST</option>
+                    <option value="CASH_SALARY">Cash Salary</option>
+                    <option value="FORM_16">Form 16</option>
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Vintage (Years)</label>
@@ -190,9 +247,10 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">EMI Not Obligated</label>
-                  <select name="emiNotObligated" value={formData.emiNotObligated ? "true" : "false"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-blue-500 text-slate-200">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
+                  <select name="emiNotObligated" value={formData.emiNotObligated || "NO"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-blue-500 text-slate-200">
+                    <option value="NO">No</option>
+                    <option value="6_MONTHS">6 Months</option>
+                    <option value="12_MONTHS">12 Months</option>
                   </select>
                 </div>
               </div>
@@ -202,14 +260,37 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
             <div className="space-y-4">
               <h3 className="text-sm font-semibold uppercase tracking-widest text-emerald-500 border-b border-[#103783]/20 pb-2">Margins & Adjustments</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">LTV Allowed (%)</label>
-                  <input required type="number" name="ltvAllowed" value={formData.ltvAllowed} onChange={handleChange} min={0} max={100} step="0.01" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 outline-none focus:border-blue-500" />
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-semibold text-slate-400">Base LTV Allowed (%)</label>
+                    <input required type="number" name="ltvAllowed" value={formData.ltvAllowed} onChange={handleChange} min={0} max={100} step="0.01" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 outline-none focus:border-blue-500" />
+                  </div>
+                  <div className="space-y-2 border border-[#103783]/20 rounded-xl p-3 bg-slate-900/30">
+                    <label className="text-[11px] font-semibold text-cyan-500">Dynamic LTV Matrix</label>
+                    <PricingMatrixBuilder
+                      value={formData.ltvComputationLogic || ""}
+                      onChange={(spel) => setFormData((prev: any) => ({ ...prev, ltvComputationLogic: spel }))}
+                      baseRate={formData.ltvAllowed}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">FOIR Allowed (%)</label>
-                  <input required type="number" name="foirMax" value={formData.foirMax} onChange={handleChange} min={0} max={100} step="0.01" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 outline-none focus:border-blue-500" />
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-semibold text-slate-400">Base FOIR Allowed (%)</label>
+                    <input required type="number" name="foirMax" value={formData.foirMax} onChange={handleChange} min={0} max={100} step="0.01" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 outline-none focus:border-blue-500" />
+                  </div>
+                  <div className="space-y-2 border border-[#103783]/20 rounded-xl p-3 bg-slate-900/30">
+                    <label className="text-[11px] font-semibold text-cyan-500">Dynamic FOIR Matrix</label>
+                    <PricingMatrixBuilder
+                      value={formData.foirComputationLogic || ""}
+                      onChange={(spel) => setFormData((prev: any) => ({ ...prev, foirComputationLogic: spel }))}
+                      baseRate={formData.foirMax}
+                    />
+                  </div>
                 </div>
+
               </div>
             </div>
 
@@ -229,14 +310,18 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   onChange={(val) => setFormData((prev: any) => ({ ...prev, conditions: val }))}
                   placeholder="e.g. Mandatory co-applicant if CIBIL < 700"
                 />
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">Property Type</label>
-                  <input type="text" name="propertyType" value={formData.propertyType} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. Plot, Flat" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">Negative Property</label>
-                  <input type="text" name="negativeProperty" value={formData.negativeProperty} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. Gram Panchayat" />
-                </div>
+                <MultiSelect
+                  label="Property Type Allow-List"
+                  options={PROPERTY_OPTIONS}
+                  value={formData.propertyType}
+                  onChange={(val) => setFormData((prev: any) => ({ ...prev, propertyType: val }))}
+                />
+                <MultiSelect
+                  label="Negative Property Deny-List"
+                  options={PROPERTY_OPTIONS}
+                  value={formData.negativeProperty}
+                  onChange={(val) => setFormData((prev: any) => ({ ...prev, negativeProperty: val }))}
+                />
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-[11px] font-semibold text-slate-400">Negative Profile</label>
                   <textarea name="profileRestrictions" value={formData.profileRestrictions} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Police, Lawyer, Politician" />

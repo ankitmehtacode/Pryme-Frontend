@@ -6,6 +6,10 @@
   /* Font import REMOVED — already loaded via <link> in index.html.
      Duplicate @import caused the browser to download Inter + Space Grotesk twice. */
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   h1,
   h2,
   h3 {
@@ -93,31 +97,13 @@
      compositing pass — catastrophic on low-end GPUs and mobile browsers.
      The noise was at 3% opacity, imperceptible on most displays. */
 
-  /* --- Lenis Scroll Engine Configuration --- */
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
+  /* Lenis Scroll Engine REMOVED — replaced by native CSS scroll-behavior: smooth.
+     Zero JS overhead, zero main-thread blocking, compositor-thread native scrolling. */
 
-  .lenis.lenis-smooth {
-    scroll-behavior: auto !important;
-  }
-
-  .lenis.lenis-smooth [data-lenis-prevent] {
-    overscroll-behavior: contain;
-  }
-
-  /* Hide default scrollbar */
-  ::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-    display: none;
-  }
-
-  * {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  /* GLOBAL SCROLLBAR HIDING REMOVED:
+     Hiding scrollbars globally is a WCAG 2.1 SC 2.4.7 violation.
+     Desktop users require visual affordance that content is scrollable.
+     Custom scrollbar styling should be applied via the .custom-scrollbar class instead. */
 
   /* --- Number Inputs hide arrows --- */
   input[type="number"]::-webkit-inner-spin-button,
@@ -221,28 +207,10 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#103783] via-[#9BAFD9] to-[#103783] animate-pulse bg-[length:200%_auto];
   }
 
-  /* --- Animations & Keyframes --- */
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(-100%);
-    }
-  }
-
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-15px);
-    }
-  }
+  /* DUPLICATE KEYFRAMES REMOVED:
+     marquee, float, and shimmer are defined in tailwind.config.ts
+     and generated automatically by tailwindcss-animate.
+     Keeping only the custom utility classes that reference them. */
 
   .animate-float-slow {
     animation: float 8s ease-in-out infinite;
@@ -250,16 +218,6 @@
 
   .animate-float-medium {
     animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-
-    100% {
-      background-position: -200% 0;
-    }
   }
 
   .animate-shimmer {

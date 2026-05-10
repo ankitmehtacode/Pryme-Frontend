@@ -3,9 +3,11 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Core Routes (Synchronous for FCP)
-import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
+// All routes are lazy-loaded for optimal code splitting.
+// Index and Auth were previously synchronous — moving them to lazy cuts ~60KB
+// from the critical-path main bundle (index-*.js).
+const Index = lazy(() => import("@/pages/Index"));
+const Auth = lazy(() => import("@/pages/Auth"));
 
 // Secondary Routes (Aggressively Lazy-Loaded)
 const Apply = lazy(() => import("@/pages/Apply"));

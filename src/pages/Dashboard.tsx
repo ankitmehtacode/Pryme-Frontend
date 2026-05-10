@@ -326,7 +326,6 @@ const Dashboard: React.FC = () => {
       // 🧠 JIT BACKEND SYNC: If this is a synthetic frontend application (from a lost lead),
       // we must recreate the lead on the backend and elevate it before we can PATCH progress.
       if (targetAppId.startsWith("pending-")) {
-        console.log("Synthesizing lost application context into backend...");
         const cachedAppStr = localStorage.getItem("pryme_pending_application");
         const cachedApp = cachedAppStr ? JSON.parse(cachedAppStr) : {};
         

@@ -418,9 +418,9 @@ export const PrymeAPI = {
 
   /** Admin: Bank CRUD — /api/v1/admin/banks */
   getAdminBanks: async () => fetchWithAuth("/admin/banks", { method: "GET" }),
-  createAdminBank: async (data: { bankName: string; logoUrl: string; isActive: boolean }) =>
+  createAdminBank: async (data: { bankName: string; logoUrl?: string; isActive: boolean }) =>
     fetchWithAuth("/admin/banks", { method: "POST", body: JSON.stringify(data) }),
-  updateAdminBank: async (id: string, data: { bankName: string; logoUrl: string; isActive: boolean }) =>
+  updateAdminBank: async (id: string, data: { bankName: string; logoUrl?: string; isActive: boolean }) =>
     fetchWithAuth(`/admin/banks/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   toggleBankVisibility: async (id: string, active: boolean) =>
     fetchWithAuth(`/admin/banks/${id}/visibility`, { method: "PATCH", body: JSON.stringify({ active }) }),

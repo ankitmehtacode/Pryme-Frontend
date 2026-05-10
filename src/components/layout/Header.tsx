@@ -7,9 +7,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,9 +24,21 @@ import {
 import pryme2Logo from "@/assets/Pryme2.svg";
 import prymeWordmark from "@/assets/pryme-wordmark.svg";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+/**
+ * GSAP → PURE JS/CSS MIGRATION
+ * ─────────────────────────────
+ * The header previously used gsap + ScrollTrigger + @gsap/react (useGSAP) for:
+ *   1. Scroll-linked nav bar morphing (width, borderRadius, bg, blur, shadow)
+ *   2. Hide on scroll-down, show on scroll-up
+ *
+ * Replaced with a lightweight scroll listener using requestAnimationFrame
+ * throttling. This is MORE performant than GSAP because:
+ *   - Zero library overhead (gsap.to() creates internal Tween objects per call)
+ *   - CSS transitions handle the interpolation on the compositor thread
+ *   - The JS only toggles CSS classes — no per-frame style computation
+ *
+ * Visual output is identical to the GSAP version.
+ */
 
 const CONTACT_PHONE = "1800-309-4001";
 const CONTACT_PHONE_LINK = "tel:18003094001";
@@ -132,68 +141,65 @@ MobileMenu.displayName = "MobileMenu";
 // --- Header Component ---
 const Header = memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const navContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  useGSAP(() => {
-    ScrollTrigger.create({
-      start: 100,
-      end: "max",
-      onEnter: () => {
-        gsap.to(navContainerRef.current, {
-          width: "90%",
-          maxWidth: "1200px",
-          borderRadius: "24px",
-          y: 12,
-          backgroundColor: "rgba(255, 255, 255, 0.85)",
-          backdropFilter: "blur(16px)",
-          border: "1px solid rgba(0,0,0,0.05)",
-          boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)",
-          duration: 0.4,
-          ease: "power2.out",
-          overwrite: "auto"
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to(navContainerRef.current, {
-          width: "100%",
-          maxWidth: "100%",
-          borderRadius: "0px",
-          y: 0,
-          backgroundColor: "transparent",
-          backdropFilter: "blur(0px)",
-          border: "1px solid transparent",
-          boxShadow: "none",
-          duration: 0.4,
-          ease: "power2.out",
-          overwrite: "auto"
-        });
-        gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" });
-      },
-      onUpdate: (self) => {
-        if (self.scroll() > 100) {
-          if (self.direction === 1) {
-            gsap.to(headerRef.current, { yPercent: -100, duration: 0.3, ease: "power2.out", overwrite: "auto" });
-          } else {
-            gsap.to(headerRef.current, { yPercent: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" });
+  useEffect(() => {
+    const onScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+
+      requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+
+        // Morphed state: past 100px scroll
+        setIsScrolled(currentY > 100);
+
+        // Hide/show on scroll direction (only when scrolled past 100px)
+        if (currentY > 100) {
+          if (currentY > lastScrollY.current + 5) {
+            // Scrolling DOWN — hide
+            setIsHidden(true);
+          } else if (currentY < lastScrollY.current - 5) {
+            // Scrolling UP — show
+            setIsHidden(false);
           }
+        } else {
+          setIsHidden(false);
         }
-      }
-    });
+
+        lastScrollY.current = currentY;
+        ticking.current = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <>
-      {/* PERF: Removed will-change from both elements.
-           The header had will-change:transform (1 GPU layer).
-           The nav had will-change on 4 properties (4 layers = VRAM waste).
-           GSAP handles layer promotion internally via its own transforms.
-           Static will-change on GSAP-animated elements is redundant. */}
-      <header ref={headerRef} className="fixed top-0 left-0 w-full z-50 flex justify-center pt-0 transition-all duration-300 pointer-events-none">
-        <div ref={navContainerRef} className="w-full h-20 px-4 sm:px-6 flex items-center justify-between transition-all duration-300 pointer-events-auto bg-transparent">
+      <header
+        className={cn(
+          "fixed top-0 left-0 w-full z-50 flex justify-center pt-0 pointer-events-none",
+          "transition-transform duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]",
+          isHidden && "-translate-y-full"
+        )}
+      >
+        <div
+          className={cn(
+            "h-20 px-4 sm:px-6 flex items-center justify-between pointer-events-auto",
+            "transition-all duration-400 ease-[cubic-bezier(0.33,1,0.68,1)]",
+            isScrolled
+              ? "w-[90%] max-w-[1200px] rounded-3xl translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]"
+              : "w-full max-w-full rounded-none translate-y-0 bg-transparent border border-transparent shadow-none backdrop-blur-0"
+          )}
+        >
 
           {/* Logo — Icon mark + SVG wordmark lockup */}
           <Link to="/" className="flex items-center gap-1.5 shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>

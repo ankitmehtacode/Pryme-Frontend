@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock, User, ArrowRight, Building2, ArrowLeft, Loader2, Code2, TrendingUp, ShieldCheck, Wallet, Sparkles, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock } from "lucide-react";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { SignupForm } from "@/components/auth/SignupForm";
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Components & Utilities
@@ -48,33 +48,7 @@ declare global {
 
 const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || "").replace(/^["']|["']$/g, '');
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-const signupSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Must include at least one uppercase letter")
-    .regex(/[0-9]/, "Must include at least one digit")
-    .regex(/[^A-Za-z0-9]/, "Must include at least one special character"),
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
-  mobileNumber: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-});
-
-type LoginData = z.infer<typeof loginSchema>;
-type SignupData = z.infer<typeof signupSchema>;
-type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
+// Zod schemas and types have been moved to src/components/auth/schemas.ts
 
 type AuthView = "login" | "signup" | "forgot-password";
 
@@ -85,14 +59,7 @@ const Auth = () => {
   const googleButtonRef = useRef<HTMLDivElement>(null);
   
   const [view, setView] = useState<AuthView>("login");
-  const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [showLoginPw, setShowLoginPw] = useState(false);
-  const [showSignupPw, setShowSignupPw] = useState(false);
-  const [showConfirmPw, setShowConfirmPw] = useState(false);
-  
-  // Silicon Valley Grade UX: Password Shake State
-  const [isLoginShaking, setIsLoginShaking] = useState(false);
 
   // Deep Link Recovery & Lead Matrix Capture
   const pendingLeadId = location.state?.leadId || null;
@@ -107,138 +74,7 @@ const Auth = () => {
     }
   }, [pendingLeadId]);
 
-  const loginForm = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-    mode: "onChange",
-  });
-
-  const signupForm = useForm<SignupData>({
-    resolver: zodResolver(signupSchema),
-    mode: "onChange",
-  });
-
-  const forgotPasswordForm = useForm<ForgotPasswordData>({
-    resolver: zodResolver(forgotPasswordSchema),
-    mode: "onChange",
-  });
-
-  useEffect(() => {
-    if (user) {
-      if (from) {
-        navigate(from, { replace: true });
-        return;
-      }
-      
-      const role = (user.role || "USER").toUpperCase();
-
-      if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/dashboard", { replace: true });
-      }
-    }
-  }, [user, navigate, from]);
-
-  const handleLogin = async (data: LoginData) => {
-    setIsLoading(true);
-    
-    const { error, user: loggedInUser } = await signIn(data.email, data.password);
-    
-    if (error) {
-      const errorMessage = error.message?.toLowerCase() || "";
-      const isAuthError = errorMessage.includes("credential") || 
-                          errorMessage.includes("password") || 
-                          errorMessage.includes("invalid") ||
-                          errorMessage.includes("incorrect") ||
-                          errorMessage.includes("401");
-
-      if (isAuthError) {
-        // 200 IQ UX: Inline context-aware error with micro-interaction (shake)
-        loginForm.setError("password", { 
-          type: "manual", 
-          message: "Incorrect password. Please double-check and try again." 
-        });
-        
-        // Trigger haptic-like shake animation
-        setIsLoginShaking(true);
-        setTimeout(() => setIsLoginShaking(false), 600);
-      } else {
-        toast({
-          title: "Login Failed",
-          description: error.message || "An unexpected error occurred. Please try again.",
-          variant: "destructive",
-        });
-      }
-      
-      loginForm.setValue("password", ""); 
-    } else {
-      toast({
-        title: "Welcome Back",
-        description: "Successfully logged into your Pryme account.",
-      });
-      // Navigation is now handled by the useEffect above reacting to the hydrated user state, 
-      // but we maintain this declarative fallback just in case.
-      if (loggedInUser) {
-        const role = (loggedInUser.role || "USER").toUpperCase();
-        if (from) {
-          navigate(from, { replace: true });
-        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
-      }
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleSignup = async (data: SignupData) => {
-    setIsLoading(true);
-    
-    const { error, user: loggedInUser } = await signUp({
-      fullName: data.fullName,
-      email: data.email,
-      password: data.password
-    });
-    
-    if (error) {
-      toast({
-        title: "Registration Failed",
-        description: error.message || "Could not create account. Please try again.",
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "Account Created",
-        description: "Welcome to Pryme! Redirecting to your dashboard...",
-      });
-      if (loggedInUser) {
-        const role = (loggedInUser.role || "USER").toUpperCase();
-        if (from) {
-          navigate(from, { replace: true });
-        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
-      }
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleForgotPassword = async (data: ForgotPasswordData) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Password Reset Email Sent",
-        description: "Check your email for a secure link to reset your credentials.",
-      });
-      setView("login");
-    }, 1500);
-  };
+  // Form components manage their own loading and submission state internally
 
   // 🧠 GOOGLE IDENTITY SERVICES SDK INITIALIZATION
   // Loads the GIS script once and initializes with our Client ID.
@@ -489,23 +325,7 @@ const Auth = () => {
                       <h2 className="text-[24px] sm:text-[26px] font-extrabold text-[#103783] mb-2 tracking-tight">Reset Password</h2>
                       <p className="text-slate-500 mb-8 text-[11px] sm:text-xs font-medium">Enter your email and we'll send a secure reset link.</p>
 
-                      <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-6">
-                        <div className="space-y-1">
-                          <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
-                          <Input
-                            type="email"
-                            placeholder="you@example.com"
-                            className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
-                            {...forgotPasswordForm.register("email")}
-                          />
-                          {forgotPasswordForm.formState.errors.email && (
-                            <p className="text-[10px] text-rose-500 mt-1 pl-1">{forgotPasswordForm.formState.errors.email.message}</p>
-                          )}
-                        </div>
-                        <Button type="submit" disabled={isLoading} className="mt-8 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-0.5 transition-all duration-300 text-[12px] sm:text-[11px] uppercase" size="sm">
-                          {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : "Send Link"}
-                        </Button>
-                      </form>
+                      <ForgotPasswordForm onSuccess={() => setView("login")} />
                     </motion.div>
                   ) : (
                     <motion.div key="auth" initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: 0.3 }}>
@@ -515,85 +335,7 @@ const Auth = () => {
                       </h2>
 
                       {view === "login" ? (
-                        <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-6">
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
-                            <Input
-                              type="email"
-                              placeholder="you@company.com"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
-                              {...loginForm.register("email")}
-                            />
-                            {loginForm.formState.errors.email && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{loginForm.formState.errors.email.message}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Password</Label>
-                            <motion.div 
-                              className="relative"
-                              animate={isLoginShaking ? { x: [-5, 5, -5, 5, -3, 3, 0], transition: { duration: 0.4 } } : {}}
-                            >
-                              <Input
-                                type={showLoginPw ? "text" : "password"}
-                                placeholder="••••••••"
-                                className={cn(
-                                  "h-10 sm:h-9 w-full border-0 border-b rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]",
-                                  loginForm.formState.errors.password 
-                                    ? "border-rose-500/50 focus-visible:border-rose-500 text-rose-600" 
-                                    : "border-[#103783]/10 hover:border-[#103783]/30 focus-visible:border-[#10B981]"
-                                )}
-                                {...loginForm.register("password", {
-                                  onChange: () => {
-                                    if (loginForm.formState.errors.password) {
-                                      loginForm.clearErrors("password");
-                                    }
-                                  }
-                                })}
-                              />
-                              <button type="button" onClick={() => setShowLoginPw(!showLoginPw)} className={cn("absolute right-1 top-1/2 -translate-y-1/2 p-1 transition-colors", loginForm.formState.errors.password ? "text-rose-400 hover:text-rose-600" : "text-slate-400 hover:text-[#103783]")} tabIndex={-1}>
-                                {showLoginPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </motion.div>
-                            <AnimatePresence>
-                              {loginForm.formState.errors.password && (
-                                <motion.div 
-                                  initial={{ opacity: 0, height: 0, y: -5 }} 
-                                  animate={{ opacity: 1, height: "auto", y: 0 }} 
-                                  exit={{ opacity: 0, height: 0, y: -5 }}
-                                  className="text-[10px] text-rose-500 mt-1.5 pl-1 font-bold flex items-center gap-1"
-                                >
-                                  <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                  </svg>
-                                  {loginForm.formState.errors.password.message}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-
-                          <div className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group">
-                             <div className="w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border border-[#10B981] flex items-center justify-center cursor-pointer transition-colors group-hover:bg-[#10B981]/10">
-                                <div className="w-2 h-2 rounded-[2px] bg-[#10B981]" />
-                             </div>
-                             <span className="text-[11px] sm:text-xs font-bold text-slate-500 cursor-pointer transition-colors group-hover:text-[#103783]">Keep me logged in</span>
-                          </div>
-
-                          <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">
-                            <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-[2px] transition-all duration-300 text-[12px] sm:text-[11px] uppercase flex items-center justify-center gap-2" size="sm">
-                              {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
-                                <>
-                                  Continue <ArrowRight className="w-4 h-4 ml-1" />
-                                </>
-                              )}
-                            </Button>
-                            
-                            <button type="button" onClick={() => setView("forgot-password")} className="text-[11px] sm:text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors pl-1">
-                              Forgot Password?
-                            </button>
-                          </div>
-
+                        <LoginForm onForgotPassword={() => setView("forgot-password")} from={from}>
                           {/* Google Sign-In Divider + Button */}
                           <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
@@ -624,95 +366,9 @@ const Auth = () => {
                               {isGoogleLoading ? "Signing in..." : "Continue with Google"}
                             </button>
                           )}
-                        </form>
+                        </LoginForm>
                       ) : (
-                        <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5 sm:space-y-6">
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Name</Label>
-                            <Input
-                              type="text"
-                              placeholder="John Doe"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
-                              {...signupForm.register("fullName")}
-                            />
-                            {signupForm.formState.errors.fullName && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.fullName.message}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
-                            <Input
-                              type="email"
-                              placeholder="you@email.com"
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
-                              {...signupForm.register("email")}
-                            />
-                            {signupForm.formState.errors.email && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.email.message}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Mobile Number</Label>
-                            <Input
-                              type="tel"
-                              placeholder="9876543210"
-                              maxLength={10}
-                              className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
-                              {...signupForm.register("mobileNumber")}
-                            />
-                            {signupForm.formState.errors.mobileNumber && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.mobileNumber.message}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pass</Label>
-                            <div className="relative">
-                              <Input
-                                type={showSignupPw ? "text" : "password"}
-                                placeholder="••••••••"
-                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                                {...signupForm.register("password")}
-                              />
-                              <button type="button" onClick={() => setShowSignupPw(!showSignupPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
-                                {showSignupPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </div>
-                            {signupForm.formState.errors.password && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.password.message}</p>
-                            )}
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Confirm</Label>
-                            <div className="relative">
-                              <Input
-                                type={showConfirmPw ? "text" : "password"}
-                                placeholder="••••••••"
-                                className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
-                                {...signupForm.register("confirmPassword")}
-                              />
-                              <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
-                                {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </div>
-                            {signupForm.formState.errors.confirmPassword && (
-                              <p className="text-[10px] text-rose-500 mt-1 pl-1">{signupForm.formState.errors.confirmPassword.message}</p>
-                            )}
-                          </div>
-
-                          <div className="pt-6 flex flex-col items-start w-full">
-                            <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-[2px] transition-all duration-300 text-[12px] sm:text-[11px] uppercase flex items-center justify-center gap-2" size="sm">
-                              {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
-                                <>
-                                  Create Account <ArrowRight className="w-4 h-4 ml-1" />
-                                </>
-                              )}
-                            </Button>
-                          </div>
-
+                        <SignupForm from={from}>
                           {/* Google Sign-In Divider + Button */}
                           <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
@@ -743,7 +399,7 @@ const Auth = () => {
                               {isGoogleLoading ? "Signing in..." : "Sign up with Google"}
                             </button>
                           )}
-                        </form>
+                        </SignupForm>
                       )}
                     </motion.div>
                   )}

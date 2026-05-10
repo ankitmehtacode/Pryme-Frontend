@@ -1,14 +1,18 @@
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
+/**
+ * Sonner Toaster — Hardcoded to "light" theme.
+ *
+ * Previously imported useTheme from "next-themes" just to read the theme value.
+ * Since the app is permanently locked to light mode, this is now a static prop.
+ * This eliminates the next-themes dependency entirely from the frontend.
+ */
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
-
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme="light"
       className="toaster group"
       toastOptions={{
         classNames: {

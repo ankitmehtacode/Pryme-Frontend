@@ -79,6 +79,8 @@ const createFreshState = (): ApplicationState => ({
     cibilPullAuthorized: false,
     dataSharingAuthorized: false,
   },
+
+  validationErrors: {},
 });
 
 // ─── DEFAULT SUB-TYPE FACTORIES ─────────────────────────────────────────────
@@ -285,6 +287,29 @@ export const useApplicationStore = create<ApplicationStore>()(
           consent: { ...state.consent, [field]: value },
           lastModifiedAt: new Date().toISOString(),
         })),
+
+      // ══════════════════════════════════════════════════════════════════
+      // VALIDATION
+      // ══════════════════════════════════════════════════════════════════
+
+      setValidationErrors: (errors) =>
+        set({
+          validationErrors: errors,
+        }),
+
+      setValidationError: (field, error) =>
+        set((state) => {
+          const newErrors = { ...state.validationErrors };
+          if (error) {
+            newErrors[field] = error;
+          } else {
+            delete newErrors[field];
+          }
+          return { validationErrors: newErrors };
+        }),
+
+      clearValidationErrors: () =>
+        set({ validationErrors: {} }),
 
       // ══════════════════════════════════════════════════════════════════
       // LIFECYCLE

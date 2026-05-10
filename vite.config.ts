@@ -48,8 +48,8 @@ export default defineConfig({
           // Core React — loaded on every page
           "vendor-react": ["react", "react-dom"],
           
-          // Animation libraries — heavy but needed for interactions
-          "vendor-animation": ["framer-motion", "gsap", "@gsap/react"],
+          // Animation library — Framer Motion only (GSAP removed)
+          "vendor-animation": ["framer-motion"],
           
           // Radix UI primitives — shared across many components
           "vendor-radix": [
@@ -71,9 +71,6 @@ export default defineConfig({
           
           // Router — loaded on every page but small
           "vendor-router": ["react-router-dom"],
-          
-          // Smooth scroll — conditionally loaded
-          "vendor-scroll": ["@studio-freight/lenis"],
           
           // Charts — only needed on dashboard/calculator pages
           "vendor-charts": ["recharts"],
