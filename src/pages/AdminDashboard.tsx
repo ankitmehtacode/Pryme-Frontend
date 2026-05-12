@@ -9,7 +9,7 @@ import {
   Activity, BarChart3, Mail, Calendar, Plus,
   Percent, ExternalLink, Shield, Link as LinkIcon,
   X, Loader2, MessageCircle, FileCheck, History,
-  Sparkles, LayoutList, Wallet, Moon, Sun, ArrowUpRight, UserPlus,
+  Sparkles, LayoutList, Wallet, ArrowUpRight, UserPlus,
   Trash2, Upload, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
   const [crmView, setCrmView] = useState<"list" | "kanban">("list");
   const [leadFilter, setLeadFilter] = useState<"all" | "queue">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
 
   // 🧠 Active/Inactive filter states for entity management
   const [bankStatusFilter, setBankStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -436,7 +436,7 @@ const AdminDashboard = () => {
       return acc;
     }, {});
 
-    const colors = ["#103783", "#3b82f6", "#103783", "#f59e0b", "#ec4899"];
+    const colors = ["#103783", "#3b82f6", "#10b981", "#f59e0b", "#ec4899"];
     return Object.entries(counts).map(([name, count], idx) => ({
       name,
       value: Math.round((count / applications.length) * 100),
@@ -444,26 +444,7 @@ const AdminDashboard = () => {
     }));
   }, [applications]);
 
-  // --- INIT THEME ---
-  useEffect(() => {
-    if (localStorage.getItem("pryme_theme") === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
 
-  // --- ACTIONS ---
-  const toggleTheme = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("pryme_theme", "light");
-      setIsDarkMode(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("pryme_theme", "dark");
-      setIsDarkMode(true);
-    }
-  };
 
   const handleExportCSV = () => {
     if (applications.length === 0) { toast.error("No data to export."); return; }
@@ -591,9 +572,7 @@ const AdminDashboard = () => {
                   className="pl-9 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm focus:bg-white/[0.08] focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all w-72 text-white placeholder:text-slate-600"
                 />
               </div>
-              <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]">
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
+
               <button className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]"><Bell className="w-4 h-4" /><div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(124,58,237,0.8)]" /></button>
             </div>
           </header>
