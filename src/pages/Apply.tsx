@@ -108,7 +108,30 @@ const Apply = () => {
           productType: data.productType,
           loanAmount: data.loanAmount,
           cibilScore: data.cibilScore,
-          monthlyIncome: data.monthlyIncome
+          monthlyIncome: data.monthlyIncome,
+          // 🧠 PIPELINE FIX: Forward ALL form fields so the metadata JSON blob
+          // in the Lead table is fully populated. Without these, the Admin Dashboard
+          // shows empty fields for Company Name, Designation, Gross Salary, etc.
+          email: data.email,
+          panCard: data.panCard,
+          dob: data.dob,
+          city: data.city,
+          state: data.state,
+          pinCode: data.pinCode,
+          employmentType: data.employmentType,
+          financialPath: data.financialPath,
+          occupation: data.occupation,
+          companyName: data.companyName,
+          designation: data.designation,
+          officialEmail: data.officialEmail,
+          grossSalary: data.grossSalary,
+          totalExperienceYears: data.totalExperienceYears,
+          businessVintageYears: data.businessVintageYears,
+          loanPurpose: data.loanPurpose,
+          propertyType: data.propertyType,
+          hasCoApplicant: data.hasCoApplicant,
+          existingBank: data.existingBank,
+          eligibleExistingEmi: data.eligibleExistingEmi,
         });
         
         // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION

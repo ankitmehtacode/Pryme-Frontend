@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -132,6 +133,7 @@ const SkeletonCard = ({ isHero, delay }: { isHero?: boolean; delay: number }) =>
 export default function Offers() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); }, []);
 
@@ -244,11 +246,20 @@ export default function Offers() {
     try {
       localStorage.setItem("pryme_target_bank", offer.bankName);
       await new Promise(resolve => setTimeout(resolve, 1500));
-      toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Create your account to track it.` });
-      // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
-      // Read from the actual source of truth where Apply.tsx:116 saved it.
-      const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
-      navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
+
+      // 🧠 AUTH-AWARE ROUTING FIX: If the user is already authenticated,
+      // send them to their dashboard to continue the application — NOT
+      // back to /auth which confuses logged-in users.
+      if (isAuthenticated) {
+        toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Redirecting to your dashboard.` });
+        navigate("/dashboard", { state: { selectedBank: offer.bankName, leadData } });
+      } else {
+        toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Create your account to track it.` });
+        // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
+        // Read from the actual source of truth where Apply.tsx:116 saved it.
+        const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
+        navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
+      }
     } catch {
       toast({ title: "Connection Error", description: "Please try again.", variant: "destructive" });
       setIsLocking(null);

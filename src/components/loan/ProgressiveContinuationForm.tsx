@@ -64,15 +64,31 @@ export default function ProgressiveContinuationForm({
     return true;
   };
 
-  const handleNextStep = () => {
-    if (validateStep1()) {
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setCurrentStep(2);
-        toast({ title: "Verified!", description: "Financial footprint secured. 1 step left.", variant: "default" });
-      }, 600);
+  const handleNextStep = async () => {
+    if (!validateStep1()) return;
+    setIsSubmitting(true);
+
+    // 🧠 PIPELINE FIX: Persist the continuation form fields into the application's
+    // metadata JSONB column so they appear in the Admin Dashboard drawer.
+    // Without this, PAN, Existing Bank, and Monthly EMI are captured in UI but never saved.
+    if (applicationId) {
+      try {
+        await PrymeAPI.updateLeadProfile(applicationId, {
+          metadata: {
+            panNumber: formData.panNumber,
+            existingBank: formData.existingBank,
+            monthlyEMI: Number(formData.monthlyEMI) || 0,
+          }
+        });
+      } catch (err) {
+        console.warn("Continuation form metadata sync failed:", err);
+        // Non-blocking: allow user to proceed even if sync fails
+      }
     }
+
+    setIsSubmitting(false);
+    setCurrentStep(2);
+    toast({ title: "Verified!", description: "Financial footprint secured. 1 step left.", variant: "default" });
   };
 
   const handleFileUpload = (docName: string) => {
