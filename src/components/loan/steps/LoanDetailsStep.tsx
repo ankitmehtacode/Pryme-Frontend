@@ -134,7 +134,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 gap-5">
                   <ValidatedInput
                     label="Property Value (₹)"
                     type="number"
@@ -155,20 +155,6 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
                         : undefined
                     }
                   />
-
-                  <StyledSelect
-                    label="Property Type"
-                    icon={Building2}
-                    value={store.loanRequirements.propertyType || undefined}
-                    onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as PropertyType })}
-                    placeholder="Select property type"
-                  >
-                    {PROPERTY_TYPE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </StyledSelect>
                 </div>
 
                 {/* Smart helper text based on loan type */}
