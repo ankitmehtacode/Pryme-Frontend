@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Building2, Home } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import type { LoanType } from "@/lib/applicationTypes";
+import type { LoanType, PropertyType } from "@/lib/applicationTypes";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
 
 const PRODUCT_OPTIONS = [
@@ -15,6 +15,21 @@ const PRODUCT_OPTIONS = [
   { value: "LAP", label: "Loan Against Property", icon: Landmark },
   { value: "AUTO_LOAN", label: "Auto Loan", icon: Landmark },
 ];
+
+const PROPERTY_TYPE_OPTIONS: { value: PropertyType; label: string }[] = [
+  { value: "FLAT", label: "Flat / Apartment" },
+  { value: "HOME", label: "Independent House / Villa" },
+  { value: "PLOT", label: "Plot / Land" },
+  { value: "SHOP", label: "Shop / Retail Space" },
+  { value: "WAREHOUSE", label: "Warehouse / Godown" },
+  { value: "HOSPITAL", label: "Hospital" },
+  { value: "HOTEL", label: "Hotel" },
+  { value: "SCHOOL", label: "School / Institution" },
+  { value: "FACTORIES", label: "Factory / Industrial" },
+];
+
+/** Loan types that require property valuation for LTV calculations */
+const PROPERTY_BACKED_LOANS: LoanType[] = ['HOME_LOAN', 'LAP'];
 
 interface LoanDetailsStepProps {
   cardCn: string;
@@ -99,6 +114,74 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
             }
           />
         </div>
+
+        {/* ── Property Details — Conditional for HOME_LOAN / LAP ───────────── */}
+        <AnimatePresence>
+          {PROPERTY_BACKED_LOANS.includes(store.loanRequirements.loanType) && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="mt-5 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] dark:bg-amber-500/[0.02] space-y-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Building2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span className="text-sm font-semibold text-foreground">Property Details</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15">
+                    Required for LTV
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <ValidatedInput
+                    label="Property Value (₹)"
+                    type="number"
+                    placeholder="e.g. 7500000"
+                    icon={Home}
+                    value={store.loanRequirements.propertyValue || ""}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const val = Number(e.target.value);
+                      store.updateLoanRequirements({ propertyValue: val });
+                    }}
+                    isValid={
+                      (store.loanRequirements.propertyValue || 0) >= (store.loanRequirements.loanAmount || 0)
+                    }
+                    error={
+                      (store.loanRequirements.propertyValue || 0) > 0 &&
+                      (store.loanRequirements.propertyValue || 0) < (store.loanRequirements.loanAmount || 0)
+                        ? "Property value must be ≥ loan amount"
+                        : undefined
+                    }
+                  />
+
+                  <StyledSelect
+                    label="Property Type"
+                    icon={Building2}
+                    value={store.loanRequirements.propertyType || undefined}
+                    onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as PropertyType })}
+                    placeholder="Select property type"
+                  >
+                    {PROPERTY_TYPE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </StyledSelect>
+                </div>
+
+                {/* Smart helper text based on loan type */}
+                <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+                  {store.loanRequirements.loanType === 'LAP'
+                    ? 'Enter the current market value of the property you are pledging as collateral.'
+                    : 'Enter the agreement value or current market value of the property you are purchasing.'}
+                  {' '}This is used to calculate your Loan-to-Value (LTV) ratio.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* CIBIL Slider */}
         <div className={`p-5 rounded-2xl border backdrop-blur-sm transition-colors duration-500 ${cibilUi.bg} ${cibilUi.border}`}>

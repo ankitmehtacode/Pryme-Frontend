@@ -650,7 +650,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         totalExperienceYears: Number((fin?.data as any)?.totalExperienceYears ?? 0),
         averageBankBalance: Number((fin?.data as any)?.abbTier ? (fin.data as any).abbTier * 100000 : 0), // ABB tier in lakhs → rupees
         propertyIdentified: Boolean(fp?.propertyIdentified ?? false),
-        estimatedPropertyValue: Number(fp?.estimatedPropertyValue ?? 0),
+        estimatedPropertyValue: Number(store.loanRequirements?.propertyValue || fp?.estimatedPropertyValue || 0),
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: Boolean((fp as any)?.hasExistingLoan ?? false),
         eligibleExistingEmi: Number((fp as any)?.existingEmi ?? (fp as any)?.totalExistingEMI ?? 0)

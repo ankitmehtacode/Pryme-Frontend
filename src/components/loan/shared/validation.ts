@@ -86,6 +86,19 @@ export function validateStage3(store: StoreSnapshot): ValidationErrors {
   if (!lr.loanType) errors.loanType = "Select a loan product";
   if (!lr.loanAmount || lr.loanAmount < 50000) errors.loanAmount = "Minimum loan amount is ₹50,000";
   if (!lr.tenureYears || lr.tenureYears < 1) errors.tenure = "Select a tenure";
+
+  // Property-backed loans require property value for accurate LTV calculation
+  if (lr.loanType === 'HOME_LOAN' || lr.loanType === 'LAP') {
+    if (!lr.propertyValue || lr.propertyValue <= 0) {
+      errors.propertyValue = "Property value is required for Home Loan / LAP";
+    } else if (lr.propertyValue < lr.loanAmount) {
+      errors.propertyValue = "Property value must be ≥ loan amount";
+    }
+    if (!lr.propertyType) {
+      errors.propertyType = "Select your property type";
+    }
+  }
+
   return errors;
 }
 
@@ -113,6 +126,8 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   loanType: 'section-loan-details',
   loanAmount: 'section-loan-details',
   tenure: 'section-loan-details',
+  propertyValue: 'section-loan-details',
+  propertyType: 'section-loan-details',
   // Stage 1 — Identity
   fullName: 'section-identity',
   mobileNumber: 'section-identity',

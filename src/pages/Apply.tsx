@@ -235,7 +235,7 @@ const Apply = () => {
             propertyType: data.propertyType || "RESIDENTIAL",
             cityTier: "TIER_1",
             loanAmount: data.loanAmount || 0,
-            propertyValue: data.estimatedPropertyValue || data.loanAmount * 1.5 || 0,
+            propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
             requestedTenureMonths: (data.loanTenure || 5) * 12,
             monthlyIncome: data.monthlyIncome || 0,
             existingEmiTotal: data.eligibleExistingEmi || 0,
