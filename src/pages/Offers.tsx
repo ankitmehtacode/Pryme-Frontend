@@ -15,11 +15,14 @@ import { toast } from "@/hooks/use-toast";
 import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 
-// ── Local Bank Logo Assets ──────────────────────────────────────────────
 import hdfcLogo from "@/assets/hdfc.svg";
 import iciciLogo from "@/assets/icici.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
+import sbiLogo from "@/assets/sbi.svg";
+import bobLogo from "@/assets/bob.svg";
+import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -160,14 +163,33 @@ export default function Offers() {
 
     return eligibleResults.map((er: any, index: number) => {
       // Map Matrix response onto our UI BankOffer structure
-      const brandColors = [
-        { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo },
-        { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo },
-        { c: "bg-[#97144d]", x: "#97144d", img: axisLogo },
-        { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo }
-      ];
+      // Resolve the correct bank theme and logo based on the bank's name
+      const resolveBankTheme = (bankName: string, productCode: string) => {
+        const name = (bankName || productCode || "").toUpperCase();
+        
+        if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo };
+        if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo };
+        if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo };
+        if (name.includes("KOTAK")) return { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo };
+        if (name.includes("SBI") || name.includes("STATE BANK")) return { c: "bg-[#0f3b8c]", x: "#0f3b8c", img: sbiLogo };
+        if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo };
+        if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo };
+        if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo };
+        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: undefined };
+        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: undefined }; // L&T Yellow
+        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: undefined };
+        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: undefined }; // ABFL Red
+        
+        // Generic fallback colors using a stable hash so it doesn't change on re-render
+        const fallbacks = [
+          { c: "bg-[#1e293b]", x: "#1e293b", img: undefined }, // Slate
+          { c: "bg-[#0f172a]", x: "#0f172a", img: undefined }, // Slate darker
+          { c: "bg-[#334155]", x: "#334155", img: undefined }  // Slate lighter
+        ];
+        return fallbacks[name.length % fallbacks.length];
+      };
       
-      const theme = brandColors[index % brandColors.length];
+      const theme = resolveBankTheme(er.productName || er.lenderName, er.productCode);
 
       // BUG-6 FIX: roi from Java is decimal (0.0875 = 8.75%). Multiply by 100 for display.
       // BUG-7 FIX: Java field is `tenureMonths`, not `maxTenureMonths`.
