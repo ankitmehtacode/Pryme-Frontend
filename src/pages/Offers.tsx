@@ -210,7 +210,14 @@ export default function Offers() {
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
         originalEngineResult: er
       };
-    }).sort((a, b) => a.interestRate - b.interestRate);
+    }).sort((a, b) => {
+      // Primary Sort: Lowest Interest Rate
+      if (a.interestRate !== b.interestRate) {
+        return a.interestRate - b.interestRate;
+      }
+      // Secondary Sort: Lowest Processing Fee
+      return a.processingFee - b.processingFee;
+    });
   }, [leadData]);
 
   // ── EMI + Comparison Intelligence ─────────────────────────────────────
