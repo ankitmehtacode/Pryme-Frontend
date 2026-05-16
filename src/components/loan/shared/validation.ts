@@ -94,9 +94,6 @@ export function validateStage3(store: StoreSnapshot): ValidationErrors {
     } else if (lr.propertyValue < lr.loanAmount) {
       errors.propertyValue = "Property value must be ≥ loan amount";
     }
-    if (!lr.propertyType) {
-      errors.propertyType = "Select your property type";
-    }
   }
 
   return errors;
@@ -127,7 +124,6 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   loanAmount: 'section-loan-details',
   tenure: 'section-loan-details',
   propertyValue: 'section-loan-details',
-  propertyType: 'section-loan-details',
   // Stage 1 — Identity
   fullName: 'section-identity',
   mobileNumber: 'section-identity',

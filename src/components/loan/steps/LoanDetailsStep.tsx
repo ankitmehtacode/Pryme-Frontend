@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Building2, Home } from "lucide-react";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
-import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import type { LoanType, PropertyType } from "@/lib/applicationTypes";
+import type { LoanType } from "@/lib/applicationTypes";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
 
 const PRODUCT_OPTIONS = [
@@ -14,18 +13,6 @@ const PRODUCT_OPTIONS = [
   { value: "HOME_LOAN", label: "Home Loan", icon: Landmark },
   { value: "LAP", label: "Loan Against Property", icon: Landmark },
   { value: "AUTO_LOAN", label: "Auto Loan", icon: Landmark },
-];
-
-const PROPERTY_TYPE_OPTIONS: { value: PropertyType; label: string }[] = [
-  { value: "FLAT", label: "Flat / Apartment" },
-  { value: "HOME", label: "Independent House / Villa" },
-  { value: "PLOT", label: "Plot / Land" },
-  { value: "SHOP", label: "Shop / Retail Space" },
-  { value: "WAREHOUSE", label: "Warehouse / Godown" },
-  { value: "HOSPITAL", label: "Hospital" },
-  { value: "HOTEL", label: "Hotel" },
-  { value: "SCHOOL", label: "School / Institution" },
-  { value: "FACTORIES", label: "Factory / Industrial" },
 ];
 
 /** Loan types that require property valuation for LTV calculations */
