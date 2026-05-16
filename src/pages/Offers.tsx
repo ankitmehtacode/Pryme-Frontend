@@ -164,8 +164,8 @@ export default function Offers() {
     return eligibleResults.map((er: any, index: number) => {
       // Map Matrix response onto our UI BankOffer structure
       // Resolve the correct bank theme and logo based on the bank's name
-      const resolveBankTheme = (bankName: string, productCode: string) => {
-        const name = (bankName || productCode || "").toUpperCase();
+      const resolveBankTheme = (bankName: string, productCode: string, lenderName?: string) => {
+        const name = `${lenderName || ""} ${bankName || ""} ${productCode || ""}`.toUpperCase();
         
         if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo };
         if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo };
@@ -189,20 +189,20 @@ export default function Offers() {
         return fallbacks[name.length % fallbacks.length];
       };
       
-      const theme = resolveBankTheme(er.productName || er.lenderName, er.productCode);
+      const theme = resolveBankTheme(er.productName || er.lenderName, er.productCode, er.lenderName);
 
-      // BUG-6 FIX: roi from Java is decimal (0.0875 = 8.75%). Multiply by 100 for display.
-      // BUG-7 FIX: Java field is `tenureMonths`, not `maxTenureMonths`.
-      // BUG-8 FIX: Java field is `maxEligibleAmount`, not `maxEligibleLoanAmount`.
-      const roiPercent = er.roi ? (er.roi < 1 ? er.roi * 100 : er.roi) : 10.5;
+      // Map dynamic backend fields without hardcoded fallbacks
+      const roiPercent = er.roi != null ? (er.roi < 1 ? er.roi * 100 : er.roi) : 0;
+      const processingFee = er.processingFee != null ? er.processingFee : 0;
+
       return {
         id: er.productCode || er.lenderId || Math.random().toString(),
-        bankName: er.productName || "Partner Bank",
+        bankName: er.productName || er.lenderName || "Partner Bank",
         logoColor: theme.c, 
         brandHex: theme.x,
         logoUrl: theme.img,
         interestRate: parseFloat(roiPercent.toFixed(2)),
-        processingFee: 1.0, 
+        processingFee: parseFloat(processingFee.toFixed(2)), 
         maxTenure: (er.tenureMonths || 60) / 12,
         maxLoanAmount: er.maxEligibleAmount || leadData.loanAmount,
         approvalOdds: 98,
