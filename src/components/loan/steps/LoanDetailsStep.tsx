@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home } from "lucide-react";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2 } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
