@@ -58,7 +58,8 @@ const Apply = () => {
     productType: string;
     employmentType?: string;
     phone?: string; 
-    name?: string; 
+    name?: string;
+    engineResults?: any[];
   } | null>(null);
 
   const bankOffers = useMemo(() => {

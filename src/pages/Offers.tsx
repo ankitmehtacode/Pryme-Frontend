@@ -50,6 +50,7 @@ interface LeadDataPayload {
   monthlyIncome: number;
   loanAmount: number;
   fullName: string;
+  engineResults?: any[];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
