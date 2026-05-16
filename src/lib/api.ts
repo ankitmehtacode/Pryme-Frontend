@@ -264,15 +264,24 @@ export const PrymeAPI = {
         state: formData.state,
         pinCode: formData.pinCode,
 
-        // Financial
+        // Financial & Advanced Underwriting
         cibilScore: formData.cibilScore,
         monthlyIncome: formData.monthlyIncome,
         monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
         grossSalary: formData.grossSalary || 0,
+        netProfit: formData.netProfit || 0,
+        depreciation: formData.depreciation || 0,
+        annualGrossReceipts: formData.annualGrossReceipts || 0,
+        last12MonthsGstTurnover: formData.last12MonthsGstTurnover || 0,
+        averageBankBalance: formData.averageBankBalance || 0,
+        isCaCertifiedOrAudited: formData.isCaCertifiedOrAudited ? "Yes" : "No",
 
-        // Employment
+        // Employment & Business
         employmentType: formData.employmentType,
         financialPath: formData.financialPath,
+        professionalSubType: formData.professionalSubType,
+        businessSubType: formData.businessSubType,
+        businessIndustryType: formData.businessIndustryType,
         occupation: formData.occupation,
         companyName: formData.companyName,
         designation: formData.designation,
@@ -280,9 +289,13 @@ export const PrymeAPI = {
         workExperience: formData.totalExperienceYears || formData.workExperience,
         businessVintageYears: formData.businessVintageYears,
 
-        // Loan details
+        // Loan & Property details
         loanPurpose: formData.loanPurpose,
         propertyType: formData.propertyType,
+        propertyValue: formData.estimatedPropertyValue || formData.propertyValue || 0,
+        propertyIdentified: formData.propertyIdentified ? "Yes" : "No",
+        isAbove50Lakhs: formData.isAbove50Lakhs ? "Yes" : "No",
+        hasExistingLoan: formData.hasExistingLoan ? "Yes" : "No",
         coApplicant: formData.hasCoApplicant ? "Yes" : "No",
         existingBank: formData.existingBank,
         currentCity: formData.city,
