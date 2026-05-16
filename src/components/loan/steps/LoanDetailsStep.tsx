@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
+import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import type { LoanType } from "@/lib/applicationTypes";

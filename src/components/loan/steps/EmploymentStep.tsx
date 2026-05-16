@@ -675,9 +675,9 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       onValueChange={(v) => store.updateLoanRequirements({ propertyType: v as Extract<PropertyType, HomePropertyType> })}
                       placeholder="Select property type"
                     >
-                      <SelectItem value="FLAT" className="cursor-pointer">Flat</SelectItem>
-                      <SelectItem value="HOME" className="cursor-pointer">Home</SelectItem>
-                      <SelectItem value="PLOT" className="cursor-pointer">Plot</SelectItem>
+                      <SelectItem value="FLAT" className="cursor-pointer">Flat / Apartment</SelectItem>
+                      <SelectItem value="HOME" className="cursor-pointer">Independent House / Villa</SelectItem>
+                      <SelectItem value="PLOT" className="cursor-pointer">Plot / Land</SelectItem>
                     </StyledSelect>
                   )}
 
