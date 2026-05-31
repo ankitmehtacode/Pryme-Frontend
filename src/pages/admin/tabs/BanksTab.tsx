@@ -111,15 +111,15 @@ export const BanksTab: React.FC<BanksTabProps> = ({
                 </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => toggleBankMutation.mutate({ id: b.id, active: !b.active })}
+                    onClick={() => toggleBankMutation.mutate({ id: b.id, active: !(b.active ?? b.isActive) })}
                     className={cn(
                       "px-2.5 py-1 text-xs font-semibold rounded-full border transition-all",
-                      b.active
+                      (b.active ?? b.isActive)
                         ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20"
                         : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
                     )}
                   >
-                    {b.active ? "Active" : "Inactive"}
+                    {(b.active ?? b.isActive) ? "Active" : "Inactive"}
                   </button>
                 </td>
                 <td className="px-6 py-4 text-right">

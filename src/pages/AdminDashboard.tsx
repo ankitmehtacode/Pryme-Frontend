@@ -286,7 +286,7 @@ const AdminDashboard = () => {
   // NOTE: These must be declared AFTER the useQuery hooks that provide banks/products/eligibilityRules
   const filteredBanks = useMemo(() => {
     if (bankStatusFilter === "all") return banks;
-    return banks.filter((b: any) => bankStatusFilter === "active" ? b.active : !b.active);
+    return banks.filter((b: any) => bankStatusFilter === "active" ? (b.active ?? b.isActive) : !(b.active ?? b.isActive));
   }, [banks, bankStatusFilter]);
 
   const filteredProducts = useMemo(() => {
