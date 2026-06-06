@@ -36,8 +36,13 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
+        // 🧠 When editing, find the bank by its stable numeric lenderCode (matches loan_products.lender_id)
+        // Fallback to name matching for legacy data, then to raw lenderId
+        const matchingBank = banks.find(b => b.lenderCode === initialData.lenderId)
+          || banks.find(b => b.bankName.toLowerCase().trim() === (initialData.lenderName || "").toLowerCase().trim());
         setFormData({ 
           ...initialData,
+          lenderId: matchingBank ? matchingBank.id : (initialData.lenderId || ""),
           // Expand fractional database ratio (0.65) back to UI percentage (65)
           maxEmiNmiRatio: initialData.maxEmiNmiRatio ? Number((initialData.maxEmiNmiRatio * 100).toFixed(2)) : 65
         });
@@ -65,7 +70,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
         });
       }
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, banks]);
 
   if (!isOpen) return null;
 
@@ -97,11 +102,22 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Prepare fail-proof final payload to match Spring Boot exact types & constraints
+    
+    const selectedBank = banks.find(b => String(b.id) === formData.lenderId);
+
+    if (!selectedBank) {
+      // Should never happen since the <select> is required, but guard anyway
+      return;
+    }
+
+    // 🧠 SILICON VALLEY FIX: Use the backend-provided stable numeric lenderCode
+    // directly — no hardcoded switch statements, no hash functions, no collisions.
+    // The bank.lenderCode is auto-generated via Postgres sequence and backfilled
+    // for all existing seed banks (HDFC=1, L&T=101, SBI=102, etc.)
     const payload = {
       ...formData,
-      // Hard parse the Select string to a Long to prevent Jackson TypeMismatchException
-      lenderId: parseInt(formData.lenderId, 10),
+      lenderId: selectedBank.lenderCode,
+      lenderName: selectedBank.bankName,
       // Database numeric(5,4) max value is 9.9999. Must scale % down to fraction to prevent exception.
       maxEmiNmiRatio: Number((formData.maxEmiNmiRatio / 100).toFixed(4))
     };

@@ -372,6 +372,7 @@ export const PrymeAPI = {
   // 🧠 DOCUMENT VAULT: List all docs for an application
   getApplicationDocuments: async (applicationId: string) => fetchWithAuth(`/applications/${applicationId}/documents`, { method: "GET" }),
   deleteApplicationDocument: async (applicationId: string, docType: string) => fetchWithAuth(`/documents/${applicationId}/${docType}`, { method: "DELETE" }),
+  deleteDocument: async (documentId: string) => fetchWithAuth(`/documents/${documentId}`, { method: "DELETE" }),
 
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
   
@@ -456,6 +457,10 @@ export const PrymeAPI = {
   /** Admin: Update user role — PATCH /api/v1/admin/users/{userId}/role (SUPER_ADMIN only) */
   updateUserRole: async (userId: string, role: string) =>
     fetchWithAuth(`/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
+
+  /** Admin: Delete user/team member — DELETE /api/v1/admin/users/{userId} */
+  deleteUser: async (userId: string) =>
+    fetchWithAuth(`/admin/users/${userId}`, { method: "DELETE" }),
   createAdminReview: async (data: any) =>
     fetchWithAuth("/admin/reviews", { method: "POST", body: JSON.stringify(data) }),
   updateAdminReview: async (id: string, data: any) =>
@@ -473,6 +478,8 @@ export const PrymeAPI = {
     fetchWithAuth(`/admin/eligibility-rules/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteEligibilityRule: async (id: string | number) =>
     fetchWithAuth(`/admin/eligibility-rules/${id}`, { method: "DELETE" }),
+  getPolicySnapshot: async (ruleId: string | number) =>
+    fetchWithAuth(`/admin/eligibility-rules/${ruleId}/snapshot`, { method: "GET" }),
 };
 
 // Standard REST Export Map

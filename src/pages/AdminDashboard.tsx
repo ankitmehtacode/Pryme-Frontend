@@ -48,11 +48,7 @@ const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
 
 const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
 
-const MOCK_METADATA_DB: Record<string, FieldMetadata> = {
-  "foirAllowed": { fieldKey: "foirAllowed", displayName: "FOIR Allowed", fieldType: "PERCENTAGE", absoluteLowerBound: 0, absoluteUpperBound: 1, allowedValues: null, requiresReason: true, unit: "%" },
-  "minBusinessVintageYears": { fieldKey: "minBusinessVintageYears", displayName: "Min Business Vintage", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 50, allowedValues: null, requiresReason: true, unit: "Yrs" },
-  "itrRequiredYears": { fieldKey: "itrRequiredYears", displayName: "ITR Required", fieldType: "INTEGER", absoluteLowerBound: 0, absoluteUpperBound: 10, allowedValues: null, requiresReason: false, unit: "Yrs" },
-};
+// MOCK_METADATA_DB removed (using dynamic backend definitions)
 
 // 🧠 DOCUMENT VAULT PANEL: Inline sub-component to fetch & display KYC docs from the backend
 const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
@@ -190,6 +186,7 @@ const AdminDashboard = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<any | null>(null);
+  const [selectedSnapshotRuleId, setSelectedSnapshotRuleId] = useState<number | null>(null);
 
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
@@ -344,6 +341,13 @@ const AdminDashboard = () => {
     enabled: !!selectedFieldKey
   });
 
+  // Fetch full policy snapshot for Engine Rules Tab
+  const { data: policySnapshot, isLoading: isLoadingSnapshot } = useQuery({
+    queryKey: ["policy_snapshot", selectedSnapshotRuleId],
+    queryFn: () => PrymeAPI.getPolicySnapshot(selectedSnapshotRuleId!),
+    enabled: selectedSnapshotRuleId !== null,
+  });
+
   // 2. The Patch Mutation
   const patchMutation = useMutation({
     mutationFn: (payload: PolicyPatchPayload) => PrymeAPI.patchPolicy(payload),
@@ -356,7 +360,7 @@ const AdminDashboard = () => {
     onError: (error: any) => { toast.error(error.message || "Policy update failed."); }
   });
 
-  const metadataForField = selectedFieldKey ? MOCK_METADATA_DB[selectedFieldKey] : null;
+  // metadataForField removed
 
   // ==========================================
   // 🧠 MUTATIONS: OPTIMISTIC PIPELINE UPDATES
@@ -664,6 +668,7 @@ const AdminDashboard = () => {
                       isSuperAdmin={isSuperAdmin} authUser={authUser}
                       setEditingEligibilityRule={setEditingEligibilityRule} setIsEligibilityModalOpen={setIsEligibilityModalOpen}
                       updateEligibilityRuleMutation={updateEligibilityRuleMutation}
+                      onViewSnapshot={(ruleId) => setSelectedSnapshotRuleId(ruleId)}
                     />
                     <AdminEligibilityModal 
                       isOpen={isEligibilityModalOpen}
@@ -836,6 +841,166 @@ const AdminDashboard = () => {
             .catch((e: any) => toast.error(e.message || "Failed to save bank."));
         }}
       />
+
+      {/* 🧠 POLICY SNAPSHOT DRAWER */}
+      {selectedSnapshotRuleId !== null && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-all">
+          <div className="w-[600px] bg-[#0a0a10] h-full shadow-2xl flex flex-col animate-in slide-in-from-right border-l border-white/[0.06]">
+            {/* Header */}
+            <div className="p-6 border-b border-white/[0.06] flex items-start justify-between bg-[#0d0d14]">
+              <div>
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-purple-500" /> Policy 360° Snapshot
+                </h2>
+                <p className="text-xs text-slate-400 mt-1 font-mono">
+                  Rule ID: {selectedSnapshotRuleId} {policySnapshot?.productCode ? `| Product: ${policySnapshot.productCode}` : ""}
+                </p>
+              </div>
+              <button 
+                onClick={() => setSelectedSnapshotRuleId(null)} 
+                className="p-2 bg-white/[0.06] rounded-full border border-white/[0.08] hover:bg-white/[0.1] active:scale-95 transition-all"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="p-6 flex-1 overflow-y-auto bg-[#0a0a10] space-y-6 custom-scrollbar text-xs">
+              {isLoadingSnapshot ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                  <p>Merging eligibility rules and product database snapshot...</p>
+                </div>
+              ) : !policySnapshot ? (
+                <div className="flex items-center justify-center h-full text-slate-400">
+                  Failed to fetch merged snapshot.
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* 1. Rule Identity */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4" /> Rule Identity
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                      <div><span className="text-slate-500 block mb-0.5">Bank Partner</span><span className="text-slate-200 font-semibold">{policySnapshot.bankName || "Any Bank"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Product Type</span><span className="text-slate-200 font-semibold">{policySnapshot.loanType || "None"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Product Code</span><span className="text-slate-200 font-mono font-semibold">{policySnapshot.productCode}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Lender Name</span><span className="text-slate-200 font-semibold">{policySnapshot.lenderName || "N/A"}</span></div>
+                    </div>
+                  </div>
+
+                  {/* 2. Applicant Gates */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-amber-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <Users className="w-4 h-4" /> Applicant Gates
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                      <div><span className="text-slate-500 block mb-0.5">Employment Type</span><span className="text-slate-200 font-medium">{policySnapshot.employmentType}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Income Type</span><span className="text-slate-200 font-medium">{policySnapshot.incomeType}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Age Limits</span><span className="text-slate-200">{policySnapshot.minAge || 0} - {policySnapshot.maxAge || 0} Years</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Min Income</span><span className="text-slate-200">₹{policySnapshot.minIncome?.toLocaleString()}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Work Exp / Vintage</span><span className="text-slate-200">{policySnapshot.workExpYears || 0} Yrs (Biz: {policySnapshot.businessAgeYears || 0} Yrs)</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Surrogate Type</span><span className="text-slate-200 font-semibold text-blue-400">{policySnapshot.surrogate || "None"}</span></div>
+                    </div>
+                  </div>
+
+                  {/* 3. Financial Limits & Product Parameters */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <Activity className="w-4 h-4" /> Limits & Product Parameters
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                      <div><span className="text-slate-500 block mb-0.5">Allowed LTV (Rule)</span><span className="text-emerald-400 font-mono font-semibold">{((policySnapshot.ltvAllowed || 0) * 100).toFixed(2)}%</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Allowed FOIR (Rule)</span><span className="text-emerald-400 font-mono font-semibold">{((policySnapshot.foirMax || 0) * 100).toFixed(2)}%</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Product ROI (ROI)</span><span className="text-slate-200 font-mono">{policySnapshot.roi ? `${((policySnapshot.roi) * 100).toFixed(2)}%` : "N/A"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Processing Fee</span><span className="text-slate-200 font-mono">{policySnapshot.processingFee ? `${((policySnapshot.processingFee) * 100).toFixed(2)}%` : "N/A"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Tenure Range</span><span className="text-slate-200">{policySnapshot.minTenureMonths || 0} - {policySnapshot.maxTenureMonths || 0} Months</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Loan Amount Range</span><span className="text-slate-200">₹{policySnapshot.minLoanAmount?.toLocaleString()} - ₹{policySnapshot.maxLoanAmount?.toLocaleString()}</span></div>
+                    </div>
+                  </div>
+
+                  {/* 4. Documentation & Verifications */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-cyan-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <FileText className="w-4 h-4" /> Documentation Requirements
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                      <div><span className="text-slate-500 block mb-0.5">KYC Requirements</span><span className="text-slate-200">{policySnapshot.kycRequirement || "Standard"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Income Proof</span><span className="text-slate-200">{policySnapshot.incomeProof || "Standard"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Bank Statement</span><span className="text-slate-200">{policySnapshot.bankStatementMonths || 0} Months</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">ITR Required</span><span className="text-slate-200">{policySnapshot.itrRequiredYears || 0} Yrs (Product: {policySnapshot.itrRequirementYears || 0} Yrs)</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Salary Slips Required</span><span className="text-slate-200">{policySnapshot.salarySlipMonths || 0} Months</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">GST Required</span><span className="text-slate-200">{policySnapshot.gstRequiredMonths || 0} Months</span></div>
+                    </div>
+                  </div>
+
+                  {/* 5. Risk, Restrictions & Property Rules */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-red-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" /> Risk, Restrictions & Property Rules
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                      <div><span className="text-slate-500 block mb-0.5">Min CIBIL Score</span><span className="text-slate-200 font-semibold">{policySnapshot.cibilMin || "N/A"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">City Tier</span><span className="text-slate-200 font-semibold">{policySnapshot.cityTier || "All"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">PF Mandatory</span><span className="text-slate-200 font-semibold">{policySnapshot.providentFundMandatory ? "Yes" : "No"}</span></div>
+                      <div><span className="text-slate-500 block mb-0.5">Allowed Property Types</span><span className="text-slate-200">{policySnapshot.propertyType || "All"}</span></div>
+                      <div className="col-span-2"><span className="text-slate-500 block mb-0.5">Negative Employer Type</span><span className="text-slate-200 font-mono break-all">{policySnapshot.negativeEmployerType || "None"}</span></div>
+                      <div className="col-span-2"><span className="text-slate-500 block mb-0.5">Negative Salary Mode</span><span className="text-slate-200 font-mono break-all">{policySnapshot.negativeSalaryMode || "None"}</span></div>
+                      <div className="col-span-2"><span className="text-slate-500 block mb-0.5">Margin By Occupation</span><span className="text-slate-200 font-mono break-all">{policySnapshot.marginByOccupation || "None"}</span></div>
+                      <div className="col-span-2"><span className="text-slate-500 block mb-0.5">Negative Property Deny-List</span><span className="text-slate-200 break-all">{policySnapshot.negativeProperty || "None"}</span></div>
+                    </div>
+                  </div>
+
+                  {/* 6. Campaign & Details */}
+                  {(policySnapshot.campaignName || policySnapshot.offerType) && (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4" /> Campaign & Special Offers
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4 bg-slate-900/30 p-3 rounded-lg border border-white/5">
+                        <div><span className="text-slate-500 block mb-0.5">Campaign Name</span><span className="text-purple-400 font-semibold">{policySnapshot.campaignName}</span></div>
+                        <div><span className="text-slate-500 block mb-0.5">Offer Type</span><span className="text-purple-400 font-semibold">{policySnapshot.offerType}</span></div>
+                        <div className="col-span-2"><span className="text-slate-500 block mb-0.5">Offer Details</span><span className="text-slate-200">{policySnapshot.offerDetails}</span></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 7. Internal Deviations */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-pink-500 border-b border-white/[0.06] pb-1.5 flex items-center gap-1.5">
+                      <Shield className="w-4 h-4" /> Internal & Deviations
+                    </h3>
+                    <div className="space-y-3 bg-[#0d0d14]/60 p-4 rounded-lg border border-white/5">
+                      <div>
+                        <span className="text-slate-500 block mb-1">Deviation Formulae</span>
+                        <pre className="p-2 bg-black/40 border border-white/5 rounded-md font-mono text-[11px] text-cyan-400 overflow-x-auto whitespace-pre-wrap">{policySnapshot.deviationFormulae || "None"}</pre>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block mb-1">Rule Conditions</span>
+                        <pre className="p-2 bg-black/40 border border-white/5 rounded-md font-mono text-[11px] text-purple-400 overflow-x-auto whitespace-pre-wrap">{policySnapshot.conditions || "None"}</pre>
+                      </div>
+                      {policySnapshot.notes && (
+                        <div>
+                          <span className="text-slate-500 block mb-1">Internal Memos / Notes</span>
+                          <p className="text-slate-300 italic">{policySnapshot.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] flex justify-end gap-3 shrink-0">
+              <Button onClick={() => setSelectedSnapshotRuleId(null)} className="bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-medium px-6 shadow-md">
+                Close Snapshot
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

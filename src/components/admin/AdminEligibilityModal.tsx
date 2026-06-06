@@ -66,6 +66,8 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     incomeType: "STANDARD",
     surrogate: "",
     workExpYears: 2,
+    businessAgeYears: 0,
+    cibilMin: 650,
     itrRequiredYears: 2,
     ltvAllowed: 80,
     ltvComputationLogic: "",
@@ -76,6 +78,11 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     emiNotObligated: "NO",
     propertyType: "RESIDENTIAL",
     negativeProperty: "",
+    negativeEmployerType: "",
+    negativeSalaryMode: "",
+    marginByOccupation: "",
+    providentFundMandatory: false,
+    cityTier: "",
     profileRestrictions: "",
     notes: "",
     active: true
@@ -89,7 +96,8 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
           ltvAllowed: initialData.ltvAllowed ? Number((initialData.ltvAllowed * 100).toFixed(2)) : 80,
           ltvComputationLogic: initialData.ltvComputationLogic || "",
           foirMax: initialData.foirMax ? Number((initialData.foirMax * 100).toFixed(2)) : 65,
-          foirComputationLogic: initialData.foirComputationLogic || ""
+          foirComputationLogic: initialData.foirComputationLogic || "",
+          providentFundMandatory: initialData.providentFundMandatory ?? false
         });
       } else {
         setFormData({
@@ -102,6 +110,8 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
           minIncome: 25000,
           incomeType: "STANDARD",
           workExpYears: 2,
+          businessAgeYears: 0,
+          cibilMin: 650,
           itrRequiredYears: 2,
           ltvAllowed: 80,
           ltvComputationLogic: "",
@@ -110,9 +120,14 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
           deviationFormulae: "",
           conditions: "",
           emiNotObligated: "NO",
-     surrogate: "",
+          surrogate: "",
           propertyType: "RESIDENTIAL",
           negativeProperty: "",
+          negativeEmployerType: "",
+          negativeSalaryMode: "",
+          marginByOccupation: "",
+          providentFundMandatory: false,
+          cityTier: "",
           profileRestrictions: "",
           notes: "",
           active: true
@@ -133,6 +148,11 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     
     if (name === "emiNotObligated") {
       setFormData((prev: any) => ({ ...prev, emiNotObligated: value }));
+      return;
+    }
+
+    if (name === "providentFundMandatory") {
+      setFormData((prev: any) => ({ ...prev, providentFundMandatory: value === "true" }));
       return;
     }
 
@@ -212,6 +232,16 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Income Type</label>
+                  <select name="incomeType" value={formData.incomeType || "STANDARD"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
+                    <option value="STANDARD">Standard</option>
+                    <option value="ITR">ITR</option>
+                    <option value="BANKING">Banking / ABB</option>
+                    <option value="GST">GST</option>
+                    <option value="CASH_SALARY">Cash Salary</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min Age (Years)</label>
                   <input type="number" name="minAge" value={formData.minAge} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
@@ -219,13 +249,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   <label className="text-[11px] font-semibold text-slate-400">Max Age (Years)</label>
                   <input type="number" name="maxAge" value={formData.maxAge} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min Income (₹)</label>
                   <input type="number" name="minIncome" value={formData.minIncome} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Surrogate</label>
                   <select name="surrogate" value={formData.surrogate || ""} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500">
@@ -242,6 +272,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   <input type="number" name="workExpYears" value={formData.workExpYears} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Business Age (Years)</label>
+                  <input type="number" name="businessAgeYears" value={formData.businessAgeYears} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">ITR Required (Years)</label>
                   <input type="number" name="itrRequiredYears" value={formData.itrRequiredYears} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
@@ -251,6 +288,29 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                     <option value="NO">No</option>
                     <option value="6_MONTHS">6 Months</option>
                     <option value="12_MONTHS">12 Months</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Min CIBIL Score</label>
+                  <input type="number" name="cibilMin" value={formData.cibilMin} onChange={handleChange} min={300} max={900} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">PF Mandatory</label>
+                  <select name="providentFundMandatory" value={formData.providentFundMandatory ? "true" : "false"} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-blue-500 text-slate-200">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">City Tier</label>
+                  <select name="cityTier" value={formData.cityTier || ""} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-blue-500 text-slate-200">
+                    <option value="">All Tiers</option>
+                    <option value="TIER_1">Tier 1</option>
+                    <option value="TIER_2">Tier 2</option>
+                    <option value="TIER_3">Tier 3</option>
                   </select>
                 </div>
               </div>
@@ -322,6 +382,18 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   value={formData.negativeProperty}
                   onChange={(val) => setFormData((prev: any) => ({ ...prev, negativeProperty: val }))}
                 />
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Negative Employer Type</label>
+                  <textarea name="negativeEmployerType" value={formData.negativeEmployerType || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Partnership, Proprietorship, Trust" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Negative Salary Mode</label>
+                  <textarea name="negativeSalaryMode" value={formData.negativeSalaryMode || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Cash, Cheque" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Margin By Occupation</label>
+                  <textarea name="marginByOccupation" value={formData.marginByOccupation || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Doctor: 85%, Trader: 75%" />
+                </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-[11px] font-semibold text-slate-400">Negative Profile</label>
                   <textarea name="profileRestrictions" value={formData.profileRestrictions} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Police, Lawyer, Politician" />

@@ -1,8 +1,12 @@
-import React from "react";
-import { Loader2, LayoutList, LayoutGrid, ArrowUpRight, Activity } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, LayoutList, LayoutGrid, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 interface ApplicationsTabProps {
@@ -16,7 +20,7 @@ interface ApplicationsTabProps {
   pipelineStages: string[];
   setSelectedApp: (app: any) => void;
   formatCurrency: (val: number) => string;
-  getNextStage: (status: string) => string | null;
+
   teamMembers: any[];
   StatusBadge: React.FC<{ status: string }>;
   isEmployee: boolean;
@@ -25,10 +29,29 @@ interface ApplicationsTabProps {
 export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
   leadFilter, setLeadFilter, crmView, setCrmView, statusMutation, assignMutation,
   filteredApplications, pipelineStages, setSelectedApp, formatCurrency,
-  getNextStage, teamMembers, StatusBadge, isEmployee
+  teamMembers, StatusBadge, isEmployee
 }) => {
+  // 🧠 Confirmation state: holds the pending action until user confirms
+  const [pendingAction, setPendingAction] = useState<{
+    type: "status" | "assign";
+    label: string;
+    appId: string;
+    payload: any;
+  } | null>(null);
+
+  const handleConfirm = () => {
+    if (!pendingAction) return;
+    if (pendingAction.type === "status") {
+      statusMutation.mutate(pendingAction.payload);
+    } else if (pendingAction.type === "assign") {
+      assignMutation.mutate(pendingAction.payload);
+    }
+    setPendingAction(null);
+  };
+
   return (
-    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col h-[calc(100vh-180px)] relative animate-in fade-in slide-in-from-bottom-2">
+    <>
+    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
       <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
         <div className="flex gap-2">
           <Button onClick={() => setLeadFilter("all")} variant={leadFilter === "all" ? "default" : "outline"} size="sm" className={cn("h-8 text-xs font-medium shadow-sm transition-all", leadFilter === "all" && "bg-primary text-primary-foreground", leadFilter !== "all" && "border-white/[0.08] text-slate-400 hover:bg-white/[0.06] bg-transparent")}>All Leads</Button>
@@ -96,7 +119,13 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
                         <Select
                           value={app.assignedTo || "UNASSIGNED"}
                           onValueChange={(val) => {
-                            assignMutation.mutate({ id: app.applicationId || app.id, assigneeId: val === "UNASSIGNED" ? "" : val });
+                            const assigneeName = val === "UNASSIGNED" ? "Unassigned" : (teamMembers.find((tm: any) => tm.id === val)?.fullName || val);
+                            setPendingAction({
+                              type: "assign",
+                              label: `Reassign ${app.applicant?.name || app.applicationId} to ${assigneeName}?`,
+                              appId: app.applicationId,
+                              payload: { id: app.applicationId || app.id, assigneeId: val === "UNASSIGNED" ? "" : val },
+                            });
                           }}
                           disabled={isEmployee}
                         >
@@ -116,18 +145,35 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
                       <td className="px-6 py-4 align-top">
                         <StatusBadge status={app.status} />
                       </td>
-                      <td className="px-6 py-4 align-top text-right">
-                        {getNextStage(app.status) ? (
-                          <Button
-                            onClick={(e) => { e.stopPropagation(); statusMutation.mutate({ id: app.applicationId, status: getNextStage(app.status)!, version: app.version }); }}
-                            disabled={statusMutation.isPending}
-                            size="sm"
-                            className="h-8 bg-primary hover:bg-[#0c2a66] text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            → {getNextStage(app.status)} <ArrowUpRight className="w-3 h-3 ml-1" />
-                          </Button>
-                        ) : (
+                      <td className="px-6 py-4 align-top text-right" onClick={(e) => e.stopPropagation()}>
+                        {["APPROVED", "REJECTED"].includes(app.status?.toUpperCase()) ? (
                           <span className="text-[10px] text-slate-600 font-medium uppercase">Terminal</span>
+                        ) : (
+                          <Select
+                            value=""
+                            onValueChange={(val) => {
+                              setPendingAction({
+                                type: "status",
+                                label: `Move ${app.applicant?.name || app.applicationId} from ${app.status} → ${val}?`,
+                                appId: app.applicationId,
+                                payload: { id: app.applicationId, status: val, version: app.version },
+                              });
+                            }}
+                            disabled={statusMutation.isPending}
+                          >
+                            <SelectTrigger className="w-[150px] h-8 text-xs font-medium bg-white/[0.04] border-white/[0.08] text-slate-300 outline-none focus:ring-blue-500/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <SelectValue placeholder="Move to…" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+                              {pipelineStages
+                                .filter((stage) => stage !== app.status?.toUpperCase())
+                                .map((stage) => (
+                                  <SelectItem key={stage} value={stage} className="text-xs">
+                                    {stage}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
                         )}
                       </td>
                     </motion.tr>
@@ -174,6 +220,30 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
         </div>
       )}
     </div>
+
+    {/* 🧠 CONFIRMATION DIALOG — intercepts all CRM mutations */}
+    <AlertDialog open={!!pendingAction} onOpenChange={(open) => { if (!open) setPendingAction(null); }}>
+      <AlertDialogContent className="bg-[#0d0d14] border-white/[0.08] text-white max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-white">Confirm Action</AlertDialogTitle>
+          <AlertDialogDescription className="text-slate-400">
+            {pendingAction?.label || "Are you sure you want to save these changes?"}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="bg-transparent border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+          >
+            Yes, Continue
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 

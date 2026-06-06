@@ -19,19 +19,20 @@ interface SettingsTabProps {
 export const SettingsTab: React.FC<SettingsTabProps> = ({
   ruleStatusFilter, setRuleStatusFilter, eligibilityRules, filteredEligibilityRules,
   isSuperAdmin, authUser, setEditingEligibilityRule, setIsEligibilityModalOpen,
-  updateEligibilityRuleMutation
+  updateEligibilityRuleMutation, onViewSnapshot
 }) => {
   const [ruleSearchQuery, setRuleSearchQuery] = useState("");
+  const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
 
   const searchFilteredRules = useMemo(() => {
     const q = ruleSearchQuery.toLowerCase().trim();
     if (!q) return filteredEligibilityRules;
     return filteredEligibilityRules.filter((rule: any) =>
-      rule.bankName?.toLowerCase().includes(q) ||
-      rule.productCode?.toLowerCase().includes(q) ||
-      rule.employmentType?.toLowerCase().includes(q) ||
-      rule.incomeType?.toLowerCase().includes(q) ||
-      rule.conditions?.toLowerCase().includes(q)
+      (rule.bankName?.toLowerCase() ?? "").includes(q) ||
+      (rule.productCode?.toLowerCase() ?? "").includes(q) ||
+      (rule.employmentType?.toLowerCase() ?? "").includes(q) ||
+      (rule.incomeType?.toLowerCase() ?? "").includes(q) ||
+      (rule.conditions?.toLowerCase() ?? "").includes(q)
     );
   }, [filteredEligibilityRules, ruleSearchQuery]);
 
@@ -56,6 +57,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               value={ruleSearchQuery}
               onChange={(e) => setRuleSearchQuery(e.target.value)}
               placeholder="Search bank, product…"
+              autoComplete="off"
               className="pl-8 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs focus:bg-white/[0.08] focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all w-48 text-white placeholder:text-slate-600"
             />
           </div>
@@ -111,41 +113,130 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                 </tr>
               ) : (
                 searchFilteredRules.map((rule: any) => (
-                  <tr key={rule.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-200">{rule.bankName || 'Any Bank'}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">{rule.productCode}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-slate-300">Min Age: {rule.minAge} | Inc: ₹{rule.minIncome?.toLocaleString()}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">{rule.employmentType} ({rule.incomeType})</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-emerald-400 font-mono">
-                        {(rule.ltvAllowed ? rule.ltvAllowed * 100 : 0)}% / {(rule.foirMax ? rule.foirMax * 100 : 0)}%
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-xs text-slate-400 max-w-[200px] truncate" title={rule.conditions}>
-                        {rule.conditions || "-"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button onClick={() => updateEligibilityRuleMutation.mutate({ id: rule.id, data: { ...rule, active: !rule.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", rule.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20")}>
-                        {rule.active ? "ACTIVE" : "INACTIVE"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-white/10 text-slate-300 hover:bg-white/5 hover:text-white"
-                        onClick={() => { setEditingEligibilityRule(rule); setIsEligibilityModalOpen(true); }}
-                      >
-                        Edit
-                      </Button>
-                    </td>
-                  </tr>
+                  <React.Fragment key={rule.id}>
+                    <tr className={cn("hover:bg-white/[0.02] transition-colors border-b border-white/[0.04]", expandedRuleId === rule.id && "bg-white/[0.02]")}>
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-slate-200">{rule.bankName || 'Any Bank'}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{rule.productCode}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-slate-300">Min Age: {rule.minAge} | Inc: ₹{rule.minIncome?.toLocaleString()} | CIBIL: {rule.cibilMin || "-"}</div>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                          <span className="text-xs text-slate-500">{rule.employmentType} ({rule.incomeType})</span>
+                          {rule.surrogate && (
+                            <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md text-[10px] font-semibold uppercase tracking-wider">
+                              {rule.surrogate}
+                            </span>
+                          )}
+                          {rule.cityTier && (
+                            <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-md text-[10px] font-semibold uppercase tracking-wider">
+                              {rule.cityTier}
+                            </span>
+                          )}
+                          {rule.employmentType?.includes("SELF_EMPLOYED") && rule.businessAgeYears !== undefined && rule.businessAgeYears !== null && (
+                            <span className="text-xs text-slate-400 font-medium">
+                              • Biz Age: {rule.businessAgeYears} Yrs
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-emerald-400 font-mono">
+                          {(rule.ltvAllowed ? rule.ltvAllowed * 100 : 0)}% / {(rule.foirMax ? rule.foirMax * 100 : 0)}%
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs text-slate-400 max-w-[200px] truncate" title={rule.conditions}>
+                          {rule.conditions || "-"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button onClick={() => updateEligibilityRuleMutation.mutate({ id: rule.id, data: { ...rule, active: !rule.active } })} className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border transition-all", rule.active ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20")}>
+                          {rule.active ? "ACTIVE" : "INACTIVE"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 animate-all"
+                            onClick={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+                          >
+                            {expandedRuleId === rule.id ? "Hide Details" : "Show Details"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 animate-all"
+                            onClick={() => onViewSnapshot && onViewSnapshot(rule.id)}
+                          >
+                            Snapshot
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-8 border-white/10 text-slate-300 hover:bg-white/5 hover:text-white"
+                            onClick={() => { setEditingEligibilityRule(rule); setIsEligibilityModalOpen(true); }}
+                          >
+                            Edit
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    {expandedRuleId === rule.id && (
+                      <tr className="bg-slate-950/40 border-b border-white/[0.04]">
+                        <td colSpan={6} className="px-6 py-4">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-300 animate-in slide-in-from-top-1 duration-200">
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Negative Employer Type</span>
+                              <span className="font-mono text-slate-400">{rule.negativeEmployerType || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Negative Salary Mode</span>
+                              <span className="font-mono text-slate-400">{rule.negativeSalaryMode || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Margin By Occupation</span>
+                              <span className="font-mono text-slate-400">{rule.marginByOccupation || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">PF Mandatory</span>
+                              <span>{rule.providentFundMandatory ? "✅ Yes" : "❌ No"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Property Type Allowed</span>
+                              <span className="text-slate-400">{rule.propertyType || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Negative Property Deny-List</span>
+                              <span className="text-slate-400">{rule.negativeProperty || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Profile Restrictions</span>
+                              <span className="text-slate-400">{rule.profileRestrictions || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">ITR Required</span>
+                              <span>{rule.itrRequiredYears || 0} Years</span>
+                            </div>
+                            <div className="col-span-2 md:col-span-4">
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Deviation Formulae</span>
+                              <pre className="p-2 bg-black/40 border border-white/5 rounded-md font-mono text-[11px] text-cyan-400 overflow-x-auto whitespace-pre-wrap">{rule.deviationFormulae || "None"}</pre>
+                            </div>
+                            <div className="col-span-2 md:col-span-4">
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Conditions</span>
+                              <pre className="p-2 bg-black/40 border border-white/5 rounded-md font-mono text-[11px] text-purple-400 overflow-x-auto whitespace-pre-wrap">{rule.conditions || "None"}</pre>
+                            </div>
+                            <div className="col-span-2 md:col-span-4">
+                              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Internal Notes</span>
+                              <p className="text-slate-400 italic">{rule.notes || "No notes written."}</p>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               )}
             </tbody>
