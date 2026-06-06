@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Users, FileText, Building2, Settings,
-  LogOut, Bell, Search, LayoutGrid, CreditCard,
+  LogOut, Bell, Search, LayoutGrid,
   ShieldCheck, Clock, CheckCircle2,
   Activity, BarChart3, Mail, Calendar, Plus,
   Percent, ExternalLink, Shield, Link as LinkIcon,
@@ -41,7 +41,7 @@ const OverviewTab = lazy(() => import("./admin/tabs/OverviewTab"));
 const ApplicationsTab = lazy(() => import("./admin/tabs/ApplicationsTab"));
 const LeadsTab = lazy(() => import("./admin/tabs/LeadsTab"));
 const BanksTab = lazy(() => import("./admin/tabs/BanksTab"));
-const OffersTab = lazy(() => import("./admin/tabs/OffersTab"));
+// OffersTab is now rendered as a sub-section inside SettingsTab (Policy Matrix)
 const UsersTab = lazy(() => import("./admin/tabs/UsersTab"));
 const CompanyTab = lazy(() => import("./admin/tabs/CompanyTab"));
 const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
       const res = await PrymeAPI.getAdminBanks();
       return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
     },
-    enabled: activeTab === "banks"
+    enabled: activeTab === "banks" || activeTab === "settings"
   });
 
   const { data: products = [], refetch: refetchProducts } = useQuery({
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
       const res = await PrymeAPI.getAdminProducts();
       return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
     },
-    enabled: activeTab === "offers"
+    enabled: activeTab === "settings"
   });
 
   const toggleBankMutation = useMutation({
@@ -526,7 +526,7 @@ const AdminDashboard = () => {
     { id: "leads", label: "Raw Inquiries", icon: LayoutList },
     { id: "users", label: "User Directory", icon: Users }, { id: "company", label: "Company Team", icon: ShieldCheck },
     { id: "banks", label: "Partner Integrations", icon: Building2 },
-    { id: "offers", label: "Marketing & Offers", icon: CreditCard }, { id: "settings", label: "Engine Rules", icon: Settings },
+    { id: "settings", label: "Policy Matrix", icon: Settings },
   ];
 
   return (
@@ -647,16 +647,7 @@ const AdminDashboard = () => {
                   />
                 )}
 
-                {activeTab === "offers" && (
-                  <>
-                    <OffersTab 
-                      productStatusFilter={productStatusFilter} setProductStatusFilter={setProductStatusFilter}
-                      products={products} filteredProducts={filteredProducts}
-                      setSelectedProduct={setSelectedProduct} setIsOfferModalOpen={setIsOfferModalOpen}
-                      toggleProductMutation={toggleProductMutation} refetchProducts={refetchProducts}
-                    />
-                  </>
-                )}
+
 
                 {activeTab === "users" && (
                   <UsersTab 
@@ -682,6 +673,10 @@ const AdminDashboard = () => {
                       setEditingEligibilityRule={setEditingEligibilityRule} setIsEligibilityModalOpen={setIsEligibilityModalOpen}
                       updateEligibilityRuleMutation={updateEligibilityRuleMutation}
                       onViewSnapshot={(ruleId) => setSelectedSnapshotRuleId(ruleId)}
+                      productStatusFilter={productStatusFilter} setProductStatusFilter={setProductStatusFilter}
+                      products={products} filteredProducts={filteredProducts}
+                      setSelectedProduct={setSelectedProduct} setIsOfferModalOpen={setIsOfferModalOpen}
+                      toggleProductMutation={toggleProductMutation} refetchProducts={refetchProducts}
                     />
                     <AdminEligibilityModal 
                       isOpen={isEligibilityModalOpen}
