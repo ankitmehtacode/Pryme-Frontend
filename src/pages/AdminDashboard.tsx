@@ -304,9 +304,19 @@ const AdminDashboard = () => {
   }, [products, productStatusFilter]);
 
   const filteredEligibilityRules = useMemo(() => {
-    if (ruleStatusFilter === "all") return eligibilityRules;
-    return eligibilityRules.filter((r: any) => ruleStatusFilter === "active" ? (r.active ?? r.isActive) : !(r.active ?? r.isActive));
-  }, [eligibilityRules, ruleStatusFilter]);
+    const resolvedRules = eligibilityRules.map((rule: any) => {
+      if (!rule.bankName || rule.bankName.trim() === "") {
+        const matchingProduct = products.find((p: any) => p.productCode === rule.productCode);
+        if (matchingProduct) {
+          return { ...rule, bankName: matchingProduct.lenderName };
+        }
+      }
+      return rule;
+    });
+
+    if (ruleStatusFilter === "all") return resolvedRules;
+    return resolvedRules.filter((r: any) => ruleStatusFilter === "active" ? (r.active ?? r.isActive) : !(r.active ?? r.isActive));
+  }, [eligibilityRules, products, ruleStatusFilter]);
 
   const [isEligibilityModalOpen, setIsEligibilityModalOpen] = useState(false);
   const [editingEligibilityRule, setEditingEligibilityRule] = useState<any>(null);
