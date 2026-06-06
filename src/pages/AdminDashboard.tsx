@@ -259,6 +259,18 @@ const AdminDashboard = () => {
     }
   });
 
+  // 🧠 DELETE USER MUTATION: Wired to DELETE /admin/users/{userId}
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId: string) => PrymeAPI.deleteUser(userId),
+    onSuccess: () => {
+      toast.success("Team member deleted. User session and footprint purged.");
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete team member.");
+    }
+  });
+
   // ==========================================
   // POLICY ENGINE UI STATES
   // ==========================================
@@ -657,6 +669,7 @@ const AdminDashboard = () => {
                   <CompanyTab 
                     teamMembers={teamMembers} isSuperAdmin={isSuperAdmin} 
                     authUser={authUser} roleMutation={roleMutation} 
+                    deleteUserMutation={deleteUserMutation}
                   />
                 )}
 
