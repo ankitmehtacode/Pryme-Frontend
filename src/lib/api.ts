@@ -359,6 +359,11 @@ export const PrymeAPI = {
          throw new Error("Upload rejected by secure vault. Please try again.");
       }
 
+      // 4. Confirm upload to backend (closed-loop verification)
+      await fetchWithAuth(`/documents/${policyResponse.documentId}/confirm-upload`, {
+        method: "POST"
+      });
+
       return { data: { documentId: policyResponse.documentId }, error: null };
     } catch (error: any) {
       console.error("Document vault encryption failed:", error);
