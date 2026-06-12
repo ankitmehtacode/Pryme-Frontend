@@ -387,19 +387,9 @@ const Apply = () => {
       {/* 🧠 UI FIX: Changed hardcoded black `#080d1e` to semantic adaptive `bg-slate-50 dark:bg-[#080d1e]` */}
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
 
-        {/* 🧠 200 IQ FIX: Minimal Header for Zen Mode */}
-        <div className="w-full absolute top-0 left-0 right-0 p-6 flex justify-center z-50">
-          <Link to="/" className="flex items-center gap-2 group">
-            <img 
-              src={prymeLogo} 
-              alt="Pryme Logo" 
-              className="h-7 sm:h-8 w-auto group-hover:scale-105 transition-transform duration-300" 
-              style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }}
-            />
-          </Link>
-        </div>
+        <Header />
 
-        <main className="flex-1 w-full flex flex-col items-center min-h-[90vh] pt-24 pb-12 relative z-10">
+        <main className="flex-1 w-full flex flex-col items-center min-h-[90vh] pt-28 md:pt-32 pb-12 relative z-10">
           <AnimatePresence mode="wait">
             {!showComparison ? (
               <motion.section 
@@ -624,6 +614,7 @@ const Apply = () => {
           </AnimatePresence>
 
         </main>
+        <Footer />
       </div>
     </>
   );
