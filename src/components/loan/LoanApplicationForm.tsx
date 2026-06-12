@@ -881,29 +881,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
 
 
-        {/* ── Real-Time Signal Injection ──────────────────────────────────────── */}
-        <div className="mt-4 p-4 rounded-xl bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-[#103783]/10 flex items-center justify-center animate-pulse">
-              <Sparkles className="w-4 h-4 text-primary dark:text-[#103783]" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-foreground">
-                {store.currentStage > 1 
-                  ? `Preliminary match: ${getIncomeOrFallback() * 12} to ${getIncomeOrFallback() * 24} limit`
-                  : 'Analyzing your profile in real-time...'}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                {store.currentStage > 2 ? '4+ lenders currently matched' : 'Connecting to lending partners'}
-              </p>
-            </div>
-          </div>
-          <div className="text-right hidden sm:block">
-            <p className="text-[10px] font-medium text-slate-500 flex items-center justify-end gap-1.5">
-              <ShieldCheck className="w-3 h-3 text-emerald-500" /> Bank-grade encryption
-            </p>
-          </div>
-        </div>
+
 
         
         
@@ -955,7 +933,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                  return false;
                })()
              }
-             className="w-full h-14 md:h-16 text-base md:text-lg font-bold rounded-2xl md:rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl transition-all"
+             className="w-full max-w-xs mx-auto h-12 text-sm md:text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all flex items-center justify-center"
              onClick={(e) => { e.preventDefault(); handleFormSubmit(); }}
           >
              {isSubmitting || isAnalyzing ? (
