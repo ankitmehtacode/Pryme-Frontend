@@ -914,7 +914,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
            return null;
         })()}
 
-        <div className="mt-8 relative z-50">
+        <div className="mt-8 relative z-50 flex justify-center">
           <Button 
              type="submit"
              disabled={
@@ -949,13 +949,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           </Button>
         </div>
 
-        {/* Trust Microcopy */}
-        <div className="flex justify-center mt-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/[0.04] border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md hover:bg-emerald-500/15">
+        {/* Trust Card Footer */}
+        <div className="-mx-5 -mb-5 md:-mx-8 md:-mb-8 mt-10 bg-slate-50/80 dark:bg-slate-900/40 border-t border-slate-150 dark:border-slate-800/60 py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <LockKeyhole className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+            <span>Bank-Grade 256-Bit SSL Secured</span>
+          </div>
+          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-500/10 dark:bg-emerald-500/[0.03] px-3.5 py-1.5 rounded-full border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-500/15">
             <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 leading-none">
-              Checking eligibility will <span className="underline decoration-2 decoration-emerald-500/50 text-emerald-950 dark:text-emerald-100 font-extrabold px-0.5">not</span> affect your credit score
-            </p>
+            <span>Checking eligibility will <span className="underline decoration-2 decoration-emerald-500/50 text-emerald-950 dark:text-emerald-100 font-extrabold px-0.5">not</span> affect your credit score</span>
           </div>
         </div>
       </motion.div>
