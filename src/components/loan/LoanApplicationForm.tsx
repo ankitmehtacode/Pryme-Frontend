@@ -682,7 +682,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
   // ── Style tokens ──────────────────────────────────────────────────────────
 
-  const cardCn = "bg-card dark:bg-[#080d1e] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-6 md:p-8 relative overflow-hidden transition-colors duration-300 hover:border-primary/10 dark:hover:border-white/[0.08]";
+  const cardCn = "bg-card dark:bg-[#080d1e] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-5 md:p-6 relative overflow-hidden transition-colors duration-300 hover:border-primary/10 dark:hover:border-white/[0.08]";
 
   // ═════════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -701,16 +701,13 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-0 h-full w-full relative">
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="mb-8">
-          <h2 className="text-2xl md:text-xl font-semibold text-foreground tracking-tight mb-1">
+        <div className="mb-5">
+          <h2 className="text-lg md:text-base font-semibold text-foreground tracking-tight mb-1">
             Start Your Application
           </h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Complete the fields below to find your best loan match.
-          </p>
 
           {/* Step Indicator */}
-          <div className="relative flex justify-between items-center mb-2">
+          <div className="relative flex justify-between items-center mb-1">
             {STEP_META.map((meta, i) => {
               const isActive = displayStep >= meta.stage;
               const isCurrent = displayStep === meta.stage;
@@ -757,7 +754,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
         {/* ── Step Content ─────────────────────────────────────────────────── */}
         
-        <div className="space-y-8 md:space-y-12">
+        <div className="space-y-5 md:space-y-6">
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* DYNAMIC RENDERER: MODULAR STEPS                                 */}
           {/* ═════════════════════════════════════════════════════════════════ */}
@@ -773,7 +770,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
 
         {/* ── Real-Time Signal Injection ──────────────────────────────────────── */}
-        <div className="mt-6 p-4 rounded-xl bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10 flex items-center justify-between">
+        <div className="mt-4 p-4 rounded-xl bg-primary/5 dark:bg-[#103783]/5 border border-primary/10 dark:border-[#103783]/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-[#103783]/10 flex items-center justify-center animate-pulse">
               <Sparkles className="w-4 h-4 text-primary dark:text-[#103783]" />
@@ -824,7 +821,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
            return null;
         })()}
 
-        <div className="mt-8 relative z-50">
+        <div className="mt-5 relative z-50">
           <Button 
              type="submit"
              disabled={
