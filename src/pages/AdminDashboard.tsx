@@ -44,6 +44,7 @@ const BanksTab = lazy(() => import("./admin/tabs/BanksTab"));
 // OffersTab is now rendered as a sub-section inside SettingsTab (Policy Matrix)
 const UsersTab = lazy(() => import("./admin/tabs/UsersTab"));
 const CompanyTab = lazy(() => import("./admin/tabs/CompanyTab"));
+const MarketingTab = lazy(() => import("./admin/tabs/MarketingTab"));
 const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
 
 const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
@@ -536,6 +537,7 @@ const AdminDashboard = () => {
     { id: "leads", label: "Raw Inquiries", icon: LayoutList },
     { id: "users", label: "User Directory", icon: Users }, { id: "company", label: "Company Team", icon: ShieldCheck },
     { id: "banks", label: "Partner Integrations", icon: Building2 },
+    { id: "marketing", label: "Marketing & Offers", icon: Percent },
     { id: "settings", label: "Policy Matrix", icon: Settings },
   ];
 
@@ -674,6 +676,10 @@ const AdminDashboard = () => {
                   />
                 )}
 
+                {activeTab === "marketing" && (
+                  <MarketingTab />
+                )}
+
                 {activeTab === "settings" && (
                   <>
                     <SettingsTab 
@@ -734,10 +740,15 @@ const AdminDashboard = () => {
                     {!isEditingProfile && !isEmployee && (
                       <Button size="sm" variant="outline" className="h-8 border-white/[0.08] text-slate-300 hover:text-white" onClick={() => {
                         setEditProfileData({
-                          fullName: selectedApp.applicant?.name || "",
+                          fullName: selectedApp.applicant?.fullName || "",
+                          phone: selectedApp.applicant?.phoneNumber || "",
+                          email: selectedApp.applicant?.email || "",
+                          city: selectedApp.applicant?.city || "",
+                          state: selectedApp.applicant?.state || "",
                           loanType: selectedApp.loanType || "",
                           requestedAmount: selectedApp.requestedAmount || 0,
-                          declaredCibilScore: selectedApp.declaredCibilScore || 0
+                          declaredCibilScore: selectedApp.declaredCibilScore || 0,
+                          metadata: selectedApp.metadata ? { ...selectedApp.metadata } : {}
                         });
                         setIsEditingProfile(true);
                       }}>
@@ -755,21 +766,122 @@ const AdminDashboard = () => {
                     <div className="p-5 border border-blue-500/30 rounded-xl space-y-4 bg-blue-500/5">
                       <div>
                         <label className="text-xs text-slate-400 mb-1 block">Applicant Name</label>
-                        <input type="text" value={editProfileData.fullName} onChange={e => setEditProfileData({ ...editProfileData, fullName: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                        <input type="text" value={editProfileData.fullName} onChange={e => setEditProfileData({ ...editProfileData, fullName: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs text-slate-400 mb-1 block">Requested Amount</label>
-                          <input type="number" value={editProfileData.requestedAmount} onChange={e => setEditProfileData({ ...editProfileData, requestedAmount: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                          <label className="text-xs text-slate-400 mb-1 block">Email</label>
+                          <input type="email" value={editProfileData.email} onChange={e => setEditProfileData({ ...editProfileData, email: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
                         </div>
                         <div>
-                          <label className="text-xs text-slate-400 mb-1 block">CIBIL Score (-1 for No History)</label>
-                          <input type="number" min="-1" max="900" value={editProfileData.declaredCibilScore} onChange={e => setEditProfileData({ ...editProfileData, declaredCibilScore: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm" />
+                          <label className="text-xs text-slate-400 mb-1 block">Phone</label>
+                          <input type="text" value={editProfileData.phone} onChange={e => setEditProfileData({ ...editProfileData, phone: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
                         </div>
                       </div>
-                      <div className="flex justify-end gap-2 pt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">City</label>
+                          <input type="text" value={editProfileData.city} onChange={e => setEditProfileData({ ...editProfileData, city: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">State</label>
+                          <input type="text" value={editProfileData.state} onChange={e => setEditProfileData({ ...editProfileData, state: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">Loan Type</label>
+                          <select value={editProfileData.loanType} onChange={e => setEditProfileData({ ...editProfileData, loanType: e.target.value })} className="w-full bg-[#0d0d14] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40">
+                            <option value="personal">Personal</option>
+                            <option value="business">Business</option>
+                            <option value="home">Home</option>
+                            <option value="lap">LAP</option>
+                            <option value="auto">Auto</option>
+                            <option value="education">Education</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">Amount</label>
+                          <input type="number" value={editProfileData.requestedAmount} onChange={e => setEditProfileData({ ...editProfileData, requestedAmount: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-400 mb-1 block">CIBIL</label>
+                          <input type="number" min="-1" max="900" value={editProfileData.declaredCibilScore} onChange={e => setEditProfileData({ ...editProfileData, declaredCibilScore: Number(e.target.value) })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white text-sm focus:outline-none focus:border-blue-500/40" />
+                        </div>
+                      </div>
+
+                      {/* 🧠 DYNAMIC METADATA KEY-VALUE MATRIX EDITOR */}
+                      <div className="border-t border-white/[0.06] pt-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Form Metadata</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newKey = prompt("Enter metadata key name (e.g. companyName, grossSalary, existingEMI):");
+                              if (newKey) {
+                                const camelKey = newKey.replace(/\s+/g, "");
+                                setEditProfileData({
+                                  ...editProfileData,
+                                  metadata: {
+                                    ...editProfileData.metadata,
+                                    [camelKey]: ""
+                                  }
+                                });
+                              }
+                            }}
+                            className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-1 rounded hover:bg-blue-500/20 transition-colors"
+                          >
+                            + Add Field
+                          </button>
+                        </div>
+
+                        <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
+                          {Object.entries(editProfileData.metadata || {}).map(([key, val]) => (
+                            <div key={key} className="flex gap-2 items-end group/item">
+                              <div className="flex-1 min-w-0">
+                                <label className="text-[10px] text-slate-500 block mb-0.5 truncate capitalize" title={key}>
+                                  {key.replace(/([A-Z])/g, ' $1').trim()}
+                                </label>
+                                <input
+                                  type={typeof val === 'number' ? 'number' : 'text'}
+                                  value={val === null || val === undefined ? '' : String(val)}
+                                  onChange={(e) => {
+                                    const rawVal = e.target.value;
+                                    const newVal = rawVal !== "" && !isNaN(Number(rawVal)) && typeof val === 'number' ? Number(rawVal) : rawVal;
+                                    setEditProfileData({
+                                      ...editProfileData,
+                                      metadata: {
+                                        ...editProfileData.metadata,
+                                        [key]: newVal
+                                      }
+                                    });
+                                  }}
+                                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg p-1.5 text-white text-xs focus:outline-none focus:border-blue-500/40"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updatedMeta = { ...editProfileData.metadata };
+                                  delete updatedMeta[key];
+                                  setEditProfileData({
+                                    ...editProfileData,
+                                    metadata: updatedMeta
+                                  });
+                                }}
+                                className="p-1.5 bg-red-500/10 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-colors shrink-0 mb-0.5 opacity-0 group-hover/item:opacity-100"
+                                title="Delete field"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.06]">
                         <Button size="sm" variant="ghost" onClick={() => setIsEditingProfile(false)} className="text-slate-400">Cancel</Button>
-                        <Button size="sm" onClick={() => updateProfileMutation.mutate({ id: selectedApp.applicationId, payload: editProfileData })} disabled={updateProfileMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button size="sm" onClick={() => updateProfileMutation.mutate({ id: selectedApp.applicationId, payload: editProfileData })} disabled={updateProfileMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
                           {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                         </Button>
                       </div>

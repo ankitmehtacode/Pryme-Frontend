@@ -453,6 +453,14 @@ export const PrymeAPI = {
     fetchWithAuth(`/admin/products/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteAdminProduct: async (id: string) => fetchWithAuth(`/admin/products/${id}`, { method: "DELETE" }),
 
+  /** Admin: Marketing Hero Offer CRUD — /api/v1/admin/offers/hero */
+  getAdminHeroOffers: async () => fetchWithAuth("/admin/offers/hero", { method: "GET" }),
+  createAdminHeroOffer: async (data: any) =>
+    fetchWithAuth("/admin/offers/hero", { method: "POST", body: JSON.stringify(data) }),
+  updateAdminHeroOffer: async (id: string, data: any) =>
+    fetchWithAuth(`/admin/offers/hero/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteAdminHeroOffer: async (id: string) => fetchWithAuth(`/admin/offers/hero/${id}`, { method: "DELETE" }),
+
   /** Admin: Testimonial CRUD — /api/v1/admin/reviews */
   getAdminReviews: async () => fetchWithAuth("/admin/reviews", { method: "GET" }),
   

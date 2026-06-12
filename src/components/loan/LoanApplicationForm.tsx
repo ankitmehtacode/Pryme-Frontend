@@ -652,8 +652,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         propertyIdentified: Boolean(fp?.propertyIdentified ?? false),
         estimatedPropertyValue: Number(store.loanRequirements?.propertyValue || fp?.estimatedPropertyValue || 0),
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
-        hasExistingLoan: Boolean((fp as any)?.hasExistingLoan ?? false),
-        eligibleExistingEmi: Number((fp as any)?.existingEmi ?? (fp as any)?.totalExistingEMI ?? 0)
+        hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
+        eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0)
       };
 
       onFormSubmit?.(data);

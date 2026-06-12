@@ -12,6 +12,20 @@ import { PrymeAPI } from "@/lib/api";
 import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 import unionLogo from "@/assets/union-bank-of-india.svg";
+import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
+import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
+import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
+
+const LOGO_MAP: Record<string, string> = {
+  idbi: idbiLogo,
+  axis: axisLogo,
+  union: unionLogo,
+  kotak: kotakLogo,
+  pnb: pnbLogo,
+  yes: yesLogo,
+  tata: tataLogo,
+};
 
 import { BANK_OFFERS } from "./ProductSelectorGrid";
 
@@ -104,12 +118,16 @@ const HeroSection = memo(() => {
 
   const activeOffers = dynamicOffers.length > 0 ? dynamicOffers.map((offer: any, i: number) => {
     const baseVisual = initialOffers[i % initialOffers.length];
+    const mappedLogo = offer.logoType && LOGO_MAP[offer.logoType.toLowerCase()]
+      ? LOGO_MAP[offer.logoType.toLowerCase()]
+      : baseVisual.logo;
     return {
       ...baseVisual,
       title: offer.title || baseVisual.title,
       bank: offer.lenderName || baseVisual.bank,
       tag: offer.tag || baseVisual.tag || "HOT RATE",
-      highlights: offer.desc ? offer.desc.split('|').map((s: string) => s.trim()) : baseVisual.highlights
+      highlights: offer.desc ? offer.desc.split('|').map((s: string) => s.trim()) : baseVisual.highlights,
+      logo: mappedLogo
     };
   }) : initialOffers;
 
