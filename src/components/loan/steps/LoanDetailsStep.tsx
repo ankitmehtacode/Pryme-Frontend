@@ -25,11 +25,18 @@ interface LoanDetailsStepProps {
 
 export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
   const store = useApplicationStore();
-  const errors = store.validationErrors;
+  const loanRequirements = store.loanRequirements || {
+    loanType: 'PERSONAL_LOAN' as LoanType,
+    loanAmount: 500000,
+    tenureYears: 5,
+    purpose: '',
+    cibilScore: 750,
+  };
+  const errors = store.validationErrors || {};
   const [editingCibil, setEditingCibil] = useState(false);
   const [cibilInputVal, setCibilInputVal] = useState("");
 
-  const cibilScore = store.loanRequirements.cibilScore;
+  const cibilScore = loanRequirements.cibilScore;
   const cibilUi = useMemo(() => {
     if (cibilScore === -1) return { color: "text-slate-500", bg: "bg-slate-500/10", border: "border-slate-500/20", label: "No History" };
     if (cibilScore >= 750) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Excellent" };
@@ -51,7 +58,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
         <StyledSelect
           label="Loan Product"
           icon={Landmark}
-          value={store.loanRequirements.loanType || undefined}
+          value={loanRequirements.loanType || undefined}
           onValueChange={(v) => store.updateLoanRequirements({ loanType: v as LoanType })}
           placeholder="Select your loan type"
           error={errors.loanType}
@@ -75,28 +82,28 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
             type="number"
             placeholder="500000"
             icon={IndianRupee}
-            value={store.loanRequirements.loanAmount || ""}
+            value={loanRequirements.loanAmount || ""}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ loanAmount: Number(e.target.value) })}
-            isValid={store.loanRequirements.loanAmount >= 50000}
+            isValid={(loanRequirements.loanAmount || 0) >= 50000}
           />
           <ValidatedInput
             label="Tenure (Years)"
             type="number"
             placeholder="5"
             icon={Calendar}
-            value={store.loanRequirements.tenureYears}
+            value={loanRequirements.tenureYears}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ tenureYears: parseInt(e.target.value) || 0 })}
             onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             isValid={
-              (store.loanRequirements.loanType === 'PERSONAL_LOAN' || store.loanRequirements.loanType === 'BUSINESS_LOAN')
-                ? (store.loanRequirements.tenureYears >= 1 && store.loanRequirements.tenureYears <= 7)
-                : (store.loanRequirements.tenureYears >= 3 && store.loanRequirements.tenureYears <= 30)
+              (loanRequirements.loanType === 'PERSONAL_LOAN' || loanRequirements.loanType === 'BUSINESS_LOAN')
+                ? (loanRequirements.tenureYears >= 1 && loanRequirements.tenureYears <= 7)
+                : (loanRequirements.tenureYears >= 3 && loanRequirements.tenureYears <= 30)
             }
             error={
-              store.loanRequirements.tenureYears > 0
-                ? ((store.loanRequirements.loanType === 'PERSONAL_LOAN' || store.loanRequirements.loanType === 'BUSINESS_LOAN') && (store.loanRequirements.tenureYears < 1 || store.loanRequirements.tenureYears > 7)
+              loanRequirements.tenureYears > 0
+                ? ((loanRequirements.loanType === 'PERSONAL_LOAN' || loanRequirements.loanType === 'BUSINESS_LOAN') && (loanRequirements.tenureYears < 1 || loanRequirements.tenureYears > 7)
                   ? "Must be 1 to 7 Years"
-                  : ((store.loanRequirements.loanType === 'HOME_LOAN' || store.loanRequirements.loanType === 'LAP') && (store.loanRequirements.tenureYears < 3 || store.loanRequirements.tenureYears > 30)
+                  : ((loanRequirements.loanType === 'HOME_LOAN' || loanRequirements.loanType === 'LAP') && (loanRequirements.tenureYears < 3 || loanRequirements.tenureYears > 30)
                     ? "Must be 3 to 30 Years" : undefined))
                 : undefined
             }
@@ -105,7 +112,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
 
         {/* ── Property Details — Conditional for HOME_LOAN / LAP ───────────── */}
         <AnimatePresence>
-          {PROPERTY_BACKED_LOANS.includes(store.loanRequirements.loanType) && (
+          {PROPERTY_BACKED_LOANS.includes(loanRequirements.loanType) && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
@@ -128,17 +135,17 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
                     type="number"
                     placeholder="e.g. 7500000"
                     icon={Home}
-                    value={store.loanRequirements.propertyValue || ""}
+                    value={loanRequirements.propertyValue || ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const val = Number(e.target.value);
                       store.updateLoanRequirements({ propertyValue: val });
                     }}
                     isValid={
-                      (store.loanRequirements.propertyValue || 0) >= (store.loanRequirements.loanAmount || 0)
+                      (loanRequirements.propertyValue || 0) >= (loanRequirements.loanAmount || 0)
                     }
                     error={
-                      (store.loanRequirements.propertyValue || 0) > 0 &&
-                      (store.loanRequirements.propertyValue || 0) < (store.loanRequirements.loanAmount || 0)
+                      (loanRequirements.propertyValue || 0) > 0 &&
+                      (loanRequirements.propertyValue || 0) < (loanRequirements.loanAmount || 0)
                         ? "Property value must be ≥ loan amount"
                         : undefined
                     }
@@ -147,7 +154,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
 
                 {/* Smart helper text based on loan type */}
                 <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
-                  {store.loanRequirements.loanType === 'LAP'
+                  {loanRequirements.loanType === 'LAP'
                     ? 'Enter the current market value of the property you are pledging as collateral.'
                     : 'Enter the agreement value or current market value of the property you are purchasing.'}
                   {' '}This is used to calculate your Loan-to-Value (LTV) ratio.

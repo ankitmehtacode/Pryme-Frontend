@@ -233,6 +233,17 @@ export interface LoanRequirements {
   vehicleQuotationPrice?: number; // Dealer quotation / proforma invoice price
 }
 
+export interface CoApplicantDetails {
+  fullName: string;
+  mobileNumber: string;
+  email: string;
+  dateOfBirth: string;
+  pinCode: string;
+  employmentType: EmploymentType | null;
+  companyName: string;
+  netMonthlySalary: string | number;
+}
+
 // ─── FINANCIAL FOOTPRINT (Stage 4 — Universal + Conditional Overrides) ──────
 
 export interface FinancialFootprint {
@@ -241,6 +252,7 @@ export interface FinancialFootprint {
   totalExistingEMI: number;       // Total monthly EMI obligations across all loans
   primaryBankName: string;        // Primary salary/business bank account
   hasCoApplicant: boolean;        // Whether a co-applicant is being added
+  coApplicantDetails?: CoApplicantDetails; // Sub-profile for co-applicant details
 
   // HOME_LOAN / LAP conditional
   propertyIdentified: boolean;    // Has the user identified a property?
@@ -317,6 +329,7 @@ export interface ApplicationActions {
   updateBusinessDetails: (data: Partial<BusinessDetails>) => void;
   updateLoanRequirements: (data: Partial<LoanRequirements>) => void;
   updateFinancialFootprint: (data: Partial<FinancialFootprint>) => void;
+  updateCoApplicantDetails: (data: Partial<CoApplicantDetails>) => void;
   updateDocuments: (docs: DocumentItem[]) => void;
   setDocumentStatus: (docId: string, status: DocumentStatus, fileUrl?: string, fileName?: string) => void;
   setConsent: (field: keyof ApplicationState['consent'], value: boolean) => void;

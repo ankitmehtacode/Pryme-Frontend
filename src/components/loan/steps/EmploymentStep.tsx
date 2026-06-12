@@ -20,9 +20,37 @@ interface EmploymentStepProps {
 }
 
 export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
-  const store = useApplicationStore();
+  const rawStore = useApplicationStore();
+  
+  // Wrap rawStore to guarantee nested objects exist during early hydration phases
+  const store = {
+    ...rawStore,
+    basicKYC: rawStore.basicKYC || {
+      fullName: '',
+      mobileNumber: '',
+      mobileVerified: false,
+      email: '',
+      dateOfBirth: '',
+      panNumber: '',
+      state: '',
+      city: '',
+      pinCode: '',
+      religion: '',
+      employmentType: null,
+    },
+    financialDetails: rawStore.financialDetails || { path: null, data: {} },
+    loanRequirements: rawStore.loanRequirements || {
+      loanType: 'PERSONAL_LOAN' as any,
+      loanAmount: 500000,
+      tenureYears: 5,
+      purpose: '',
+      cibilScore: 750,
+    },
+    validationErrors: rawStore.validationErrors || {},
+  };
+
   const errors = store.validationErrors;
-  const setErrors = store.setValidationErrors;
+  const setErrors = store.setValidationErrors || (() => {});
   
   return (
     <div className={cardCn}>

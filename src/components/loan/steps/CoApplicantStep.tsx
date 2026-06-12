@@ -14,8 +14,18 @@ interface CoApplicantStepProps {
 
 export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
   const store = useApplicationStore();
-  const coApplicant = store.financialFootprint.coApplicantDetails;
-  const updateCoApplicant = store.updateCoApplicantDetails;
+  const financialFootprint = store.financialFootprint || {};
+  const coApplicant = financialFootprint.coApplicantDetails || {
+    fullName: '',
+    mobileNumber: '',
+    email: '',
+    dateOfBirth: '',
+    pinCode: '',
+    employmentType: null,
+    companyName: '',
+    netMonthlySalary: '',
+  };
+  const updateCoApplicant = store.updateCoApplicantDetails || (() => {});
 
   return (
     <div className={cardCn}>
@@ -23,12 +33,12 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
         label="Adding a Co-Applicant?"
         description="A co-applicant can increase your loan eligibility"
         icon={UserPlus}
-        checked={store.financialFootprint.hasCoApplicant}
+        checked={!!financialFootprint.hasCoApplicant}
         onChange={(v) => store.updateFinancialFootprint({ hasCoApplicant: v })}
       />
 
       <AnimatePresence>
-        {store.financialFootprint.hasCoApplicant && (
+        {!!financialFootprint.hasCoApplicant && (
           <motion.div
             key="co-applicant-form"
             initial={{ opacity: 0, height: 0 }}

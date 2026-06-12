@@ -14,7 +14,20 @@ interface IdentityStepProps {
 
 export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
   const store = useApplicationStore();
-  const errors = store.validationErrors;
+  const basicKYC = store.basicKYC || {
+    fullName: '',
+    mobileNumber: '',
+    mobileVerified: false,
+    email: '',
+    dateOfBirth: '',
+    panNumber: '',
+    state: '',
+    city: '',
+    pinCode: '',
+    religion: '',
+    employmentType: null,
+  };
+  const errors = store.validationErrors || {};
 
   return (
     <div id="section-identity" className={cn(cardCn, 'transition-all duration-500')}>
@@ -30,9 +43,9 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
           label="Full Name (As per PAN)"
           placeholder="Rahul Sharma"
           icon={User}
-          value={store.basicKYC.fullName}
+          value={basicKYC.fullName}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ fullName: e.target.value })}
-          isValid={(store.basicKYC.fullName || "").length >= 3}
+          isValid={(basicKYC.fullName || "").length >= 3}
           error={errors.fullName}
         />
 
@@ -43,12 +56,12 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
               placeholder="9876543210"
               icon={Phone}
               maxLength={10}
-              value={store.basicKYC.mobileNumber}
+              value={basicKYC.mobileNumber}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-              isValid={/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber)}
+              isValid={/^[6-9]\d{9}$/.test(basicKYC.mobileNumber)}
               error={errors.mobileNumber}
             />
-            {/^[6-9]\d{9}$/.test(store.basicKYC.mobileNumber) && !store.basicKYC.mobileVerified && (
+            {/^[6-9]\d{9}$/.test(basicKYC.mobileNumber) && !basicKYC.mobileVerified && (
               <div className="animate-in fade-in slide-in-from-top-1 mt-1 space-y-2">
                 {/* Verify Now / Verify Later toggle */}
                 <div className="flex items-center gap-2">
@@ -58,7 +71,7 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
                     size="sm"
                     className="flex-1 h-9 text-xs font-semibold border-primary/30 text-primary hover:bg-primary hover:text-white transition-all"
                     onClick={() => {
-                      toast({ title: "OTP Sent", description: `A 6-digit OTP has been sent to ${store.basicKYC.mobileNumber}` });
+                      toast({ title: "OTP Sent", description: `A 6-digit OTP has been sent to ${basicKYC.mobileNumber}` });
                     }}
                   >
                     <Phone className="w-3 h-3 mr-1.5" /> Verify Now
@@ -80,7 +93,7 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
                 <p className="text-[10px] text-muted-foreground/50 ml-0.5">Verification is optional. You can proceed without it.</p>
               </div>
             )}
-            {store.basicKYC.mobileVerified && (
+            {basicKYC.mobileVerified && (
               <div className="flex items-center gap-1.5 mt-1 animate-in fade-in">
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                 <span className="text-[11px] font-semibold text-primary">Mobile Verified</span>
@@ -92,9 +105,9 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
             type="email"
             placeholder="rahul@company.com"
             icon={Mail}
-            value={store.basicKYC.email}
+            value={basicKYC.email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ email: e.target.value })}
-            isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.basicKYC.email)}
+            isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(basicKYC.email)}
             error={errors.email}
           />
         </div>
@@ -105,16 +118,16 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
             type="date"
             max={new Date(new Date().setFullYear(new Date().getFullYear() - 19)).toISOString().split("T")[0]}
             icon={Calendar}
-            value={store.basicKYC.dateOfBirth}
+            value={basicKYC.dateOfBirth}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ dateOfBirth: e.target.value })}
-            isValid={!!store.basicKYC.dateOfBirth}
+            isValid={!!basicKYC.dateOfBirth}
             error={errors.dateOfBirth}
           />
 
           <StyledSelect
             label="Religion"
             icon={User}
-            value={store.basicKYC.religion}
+            value={basicKYC.religion}
             onValueChange={(v) => store.updateBasicKYC({ religion: v })}
             placeholder="Select Religion"
             error={errors.religion}
@@ -129,7 +142,7 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
           <StyledSelect
             label="State"
             icon={MapPin}
-            value={store.basicKYC.state}
+            value={basicKYC.state}
             onValueChange={(v) => {
               store.updateBasicKYC({ state: v, city: '' });
             }}
@@ -144,12 +157,12 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
           <StyledSelect
             label="City"
             icon={Building2}
-            value={store.basicKYC.city}
+            value={basicKYC.city}
             onValueChange={(v) => store.updateBasicKYC({ city: v })}
-            placeholder={store.basicKYC.state ? "Select City" : "Select state first"}
+            placeholder={basicKYC.state ? "Select City" : "Select state first"}
             error={errors.city}
           >
-            {(STATE_CITIES[store.basicKYC.state] || []).map((c) => (
+            {(STATE_CITIES[basicKYC.state] || []).map((c) => (
               <SelectItem key={c} value={c} className="cursor-pointer">{c}</SelectItem>
             ))}
           </StyledSelect>
@@ -159,9 +172,9 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
             placeholder="400001"
             icon={Hash}
             maxLength={6}
-            value={store.basicKYC.pinCode}
+            value={basicKYC.pinCode}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ pinCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-            isValid={/^\d{6}$/.test(store.basicKYC.pinCode)}
+            isValid={/^\d{6}$/.test(basicKYC.pinCode)}
             error={errors.pinCode}
           />
         </div>

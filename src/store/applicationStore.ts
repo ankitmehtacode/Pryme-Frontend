@@ -26,6 +26,7 @@ import type {
   DocumentItem,
   DocumentStatus,
   StageNumber,
+  CoApplicantDetails,
 } from '@/lib/applicationTypes';
 import { generateSafeUUID } from '@/lib/utils';
 
@@ -70,6 +71,16 @@ const createFreshState = (): ApplicationState => ({
     propertyIdentified: false,
     estimatedPropertyValue: 0,
     isAbove50Lakhs: false,
+    coApplicantDetails: {
+      fullName: '',
+      mobileNumber: '',
+      email: '',
+      dateOfBirth: '',
+      pinCode: '',
+      employmentType: null,
+      companyName: '',
+      netMonthlySalary: '',
+    },
   },
 
   documents: [],
@@ -261,6 +272,27 @@ export const useApplicationStore = create<ApplicationStore>()(
           lastModifiedAt: new Date().toISOString(),
         })),
 
+      updateCoApplicantDetails: (data: Partial<CoApplicantDetails>) =>
+        set((state) => ({
+          financialFootprint: {
+            ...state.financialFootprint,
+            coApplicantDetails: {
+              ...(state.financialFootprint?.coApplicantDetails || {
+                fullName: '',
+                mobileNumber: '',
+                email: '',
+                dateOfBirth: '',
+                pinCode: '',
+                employmentType: null,
+                companyName: '',
+                netMonthlySalary: '',
+              }),
+              ...data,
+            },
+          },
+          lastModifiedAt: new Date().toISOString(),
+        })),
+
       updateDocuments: (docs: DocumentItem[]) =>
         set({
           documents: docs,
@@ -407,7 +439,14 @@ export const useApplicationStore = create<ApplicationStore>()(
           basicKYC:           { ...fresh.basicKYC,           ...persisted.basicKYC },
           financialDetails:   patchedFinancialDetails,
           loanRequirements:   { ...fresh.loanRequirements,   ...persisted.loanRequirements },
-          financialFootprint: { ...fresh.financialFootprint, ...persisted.financialFootprint },
+          financialFootprint: {
+            ...fresh.financialFootprint,
+            ...persisted.financialFootprint,
+            coApplicantDetails: {
+              ...fresh.financialFootprint.coApplicantDetails,
+              ...(persisted.financialFootprint?.coApplicantDetails ?? {}),
+            },
+          },
           documents:          persisted.documents ?? fresh.documents,
           consent:            { ...fresh.consent,            ...persisted.consent },
         } as ApplicationState;

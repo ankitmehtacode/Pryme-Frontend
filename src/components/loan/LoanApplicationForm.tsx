@@ -139,10 +139,13 @@ const DocumentCard = ({
 
 function resolveDocuments(store: ReturnType<typeof useApplicationStore.getState>): DocEntry[] {
   const docs: DocEntry[] = [];
-  const emp = store.basicKYC.employmentType;
-  const finPath = store.financialDetails.path;
-  const loanType = store.loanRequirements.loanType;
-  const fp = store.financialFootprint;
+  const k = store.basicKYC || {};
+  const emp = k.employmentType;
+  const fin = store.financialDetails || {};
+  const finPath = fin.path;
+  const lr = store.loanRequirements || {};
+  const loanType = lr.loanType;
+  const fp = store.financialFootprint || {};
 
   // UNIVERSAL (always)
   docs.push(
@@ -224,10 +227,10 @@ const DocumentVaultStage = ({
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
 
   const requiredDocs = useMemo(() => resolveDocuments(useApplicationStore.getState()), [
-    store.basicKYC.employmentType,
-    store.financialDetails.path,
-    store.loanRequirements.loanType,
-    store.financialFootprint.isAbove50Lakhs,
+    store.basicKYC?.employmentType,
+    store.financialDetails?.path,
+    store.loanRequirements?.loanType,
+    store.financialFootprint?.isAbove50Lakhs,
   ]);
 
   const handleFileSelect = useCallback((docId: string, file: File) => {
@@ -332,9 +335,9 @@ const DocumentVaultStage = ({
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/5 border border-blue-500/10 relative z-10">
           <AlertCircle className="w-3.5 h-3.5 text-blue-500 shrink-0" />
           <p className="text-[11px] text-muted-foreground font-medium">
-            This checklist is personalized for <span className="text-foreground font-semibold">{store.basicKYC.employmentType === 'SALARIED' ? 'Salaried' : store.basicKYC.employmentType === 'PROFESSIONAL' ? 'Professional' : 'Self-Employed'}</span> applicants
-            {(store.loanRequirements.loanType === 'HOME_LOAN' || store.loanRequirements.loanType === 'LAP') && ' with property documentation'}
-            {store.loanRequirements.loanType === 'BUSINESS_LOAN' && store.financialFootprint.isAbove50Lakhs && ' (High-value business loan)'}
+            This checklist is personalized for <span className="text-foreground font-semibold">{store.basicKYC?.employmentType === 'SALARIED' ? 'Salaried' : store.basicKYC?.employmentType === 'PROFESSIONAL' ? 'Professional' : 'Self-Employed'}</span> applicants
+            {((store.loanRequirements?.loanType === 'HOME_LOAN' || store.loanRequirements?.loanType === 'LAP')) && ' with property documentation'}
+            {store.loanRequirements?.loanType === 'BUSINESS_LOAN' && store.financialFootprint?.isAbove50Lakhs && ' (High-value business loan)'}
             . Upload PDF or images.
           </p>
         </div>
@@ -771,13 +774,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   }, [store, onFormSubmit]);
 
   const handleAnalysisComplete = useCallback(() => {
+    const lr = store.loanRequirements || {};
+    const k = store.basicKYC || {};
     navigate("/offers", {
       state: {
-        cibilScore: store.loanRequirements.cibilScore,
-        productType: store.loanRequirements.loanType,
+        cibilScore: lr.cibilScore ?? 750,
+        productType: lr.loanType ?? "PERSONAL_LOAN",
         monthlyIncome: 50000,
-        loanAmount: store.loanRequirements.loanAmount,
-        fullName: store.basicKYC.fullName,
+        loanAmount: lr.loanAmount ?? 500000,
+        fullName: k.fullName || "Guest",
       },
     });
   }, [navigate, store]);
@@ -793,10 +798,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // ═════════════════════════════════════════════════════════════════════════════
 
   const getIncomeOrFallback = () => {
-    const fin = store.financialDetails;
-    if (fin.path === "SALARIED") return fin.data.netMonthlySalary || 50000;
-    if (fin.path === "PROFESSIONAL") return fin.data.netMonthlyIncome || 50000;
-    if (fin.path === "SELF_EMPLOYED") return fin.data.netMonthlyIncome || 50000;
+    const fin = store.financialDetails || {};
+    const d = fin.data || {};
+    if (fin.path === "SALARIED") return d.netMonthlySalary || 50000;
+    if (fin.path === "PROFESSIONAL") return d.netMonthlyIncome || 50000;
+    if (fin.path === "SELF_EMPLOYED") return d.netMonthlyIncome || 50000;
     return 50000;
   };
 
@@ -905,15 +911,18 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         {(() => {
            let income = 0;
            let emi = 0;
-           if (store.basicKYC.employmentType === 'SALARIED' && store.financialDetails.path === 'SALARIED') {
-              income = store.financialDetails.data.netMonthlySalary || 0;
-              emi = store.financialDetails.data.existingEMI || 0;
-           } else if (store.basicKYC.employmentType === 'SELF_EMPLOYED' && store.financialDetails.path === 'SELF_EMPLOYED') {
-              income = store.financialDetails.data.netMonthlyIncome || 0;
-              emi = store.financialDetails.data.existingEMI || 0;
-           } else if (store.basicKYC.employmentType === 'PROFESSIONAL' && store.financialDetails.path === 'PROFESSIONAL') {
-              income = store.financialDetails.data.netMonthlyIncome || 0;
-              emi = store.financialDetails.data.existingEMI || 0;
+           const empType = store.basicKYC?.employmentType;
+           const fin = store.financialDetails || {};
+           const finData = fin.data || {};
+           if (empType === 'SALARIED' && fin.path === 'SALARIED') {
+              income = finData.netMonthlySalary || 0;
+              emi = finData.existingEMI || 0;
+           } else if (empType === 'SELF_EMPLOYED' && fin.path === 'SELF_EMPLOYED') {
+              income = finData.netMonthlyIncome || 0;
+              emi = finData.existingEMI || 0;
+           } else if (empType === 'PROFESSIONAL' && fin.path === 'PROFESSIONAL') {
+              income = finData.netMonthlyIncome || 0;
+              emi = finData.existingEMI || 0;
            }
            
            if (income > 0 && emi >= income) {
@@ -933,12 +942,15 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
              disabled={
                isSubmitting || isAnalyzing ||
                (() => {
-                 if (store.basicKYC.employmentType === 'SALARIED' && store.financialDetails.path === 'SALARIED') {
-                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlySalary || 0) && (store.financialDetails.data.netMonthlySalary || 0) > 0;
-                 } else if (store.basicKYC.employmentType === 'SELF_EMPLOYED' && store.financialDetails.path === 'SELF_EMPLOYED') {
-                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlyIncome || 0) && (store.financialDetails.data.netMonthlyIncome || 0) > 0;
-                 } else if (store.basicKYC.employmentType === 'PROFESSIONAL' && store.financialDetails.path === 'PROFESSIONAL') {
-                    return (store.financialDetails.data.existingEMI || 0) >= (store.financialDetails.data.netMonthlyIncome || 0) && (store.financialDetails.data.netMonthlyIncome || 0) > 0;
+                 const empType = store.basicKYC?.employmentType;
+                 const fin = store.financialDetails || {};
+                 const finData = fin.data || {};
+                 if (empType === 'SALARIED' && fin.path === 'SALARIED') {
+                    return (finData.existingEMI || 0) >= (finData.netMonthlySalary || 0) && (finData.netMonthlySalary || 0) > 0;
+                 } else if (empType === 'SELF_EMPLOYED' && fin.path === 'SELF_EMPLOYED') {
+                    return (finData.existingEMI || 0) >= (finData.netMonthlyIncome || 0) && (finData.netMonthlyIncome || 0) > 0;
+                 } else if (empType === 'PROFESSIONAL' && fin.path === 'PROFESSIONAL') {
+                    return (finData.existingEMI || 0) >= (finData.netMonthlyIncome || 0) && (finData.netMonthlyIncome || 0) > 0;
                  }
                  return false;
                })()
