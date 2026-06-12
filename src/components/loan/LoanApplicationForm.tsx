@@ -29,6 +29,7 @@ import {
   validateAllStages, ERROR_SECTION_MAP, STAGE_LABELS_FRIENDLY,
   type ValidationErrors,
 } from "./shared/validation";
+import { STATE_PIN_PREFIXES, CITY_PIN_PREFIXES } from "./shared/constants";
 
 // ─── DOCUMENT UPLOAD CARD ───────────────────────────────────────────────────
 
@@ -405,9 +406,9 @@ const DocumentVaultStage = ({
 // ─── STEP METADATA ──────────────────────────────────────────────────────────
 
 const STEP_META = [
-  { stage: 1 as StageNumber, label: "Identity", icon: User },
-  { stage: 2 as StageNumber, label: "Employment", icon: Briefcase },
-  { stage: 3 as StageNumber, label: "Loan Details", icon: IndianRupee },
+  { stage: 1 as StageNumber, label: "Loan Details", icon: IndianRupee },
+  { stage: 2 as StageNumber, label: "Identity", icon: User },
+  { stage: 3 as StageNumber, label: "Employment", icon: Briefcase },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -511,8 +512,111 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     return () => observer.disconnect();
   }, []);
 
-  // Map internal stages to display steps (we only show 1-4 for now)
-  const displayStep = Math.min(store.currentStage, 4);
+  // ── 200 IQ REAL-TIME PROGRESS ANALYZER ──────────────────────────────────────
+  const progressMetrics = useMemo(() => {
+    // 1. Loan Details Step Progress
+    const lr = store.loanRequirements;
+    const isPropertyBacked = ['HOME_LOAN', 'LAP'].includes(lr.loanType);
+    let score1 = 0;
+    let total1 = 3;
+    if (lr.loanType) score1 += 1;
+    if (lr.loanAmount >= 50000) score1 += 1;
+    
+    const tenureValid = (lr.loanType === 'PERSONAL_LOAN' || lr.loanType === 'BUSINESS_LOAN')
+      ? (lr.tenureYears >= 1 && lr.tenureYears <= 7)
+      : (lr.tenureYears >= 3 && lr.tenureYears <= 30);
+    if (lr.tenureYears > 0 && tenureValid) score1 += 1;
+
+    if (isPropertyBacked) {
+      total1 = 4;
+      if (lr.propertyValue && lr.propertyValue >= lr.loanAmount) score1 += 1;
+    }
+    const p1 = score1 / total1;
+
+    // 2. Identity Step Progress
+    const k = store.basicKYC;
+    let score2 = 0;
+    const total2 = 7;
+    if (k.fullName && k.fullName.trim().length >= 3) score2 += 1;
+    if (k.mobileNumber && /^[6-9]\d{9}$/.test(k.mobileNumber)) score2 += 1;
+    if (k.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(k.email)) score2 += 1;
+    if (k.dateOfBirth) score2 += 1;
+    if (k.state) score2 += 1;
+    if (k.city) score2 += 1;
+    
+    let isPinValid = false;
+    if (k.pinCode && /^\d{6}$/.test(k.pinCode)) {
+      isPinValid = true;
+      if (k.city && CITY_PIN_PREFIXES[k.city]) {
+        const validPrefixes = CITY_PIN_PREFIXES[k.city];
+        isPinValid = validPrefixes.some(prefix => k.pinCode.startsWith(prefix));
+      } else if (k.state && STATE_PIN_PREFIXES[k.state]) {
+        const validPrefixes = STATE_PIN_PREFIXES[k.state];
+        isPinValid = validPrefixes.some(prefix => k.pinCode.startsWith(prefix));
+      }
+    }
+    if (isPinValid) score2 += 1;
+    const p2 = score2 / total2;
+
+    // 3. Employment Step Progress
+    let score3 = 0;
+    let total3 = 1;
+    const emp = k.employmentType;
+    if (emp) {
+      score3 += 1;
+      const fin = store.financialDetails;
+      if (emp === "SALARIED" && fin.path === "SALARIED") {
+        total3 = 7;
+        const d = fin.data;
+        if (d.subType) score3 += 1;
+        if (d.subType !== "PRIVATE" || d.companyType) score3 += 1;
+        if (d.companyName && d.companyName.trim().length >= 2) score3 += 1;
+        if (d.designation && d.designation.trim().length >= 2) score3 += 1;
+        if (d.netMonthlySalary && d.netMonthlySalary >= 10000) score3 += 1;
+        if (typeof d.totalExperienceYears === 'number' && d.totalExperienceYears >= 0) score3 += 1;
+      } else if (emp === "PROFESSIONAL" && fin.path === "PROFESSIONAL") {
+        total3 = 5;
+        const d = fin.data;
+        if (d.subType) score3 += 1;
+        if (d.practiceName && d.practiceName.trim().length >= 2) score3 += 1;
+        if (typeof d.practiceYears === 'number' && d.practiceYears >= 0) score3 += 1;
+        if (d.netMonthlyIncome && d.netMonthlyIncome >= 10000) score3 += 1;
+      } else if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
+        total3 = 4;
+        const d = fin.data;
+        if (d.subType) score3 += 1;
+        if (d.businessName && d.businessName.trim().length >= 2) score3 += 1;
+        if (d.netMonthlyIncome && d.netMonthlyIncome >= 10000) score3 += 1;
+      }
+    }
+    const p3 = score3 / total3;
+
+    // Calculate active stage
+    let activeStage = 1;
+    if (p1 >= 1) {
+      activeStage = 2;
+      if (p2 >= 1) {
+        activeStage = 3;
+        if (p3 >= 1) {
+          activeStage = 4; // Complete
+        }
+      }
+    }
+
+    // Calculate dynamic bar percentage
+    let barPercent = p1 * 50;
+    if (p1 >= 1) {
+      barPercent = 50 + (p2 * 50);
+    }
+
+    return {
+      p1,
+      p2,
+      p3,
+      activeStage,
+      barPercent,
+    };
+  }, [store.loanRequirements, store.basicKYC, store.financialDetails]);
 
   // ── Sync loan amount to parent ────────────────────────────────────────────
   useEffect(() => {
@@ -709,8 +813,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           {/* Step Indicator */}
           <div className="relative flex justify-between items-center mb-1">
             {STEP_META.map((meta, i) => {
-              const isActive = displayStep >= meta.stage;
-              const isCurrent = displayStep === meta.stage;
+              const isCompleted = i === 0 ? progressMetrics.p1 >= 1 : (i === 1 ? progressMetrics.p2 >= 1 : progressMetrics.p3 >= 1);
+              const isActive = i === 0 ? true : (i === 1 ? progressMetrics.p1 >= 1 : progressMetrics.p2 >= 1);
+              const isCurrent = progressMetrics.activeStage === meta.stage;
+
               return (
                 <div key={meta.label} className="flex flex-col items-center z-10">
                   <motion.div
@@ -726,7 +832,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                         : "bg-secondary dark:bg-[#1a1a1a] text-muted-foreground border border-border dark:border-white/10"
                     )}
                   >
-                    {isActive && meta.stage < displayStep ? (
+                    {isCompleted ? (
                       <CheckCircle2 className="w-4 h-4" />
                     ) : (
                       meta.stage
@@ -745,8 +851,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
             <div className="absolute top-4 left-8 right-8 h-[2px] bg-border dark:bg-white/[0.06] -z-0">
               <motion.div
                 className="h-full bg-primary dark:bg-[#103783]"
-                animate={{ width: `${((displayStep - 1) / (STEP_META.length - 1)) * 100}%` }}
-                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                animate={{ width: `${progressMetrics.barPercent}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               />
             </div>
           </div>
