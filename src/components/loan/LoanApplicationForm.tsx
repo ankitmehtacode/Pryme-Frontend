@@ -515,17 +515,17 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // ── 200 IQ REAL-TIME PROGRESS ANALYZER ──────────────────────────────────────
   const progressMetrics = useMemo(() => {
     // 1. Loan Details Step Progress
-    const lr = store.loanRequirements;
-    const isPropertyBacked = ['HOME_LOAN', 'LAP'].includes(lr.loanType);
+    const lr = store.loanRequirements || {};
+    const isPropertyBacked = ['HOME_LOAN', 'LAP'].includes(lr.loanType || '');
     let score1 = 0;
     let total1 = 3;
     if (lr.loanType) score1 += 1;
-    if (lr.loanAmount >= 50000) score1 += 1;
+    if (lr.loanAmount && lr.loanAmount >= 50000) score1 += 1;
     
     const tenureValid = (lr.loanType === 'PERSONAL_LOAN' || lr.loanType === 'BUSINESS_LOAN')
-      ? (lr.tenureYears >= 1 && lr.tenureYears <= 7)
-      : (lr.tenureYears >= 3 && lr.tenureYears <= 30);
-    if (lr.tenureYears > 0 && tenureValid) score1 += 1;
+      ? (lr.tenureYears && lr.tenureYears >= 1 && lr.tenureYears <= 7)
+      : (lr.tenureYears && lr.tenureYears >= 3 && lr.tenureYears <= 30);
+    if (lr.tenureYears && lr.tenureYears > 0 && tenureValid) score1 += 1;
 
     if (isPropertyBacked) {
       total1 = 4;
@@ -534,7 +534,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     const p1 = score1 / total1;
 
     // 2. Identity Step Progress
-    const k = store.basicKYC;
+    const k = store.basicKYC || {};
     let score2 = 0;
     const total2 = 7;
     if (k.fullName && k.fullName.trim().length >= 3) score2 += 1;
@@ -564,10 +564,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     const emp = k.employmentType;
     if (emp) {
       score3 += 1;
-      const fin = store.financialDetails;
+      const fin = store.financialDetails || {};
       if (emp === "SALARIED" && fin.path === "SALARIED") {
         total3 = 7;
-        const d = fin.data;
+        const d = fin.data || {};
         if (d.subType) score3 += 1;
         if (d.subType !== "PRIVATE" || d.companyType) score3 += 1;
         if (d.companyName && d.companyName.trim().length >= 2) score3 += 1;
@@ -576,14 +576,14 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         if (typeof d.totalExperienceYears === 'number' && d.totalExperienceYears >= 0) score3 += 1;
       } else if (emp === "PROFESSIONAL" && fin.path === "PROFESSIONAL") {
         total3 = 5;
-        const d = fin.data;
+        const d = fin.data || {};
         if (d.subType) score3 += 1;
         if (d.practiceName && d.practiceName.trim().length >= 2) score3 += 1;
         if (typeof d.practiceYears === 'number' && d.practiceYears >= 0) score3 += 1;
         if (d.netMonthlyIncome && d.netMonthlyIncome >= 10000) score3 += 1;
       } else if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
         total3 = 4;
-        const d = fin.data;
+        const d = fin.data || {};
         if (d.subType) score3 += 1;
         if (d.businessName && d.businessName.trim().length >= 2) score3 += 1;
         if (d.netMonthlyIncome && d.netMonthlyIncome >= 10000) score3 += 1;

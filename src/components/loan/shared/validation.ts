@@ -14,7 +14,7 @@ export type ValidationErrors = Record<string, string>;
 // ── Stage 1: Identity & KYC ─────────────────────────────────────────────────
 
 export function validateStage1(store: StoreSnapshot): ValidationErrors {
-  const k = store.basicKYC;
+  const k = store.basicKYC || {};
   const errors: ValidationErrors = {};
   if (!k.fullName || k.fullName.trim().length < 3) errors.fullName = "Name must be at least 3 characters";
   if (!k.mobileNumber || !/^[6-9]\d{9}$/.test(k.mobileNumber)) errors.mobileNumber = "Enter a valid 10-digit mobile number";
@@ -44,10 +44,10 @@ export function validateStage1(store: StoreSnapshot): ValidationErrors {
 
 export function validateStage2(store: StoreSnapshot): ValidationErrors {
   const errors: ValidationErrors = {};
-  const emp = store.basicKYC.employmentType;
+  const emp = store.basicKYC?.employmentType;
   if (!emp) { errors.employmentType = "Select your employment type"; return errors; }
 
-  const fin = store.financialDetails;
+  const fin = store.financialDetails || {};
 
   if (emp === "SALARIED" && fin.path === "SALARIED") {
     const d = fin.data;
@@ -82,7 +82,7 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
 
 export function validateStage3(store: StoreSnapshot): ValidationErrors {
   const errors: ValidationErrors = {};
-  const lr = store.loanRequirements;
+  const lr = store.loanRequirements || {};
   if (!lr.loanType) errors.loanType = "Select a loan product";
   if (!lr.loanAmount || lr.loanAmount < 50000) errors.loanAmount = "Minimum loan amount is ₹50,000";
   if (!lr.tenureYears || lr.tenureYears < 1) errors.tenure = "Select a tenure";
