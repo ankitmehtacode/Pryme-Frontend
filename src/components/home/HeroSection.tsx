@@ -113,7 +113,7 @@ const HeroSection = memo(() => {
 
   const { data: dynamicOffers = [] } = useQuery({
     queryKey: ["public_hero_offers"],
-    queryFn: () => PrymeAPI.getHeroOffers().then(res => res.data || res)
+    queryFn: () => PrymeAPI.getHeroOffers().then(res => res.offers || res.data || res)
   });
 
   const activeOffers = dynamicOffers.length > 0 ? dynamicOffers.map((offer: any, i: number) => {
