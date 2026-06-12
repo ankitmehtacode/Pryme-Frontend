@@ -914,7 +914,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
            return null;
         })()}
 
-        <div className="mt-5 relative z-50">
+        <div className="mt-8 relative z-50">
           <Button 
              type="submit"
              disabled={
@@ -950,11 +950,13 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
 
         {/* Trust Microcopy */}
-        <div className="flex items-center justify-center gap-1.5 mt-3 px-2 group">
-          <LockKeyhole className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
-          <p className="text-[10.5px] text-muted-foreground/60 font-medium text-center leading-tight">
-            Checking eligibility will <span className="font-semibold text-foreground/80">not</span> affect your credit score
-          </p>
+        <div className="flex justify-center mt-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/[0.04] border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md hover:bg-emerald-500/15">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 leading-none">
+              Checking eligibility will <span className="underline decoration-2 decoration-emerald-500/50 text-emerald-950 dark:text-emerald-100 font-extrabold px-0.5">not</span> affect your credit score
+            </p>
+          </div>
         </div>
       </motion.div>
     </>
