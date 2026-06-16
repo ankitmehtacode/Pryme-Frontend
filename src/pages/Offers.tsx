@@ -592,7 +592,7 @@ export default function Offers() {
                     <div className="flex flex-wrap gap-3 pb-1">
                       {[
                         { label: "Total Repayment", value: `₹${(totalRepayments[heroOffer.id] || 0).toLocaleString("en-IN")}` },
-                        { label: "Interest (APR)", value: `${heroOffer.interestRate}%` },
+                        { label: "Interest", value: `${heroOffer.interestRate}%` },
                         { label: "Tenure", value: `${heroOffer.maxTenure} yrs` },
                         { label: "Processing Fee", value: heroOffer.processingFee >= 100 ? `₹${Math.round(heroOffer.processingFee).toLocaleString("en-IN")}` : `${heroOffer.processingFee}%` },
                       ].map((m, i) => (

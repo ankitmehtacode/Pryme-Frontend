@@ -171,7 +171,7 @@ export function BankComparisonCard({
             {/* ── Metrics Chips ────────────────────────────── */}
             <div className="hidden xl:flex items-center gap-3">
               {[
-                { label: "APR", value: `${offer.interestRate}%` },
+                { label: "Interest", value: `${offer.interestRate}%` },
                 { label: "Tenure", value: `${offer.maxTenure} yrs` },
                 { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
               ].map((m, i) => (
@@ -239,7 +239,7 @@ export function BankComparisonCard({
           <div className="xl:hidden mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
-              { label: "APR", value: `${offer.interestRate}%` },
+              { label: "Interest", value: `${offer.interestRate}%` },
               { label: "Tenure", value: `${offer.maxTenure} yrs` },
               { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
             ].map((m, i) => (
