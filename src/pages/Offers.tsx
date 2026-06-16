@@ -594,7 +594,7 @@ export default function Offers() {
                         { label: "Total Repayment", value: `₹${(totalRepayments[heroOffer.id] || 0).toLocaleString("en-IN")}` },
                         { label: "Interest (APR)", value: `${heroOffer.interestRate}%` },
                         { label: "Tenure", value: `${heroOffer.maxTenure} yrs` },
-                        { label: "Processing Fee", value: `${heroOffer.processingFee}%` },
+                        { label: "Processing Fee", value: heroOffer.processingFee >= 100 ? `₹${Math.round(heroOffer.processingFee).toLocaleString("en-IN")}` : `${heroOffer.processingFee}%` },
                       ].map((m, i) => (
                         <div key={i} className="px-3.5 py-2 rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.1]">
                           <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 leading-none mb-1">{m.label}</p>

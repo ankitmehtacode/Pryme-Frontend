@@ -173,7 +173,7 @@ export function BankComparisonCard({
               {[
                 { label: "APR", value: `${offer.interestRate}%` },
                 { label: "Tenure", value: `${offer.maxTenure} yrs` },
-                { label: "Fee", value: `${offer.processingFee}%` },
+                { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
               ].map((m, i) => (
                 <div
                   key={i}
@@ -241,7 +241,7 @@ export function BankComparisonCard({
               { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
               { label: "APR", value: `${offer.interestRate}%` },
               { label: "Tenure", value: `${offer.maxTenure} yrs` },
-              { label: "Fee", value: `${offer.processingFee}%` },
+              { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
             ].map((m, i) => (
               <div
                 key={i}
@@ -294,8 +294,16 @@ export function BankComparisonCard({
                     {[
                       { l: "Principal", v: principalAmount },
                       { l: "Total Interest", v: totalRepayment - principalAmount },
-                      { l: `Processing (${offer.processingFee}%)`, v: Math.round(principalAmount * offer.processingFee / 100) },
-                      { l: "GST on PF", v: Math.round(principalAmount * offer.processingFee / 100 * 0.18) },
+                      ...(offer.processingFee >= 100
+                        ? [
+                            { l: "Processing Fee (Base)", v: Math.round(offer.processingFee / 1.18) },
+                            { l: "GST on PF (18%)", v: offer.processingFee - Math.round(offer.processingFee / 1.18) }
+                          ]
+                        : [
+                            { l: `Processing (${offer.processingFee}%)`, v: Math.round(principalAmount * offer.processingFee / 100) },
+                            { l: "GST on PF", v: Math.round(principalAmount * offer.processingFee / 100 * 0.18) }
+                          ]
+                      )
                     ].map((r, i) => (
                       <div key={i} className="flex justify-between text-[11px] py-1.5 border-b border-dashed border-slate-100/60 dark:border-white/[0.04] last:border-b-0">
                         <span className="text-muted-foreground font-medium">{r.l}</span>

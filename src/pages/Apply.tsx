@@ -234,6 +234,8 @@ const Apply = () => {
             employmentType: data.employmentType?.toUpperCase() || "SALARIED",
             // BUG-4 FIX: Real property type from form
             propertyType: data.propertyType || "RESIDENTIAL",
+            propertyCategory: data.propertyCategory || null,
+            businessPropertyCategory: data.businessPropertyCategory || null,
             cityTier: "TIER_1",
             loanAmount: data.loanAmount || 0,
             propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,

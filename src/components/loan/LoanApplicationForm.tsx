@@ -735,6 +735,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
         // Property type — BUG-4 FIX: pass real value from form, not hardcoded "RESIDENTIAL"
         propertyType: (store.loanRequirements as any)?.propertyType ?? "RESIDENTIAL",
+        propertyCategory: store.loanRequirements?.propertyCategory ?? null,
+        businessPropertyCategory: store.loanRequirements?.businessPropertyCategory ?? null,
 
         // 🧠 PIPELINE FIX: Forward employment-specific fields for Admin Dashboard visibility
         pinCode: store.basicKYC?.pinCode ?? "",
