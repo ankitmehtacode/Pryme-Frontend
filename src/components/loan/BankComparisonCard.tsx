@@ -236,7 +236,7 @@ export function BankComparisonCard({
           </div>
 
           {/* ── Mobile Stats Row ────────────────────────────── */}
-          <div className="xl:hidden mt-5 grid grid-cols-4 gap-3">
+          <div className="xl:hidden mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
               { label: "APR", value: `${offer.interestRate}%` },
@@ -248,11 +248,11 @@ export function BankComparisonCard({
                 className="px-3 py-3 rounded-2xl bg-slate-50/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] backdrop-blur-md shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-white/[0.08]"
               >
                 <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{m.label}</p>
-                <p className={`${m.bold ? 'text-lg font-extrabold' : 'text-sm font-bold'} text-foreground tabular-nums tracking-tight`}>{m.value}</p>
+                <p className={`${m.bold ? 'text-base sm:text-lg font-extrabold' : 'text-xs sm:text-sm font-bold'} text-foreground tabular-nums tracking-tight`}>{m.value}</p>
               </div>
             ))}
             {emiDiffFromHero !== 0 && (
-              <div className="col-span-4 mt-1.5 flex flex-col gap-0.5">
+              <div className="col-span-2 sm:col-span-4 mt-1.5 flex flex-col gap-0.5">
                  <p className="text-xs sm:text-sm font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
                     {emiDiffFromHero > 0
                       ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
