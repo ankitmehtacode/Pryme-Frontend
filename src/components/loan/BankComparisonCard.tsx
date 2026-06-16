@@ -187,7 +187,7 @@ export function BankComparisonCard({
 
             {/* ── CTA ──────────────────────────────────────── */}
             <div className="flex items-center gap-3 justify-end w-full xl:w-auto mt-5 xl:mt-0 xl:col-start-5">
-              <div className="flex flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[160px]">
+              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[160px]">
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
