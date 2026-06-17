@@ -45,18 +45,23 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         variant: "destructive"
       });
     } else {
-      toast({
-        title: "Account Created",
-        description: "Welcome to Pryme! Redirecting to your dashboard...",
-      });
       if (loggedInUser) {
         const role = (loggedInUser.role || "USER").toUpperCase();
+        const isAdminOrEmployee = ["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role);
+
+        toast({
+          title: "Account Created",
+          description: isAdminOrEmployee
+            ? "Welcome to Pryme! Redirecting to admin dashboard..."
+            : "Welcome to Pryme! Redirecting to home page...",
+        });
+
         if (from) {
           navigate(from, { replace: true });
-        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
+        } else if (isAdminOrEmployee) {
           navigate("/admin", { replace: true });
         } else {
-          navigate("/dashboard", { replace: true });
+          navigate("/", { replace: true });
         }
       }
     }

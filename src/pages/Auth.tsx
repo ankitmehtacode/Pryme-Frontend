@@ -130,7 +130,7 @@ const Auth = () => {
   const handleGoogleCredentialResponse = async (response: { credential: string }) => {
     setIsGoogleLoading(true);
     
-    const { error, user: loggedInUser } = await signInWithGoogle(response.credential);
+    const { error, user: loggedInUser, isNewUser } = await signInWithGoogle(response.credential);
     
     if (error) {
       toast({
@@ -139,18 +139,27 @@ const Auth = () => {
         variant: "destructive",
       });
     } else {
-      toast({
-        title: "Welcome to Pryme",
-        description: "Successfully signed in with Google.",
-      });
       if (loggedInUser) {
         const role = (loggedInUser.role || "USER").toUpperCase();
+        const isAdminOrEmployee = ["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role);
+
+        toast({
+          title: "Welcome to Pryme",
+          description: isNewUser
+            ? "Your account has been created successfully. Redirecting to home page..."
+            : "Successfully signed in with Google.",
+        });
+
         if (from) {
           navigate(from, { replace: true });
-        } else if (["ADMIN", "SUPER_ADMIN", "EMPLOYEE"].includes(role)) {
+        } else if (isAdminOrEmployee) {
           navigate("/admin", { replace: true });
         } else {
-          navigate("/dashboard", { replace: true });
+          if (isNewUser) {
+            navigate("/", { replace: true });
+          } else {
+            navigate("/dashboard", { replace: true });
+          }
         }
       }
     }

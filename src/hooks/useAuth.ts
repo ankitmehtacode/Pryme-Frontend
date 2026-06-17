@@ -57,7 +57,7 @@ export const useAuth = () => {
   // forward Set-Cookie headers, so the old flow (login → /auth/me) always
   // got a 401 on the second call. This eliminates that entirely.
   const signIn = useCallback(
-    async (email: string, password: string): Promise<{ error: Error | null; user: MeResponse | null }> => {
+    async (email: string, password: string): Promise<{ error: Error | null; user: MeResponse | null; isNewUser?: boolean }> => {
       try {
         const loginResponse = await PrymeAPI.login({ email, password });
         // The backend now embeds the full MeResponse inside LoginResponse.user
@@ -66,7 +66,7 @@ export const useAuth = () => {
           // Inject directly into React Query cache — instant hydration, zero latency
           queryClient.setQueryData(AUTH_QUERY_KEY, userData);
         }
-        return { error: null, user: userData || null };
+        return { error: null, user: userData || null, isNewUser: loginResponse.isNewUser };
       } catch (err) {
         return { error: err as Error, user: null };
       }
@@ -76,12 +76,13 @@ export const useAuth = () => {
 
   // ─── SIGN UP + AUTO-LOGIN ─────────────────────────────────────────────────
   const signUp = useCallback(
-    async (userData: any): Promise<{ error: Error | null; user: MeResponse | null }> => {
+    async (userData: any): Promise<{ error: Error | null; user: MeResponse | null; isNewUser?: boolean }> => {
       try {
         await PrymeAPI.signup(userData);
         const email = userData.email || userData.username;
         const password = userData.password || userData.securityKey || userData.key;
-        return await signIn(email, password);
+        const result = await signIn(email, password);
+        return { ...result, isNewUser: true };
       } catch (err) {
         return { error: err as Error, user: null };
       }
@@ -93,14 +94,14 @@ export const useAuth = () => {
   // Sends the Google Identity Services credential (ID token) to the backend.
   // Follows the exact same cache hydration pattern as password signIn.
   const signInWithGoogle = useCallback(
-    async (idToken: string): Promise<{ error: Error | null; user: MeResponse | null }> => {
+    async (idToken: string): Promise<{ error: Error | null; user: MeResponse | null; isNewUser?: boolean }> => {
       try {
         const loginResponse = await PrymeAPI.googleSignIn(idToken);
         const userData: MeResponse = loginResponse.user;
         if (userData) {
           queryClient.setQueryData(AUTH_QUERY_KEY, userData);
         }
-        return { error: null, user: userData || null };
+        return { error: null, user: userData || null, isNewUser: loginResponse.isNewUser };
       } catch (err) {
         return { error: err as Error, user: null };
       }
