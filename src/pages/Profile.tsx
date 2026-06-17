@@ -28,21 +28,36 @@ const Profile = () => {
     profilePictureUrl: "",
     metadata: {
       panCard: "",
-      monthlyIncome: ""
+      monthlyIncome: "",
+      preferences: {
+        appUpdates: true,
+        newOffers: true,
+        emiReminders: true
+      }
     }
   });
-
+ 
   useEffect(() => {
     fetchProfile();
   }, []);
-
+ 
   const fetchProfile = async () => {
     try {
       const res = await PrymeAPI.getProfile();
       if (res && res.data) {
+        const metadata = res.data.metadata || {};
+        const preferences = {
+          appUpdates: true,
+          newOffers: true,
+          emiReminders: true,
+          ...(metadata.preferences || {})
+        };
         setProfileData({
           ...res.data,
-          metadata: res.data.metadata || {}
+          metadata: {
+            ...metadata,
+            preferences
+          }
         });
       }
     } catch (error) {
@@ -114,6 +129,50 @@ const Profile = () => {
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleTogglePreference = async (key: string) => {
+    const currentVal = profileData.metadata?.preferences?.[key] ?? true;
+    const newVal = !currentVal;
+
+    const updatedProfile = {
+      ...profileData,
+      metadata: {
+        ...profileData.metadata,
+        preferences: {
+          ...(profileData.metadata?.preferences || {}),
+          [key]: newVal
+        }
+      }
+    };
+
+    // Optimistically update UI
+    setProfileData(updatedProfile);
+
+    try {
+      await PrymeAPI.updateProfile(updatedProfile);
+      toast({
+        title: "Preferences Updated",
+        description: "Your notification settings have been saved successfully.",
+      });
+    } catch (error) {
+      // Revert on error
+      setProfileData({
+        ...profileData,
+        metadata: {
+          ...profileData.metadata,
+          preferences: {
+            ...(profileData.metadata?.preferences || {}),
+            [key]: currentVal
+          }
+        }
+      });
+      toast({
+        title: "Update Failed",
+        description: "Failed to update notification preferences.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -289,20 +348,32 @@ const Profile = () => {
             <h3 className="text-xl font-semibold mb-6">Notification Preferences</h3>
             <div className="space-y-4">
               {[
-                { title: "Application Updates", desc: "Get notified when your loan status changes." },
-                { title: "New Offers", desc: "Alert me when a better interest rate is available." },
-                { title: "EMI Reminders", desc: "Receive reminders 3 days before EMI is due." }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/50 border border-border">
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm text-slate-500">{item.desc}</p>
+                { key: "appUpdates", title: "Application Updates", desc: "Get notified when your loan status changes." },
+                { key: "newOffers", title: "New Offers", desc: "Alert me when a better interest rate is available." },
+                { key: "emiReminders", title: "EMI Reminders", desc: "Receive reminders 3 days before EMI is due." }
+              ].map((item) => {
+                const checked = profileData.metadata?.preferences?.[item.key] ?? true;
+                return (
+                  <div key={item.key} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/50 border border-border">
+                    <div>
+                      <p className="font-medium">{item.title}</p>
+                      <p className="text-sm text-slate-500">{item.desc}</p>
+                    </div>
+                    <div 
+                      onClick={() => handleTogglePreference(item.key)}
+                      className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
+                        checked ? "bg-primary dark:bg-[#103783]" : "bg-slate-300 dark:bg-white/[0.1]"
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${
+                          checked ? "left-[24px]" : "left-[4px]"
+                        }`}
+                      />
+                    </div>
                   </div>
-                  <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
-                    <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
