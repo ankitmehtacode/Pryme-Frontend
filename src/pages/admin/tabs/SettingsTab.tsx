@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Settings, Search, CreditCard, Zap } from "lucide-react";
+import { Plus, Settings, Search, CreditCard, Zap, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import OffersTab from "./OffersTab";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 
 /* ══════════════════════════════════════════════════════════════════════
    UNIFIED POLICY MATRIX TAB
@@ -23,6 +24,7 @@ interface SettingsTabProps {
   setEditingEligibilityRule: (rule: any) => void;
   setIsEligibilityModalOpen: (open: boolean) => void;
   updateEligibilityRuleMutation: any;
+  deleteEligibilityRuleMutation: any;
   onViewSnapshot?: (ruleId: number) => void;
 
   // ── Product Matrix (LoanProduct) ────────────────────────────────────
@@ -41,7 +43,7 @@ type SubSection = "rules" | "products";
 export const SettingsTab: React.FC<SettingsTabProps> = ({
   ruleStatusFilter, setRuleStatusFilter, eligibilityRules, filteredEligibilityRules,
   isSuperAdmin, authUser, setEditingEligibilityRule, setIsEligibilityModalOpen,
-  updateEligibilityRuleMutation, onViewSnapshot,
+  updateEligibilityRuleMutation, deleteEligibilityRuleMutation, onViewSnapshot,
   // Product props
   productStatusFilter, setProductStatusFilter, products, filteredProducts,
   setSelectedProduct, setIsOfferModalOpen, toggleProductMutation, refetchProducts
@@ -245,6 +247,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                               >
                                 Edit
                               </Button>
+                              {isSuperAdmin && (
+                                <ConfirmAction
+                                  title="Delete Engine Rule"
+                                  description={`Are you sure you want to delete the eligibility rule for ${rule.bankName || 'Any Bank'} (${rule.productCode})? This action cannot be reversed.`}
+                                  confirmLabel="Delete Rule"
+                                  cancelLabel="Cancel"
+                                  variant="destructive"
+                                  onConfirm={() => deleteEligibilityRuleMutation.mutate(rule.id)}
+                                >
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-8 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 mr-1" />
+                                    Delete
+                                  </Button>
+                                </ConfirmAction>
+                              )}
                             </div>
                           </td>
                         </tr>

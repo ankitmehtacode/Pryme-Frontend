@@ -342,6 +342,15 @@ const AdminDashboard = () => {
     onError: (err: any) => toast.error(err.message || "Failed to update rule")
   });
 
+  const deleteEligibilityRuleMutation = useMutation({
+    mutationFn: (id: string | number) => PrymeAPI.deleteEligibilityRule(id),
+    onSuccess: () => {
+      toast.success("Engine Rule deleted successfully.");
+      refetchEligibilityRules();
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to delete rule")
+  });
+
   const handleEligibilitySubmit = (data: any) => {
     if (data.id) updateEligibilityRuleMutation.mutate({ id: data.id, data });
     else createEligibilityRuleMutation.mutate(data);
@@ -688,6 +697,7 @@ const AdminDashboard = () => {
                       isSuperAdmin={isSuperAdmin} authUser={authUser}
                       setEditingEligibilityRule={setEditingEligibilityRule} setIsEligibilityModalOpen={setIsEligibilityModalOpen}
                       updateEligibilityRuleMutation={updateEligibilityRuleMutation}
+                      deleteEligibilityRuleMutation={deleteEligibilityRuleMutation}
                       onViewSnapshot={(ruleId) => setSelectedSnapshotRuleId(ruleId)}
                       productStatusFilter={productStatusFilter} setProductStatusFilter={setProductStatusFilter}
                       products={products} filteredProducts={filteredProducts}
