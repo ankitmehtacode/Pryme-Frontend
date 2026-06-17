@@ -23,6 +23,33 @@ const BlogDetail = () => {
 
   if (!blog) return null; // Will redirect in useEffect
 
+  const shareUrl = window.location.href;
+  const shareTitle = blog.title;
+
+  const shareOnFacebook = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      "_blank",
+      "noopener,noreferrer,width=600,height=400"
+    );
+  };
+
+  const shareOnTwitter = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      "_blank",
+      "noopener,noreferrer,width=600,height=400"
+    );
+  };
+
+  const shareOnLinkedIn = () => {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      "_blank",
+      "noopener,noreferrer,width=600,height=400"
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
@@ -73,21 +100,27 @@ const BlogDetail = () => {
                 <span>Share this Insight</span>
               </div>
               <div className="flex items-center gap-4">
-                <button className="p-3 rounded-full bg-slate-100 hover:bg-[#1877F2] hover:text-white transition-colors text-slate-600">
+                <button
+                  onClick={shareOnFacebook}
+                  className="p-3 rounded-full bg-slate-100 hover:bg-[#1877F2] hover:text-white transition-colors text-slate-600 cursor-pointer"
+                  aria-label="Share on Facebook"
+                >
                   <Facebook className="w-5 h-5" />
                 </button>
-                <button className="p-3 rounded-full bg-slate-100 hover:bg-[#1DA1F2] hover:text-white transition-colors text-slate-600">
+                <button
+                  onClick={shareOnTwitter}
+                  className="p-3 rounded-full bg-slate-100 hover:bg-[#1DA1F2] hover:text-white transition-colors text-slate-600 cursor-pointer"
+                  aria-label="Share on Twitter"
+                >
                   <Twitter className="w-5 h-5" />
                 </button>
-                <a
-                  href="https://www.linkedin.com/company/pryme-consultingindia/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 rounded-full bg-slate-100 hover:bg-[#0A66C2] hover:text-white transition-colors text-slate-600"
-                  aria-label="Visit Pryme on LinkedIn"
+                <button
+                  onClick={shareOnLinkedIn}
+                  className="p-3 rounded-full bg-slate-100 hover:bg-[#0A66C2] hover:text-white transition-colors text-slate-600 cursor-pointer"
+                  aria-label="Share on LinkedIn"
                 >
                   <Linkedin className="w-5 h-5" />
-                </a>
+                </button>
               </div>
             </div>
 
