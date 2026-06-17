@@ -1,12 +1,15 @@
 import React, { useMemo } from "react";
 import { Loader2, Briefcase, IndianRupee } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 interface LeadsTabProps {
   isLoadingLeads: boolean;
   rawLeads: any[];
   formatCurrency: (val: number) => string;
   StatusBadge: React.FC<{ status: string }>;
+  onUpdateStatus: (id: string, status: string) => void;
+  isUpdating: boolean;
 }
 
 // 🧠 Safe metadata parser — the metadata field is a JSON string from the backend.
@@ -34,7 +37,7 @@ const formatEmploymentType = (raw: string | undefined): string => {
   return map[raw.toUpperCase()] || raw.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 };
 
-export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge }) => {
+export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating }) => {
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
       <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
@@ -105,7 +108,24 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                         )}
                       </td>
                       <td className="px-6 py-4 align-top">
-                        <StatusBadge status={lead.status || 'NEW'} />
+                        {lead.status === "CONVERTED" ? (
+                          <StatusBadge status={lead.status} />
+                        ) : (
+                          <Select
+                            value={lead.status || "NEW"}
+                            onValueChange={(val) => onUpdateStatus(lead.id, val)}
+                            disabled={isUpdating}
+                          >
+                            <SelectTrigger className="bg-transparent border-0 p-0 h-auto w-auto focus:ring-0 focus:ring-offset-0 select-none cursor-pointer hover:opacity-80 transition-opacity">
+                              <StatusBadge status={lead.status || "NEW"} />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+                              <SelectItem value="NEW" className="text-xs">NEW</SelectItem>
+                              <SelectItem value="CONTACTED" className="text-xs">CONTACTED</SelectItem>
+                              <SelectItem value="REJECTED" className="text-xs">REJECTED</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </td>
                     </motion.tr>
                   );

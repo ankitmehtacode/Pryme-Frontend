@@ -189,6 +189,48 @@ const AdminDashboard = () => {
   const [editingBank, setEditingBank] = useState<any | null>(null);
   const [selectedSnapshotRuleId, setSelectedSnapshotRuleId] = useState<number | null>(null);
 
+  // Notifications State & Click Outside Hook
+  interface AdminNotification {
+    id: string;
+    title: string;
+    message: string;
+    time: string;
+  }
+
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([
+    {
+      id: "1",
+      title: "System Update",
+      message: "Policy Matrix and engine rules have been successfully compiled.",
+      time: "10m ago"
+    },
+    {
+      id: "2",
+      title: "Bank Partner Added",
+      message: "New API integration for Bank of Baroda is now live.",
+      time: "1h ago"
+    },
+    {
+      id: "3",
+      title: "Underwriter Performance",
+      message: "Lead distribution queue updated for regional underwriters.",
+      time: "2h ago"
+    }
+  ]);
+
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
 
@@ -409,6 +451,17 @@ const AdminDashboard = () => {
     }
   });
 
+  const leadStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) => PrymeAPI.updateLeadStatus(id, status),
+    onSuccess: () => {
+      toast.success("Lead status updated successfully.");
+      queryClient.invalidateQueries({ queryKey: ["admin_leads"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update lead status.");
+    }
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) => PrymeAPI.updateLeadProfile(id, payload),
     onSuccess: (data: any) => {
@@ -610,7 +663,69 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <button className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06]"><Bell className="w-4 h-4" /><div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(124,58,237,0.8)]" /></button>
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06] focus:outline-none"
+                >
+                  <Bell className="w-4 h-4" />
+                  {notifications.length > 0 && (
+                    <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.8)] border border-[#0a0a10]" />
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isNotificationsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-80 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3 text-left"
+                    >
+                      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                        <span className="font-semibold text-white text-xs uppercase tracking-wider">Notifications</span>
+                        {notifications.length > 0 && (
+                          <button
+                            onClick={() => setNotifications([])}
+                            className="text-[10px] text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                          >
+                            Clear All
+                          </button>
+                        )}
+                      </div>
+
+                      {notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
+                          <Bell className="w-8 h-8 text-slate-600 animate-pulse" />
+                          <p className="text-xs font-medium text-slate-400">No notifications available</p>
+                        </div>
+                      ) : (
+                        <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04] pr-1">
+                          {notifications.map((note) => (
+                            <div
+                              key={note.id}
+                              className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3 group/item"
+                            >
+                              <div className="flex-1">
+                                <p className="text-xs font-semibold text-white">{note.title}</p>
+                                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{note.message}</p>
+                                <span className="text-[9px] text-slate-600 font-medium block mt-1">{note.time}</span>
+                              </div>
+                              <button
+                                onClick={() => setNotifications(prev => prev.filter(n => n.id !== note.id))}
+                                className="text-slate-600 hover:text-slate-400 opacity-0 group-hover/item:opacity-100 transition-opacity p-1 shrink-0"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </header>
 
@@ -649,6 +764,8 @@ const AdminDashboard = () => {
                   <LeadsTab 
                     isLoadingLeads={isLoadingLeads} rawLeads={rawLeads} 
                     formatCurrency={formatCurrency} StatusBadge={StatusBadge} 
+                    onUpdateStatus={(id, status) => leadStatusMutation.mutate({ id, status })}
+                    isUpdating={leadStatusMutation.isPending}
                   />
                 )}
 
@@ -830,6 +947,18 @@ const AdminDashboard = () => {
                               const newKey = prompt("Enter metadata key name (e.g. companyName, grossSalary, existingEMI):");
                               if (newKey) {
                                 const camelKey = newKey.replace(/\s+/g, "");
+                                if (!camelKey) return;
+                                
+                                const normalizedNew = camelKey.toLowerCase();
+                                const exists = Object.keys(editProfileData.metadata || {}).some(
+                                  (k) => k.toLowerCase() === normalizedNew
+                                );
+                                
+                                if (exists) {
+                                  toast.error("A field with this name already exists.");
+                                  return;
+                                }
+
                                 setEditProfileData({
                                   ...editProfileData,
                                   metadata: {

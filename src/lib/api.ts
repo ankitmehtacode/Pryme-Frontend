@@ -347,15 +347,25 @@ export const PrymeAPI = {
       });
 
       // 3. PUT directly to S3
-      const s3Response = await fetch(policyResponse.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file
-      });
+      let s3Response: Response;
+      try {
+        s3Response = await fetch(policyResponse.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+      } catch (s3Error: any) {
+        // 🧠 CSP / CORS / Network block — the fetch itself threw, not the response
+        console.error("S3 PUT blocked (possible CSP/CORS violation):", s3Error);
+        throw new Error("File upload was blocked by a security policy. Please contact support if this persists.");
+      }
 
       if (!s3Response.ok) {
          const errorText = await s3Response.text().catch(() => "Unknown S3 error");
          console.error("S3 upload rejected:", s3Response.status, errorText);
+         if (s3Response.status === 403) {
+           throw new Error("Upload link expired. Please try uploading again.");
+         }
          throw new Error("Upload rejected by secure vault. Please try again.");
       }
 
@@ -366,8 +376,8 @@ export const PrymeAPI = {
 
       return { data: { documentId: policyResponse.documentId }, error: null };
     } catch (error: any) {
-      console.error("Document vault encryption failed:", error);
-      return { data: null, error: { message: error.message || "Network stream disrupted." } };
+      console.error("Document vault upload failed:", error);
+      return { data: null, error: { message: error.message || "Failed to upload document. Please check your connection and try again." } };
     }
   },
 
@@ -434,6 +444,10 @@ export const PrymeAPI = {
 
   /** Admin: List all raw leads — GET /api/v1/admin/leads */
   getAdminLeads: async () => fetchWithAuth("/admin/leads", { method: "GET" }),
+
+  /** Admin: Update status of a raw lead — PATCH /api/v1/admin/leads/{leadId}/status */
+  updateLeadStatus: async (leadId: string, status: string) =>
+    fetchWithAuth(`/admin/leads/${leadId}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 
   /** Admin: Bank CRUD — /api/v1/admin/banks */
   getAdminBanks: async () => fetchWithAuth("/admin/banks", { method: "GET" }),
