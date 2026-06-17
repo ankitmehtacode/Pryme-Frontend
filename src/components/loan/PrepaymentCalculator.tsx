@@ -118,9 +118,9 @@ const PrepaymentCalculator = ({ showTerminology = true }: PrepaymentCalculatorPr
   ];
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col h-full justify-between">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col w-full">
 
-      <div className="flex flex-col h-full justify-start">
+      <div className="flex-1 flex flex-col lg:min-h-[485px] justify-between relative z-10 w-full">
         {/* Header */}
         <div className="flex items-center gap-3.5 mb-5 relative z-10 w-full shrink-0">
           <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
