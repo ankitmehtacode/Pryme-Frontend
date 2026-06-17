@@ -72,6 +72,7 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
     const d = fin.data;
     if (!d.subType) errors.subType = "Select your business program";
     if (!d.businessName || d.businessName.trim().length < 2) errors.businessName = "Enter your business name";
+    if (!d.vintageYears || d.vintageYears <= 0) errors.vintageYears = "Enter your business vintage in years";
     if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";
   }
 
@@ -146,6 +147,7 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   practiceYears: 'section-employment',
   netMonthlyIncome: 'section-employment',
   businessName: 'section-employment',
+  vintageYears: 'section-employment',
 };
 
 export const STAGE_LABELS_FRIENDLY: Record<string, string> = {

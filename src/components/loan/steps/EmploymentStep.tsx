@@ -425,7 +425,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                         className="space-y-5"
                       >
 
-                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           {/* Last 12 months GST turnover — the primary income proxy */}
                           <ValidatedInput
                             label="Last 12 Months GST Turnover (₹)"
@@ -458,20 +458,6 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                             <SelectItem value="Retail">Retail (12% Margin)</SelectItem>
                             <SelectItem value="Wholesale">Wholesale (8% Margin)</SelectItem>
                             <SelectItem value="Manufacturing">Manufacturing (4% Margin)</SelectItem>
-                          </StyledSelect>
-
-                          {/* GST Filing Months */}
-                          <StyledSelect
-                            label="GST Returns Filed (Months)"
-                            icon={FileText}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.gstFilingMonths ? store.financialDetails.data.gstFilingMonths.toString() : undefined}
-                            onValueChange={(v) => store.updateBusinessDetails({ gstFilingMonths: Number(v) })}
-                            placeholder="Select filing period"
-                          >
-                            <SelectItem value="6">6 Months</SelectItem>
-                            <SelectItem value="12">12 Months</SelectItem>
-                            <SelectItem value="24">24 Months</SelectItem>
-                            <SelectItem value="36">36+ Months</SelectItem>
                           </StyledSelect>
                         </div>
                       </motion.div>
