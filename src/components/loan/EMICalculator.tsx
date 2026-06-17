@@ -85,7 +85,7 @@ const EMICalculator = ({
   const principalArc = (principalPercentage / 100) * circumference;
 
   return (
-    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col h-full min-w-0 w-full", className)}>
+    <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-[#103783]/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-[#103783]/40 flex flex-col min-w-0 w-full", className)}>
       
 
       {/* Header */}

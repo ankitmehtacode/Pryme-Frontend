@@ -73,7 +73,7 @@ const PrepaymentCalculator = () => {
     : "0";
 
   return (
-    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col h-full">
+    <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col">
 
       {/* Header */}
       <div className="flex items-center gap-3.5 mb-6 relative z-10 w-full shrink-0">
