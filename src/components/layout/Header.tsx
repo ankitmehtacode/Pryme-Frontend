@@ -202,7 +202,7 @@ const Header = memo(() => {
         >
 
           {/* Logo — Icon mark + SVG wordmark lockup */}
-          <Link to="/" className="flex items-center gap-1.5 shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <Link to="/" className="flex items-center gap-[28px] shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <img
               src={pryme2Logo}
               alt=""

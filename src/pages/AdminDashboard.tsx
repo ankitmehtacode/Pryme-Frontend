@@ -613,7 +613,7 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed h-full z-20">
           <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
-            <Link to="/" className="flex items-center gap-2 transition-transform duration-300 hover:scale-[1.02]">
+            <Link to="/" className="flex items-center gap-[28px] transition-transform duration-300 hover:scale-[1.02]">
               <img
                 src={pryme2Logo}
                 alt=""
