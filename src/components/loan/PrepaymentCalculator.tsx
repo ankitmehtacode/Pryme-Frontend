@@ -152,10 +152,10 @@ const PrepaymentCalculator = () => {
         </div>
 
         {/* Right Col: Savings Hero & Output Matrix */}
-        <div className="flex flex-col gap-3 justify-between w-full min-w-0 h-full mt-2 lg:mt-0">
+        <div className="flex flex-col lg:grid lg:grid-rows-5 gap-3 w-full min-w-0 h-full mt-2 lg:mt-0">
           
           {/* Savings Hero */}
-          <div className="flex flex-col items-center justify-center p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1">
+          <div className="flex flex-col items-center justify-center p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1 lg:row-span-3">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b9811a_1px,transparent_1px),linear-gradient(to_bottom,#10b9811a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
             
             <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5 relative z-10">
@@ -169,29 +169,29 @@ const PrepaymentCalculator = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 shrink-0">
+          <div className="grid grid-cols-2 gap-3 shrink-0 lg:row-span-1">
              {/* Tenure Saved */}
-             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
+             <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Tenure Trimmed</span>
                <span className="text-xl font-bold text-foreground leading-none">{calculations.tenureSaved} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
              </div>
              
              {/* New Tenure */}
-             <div className="flex flex-col items-center justify-center p-3.5 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
+             <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">New Total Tenure</span>
                <span className="text-xl font-bold text-foreground leading-none">{calculations.monthsWithPrepayment} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
              </div>
           </div>
 
           {/* Comparison Matrix */}
-          <div className="grid grid-cols-2 gap-3 shrink-0">
-            <div className="p-3.5 bg-red-50/30 dark:bg-red-500/5 rounded-xl border border-red-200/50 dark:border-red-500/10 flex flex-col justify-center">
+          <div className="grid grid-cols-2 gap-3 shrink-0 lg:row-span-1">
+            <div className="p-3 bg-red-50/30 dark:bg-red-500/5 rounded-xl border border-red-200/50 dark:border-red-500/10 flex flex-col justify-center items-center text-center">
               <p className="text-[8px] font-bold uppercase tracking-wider text-red-500/70 mb-1">Base Interest</p>
-              <p className="text-[13px] xl:text-sm font-bold text-foreground leading-none truncate">{formatCurrency(calculations.interestOriginal)}</p>
+              <p className="text-sm font-bold text-foreground leading-none truncate w-full">{formatCurrency(calculations.interestOriginal)}</p>
             </div>
-            <div className="p-3.5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl border border-emerald-200/50 dark:border-emerald-500/10 flex flex-col justify-center">
+            <div className="p-3 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl border border-emerald-200/50 dark:border-emerald-500/10 flex flex-col justify-center items-center text-center">
               <p className="text-[8px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70 mb-1">New Interest</p>
-              <p className="text-[13px] xl:text-sm font-bold text-foreground leading-none truncate">{formatCurrency(calculations.interestWithPrepayment)}</p>
+              <p className="text-sm font-bold text-foreground leading-none truncate w-full">{formatCurrency(calculations.interestWithPrepayment)}</p>
             </div>
           </div>
           
