@@ -1,4 +1,4 @@
-import { Building2, GraduationCap, BriefcaseBusiness, IndianRupee, Landmark } from "lucide-react";
+import { Building2, GraduationCap, BriefcaseBusiness, IndianRupee, Landmark, Wallet, Briefcase, Home, Car } from "lucide-react";
 import type { EmploymentType, LoanType } from "@/lib/applicationTypes";
 
 export const STATE_CITIES: Record<string, string[]> = {
@@ -92,9 +92,9 @@ export const EMPLOYMENT_OPTIONS: { value: EmploymentType; label: string; icon: a
 ];
 
 export const PRODUCT_OPTIONS: { value: LoanType; label: string; icon: any }[] = [
-  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: IndianRupee },
-  { value: "BUSINESS_LOAN", label: "Business Loan", icon: Landmark },
-  { value: "HOME_LOAN", label: "Home Loan", icon: Landmark },
-  { value: "LAP", label: "Loan Against Property", icon: Landmark },
-  { value: "AUTO_LOAN", label: "Auto Loan", icon: Landmark },
+  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: Wallet },
+  { value: "BUSINESS_LOAN", label: "Business Loan", icon: Briefcase },
+  { value: "HOME_LOAN", label: "Home Loan", icon: Home },
+  { value: "LAP", label: "Loan Against Property", icon: Building2 },
+  { value: "AUTO_LOAN", label: "Auto Loan", icon: Car },
 ];

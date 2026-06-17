@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2 } from "lucide-react";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2, Wallet, Briefcase, Car } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -9,11 +9,11 @@ import type { LoanType } from "@/lib/applicationTypes";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
 
 const PRODUCT_OPTIONS = [
-  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: IndianRupee },
-  { value: "BUSINESS_LOAN", label: "Business Loan", icon: Landmark },
-  { value: "HOME_LOAN", label: "Home Loan", icon: Landmark },
-  { value: "LAP", label: "Loan Against Property", icon: Landmark },
-  { value: "AUTO_LOAN", label: "Auto Loan", icon: Landmark },
+  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: Wallet },
+  { value: "BUSINESS_LOAN", label: "Business Loan", icon: Briefcase },
+  { value: "HOME_LOAN", label: "Home Loan", icon: Home },
+  { value: "LAP", label: "Loan Against Property", icon: Building2 },
+  { value: "AUTO_LOAN", label: "Auto Loan", icon: Car },
 ];
 
 /** Loan types that require property valuation for LTV calculations */
@@ -45,6 +45,11 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
     return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
   }, [cibilScore]);
 
+  const selectedProduct = useMemo(() => {
+    return PRODUCT_OPTIONS.find(opt => opt.value === loanRequirements.loanType);
+  }, [loanRequirements.loanType]);
+  const selectedIcon = selectedProduct ? selectedProduct.icon : Landmark;
+
   return (
     <div id="section-loan-details" className={cn(cardCn, 'transition-all duration-500')}>
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -57,7 +62,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
       <div className="space-y-5 relative z-10">
         <StyledSelect
           label="Loan Product"
-          icon={Landmark}
+          icon={selectedIcon}
           value={loanRequirements.loanType || undefined}
           onValueChange={(v) => store.updateLoanRequirements({ loanType: v as LoanType })}
           placeholder="Select your loan type"
@@ -68,7 +73,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
             return (
               <SelectItem key={opt.value} value={opt.value}>
                 <span className="flex items-center gap-2">
-                  <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
+                  <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60 [[data-radix-select-trigger]_&]:hidden" />
                   {opt.label}
                 </span>
               </SelectItem>
