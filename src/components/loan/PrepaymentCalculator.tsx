@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Calculator, TrendingDown } from "lucide-react";
+import { Calculator, TrendingDown, Calendar, Percent, Zap } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 const PrepaymentCalculator = () => {
@@ -8,6 +8,7 @@ const PrepaymentCalculator = () => {
   const [tenureMonths, setTenureMonths] = useState(120);
   const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
   const [prepaymentMonth, setPrepaymentMonth] = useState(12);
+  const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
 
   // Formatting helpers
   const formatCurrency = (value: number) => {
@@ -28,7 +29,7 @@ const PrepaymentCalculator = () => {
     const totalOriginal = emiOriginal * tenureMonths;
     const interestOriginal = totalOriginal - loanAmount;
 
-    // With Prepayment — recalculate after prepayment month
+    // With Prepayment / Step-up
     let balance = loanAmount;
     let totalPaidWithPrepayment = 0;
     let monthsWithPrepayment = 0;
@@ -37,14 +38,33 @@ const PrepaymentCalculator = () => {
       if (balance <= 0) break;
 
       const interestForMonth = balance * monthlyRate;
-      const principalForMonth = Math.min(emiOriginal - interestForMonth, balance);
-      totalPaidWithPrepayment += Math.min(emiOriginal, balance + interestForMonth);
+      
+      // Calculate current EMI for this month (incorporating annual 5% step-up if active)
+      const isStepUp = strategy === "step-up" || strategy === "combo";
+      const yearIndex = Math.floor((m - 1) / 12);
+      const currentEmi = isStepUp ? emiOriginal * Math.pow(1.05, yearIndex) : emiOriginal;
+
+      // Regular monthly payment
+      const paymentForMonth = Math.min(currentEmi, balance + interestForMonth);
+      const principalForMonth = paymentForMonth - interestForMonth;
+      totalPaidWithPrepayment += paymentForMonth;
       balance -= principalForMonth;
       monthsWithPrepayment = m;
 
-      // Apply prepayment
-      if (m === prepaymentMonth && balance > 0) {
+      // Apply prepayments at the end of the month
+      if (balance <= 0) break;
+
+      // 1. Lump Sum Prepayment (only for lump-sum strategy)
+      if (strategy === "lump-sum" && m === prepaymentMonth) {
         const actualPrepayment = Math.min(prepaymentAmount, balance);
+        balance -= actualPrepayment;
+        totalPaidWithPrepayment += actualPrepayment;
+      }
+
+      // 2. 13th EMI / Combo Prepayment
+      // paid at the end of every 12-month cycle (month 12, 24, 36...)
+      if ((strategy === "13th-emi" || strategy === "combo") && m % 12 === 0) {
+        const actualPrepayment = Math.min(currentEmi, balance);
         balance -= actualPrepayment;
         totalPaidWithPrepayment += actualPrepayment;
       }
@@ -66,7 +86,7 @@ const PrepaymentCalculator = () => {
       tenureSaved: Math.max(0, tenureSaved),
       monthsWithPrepayment,
     };
-  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth]);
+  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth, strategy]);
 
   const savingsPercentage = calculations.interestOriginal > 0 
     ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1) 
@@ -76,7 +96,7 @@ const PrepaymentCalculator = () => {
     <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col">
 
       {/* Header */}
-      <div className="flex items-center gap-3.5 mb-6 relative z-10 w-full shrink-0">
+      <div className="flex items-center gap-3.5 mb-5 relative z-10 w-full shrink-0">
         <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
           <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         </div>
@@ -88,15 +108,37 @@ const PrepaymentCalculator = () => {
         </div>
       </div>
 
+      {/* Strategy Tabs Selector */}
+      <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/40 dark:bg-[#0d1829]/65 rounded-xl border border-border dark:border-white/5 mb-5 relative z-10 select-none shrink-0">
+        {[
+          { id: "lump-sum", label: "Lump Sum" },
+          { id: "13th-emi", label: "13th EMI" },
+          { id: "step-up", label: "5% Step-Up" },
+          { id: "combo", label: "Pryme Combo" }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setStrategy(tab.id as any)}
+            className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${
+              strategy === tab.id
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-emerald-500 dark:text-[#080d1e]"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 relative z-10 w-full h-full items-stretch">
         
-        {/* Left Col: 5 Compact Interactive Sliders */}
-        <div className="space-y-3 flex flex-col justify-start w-full min-w-0">
+        {/* Left Col: 5 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
+        <div className="lg:grid lg:grid-rows-5 lg:gap-3 flex flex-col space-y-3 lg:space-y-0 w-full min-w-0">
           
           {/* Loan Amount */}
-          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
-            <div className="flex justify-between items-center mb-2">
+          <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="flex justify-between items-center mb-1.5">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Amount</label>
               <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {formatCurrency(loanAmount)}
@@ -106,8 +148,8 @@ const PrepaymentCalculator = () => {
           </div>
 
           {/* Interest Rate */}
-          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
-            <div className="flex justify-between items-center mb-2">
+          <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="flex justify-between items-center mb-1.5">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Interest Rate</label>
               <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {interestRate}% <span className="text-[8px] text-muted-foreground">p.a.</span>
@@ -117,8 +159,8 @@ const PrepaymentCalculator = () => {
           </div>
 
           {/* Tenure */}
-          <div className="bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30">
-            <div className="flex justify-between items-center mb-2">
+          <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="flex justify-between items-center mb-1.5">
               <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Tenure</label>
               <div className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded shadow-sm border border-border dark:border-white/5 leading-none">
                 {tenureMonths} Mo <span className="text-[8px] text-muted-foreground">({(tenureMonths/12).toFixed(1)} Yrs)</span>
@@ -127,27 +169,106 @@ const PrepaymentCalculator = () => {
             <Slider max={360} min={12} step={12} value={[tenureMonths]} onValueChange={(val) => setTenureMonths(val[0])} className="w-full cursor-pointer py-0.5" />
           </div>
 
-          {/* Prepayment Amount */}
-          <div className="bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepayment Amount</label>
-              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
-                {formatCurrency(prepaymentAmount)}
+          {strategy === "lump-sum" ? (
+            <>
+              {/* Prepayment Amount */}
+              <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40 flex flex-col justify-center">
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepayment Amount</label>
+                  <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
+                    {formatCurrency(prepaymentAmount)}
+                  </div>
+                </div>
+                <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
               </div>
-            </div>
-            <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
-          </div>
 
-          {/* Prepayment Month */}
-          <div className="bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepay After Month</label>
-              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
-                Month {prepaymentMonth}
+              {/* Prepayment Month */}
+              <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm transition-all focus-within:border-emerald-600/50 hover:border-emerald-500/40 flex flex-col justify-center">
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepay After Month</label>
+                  <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded shadow-sm border border-emerald-200/50 dark:border-emerald-500/20 leading-none">
+                    Month {prepaymentMonth}
+                  </div>
+                </div>
+                <Slider max={Math.max(1, tenureMonths - 1)} min={1} step={1} value={[prepaymentMonth]} onValueChange={(val) => setPrepaymentMonth(val[0])} className="w-full cursor-pointer py-0.5" />
               </div>
+            </>
+          ) : (
+            /* Strategy Specific Info Card spanning 2 rows on desktop to align with bottom rows of output */
+            <div className="lg:row-span-2 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-4 rounded-xl border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden h-full select-none">
+              <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+              
+              {strategy === "13th-emi" && (
+                <div className="flex gap-3 items-start relative z-10">
+                  <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                    <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1 uppercase tracking-wider">13th EMI Acceleration</h4>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                      By making <strong className="text-foreground font-semibold">one extra EMI payment every 12 months</strong>, you aggressively reduce your outstanding principal. This simple compounding habit can trim a 20-year loan by up to 4 years.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {strategy === "step-up" && (
+                <div className="flex gap-3 items-start relative z-10">
+                  <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                    <Percent className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1 uppercase tracking-wider">5% Step-Up Strategy</h4>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed mb-1.5">
+                      Increases your monthly EMI by <strong className="text-foreground font-semibold">5% at the end of every 12 months</strong>.
+                    </p>
+                    <ul className="text-[9px] text-muted-foreground space-y-1 pl-1 list-none">
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Entire 5% increment goes directly to principal reduction.</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Compound interest is stifled immediately.</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Repay a standard 20-year loan in <strong className="text-foreground font-semibold">12-14 years</strong>.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {strategy === "combo" && (
+                <div className="flex gap-3 items-start relative z-10">
+                  <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                    <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1 uppercase tracking-wider">Pryme Dual-Engine Combo</h4>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed mb-1.5">
+                      Combines both <strong className="text-foreground font-semibold">13th EMI prepayments</strong> and a <strong className="text-foreground font-semibold">5% annual step-up</strong>.
+                    </p>
+                    <ul className="text-[9px] text-muted-foreground space-y-1 pl-1 list-none">
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Yearly 5% compounding EMI increment.</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Extra 13th EMI paid at the end of each year.</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Ultimate acceleration: cuts loan tenure by more than half.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
-            <Slider max={Math.max(1, tenureMonths - 1)} min={1} step={1} value={[prepaymentMonth]} onValueChange={(val) => setPrepaymentMonth(val[0])} className="w-full cursor-pointer py-0.5" />
-          </div>
+          )}
 
         </div>
 
@@ -155,13 +276,13 @@ const PrepaymentCalculator = () => {
         <div className="flex flex-col lg:grid lg:grid-rows-5 gap-3 w-full min-w-0 h-full mt-2 lg:mt-0">
           
           {/* Savings Hero */}
-          <div className="flex flex-col items-center justify-center p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1 lg:row-span-3">
+          <div className="flex flex-col items-center justify-center p-4 lg:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1 lg:row-span-3">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b9811a_1px,transparent_1px),linear-gradient(to_bottom,#10b9811a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
             
             <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5 relative z-10">
               <TrendingDown className="w-3.5 h-3.5" /> Interest Saved
             </span>
-            <span className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none drop-shadow-sm mb-2 truncate max-w-full relative z-10">
+            <span className="text-xl lg:text-2xl xl:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none drop-shadow-sm mb-2 truncate max-w-full relative z-10">
               {formatCurrency(calculations.interestSaved)}
             </span>
             <span className="text-[9px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-sm border border-emerald-500/20 relative z-10">

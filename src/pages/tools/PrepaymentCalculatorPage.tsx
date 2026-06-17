@@ -13,6 +13,7 @@ import {
   Percent,
   ArrowDownRight,
   Info,
+  Zap
 } from "lucide-react";
 import {
   Accordion,
@@ -27,6 +28,7 @@ const PrepaymentCalculatorPage = () => {
   const [tenureMonths, setTenureMonths] = useState(120);
   const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
   const [prepaymentMonth, setPrepaymentMonth] = useState(12);
+  const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
 
   const calculations = useMemo(() => {
     const monthlyRate = interestRate / 12 / 100;
@@ -38,7 +40,7 @@ const PrepaymentCalculatorPage = () => {
     const totalOriginal = emiOriginal * tenureMonths;
     const interestOriginal = totalOriginal - loanAmount;
 
-    // With Prepayment — recalculate after prepayment month
+    // With Prepayment / Step-up
     let balance = loanAmount;
     let totalPaidWithPrepayment = 0;
     let monthsWithPrepayment = 0;
@@ -47,14 +49,33 @@ const PrepaymentCalculatorPage = () => {
       if (balance <= 0) break;
 
       const interestForMonth = balance * monthlyRate;
-      const principalForMonth = Math.min(emiOriginal - interestForMonth, balance);
-      totalPaidWithPrepayment += Math.min(emiOriginal, balance + interestForMonth);
+      
+      // Calculate current EMI for this month (incorporating annual 5% step-up if active)
+      const isStepUp = strategy === "step-up" || strategy === "combo";
+      const yearIndex = Math.floor((m - 1) / 12);
+      const currentEmi = isStepUp ? emiOriginal * Math.pow(1.05, yearIndex) : emiOriginal;
+
+      // Regular monthly payment
+      const paymentForMonth = Math.min(currentEmi, balance + interestForMonth);
+      const principalForMonth = paymentForMonth - interestForMonth;
+      totalPaidWithPrepayment += paymentForMonth;
       balance -= principalForMonth;
       monthsWithPrepayment = m;
 
-      // Apply prepayment
-      if (m === prepaymentMonth && balance > 0) {
+      // Apply prepayments at the end of the month
+      if (balance <= 0) break;
+
+      // 1. Lump Sum Prepayment (only for lump-sum strategy)
+      if (strategy === "lump-sum" && m === prepaymentMonth) {
         const actualPrepayment = Math.min(prepaymentAmount, balance);
+        balance -= actualPrepayment;
+        totalPaidWithPrepayment += actualPrepayment;
+      }
+
+      // 2. 13th EMI / Combo Prepayment
+      // paid at the end of every 12-month cycle (month 12, 24, 36...)
+      if ((strategy === "13th-emi" || strategy === "combo") && m % 12 === 0) {
+        const actualPrepayment = Math.min(currentEmi, balance);
         balance -= actualPrepayment;
         totalPaidWithPrepayment += actualPrepayment;
       }
@@ -76,7 +97,7 @@ const PrepaymentCalculatorPage = () => {
       tenureSaved: Math.max(0, tenureSaved),
       monthsWithPrepayment,
     };
-  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth]);
+  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth, strategy]);
 
   const formatCurrency = (value: number) => {
     if (value >= 10000000) return `₹${(value / 10000000).toFixed(2)} Cr`;
@@ -125,7 +146,7 @@ const PrepaymentCalculatorPage = () => {
                   Calculator
                 </h1>
                 <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                  Discover how a single lump-sum prepayment can dramatically
+                  Discover how a smart prepayment strategy can dramatically
                   reduce your total interest and loan tenure.
                 </p>
               </div>
@@ -147,9 +168,31 @@ const PrepaymentCalculatorPage = () => {
                           Prepayment Calculator
                         </h3>
                         <p className="text-[8px] md:text-[9px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">
-                          Lump-sum savings estimator
+                          Lump-sum & accelerated savings estimator
                         </p>
                       </div>
+                    </div>
+
+                    {/* Strategy Selector Tabs */}
+                    <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/40 dark:bg-[#0d1829]/65 rounded-xl border border-border dark:border-white/5 mb-5 relative z-10 select-none shrink-0">
+                      {[
+                        { id: "lump-sum", label: "Lump Sum" },
+                        { id: "13th-emi", label: "13th EMI" },
+                        { id: "step-up", label: "5% Step-Up" },
+                        { id: "combo", label: "Pryme Combo" }
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setStrategy(tab.id as any)}
+                          className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${
+                            strategy === tab.id
+                              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-emerald-500 dark:text-[#080d1e]"
+                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
                     </div>
 
                     {/* Savings Hero */}
@@ -307,61 +350,140 @@ const PrepaymentCalculatorPage = () => {
                         </div>
                       </div>
 
-                      {/* Prepayment Amount */}
-                      <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
-                        <div className="flex justify-between items-center mb-3 md:mb-4">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Prepayment Amount
-                          </span>
-                          <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
-                            {formatCurrency(prepaymentAmount)}
-                          </span>
-                        </div>
-                        <Slider
-                          value={[prepaymentAmount]}
-                          onValueChange={(v) => setPrepaymentAmount(v[0])}
-                          min={10000}
-                          max={Math.min(loanAmount, 5000000)}
-                          step={10000}
-                          className="cursor-pointer py-1"
-                        />
-                        <div className="flex justify-between mt-2 md:mt-3">
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            ₹10K
-                          </span>
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            {formatCurrency(Math.min(loanAmount, 5000000))}
-                          </span>
-                        </div>
-                      </div>
+                      {strategy === "lump-sum" ? (
+                        <>
+                          {/* Prepayment Amount */}
+                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
+                            <div className="flex justify-between items-center mb-3 md:mb-4">
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                                Prepayment Amount
+                              </span>
+                              <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
+                                {formatCurrency(prepaymentAmount)}
+                              </span>
+                            </div>
+                            <Slider
+                              value={[prepaymentAmount]}
+                              onValueChange={(v) => setPrepaymentAmount(v[0])}
+                              min={10000}
+                              max={Math.min(loanAmount, 5000000)}
+                              step={10000}
+                              className="cursor-pointer py-1"
+                            />
+                            <div className="flex justify-between mt-2 md:mt-3">
+                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                                ₹10K
+                              </span>
+                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                                {formatCurrency(Math.min(loanAmount, 5000000))}
+                              </span>
+                            </div>
+                          </div>
 
-                      {/* Prepayment Month */}
-                      <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
-                        <div className="flex justify-between items-center mb-3 md:mb-4">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Prepay After Month
-                          </span>
-                          <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
-                            Month {prepaymentMonth}
-                          </span>
+                          {/* Prepayment Month */}
+                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
+                            <div className="flex justify-between items-center mb-3 md:mb-4">
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                                Prepay After Month
+                              </span>
+                              <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
+                                Month {prepaymentMonth}
+                              </span>
+                            </div>
+                            <Slider
+                              value={[prepaymentMonth]}
+                              onValueChange={(v) => setPrepaymentMonth(v[0])}
+                              min={1}
+                              max={Math.max(1, tenureMonths - 1)}
+                              step={1}
+                              className="cursor-pointer py-1"
+                            />
+                            <div className="flex justify-between mt-2 md:mt-3">
+                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                                Month 1
+                              </span>
+                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                                Month {Math.max(1, tenureMonths - 1)}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        /* Strategy Explanation Card */
+                        <div className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-5 rounded-xl border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden select-none">
+                          <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+                          
+                          {strategy === "13th-emi" && (
+                            <div className="flex gap-4 items-start relative z-10">
+                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">13th EMI Acceleration</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  By making <strong className="text-foreground font-semibold">one extra EMI payment every 12 months</strong>, you aggressively reduce your outstanding principal. This simple compounding habit can trim a 20-year loan by up to 4 years.
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {strategy === "step-up" && (
+                            <div className="flex gap-4 items-start relative z-10">
+                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                                <Percent className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">5% Step-Up Strategy</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                                  Increases your monthly EMI by <strong className="text-foreground font-semibold">5% at the end of every 12 months</strong>.
+                                </p>
+                                <ul className="text-xs text-muted-foreground space-y-1.5 pl-1 list-none">
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Entire 5% increment goes directly to principal reduction.</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Compound interest is stifled immediately.</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Repay a standard 20-year loan in <strong className="text-foreground font-semibold">12-14 years</strong>.</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          )}
+
+                          {strategy === "combo" && (
+                            <div className="flex gap-4 items-start relative z-10">
+                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                                <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">Pryme Dual-Engine Combo</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                                  Combines both <strong className="text-foreground font-semibold">13th EMI prepayments</strong> and a <strong className="text-foreground font-semibold">5% annual step-up</strong>.
+                                </p>
+                                <ul className="text-xs text-muted-foreground space-y-1.5 pl-1 list-none">
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Yearly 5% compounding EMI increment.</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Extra 13th EMI paid at the end of each year.</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Ultimate acceleration: cuts loan tenure by more than half.</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <Slider
-                          value={[prepaymentMonth]}
-                          onValueChange={(v) => setPrepaymentMonth(v[0])}
-                          min={1}
-                          max={Math.max(1, tenureMonths - 1)}
-                          step={1}
-                          className="cursor-pointer py-1"
-                        />
-                        <div className="flex justify-between mt-2 md:mt-3">
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            Month 1
-                          </span>
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            Month {Math.max(1, tenureMonths - 1)}
-                          </span>
-                        </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Terminology */}
