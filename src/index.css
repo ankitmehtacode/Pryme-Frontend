@@ -324,6 +324,12 @@
   }
 }
 
+/* Prevent duplicate icons inside select trigger values */
+[data-radix-select-trigger] .select-item-icon,
+button[role="combobox"] .select-item-icon {
+  display: none !important;
+}
+
 /* ─────────────────────────────────────────────────────────────
    ACCESSIBILITY + LOW-END DEVICE PERFORMANCE GUARD
    When "Reduce Motion" is enabled in OS settings (iOS, Android,

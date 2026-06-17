@@ -73,7 +73,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
             return (
               <SelectItem key={opt.value} value={opt.value}>
                 <span className="flex items-center gap-2">
-                  <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60 [[data-radix-select-trigger]_&]:hidden" />
+                  <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60 select-item-icon" />
                   {opt.label}
                 </span>
               </SelectItem>
