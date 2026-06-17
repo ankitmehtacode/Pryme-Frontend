@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Loader2, Briefcase, IndianRupee } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface LeadsTabProps {
   isLoadingLeads: boolean;
@@ -117,7 +117,9 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                             disabled={isUpdating}
                           >
                             <SelectTrigger className="bg-transparent border-0 p-0 h-auto w-auto focus:ring-0 focus:ring-offset-0 select-none cursor-pointer hover:opacity-80 transition-opacity">
-                              <StatusBadge status={lead.status || "NEW"} />
+                              <SelectValue>
+                                <StatusBadge status={lead.status || "NEW"} />
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
                               <SelectItem value="NEW" className="text-xs">NEW</SelectItem>

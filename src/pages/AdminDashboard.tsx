@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import pryme2Logo from "@/assets/Pryme2.svg";
 import prymeWordmark from "@/assets/pryme-wordmark.svg";
 import { PrymeAPI } from "@/lib/api";
@@ -68,7 +69,9 @@ const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       const docType = file.name.split('.')[0].toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
-      return await PrymeAPI.uploadApplicationDocument(applicationId, docType, file);
+      const res = await PrymeAPI.uploadApplicationDocument(applicationId, docType, file);
+      if (res.error) throw new Error(res.error.message);
+      return res.data;
     },
     onSuccess: () => {
       toast.success("Document uploaded successfully.");
@@ -78,7 +81,13 @@ const DocumentsPanel = ({ applicationId }: { applicationId: string }) => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (docId: string) => fetchWithAuth(`/documents/${docId}`, { method: "DELETE" }),
+    mutationFn: async (docId: string) => {
+      const res = await PrymeAPI.deleteDocument(docId);
+      if (res && typeof res === 'object' && 'error' in res && res.error) {
+        throw new Error((res.error as any).message);
+      }
+      return res;
+    },
     onSuccess: () => {
       toast.success("Document deleted.");
       queryClient.invalidateQueries({ queryKey: ["app_documents", applicationId] });
@@ -197,7 +206,6 @@ const AdminDashboard = () => {
     time: string;
   }
 
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<AdminNotification[]>([
     {
       id: "1",
@@ -218,18 +226,6 @@ const AdminDashboard = () => {
       time: "2h ago"
     }
   ]);
-
-  const notificationsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setIsNotificationsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
 
@@ -663,69 +659,64 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="relative" ref={notificationsRef}>
-                <button
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06] focus:outline-none"
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="relative p-2.5 text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/[0.06] focus:outline-none"
+                  >
+                    <Bell className="w-4 h-4" />
+                    {notifications.length > 0 && (
+                      <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.8)] border border-[#0a0a10]" />
+                    )}
+                  </button>
+                </PopoverTrigger>
+
+                <PopoverContent 
+                  align="end" 
+                  sideOffset={8}
+                  className="w-80 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-4 flex flex-col gap-3 text-left"
                 >
-                  <Bell className="w-4 h-4" />
-                  {notifications.length > 0 && (
-                    <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.8)] border border-[#0a0a10]" />
-                  )}
-                </button>
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                    <span className="font-semibold text-white text-xs uppercase tracking-wider">Notifications</span>
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={() => setNotifications([])}
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
 
-                <AnimatePresence>
-                  {isNotificationsOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-80 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3 text-left"
-                    >
-                      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
-                        <span className="font-semibold text-white text-xs uppercase tracking-wider">Notifications</span>
-                        {notifications.length > 0 && (
+                  {notifications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
+                      <Bell className="w-8 h-8 text-slate-600 animate-pulse" />
+                      <p className="text-xs font-medium text-slate-400">No notifications available</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04] pr-1">
+                      {notifications.map((note) => (
+                        <div
+                          key={note.id}
+                          className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3 group/item"
+                        >
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold text-white">{note.title}</p>
+                            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{note.message}</p>
+                            <span className="text-[9px] text-slate-600 font-medium block mt-1">{note.time}</span>
+                          </div>
                           <button
-                            onClick={() => setNotifications([])}
-                            className="text-[10px] text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                            onClick={() => setNotifications(prev => prev.filter(n => n.id !== note.id))}
+                            className="text-slate-600 hover:text-slate-400 opacity-0 group-hover/item:opacity-100 transition-opacity p-1 shrink-0"
                           >
-                            Clear All
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        )}
-                      </div>
-
-                      {notifications.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
-                          <Bell className="w-8 h-8 text-slate-600 animate-pulse" />
-                          <p className="text-xs font-medium text-slate-400">No notifications available</p>
                         </div>
-                      ) : (
-                        <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04] pr-1">
-                          {notifications.map((note) => (
-                            <div
-                              key={note.id}
-                              className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3 group/item"
-                            >
-                              <div className="flex-1">
-                                <p className="text-xs font-semibold text-white">{note.title}</p>
-                                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{note.message}</p>
-                                <span className="text-[9px] text-slate-600 font-medium block mt-1">{note.time}</span>
-                              </div>
-                              <button
-                                onClick={() => setNotifications(prev => prev.filter(n => n.id !== note.id))}
-                                className="text-slate-600 hover:text-slate-400 opacity-0 group-hover/item:opacity-100 transition-opacity p-1 shrink-0"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
+                      ))}
+                    </div>
                   )}
-                </AnimatePresence>
-              </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </header>
 
