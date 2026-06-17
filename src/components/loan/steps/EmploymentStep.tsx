@@ -490,7 +490,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                             isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) > 0}
                           />
                           <ValidatedInput
-                            label="Net Monthly Income (₹)"
+                            label="Business Income as per ITR (₹)"
                             type="number"
                             placeholder="100000"
                             icon={IndianRupee}
