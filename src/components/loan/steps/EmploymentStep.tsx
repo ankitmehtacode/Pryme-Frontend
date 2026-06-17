@@ -22,6 +22,11 @@ interface EmploymentStepProps {
 export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
   const rawStore = useApplicationStore();
   
+  const getInputValue = (val: any) => {
+    if (val === undefined || val === null) return "";
+    return val;
+  };
+
   // Wrap rawStore to guarantee nested objects exist during early hydration phases
   const store = {
     ...rawStore,
@@ -200,8 +205,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   type="number"
                   placeholder="e.g. 45000"
                   icon={CreditCard}
-                  value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.existingEMI || "") : ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ existingEMI: Number(e.target.value) })}
+                  value={getInputValue(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.existingEMI : null)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ existingEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                   isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.existingEMI : -1) >= 0}
                 />
 
@@ -225,8 +230,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                           type="number"
                           placeholder="e.g. 15000 (or 0 if none)"
                           icon={IndianRupee}
-                          value={store.financialDetails.path === "SALARIED" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ maturingLoanEMI: Number(e.target.value) })}
+                          value={getInputValue(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.maturingLoanEMI : null)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateSalariedDetails({ maturingLoanEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                           isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                         />
                       </div>
@@ -329,8 +334,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   type="number"
                   placeholder="e.g. 45000"
                   icon={CreditCard}
-                  value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.existingEMI || "") : ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ existingEMI: Number(e.target.value) })}
+                  value={getInputValue(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.existingEMI : null)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ existingEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                   isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.existingEMI : -1) >= 0}
                 />
 
@@ -354,8 +359,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                           type="number"
                           placeholder="e.g. 15000 (or 0 if none)"
                           icon={IndianRupee}
-                          value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ maturingLoanEMI: Number(e.target.value) })}
+                          value={getInputValue(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.maturingLoanEMI : null)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ maturingLoanEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                           isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                         />
                       </div>
@@ -631,8 +636,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   type="number"
                   placeholder="e.g. 45000"
                   icon={CreditCard}
-                  value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.existingEMI || "") : ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ existingEMI: Number(e.target.value) })}
+                  value={getInputValue(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.existingEMI : null)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ existingEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                   isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.existingEMI : -1) >= 0}
                 />
 
@@ -656,8 +661,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                           type="number"
                           placeholder="e.g. 15000 (or 0 if none)"
                           icon={IndianRupee}
-                          value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.maturingLoanEMI ?? "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ maturingLoanEMI: Number(e.target.value) })}
+                          value={getInputValue(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.maturingLoanEMI : null)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ maturingLoanEMI: e.target.value === "" ? undefined : Number(e.target.value) })}
                           isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.maturingLoanEMI ?? 0 : 0) >= 0}
                         />
                       </div>

@@ -128,7 +128,7 @@ export interface SalariedDetails {
   grossSalary: number;           // Pre-tax
   netMonthlySalary: number;      // Take-home
   hasExistingLoans: boolean;
-  existingEMI: number;           // Total monthly EMI burden (Step A)
+  existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 
@@ -146,7 +146,7 @@ export interface ProfessionalDetails {
   annualGrossReceipts: number;   // Gross professional receipts (pre-expense)
   netMonthlyIncome: number;
   hasExistingLoans: boolean;
-  existingEMI: number;           // Total monthly EMI burden (Step A)
+  existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 
@@ -191,7 +191,7 @@ export interface BusinessDetails {
   // Common
   netMonthlyIncome: number;
   hasExistingLoans: boolean;
-  existingEMI: number;           // Total monthly EMI burden (Step A)
+  existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
 }
 

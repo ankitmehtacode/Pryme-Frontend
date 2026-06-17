@@ -108,7 +108,7 @@ const defaultSalaried: SalariedDetails = {
   grossSalary: 0,
   netMonthlySalary: 0,
   hasExistingLoans: false,
-  existingEMI: 0,
+  existingEMI: undefined,
 };
 
 const defaultProfessional: ProfessionalDetails = {
@@ -122,7 +122,7 @@ const defaultProfessional: ProfessionalDetails = {
   annualGrossReceipts: 0,
   netMonthlyIncome: 0,
   hasExistingLoans: false,
-  existingEMI: 0,
+  existingEMI: undefined,
 };
 
 const defaultBusiness: BusinessDetails = {
@@ -151,7 +151,7 @@ const defaultBusiness: BusinessDetails = {
   // Common
   netMonthlyIncome: 0,
   hasExistingLoans: false,
-  existingEMI: 0,
+  existingEMI: undefined,
 };
 
 // ─── STORE SCHEMA VERSION ───────────────────────────────────────────────────
