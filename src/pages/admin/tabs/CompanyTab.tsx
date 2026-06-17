@@ -31,7 +31,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
             <th className="px-6 py-4">Email</th>
             <th className="px-6 py-4">Role</th>
             <th className="px-6 py-4">Joined</th>
-            <th className="px-6 py-4">System UUID</th>
+            <th className="px-6 py-4">Employee ID</th>
             <th className="px-6 py-4 text-right">Actions</th>
           </tr>
         </thead>
@@ -85,7 +85,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
                   )}
                 </td>
                 <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
-                <td className="px-6 py-4 text-slate-600 font-mono text-[10px]">{u.id}</td>
+                <td className="px-6 py-4 text-slate-300 font-mono text-xs font-semibold">{u.employeeId || '—'}</td>
                 <td className="px-6 py-4 text-right">
                   {canDelete && (
                     <ConfirmAction

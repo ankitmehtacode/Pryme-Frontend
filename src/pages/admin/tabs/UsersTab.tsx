@@ -19,10 +19,10 @@ export const UsersTab: React.FC<UsersTabProps> = ({ users, isSuperAdmin, authUse
         <thead className="bg-white/[0.02] border-b border-white/[0.04]">
           <tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
             <th className="px-6 py-4">Customer</th>
+            <th className="px-6 py-4">Customer ID</th>
             <th className="px-6 py-4">Email</th>
             <th className="px-6 py-4">Location</th>
             <th className="px-6 py-4">Joined</th>
-            <th className="px-6 py-4">System UUID</th>
             <th className="px-6 py-4 text-right">Actions</th>
           </tr>
         </thead>
@@ -40,10 +40,10 @@ export const UsersTab: React.FC<UsersTabProps> = ({ users, isSuperAdmin, authUse
                     <p className="font-semibold text-white">{u.fullName || u.full_name}</p>
                   </div>
                 </td>
+                <td className="px-6 py-4 text-slate-300 font-mono text-xs font-semibold">{u.customerId || '—'}</td>
                 <td className="px-6 py-4 text-slate-400 text-xs">{u.email}</td>
                 <td className="px-6 py-4 text-slate-500 text-xs">{u.city ? `${u.city}, ${u.state || ''}` : '—'}</td>
                 <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
-                <td className="px-6 py-4 text-slate-600 font-mono text-[10px]">{u.id}</td>
                 <td className="px-6 py-4 text-right">
                   {(isSuperAdmin || authUser?.role === "ADMIN") && (
                     <Select
