@@ -15,6 +15,7 @@ interface OffersTabProps {
   setIsOfferModalOpen: (open: boolean) => void;
   toggleProductMutation: any;
   refetchProducts: () => void;
+  globalSearchQuery?: string;
 }
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
@@ -47,13 +48,14 @@ const DetailCell = ({ label, value, mono }: { label: string; value: any; mono?: 
 
 export const OffersTab: React.FC<OffersTabProps> = ({
   productStatusFilter, setProductStatusFilter, products, filteredProducts,
-  setSelectedProduct, setIsOfferModalOpen, toggleProductMutation, refetchProducts
+  setSelectedProduct, setIsOfferModalOpen, toggleProductMutation, refetchProducts,
+  globalSearchQuery
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const searchFilteredProducts = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
+    const q = (globalSearchQuery || searchQuery).toLowerCase().trim();
     if (!q) return filteredProducts;
     return filteredProducts.filter((p: any) =>
       (p.lenderName?.toLowerCase() ?? "").includes(q) ||
@@ -62,7 +64,7 @@ export const OffersTab: React.FC<OffersTabProps> = ({
       (p.campaignName?.toLowerCase() ?? "").includes(q) ||
       (p.loanType?.toLowerCase() ?? "").includes(q)
     );
-  }, [filteredProducts, searchQuery]);
+  }, [filteredProducts, searchQuery, globalSearchQuery]);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6">

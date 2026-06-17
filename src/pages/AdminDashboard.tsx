@@ -180,6 +180,11 @@ const AdminDashboard = () => {
   const [leadFilter, setLeadFilter] = useState<"all" | "queue">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // 🧠 Reset search query when switching workspace tabs to keep search context scoped
+  useEffect(() => {
+    setSearchQuery("");
+  }, [activeTab]);
+
 
   // 🧠 Active/Inactive filter states for entity management
   const [bankStatusFilter, setBankStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -811,6 +816,7 @@ const AdminDashboard = () => {
                       products={products} filteredProducts={filteredProducts}
                       setSelectedProduct={setSelectedProduct} setIsOfferModalOpen={setIsOfferModalOpen}
                       toggleProductMutation={toggleProductMutation} refetchProducts={refetchProducts}
+                      searchQuery={searchQuery}
                     />
                     <AdminEligibilityModal 
                       isOpen={isEligibilityModalOpen}

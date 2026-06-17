@@ -36,6 +36,9 @@ interface SettingsTabProps {
   setIsOfferModalOpen: (open: boolean) => void;
   toggleProductMutation: any;
   refetchProducts: () => void;
+  
+  // ── Global Search ──────────────────────────────────────────────────
+  searchQuery?: string;
 }
 
 type SubSection = "rules" | "products";
@@ -46,14 +49,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   updateEligibilityRuleMutation, deleteEligibilityRuleMutation, onViewSnapshot,
   // Product props
   productStatusFilter, setProductStatusFilter, products, filteredProducts,
-  setSelectedProduct, setIsOfferModalOpen, toggleProductMutation, refetchProducts
+  setSelectedProduct, setIsOfferModalOpen, toggleProductMutation, refetchProducts,
+  searchQuery
 }) => {
   const [activeSubSection, setActiveSubSection] = useState<SubSection>("rules");
   const [ruleSearchQuery, setRuleSearchQuery] = useState("");
   const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
 
   const searchFilteredRules = useMemo(() => {
-    const q = ruleSearchQuery.toLowerCase().trim();
+    const q = (searchQuery || ruleSearchQuery).toLowerCase().trim();
     if (!q) return filteredEligibilityRules;
     return filteredEligibilityRules.filter((rule: any) =>
       (rule.bankName?.toLowerCase() ?? "").includes(q) ||
@@ -62,7 +66,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       (rule.incomeType?.toLowerCase() ?? "").includes(q) ||
       (rule.conditions?.toLowerCase() ?? "").includes(q)
     );
-  }, [filteredEligibilityRules, ruleSearchQuery]);
+  }, [filteredEligibilityRules, ruleSearchQuery, searchQuery]);
 
   const subSections: { id: SubSection; label: string; icon: React.ElementType; count: number }[] = [
     { id: "rules", label: "Engine Rules", icon: Zap, count: eligibilityRules.length },
@@ -344,6 +348,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           setIsOfferModalOpen={setIsOfferModalOpen}
           toggleProductMutation={toggleProductMutation}
           refetchProducts={refetchProducts}
+          globalSearchQuery={searchQuery}
         />
       )}
     </div>
