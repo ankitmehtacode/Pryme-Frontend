@@ -453,14 +453,6 @@ const HeroSection = memo(() => {
               </span>
               <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Happy Customers</span>
             </div>
-            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
-            <div className="flex items-center gap-1.5">
-              <Landmark className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                <MiniCountUp to={15} suffix="+" />
-              </span>
-              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Banking Partners</span>
-            </div>
           </div>
         </div>
 
