@@ -27,7 +27,7 @@ const PartnerBankMarquee = memo(() => {
       {/* PERF FIX: Replaced max-w-[100vw] with w-full.
            100vw includes scrollbar width on Windows/Linux (17px) → horizontal overflow.
            w-full respects the parent's content-box → no overflow ever. */}
-      <div className="relative flex w-full overflow-hidden py-4">
+      <div className="relative flex w-full overflow-hidden py-0">
 
         {/* Wide luminous edge fades */}
         <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-r from-slate-50 via-slate-50/80 dark:from-[#030303] dark:via-[#030303]/80 to-transparent z-10 pointer-events-none" />
@@ -40,7 +40,7 @@ const PartnerBankMarquee = memo(() => {
 
         {/* Marquee Track */}
         <div className="flex w-full group overflow-hidden">
-          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-4">
+          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-1">
             {banks.map((bank, index) => (
               <div
                 key={`track1-${index}`}
@@ -70,7 +70,7 @@ const PartnerBankMarquee = memo(() => {
               compositing operations in a scrolling loop. The visual hover effect
               on track 1 (above) is already sufficient. This track is invisible
               to screen readers; it exists only to make the marquee loop seamless. */}
-          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-4">
+          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-1">
             {banks.map((bank, index) => (
               <div
                 key={`track2-${index}`}
@@ -96,7 +96,7 @@ const PartnerBankMarquee = memo(() => {
       </div>
 
       {/* Section Header */}
-      <div className="container mx-auto px-4 mt-10 mb-4 text-center">
+      <div className="container mx-auto px-4 mt-6 mb-2 text-center">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           Lending Partners

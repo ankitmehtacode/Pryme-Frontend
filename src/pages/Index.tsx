@@ -127,7 +127,7 @@ const Index = () => {
               <ProductSelectorGrid />
               
               {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
-              <div className="pt-4 pb-2 md:pb-4 w-full transition-all">
+              <div className="pt-0 pb-0 w-full transition-all">
                 <PartnerBankMarquee />
               </div>
             </div>
@@ -135,7 +135,7 @@ const Index = () => {
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
-            <section className="section-contained py-12 md:py-16 lg:py-20 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="section-contained pt-2 pb-12 md:pt-4 md:pb-16 lg:pt-6 lg:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}

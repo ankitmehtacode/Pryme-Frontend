@@ -110,7 +110,7 @@ const viewportHeading = { once: true };
 
 const ProductSelectorGrid = memo(() => {
   return (
-    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-10 pt-0 overflow-x-clip">
+    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-2 pt-0 overflow-x-clip">
       
       {/* 🧠 4K React Bits Style Beams Background */}
       <BackgroundBeams />
