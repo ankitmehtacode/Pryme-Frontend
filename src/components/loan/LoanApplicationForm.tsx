@@ -762,7 +762,12 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         estimatedPropertyValue: Number(store.loanRequirements?.propertyValue || fp?.estimatedPropertyValue || 0),
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
-        eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0)
+        eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0),
+        itrYearsAvailable: (fin?.path === "SELF_EMPLOYED" && (fin.data as any).subType === "ITR_BASED")
+          ? ((fin.data as any).itrFiledYears !== undefined && (fin.data as any).itrFiledYears !== null
+              ? Number((fin.data as any).itrFiledYears)
+              : null)
+          : null
       };
 
       onFormSubmit?.(data);

@@ -504,10 +504,11 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                           <StyledSelect
                             label="ITR Filing (Years)"
                             icon={FileText}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.itrFiledYears ? store.financialDetails.data.itrFiledYears.toString() : undefined}
+                            value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.itrFiledYears !== undefined && store.financialDetails.data.itrFiledYears !== null ? store.financialDetails.data.itrFiledYears.toString() : undefined}
                             onValueChange={(v) => store.updateBusinessDetails({ itrFiledYears: Number(v) })}
                             placeholder="Select years of ITR filed"
                           >
+                            <SelectItem value="0">Not Filed</SelectItem>
                             <SelectItem value="1">1 Year</SelectItem>
                             <SelectItem value="2">2 Years</SelectItem>
                             <SelectItem value="3">3 or more Years</SelectItem>

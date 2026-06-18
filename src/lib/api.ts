@@ -288,6 +288,7 @@ export const PrymeAPI = {
         officialEmail: formData.officialEmail,
         workExperience: formData.totalExperienceYears || formData.workExperience,
         businessVintageYears: formData.businessVintageYears,
+        itrYearsAvailable: formData.itrYearsAvailable !== undefined ? formData.itrYearsAvailable : null,
 
         // Loan & Property details
         loanPurpose: formData.loanPurpose,

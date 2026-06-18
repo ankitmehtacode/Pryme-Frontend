@@ -133,6 +133,7 @@ const Apply = () => {
           hasCoApplicant: data.hasCoApplicant,
           existingBank: data.existingBank,
           eligibleExistingEmi: data.eligibleExistingEmi,
+          itrYearsAvailable: data.itrYearsAvailable,
         });
         
         // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION
@@ -248,7 +249,8 @@ const Apply = () => {
             // GEO-FENCE: Pass pinCode to engine for Indore-only validation
             pinCode: data.pinCode || "",
             // BUG-2 FIX: Correct field names matching Java IncomeComputationInput record
-            incomeComputationInput: incomeInput
+            incomeComputationInput: incomeInput,
+            itrYearsAvailable: data.itrYearsAvailable !== undefined && data.itrYearsAvailable !== null ? Number(data.itrYearsAvailable) : null
         };
         const engineRes = await PrymeAPI.evaluateEligibility(payload);
         if (engineRes && Array.isArray(engineRes)) {
