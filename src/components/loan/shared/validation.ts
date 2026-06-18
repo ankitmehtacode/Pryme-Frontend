@@ -70,7 +70,6 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
 
   if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
     const d = fin.data;
-    if (!d.subType) errors.subType = "Select your business program";
     if (!d.businessName || d.businessName.trim().length < 2) errors.businessName = "Enter your business name";
     if (!d.vintageYears || d.vintageYears <= 0) errors.vintageYears = "Enter your business vintage in years";
     if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";

@@ -382,222 +382,191 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
               >
                 <div className="h-px bg-gradient-to-r from-transparent via-border dark:via-white/[0.06] to-transparent" />
 
-                <PillSelector<BusinessSubType>
-                  label="Business Program"
-                  options={[
-                    { value: "ITR_BASED", label: "ITR Based", icon: CreditCard },
-                    { value: "GST_BASED", label: "GST Based", icon: CreditCard },
-                    { value: "BANKING_PROGRAM", label: "Banking (ABB)", icon: Landmark },
-                  ]}
-                  value={store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.subType : null}
-                  onChange={(v) => store.updateBusinessDetails({ subType: v })}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <ValidatedInput
-                    label="Business Name"
-                    placeholder="Sharma Enterprises"
-                    icon={BriefcaseBusiness}
-                    value={store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.businessName : ""}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ businessName: e.target.value })}
-                    isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.businessName || "" : "").length >= 2}
-                    error={errors.businessName}
-                  />
-                  <ValidatedInput
-                    label="Business Vintage (Years)"
-                    type="number"
-                    placeholder="5"
-                    icon={Calendar}
-                    value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.vintageYears || "") : ""}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ vintageYears: Number(e.target.value) })}
-                    isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.vintageYears || 0 : 0) > 0}
-                    error={errors.vintageYears}
-                  />
+                {/* Sub-section: Core Business Details */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <span className="w-1.5 h-3.5 rounded-full bg-primary dark:bg-blue-500" />
+                    Core Business Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ValidatedInput
+                      label="Business Name"
+                      placeholder="Sharma Enterprises"
+                      icon={BriefcaseBusiness}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.businessName : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ businessName: e.target.value })}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.businessName || "" : "").length >= 2}
+                      error={errors.businessName}
+                    />
+                    <ValidatedInput
+                      label="Business Vintage (Years)"
+                      type="number"
+                      placeholder="5"
+                      icon={Calendar}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.vintageYears || "") : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ vintageYears: Number(e.target.value) })}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.vintageYears || 0 : 0) > 0}
+                      error={errors.vintageYears}
+                    />
+                  </div>
                 </div>
 
-                {/* ── Program-specific income / turnover fields ─────── */}
-                {(() => {
-                  const subType = store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.subType : null;
+                <div className="h-px bg-slate-100 dark:bg-white/[0.04]" />
 
-                  if (subType === "GST_BASED") return (
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key="gst-fields"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                        className="space-y-5"
-                      >
+                {/* Sub-section: GST Details */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <span className="w-1.5 h-3.5 rounded-full bg-primary dark:bg-blue-500" />
+                    GST Filing Details <span className="text-xs font-normal text-slate-400 dark:text-slate-500">(Optional if not registered)</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ValidatedInput
+                      label="Last 12 Months GST Turnover (₹)"
+                      type="number"
+                      placeholder="e.g. 6000000"
+                      icon={IndianRupee}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.last12MonthsGstTurnover || "") : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const val = Number(e.target.value);
+                        store.updateBusinessDetails({
+                          last12MonthsGstTurnover: val,
+                          monthlyGSTTurnover: Math.round(val / 12),
+                          netMonthlyIncome: val > 0 ? Math.round(val / 12) : (store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0),
+                          subType: val > 0 ? "GST_BASED" : "ITR_BASED"
+                        });
+                      }}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.last12MonthsGstTurnover || 0 : 0) >= 0}
+                    />
+                    <StyledSelect
+                      label="Business Industry Type"
+                      icon={Briefcase}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.industryType || "Service") : undefined}
+                      onValueChange={(v) => store.updateBusinessDetails({ industryType: v })}
+                      placeholder="Select industry type"
+                    >
+                      <SelectItem value="Service">Service (10% Margin)</SelectItem>
+                      <SelectItem value="Retail">Retail (12% Margin)</SelectItem>
+                      <SelectItem value="Wholesale">Wholesale (8% Margin)</SelectItem>
+                      <SelectItem value="Manufacturing">Manufacturing (4% Margin)</SelectItem>
+                    </StyledSelect>
+                  </div>
+                </div>
 
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          {/* Last 12 months GST turnover — the primary income proxy */}
-                          <ValidatedInput
-                            label="Last 12 Months GST Turnover (₹)"
-                            type="number"
-                            placeholder="e.g. 6000000"
-                            icon={IndianRupee}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.last12MonthsGstTurnover || "") : ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              const val = Number(e.target.value);
-                              // Mirror monthly avg to netMonthlyIncome for downstream eligibility calc
-                              store.updateBusinessDetails({
-                                last12MonthsGstTurnover: val,
-                                monthlyGSTTurnover: Math.round(val / 12),
-                                netMonthlyIncome: Math.round(val / 12),
-                              });
-                            }}
-                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.last12MonthsGstTurnover || 0 : 0) > 0}
-                            error={errors.netMonthlyIncome}
-                          />
+                <div className="h-px bg-slate-100 dark:bg-white/[0.04]" />
 
-                          {/* Business Industry Type */}
-                          <StyledSelect
-                            label="Business Industry Type"
-                            icon={Briefcase}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.industryType || "Service") : undefined}
-                            onValueChange={(v) => store.updateBusinessDetails({ industryType: v })}
-                            placeholder="Select industry type"
-                          >
-                            <SelectItem value="Service">Service (10% Margin)</SelectItem>
-                            <SelectItem value="Retail">Retail (12% Margin)</SelectItem>
-                            <SelectItem value="Wholesale">Wholesale (8% Margin)</SelectItem>
-                            <SelectItem value="Manufacturing">Manufacturing (4% Margin)</SelectItem>
-                          </StyledSelect>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
+                {/* Sub-section: ITR Details */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <span className="w-1.5 h-3.5 rounded-full bg-primary dark:bg-blue-500" />
+                    ITR Filing &amp; Income Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ValidatedInput
+                      label="Annual Turnover (₹)"
+                      type="number"
+                      placeholder="5000000"
+                      icon={IndianRupee}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.annualTurnover || "") : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const val = Number(e.target.value);
+                        store.updateBusinessDetails({
+                          annualTurnover: val,
+                          subType: "ITR_BASED"
+                        });
+                      }}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) >= 0}
+                    />
+                    <ValidatedInput
+                      label="Business Income as per ITR (₹)"
+                      type="number"
+                      placeholder="100000"
+                      icon={IndianRupee}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const val = Number(e.target.value);
+                        store.updateBusinessDetails({
+                          netMonthlyIncome: val,
+                          subType: "ITR_BASED"
+                        });
+                      }}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                      error={errors.netMonthlyIncome}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <StyledSelect
+                      label="ITR Filing (Years)"
+                      icon={FileText}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.itrFiledYears !== undefined && store.financialDetails.data.itrFiledYears !== null ? store.financialDetails.data.itrFiledYears.toString() : undefined}
+                      onValueChange={(v) => {
+                        const val = Number(v);
+                        store.updateBusinessDetails({
+                          itrFiledYears: val,
+                          subType: "ITR_BASED"
+                        });
+                      }}
+                      placeholder="Select years of ITR filed"
+                    >
+                      <SelectItem value="0">Not Filed</SelectItem>
+                      <SelectItem value="1">1 Year</SelectItem>
+                      <SelectItem value="2">2 Years</SelectItem>
+                      <SelectItem value="3">3 or more Years</SelectItem>
+                    </StyledSelect>
+                  </div>
 
-                  if (subType === "ITR_BASED") return (
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key="itr-fields"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                        className="space-y-5"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <ValidatedInput
-                            label="Annual Turnover (₹)"
-                            type="number"
-                            placeholder="5000000"
-                            icon={IndianRupee}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.annualTurnover || "") : ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ annualTurnover: Number(e.target.value) })}
-                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) > 0}
-                          />
-                          <ValidatedInput
-                            label="Business Income as per ITR (₹)"
-                            type="number"
-                            placeholder="100000"
-                            icon={IndianRupee}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ netMonthlyIncome: Number(e.target.value) })}
-                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
-                            error={errors.netMonthlyIncome}
-                          />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <StyledSelect
-                            label="ITR Filing (Years)"
-                            icon={FileText}
-                            value={store.financialDetails.path === "SELF_EMPLOYED" && store.financialDetails.data.itrFiledYears !== undefined && store.financialDetails.data.itrFiledYears !== null ? store.financialDetails.data.itrFiledYears.toString() : undefined}
-                            onValueChange={(v) => store.updateBusinessDetails({ itrFiledYears: Number(v) })}
-                            placeholder="Select years of ITR filed"
-                          >
-                            <SelectItem value="0">Not Filed</SelectItem>
-                            <SelectItem value="1">1 Year</SelectItem>
-                            <SelectItem value="2">2 Years</SelectItem>
-                            <SelectItem value="3">3 or more Years</SelectItem>
-                          </StyledSelect>
-                        </div>
-
-                        {/* Depreciation add-back — only relevant for property-collateral loans */}
-                        <AnimatePresence>
-                          
-                          {store.loanRequirements.loanType === "AUTO_LOAN" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              <ValidatedInput
-                                label="On Road Price of Vehicle (₹)"
-                                type="number"
-                                placeholder="1050000"
-                                icon={IndianRupee}
-                                value={store.loanRequirements.vehicleOnRoadPrice || ""}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleOnRoadPrice: Number(e.target.value) })}
-                                isValid={(store.loanRequirements.vehicleOnRoadPrice || 0) > 100000}
-                              />
-                              <ValidatedInput
-                                label="Quotation of Vehicle (₹)"
-                                type="number"
-                                placeholder="850000"
-                                icon={IndianRupee}
-                                value={store.loanRequirements.vehicleQuotationPrice || ""}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleQuotationPrice: Number(e.target.value) })}
-                                isValid={(store.loanRequirements.vehicleQuotationPrice || 0) > 100000}
-                              />
-                            </div>
-                          )}
-                          
-                          {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
-                            <motion.div
-                              key="depreciation-field"
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                              className="overflow-hidden"
-                            >
-                              <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
-                                  <IndianRupee className="w-3.5 h-3.5" />
-                                  P&amp;L Normalisation (Property Loan)
-                                </p>
-                                <ValidatedInput
-                                  label="Annual Depreciation Add-back (₹)"
-                                  type="number"
-                                  placeholder="e.g. 240000 — from P&L / Balance Sheet"
-                                  icon={IndianRupee}
-                                  value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.depreciation || "") : ""}
-                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ depreciation: Number(e.target.value) })}
-                                  isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.depreciation || 0 : 0) >= 0}
-                                />
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-
-                  // BANKING_PROGRAM or not yet selected — show net income only
-                  if (subType === "BANKING_PROGRAM") return (
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key="banking-fields"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                      >
+                  {/* Depreciation add-back — only relevant for property-collateral loans */}
+                  <AnimatePresence>
+                    {store.loanRequirements.loanType === "AUTO_LOAN" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <ValidatedInput
-                          label="Net Monthly Income (₹)"
+                          label="On Road Price of Vehicle (₹)"
                           type="number"
-                          placeholder="100000"
+                          placeholder="1050000"
                           icon={IndianRupee}
-                          value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ netMonthlyIncome: Number(e.target.value) })}
-                          isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
-                          error={errors.netMonthlyIncome}
+                          value={store.loanRequirements.vehicleOnRoadPrice || ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleOnRoadPrice: Number(e.target.value) })}
+                          isValid={(store.loanRequirements.vehicleOnRoadPrice || 0) > 100000}
                         />
+                        <ValidatedInput
+                          label="Quotation of Vehicle (₹)"
+                          type="number"
+                          placeholder="850000"
+                          icon={IndianRupee}
+                          value={store.loanRequirements.vehicleQuotationPrice || ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ vehicleQuotationPrice: Number(e.target.value) })}
+                          isValid={(store.loanRequirements.vehicleQuotationPrice || 0) > 100000}
+                        />
+                      </div>
+                    )}
+                    
+                    {(store.loanRequirements.loanType === "HOME_LOAN" || store.loanRequirements.loanType === "LAP") && (
+                      <motion.div
+                        key="depreciation-field"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
+                            <IndianRupee className="w-3.5 h-3.5" />
+                            P&amp;L Normalisation (Property Loan)
+                          </p>
+                          <ValidatedInput
+                            label="Annual Depreciation Add-back (₹)"
+                            type="number"
+                            placeholder="e.g. 240000 — from P&L / Balance Sheet"
+                            icon={IndianRupee}
+                            value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.depreciation || "") : ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ depreciation: Number(e.target.value) })}
+                            isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.depreciation || 0 : 0) >= 0}
+                          />
+                        </div>
                       </motion.div>
-                    </AnimatePresence>
-                  );
-
-                  return null;
-                })()}
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* ── CA Certification toggle — universal signal for all SELF_EMPLOYED ── */}
                 <div className="flex items-start gap-4 p-4 rounded-xl border border-border dark:border-white/[0.06] bg-secondary/30 dark:bg-white/[0.02]">

@@ -730,7 +730,26 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         // Employment path metadata — needed by Apply.tsx to resolve the correct surrogate programName
         financialPath: fin?.path ?? null,                                       // SALARIED | PROFESSIONAL | SELF_EMPLOYED
         professionalSubType: fin?.path === "PROFESSIONAL" ? (fin.data as any)?.subType ?? null : null, // CA | CS | DOCTOR | LAWYER
-        businessSubType: fin?.path === "SELF_EMPLOYED" ? (fin.data as any)?.subType ?? null : null,    // ITR_BASED | GST_BASED | BANKING_PROGRAM | CASH_FLOW_PROGRAM
+        businessSubType: (() => {
+          if (fin?.path !== "SELF_EMPLOYED") return null;
+          const d = fin.data as any;
+          const gstTurnover = Number(d.last12MonthsGstTurnover ?? 0);
+          const itrIncome = Number(d.netMonthlyIncome ?? 0);
+          const annualTurnover = Number(d.annualTurnover ?? 0);
+          
+          if (gstTurnover > 0 && annualTurnover === 0 && itrIncome === 0) {
+            return "GST_BASED";
+          }
+          if (gstTurnover > 0) {
+            const industry = d.industryType || "Service";
+            const margin = industry === "Service" ? 0.10 : (industry === "Retail" ? 0.12 : (industry === "Wholesale" ? 0.08 : 0.04));
+            const gstIncome = (gstTurnover * margin) / 12;
+            if (gstIncome > itrIncome) {
+              return "GST_BASED";
+            }
+          }
+          return "ITR_BASED";
+        })(),
         businessIndustryType: fin?.path === "SELF_EMPLOYED" ? (fin.data as any)?.industryType ?? null : null,
 
         // Property type — BUG-4 FIX: pass real value from form, not hardcoded "RESIDENTIAL"
@@ -763,11 +782,31 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
         eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0),
-        itrYearsAvailable: (fin?.path === "SELF_EMPLOYED" && (fin.data as any).subType === "ITR_BASED")
-          ? ((fin.data as any).itrFiledYears !== undefined && (fin.data as any).itrFiledYears !== null
-              ? Number((fin.data as any).itrFiledYears)
-              : null)
-          : null
+        itrYearsAvailable: (() => {
+          if (fin?.path !== "SELF_EMPLOYED") return null;
+          const d = fin.data as any;
+          const gstTurnover = Number(d.last12MonthsGstTurnover ?? 0);
+          const itrIncome = Number(d.netMonthlyIncome ?? 0);
+          const annualTurnover = Number(d.annualTurnover ?? 0);
+          let resolvedSubType = "ITR_BASED";
+          if (gstTurnover > 0 && annualTurnover === 0 && itrIncome === 0) {
+            resolvedSubType = "GST_BASED";
+          } else if (gstTurnover > 0) {
+            const industry = d.industryType || "Service";
+            const margin = industry === "Service" ? 0.10 : (industry === "Retail" ? 0.12 : (industry === "Wholesale" ? 0.08 : 0.04));
+            const gstIncome = (gstTurnover * margin) / 12;
+            if (gstIncome > itrIncome) {
+              resolvedSubType = "GST_BASED";
+            }
+          }
+          
+          if (resolvedSubType === "ITR_BASED") {
+            return d.itrFiledYears !== undefined && d.itrFiledYears !== null
+              ? Number(d.itrFiledYears)
+              : null;
+          }
+          return null;
+        })()
       };
 
       onFormSubmit?.(data);
