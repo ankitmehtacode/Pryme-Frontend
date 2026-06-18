@@ -436,23 +436,35 @@ const HeroSection = memo(() => {
         </div>
 
         {/* 🧠 200 IQ Inline Trust Metrics Row — Static (Outside AnimatePresence) */}
-        <div className="relative z-30 pb-3.5 sm:pb-5 md:pb-6 pointer-events-auto shrink-0 w-full text-center">
-          <div className="inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 hover:bg-white/15 transition-colors border border-white/20 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm">
-            <div className="flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
-              </span>
-              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Loans Facilitated</span>
+        <div className="relative z-30 pb-3.5 sm:pb-5 md:pb-6 pointer-events-auto shrink-0 w-full text-center px-4">
+          <div className="inline-flex items-center justify-center gap-x-4 md:gap-x-6 px-4 py-2 bg-white/10 hover:bg-white/15 transition-colors border border-white/20 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm divide-x divide-[#103783]/15">
+            
+            {/* Metric 1 */}
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-[#103783] shrink-0" strokeWidth={2.5} />
+              <div className="flex flex-col md:flex-row md:items-center gap-x-1.5 gap-y-0.5 text-left">
+                <span className="text-xs sm:text-[13px] font-extrabold text-[#0a1530] leading-none">
+                  <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
+                </span>
+                <span className="text-[8px] sm:text-[9px] text-slate-700 font-bold uppercase tracking-wider leading-none">
+                  Loans Facilitated
+                </span>
+              </div>
             </div>
-            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
-            <div className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                <MiniCountUp to={10000} suffix="+" formatComma={true} />
-              </span>
-              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Happy Customers</span>
+
+            {/* Metric 2 */}
+            <div className="pl-4 md:pl-6 flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#103783] shrink-0" strokeWidth={2.5} />
+              <div className="flex flex-col md:flex-row md:items-center gap-x-1.5 gap-y-0.5 text-left">
+                <span className="text-xs sm:text-[13px] font-extrabold text-[#0a1530] leading-none">
+                  <MiniCountUp to={10000} suffix="+" formatComma={true} />
+                </span>
+                <span className="text-[8px] sm:text-[9px] text-slate-700 font-bold uppercase tracking-wider leading-none">
+                  Happy Customers
+                </span>
+              </div>
             </div>
+
           </div>
         </div>
 
