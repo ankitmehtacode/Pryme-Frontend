@@ -123,7 +123,7 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#080d1e]">
+            <div id="products" className="section-contained relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#080d1e]">
               <ProductSelectorGrid />
               
               {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
@@ -196,11 +196,17 @@ const Index = () => {
             {/* 5. BOTTOM OF FUNNEL: Closing the deal (Process & Trust) */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
             <div className="relative z-10 bg-slate-50 dark:bg-[#030303]">
-              <ProcessSection />
+              <div className="section-contained">
+                <ProcessSection />
+              </div>
               <ScrollReveal direction="up" duration={1}>
-              <TrustMonologue />
+                <div className="section-contained">
+                  <TrustMonologue />
+                </div>
               </ScrollReveal>
-              <CustomerReviews />
+              <div className="section-contained">
+                <CustomerReviews />
+              </div>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
               <section className="section-contained py-16 md:py-20 lg:py-24 container mx-auto px-4">

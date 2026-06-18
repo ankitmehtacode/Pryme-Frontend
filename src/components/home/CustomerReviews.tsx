@@ -1,6 +1,6 @@
 import { memo, useRef } from "react";
 import { Star, Quote } from "lucide-react";
-import { motion, useMotionValue, useTransform, useAnimationFrame } from "framer-motion";
+import { motion, useMotionValue, useTransform, useAnimationFrame, useInView } from "framer-motion";
 
 const reviews = [
   {
@@ -84,10 +84,13 @@ const CustomerReviews = () => {
   const isDragging = useRef(false);
   const rangeRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: false, margin: "200px" });
 
   // 200 IQ Perf: Manual animation loop directly drives CSS variable and transform, 
   // keeping the entire 60fps operation completely off the React render cycle.
   useAnimationFrame((time, delta) => {
+    if (!isInView) return; // 🧠 Silicon Valley Perf: Pause loop entirely when off-screen
     if (!isDragging.current && !isHovered.current) {
       let current = progress.get();
       current += delta * 0.0012; // Base marquee speed
@@ -117,6 +120,7 @@ const CustomerReviews = () => {
 
   return (
     <section
+      ref={sectionRef}
       className="py-24 md:py-32 overflow-hidden relative bg-[#030303]"
       style={{ contain: "content" }}
       onMouseEnter={() => isHovered.current = true}
