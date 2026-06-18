@@ -4,6 +4,7 @@ import {
   ArrowRight, Zap, Sparkles, Percent, 
   ChevronRight, ChevronLeft, CheckCircle2,
   TrendingUp, WalletCards, Coins, Landmark, BadgePercent, ShieldCheck,
+  Users
 } from "lucide-react";
 import { motion, AnimatePresence, Variants, useInView } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +29,45 @@ const LOGO_MAP: Record<string, string> = {
 };
 
 import { BANK_OFFERS } from "./ProductSelectorGrid";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 🧠 Animated Counter for Trust Metrics Row
+// ─────────────────────────────────────────────────────────────────────────────
+const MiniCountUp = ({ to, prefix = "", suffix = "", formatComma = false }: { to: number, prefix?: string, suffix?: string, formatComma?: boolean }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    if (!isInView) return;
+    let startTime: number | null = null;
+    const duration = 1500;
+    let animationFrameId: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(eased * to));
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        setCount(to);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isInView, to]);
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {formatComma ? count.toLocaleString("en-IN") : count}
+      {suffix}
+    </span>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
@@ -382,6 +422,33 @@ const HeroSection = memo(() => {
                   </Link>
                 </div>
 
+              </div>
+
+              {/* 🧠 200 IQ Inline Trust Metrics Row */}
+              <div className="mt-3.5 md:mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/40 hover:bg-white/50 transition-colors border border-white/50 rounded-2xl shadow-sm backdrop-blur-sm pointer-events-auto max-w-xl sm:max-w-2xl mx-auto drop-shadow-sm">
+                <div className="flex items-center gap-1.5">
+                  <Coins className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                    <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
+                  </span>
+                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Loans Facilitated</span>
+                </div>
+                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                    <MiniCountUp to={10000} suffix="+" formatComma={true} />
+                  </span>
+                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Happy Customers</span>
+                </div>
+                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
+                <div className="flex items-center gap-1.5">
+                  <Landmark className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                    <MiniCountUp to={15} suffix="+" />
+                  </span>
+                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Banking Partners</span>
+                </div>
               </div>
 
               {/* Tagline */}

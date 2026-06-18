@@ -42,7 +42,6 @@ import ScrollToTop from "@/components/ui/ScrollToTop";
 
 // Above-the-fold components (eager)
 import HeroSection from "@/components/home/HeroSection";
-import TrustMetrics from "@/components/home/TrustMetrics";
 import ProductSelectorGrid from "@/components/home/ProductSelectorGrid";
 import PartnerBankMarquee from "@/components/home/PartnerBankMarquee"; 
 
@@ -120,11 +119,6 @@ const Index = () => {
             {/* 🧠 1. HERO SECTION: The Billboard */}
             <div className="relative z-30">
               <HeroSection />
-            </div>
-
-            {/* 🧠 1.5 TRUST METRICS BAND: Animated Credibility Indicators */}
-            <div className="relative z-20">
-              <TrustMetrics />
             </div>
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
