@@ -157,7 +157,7 @@ export const PrymeAPI = {
 
   signup: async (...args: any[]) => {
     let fullName = "Pryme Client";
-    let email, password;
+    let email, password, phone;
 
     if (args.length >= 2 && typeof args[0] === 'string') {
       if (args.length === 3) {
@@ -170,6 +170,7 @@ export const PrymeAPI = {
       fullName = obj.fullName || obj.name || "Pryme Client";
       email = obj.email || obj.username;
       password = obj.password || obj.securityKey || obj.key;
+      phone = obj.phone || obj.mobileNumber; // 🧠 Capture mobile from registration form
     }
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
@@ -178,7 +179,7 @@ export const PrymeAPI = {
     // Registration is permitAll in SecurityConfig, so the missing cookie is fine.
     return fetchWithAuth("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ fullName, email, password, role: "USER" }),
+      body: JSON.stringify({ fullName, email, password, phone, role: "USER" }),
     });
   },
 

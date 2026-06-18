@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PrymeAPI } from "@/lib/api";
 
 const Profile = () => {
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState("Personal Info");
@@ -20,9 +20,12 @@ const Profile = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 🧠 200 IQ: Seed profile state from the auth cache (React Query) for instant display.
+  // The GET /users/profile call will overwrite with richer data once it resolves.
   const [profileData, setProfileData] = useState<any>({
-    fullName: "",
-    phone: "",
+    fullName: authUser?.name || "",
+    email: authUser?.email || "",
+    phone: authUser?.phone || "",
     city: "",
     state: "",
     profilePictureUrl: "",

@@ -35,7 +35,8 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
     const { error, user: loggedInUser } = await signUp({
       fullName: data.fullName,
       email: data.email,
-      password: data.password
+      password: data.password,
+      mobileNumber: data.mobileNumber,
     });
     
     if (error) {
