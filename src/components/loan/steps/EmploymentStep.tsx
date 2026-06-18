@@ -164,7 +164,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                   <ValidatedInput
-                    label="Gross Salary (₹)"
+                    label="Gross Monthly Income (₹)"
                     type="number"
                     placeholder="100000"
                     icon={IndianRupee}
@@ -173,7 +173,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     isValid={(store.financialDetails.path === "SALARIED" ? store.financialDetails.data.grossSalary : 0) >= 10000}
                   />
                   <ValidatedInput
-                    label="Net Salary (₹)"
+                    label="Net Monthly Income (₹)"
                     type="number"
                     placeholder="85000"
                     icon={IndianRupee}
