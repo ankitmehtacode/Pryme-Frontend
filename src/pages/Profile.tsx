@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
-import { User, Shield, CreditCard, Bell, LogOut, ChevronRight, Camera, Loader2, CheckCircle2 } from "lucide-react";
+import { User, Shield, LogOut, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -135,49 +135,6 @@ const Profile = () => {
     }
   };
 
-  const handleTogglePreference = async (key: string) => {
-    const currentVal = profileData.metadata?.preferences?.[key] ?? true;
-    const newVal = !currentVal;
-
-    const updatedProfile = {
-      ...profileData,
-      metadata: {
-        ...profileData.metadata,
-        preferences: {
-          ...(profileData.metadata?.preferences || {}),
-          [key]: newVal
-        }
-      }
-    };
-
-    // Optimistically update UI
-    setProfileData(updatedProfile);
-
-    try {
-      await PrymeAPI.updateProfile(updatedProfile);
-      toast({
-        title: "Preferences Updated",
-        description: "Your notification settings have been saved successfully.",
-      });
-    } catch (error) {
-      // Revert on error
-      setProfileData({
-        ...profileData,
-        metadata: {
-          ...profileData.metadata,
-          preferences: {
-            ...(profileData.metadata?.preferences || {}),
-            [key]: currentVal
-          }
-        }
-      });
-      toast({
-        title: "Update Failed",
-        description: "Failed to update notification preferences.",
-        variant: "destructive"
-      });
-    }
-  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -188,202 +145,127 @@ const Profile = () => {
       );
     }
 
-    switch (activeTab) {
-      case "Personal Info":
-        return (
-          <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-xl">
-            <div className="flex items-center gap-6 mb-10">
-              <div className="relative group">
-                <div className="w-24 h-24 rounded-3xl bg-slate-200 dark:bg-white/10 flex items-center justify-center border-2 border-primary overflow-hidden">
-                  {profileData.profilePictureUrl ? (
-                    <img src={profileData.profilePictureUrl} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-12 h-12 text-slate-400" />
-                  )}
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 animate-spin text-white" />
-                    </div>
-                  )}
-                </div>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange} 
-                  className="hidden" 
-                  accept="image/jpeg,image/png" 
-                />
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="absolute -bottom-2 -right-2 p-2 bg-primary text-white rounded-xl shadow-lg hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  <Camera className="w-4 h-4" />
-                </button>
-              </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-foreground uppercase tracking-tight">{profileData.fullName || profileData.email?.split("@")[0] || "Member"}</h2>
-                <p className="text-slate-500 dark:text-slate-400">{profileData.email}</p>
-                <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-bold border border-blue-500/20">
-                   <Shield className="w-3 h-3" /> VERIFIED ACCOUNT
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Identity Details</p>
-                
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-500 ml-1">Full Name</label>
-                  <Input 
-                    value={profileData.fullName || ""} 
-                    onChange={e => setProfileData({...profileData, fullName: e.target.value})}
-                    className="rounded-xl border-border bg-secondary"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-500 ml-1">Phone Number</label>
-                  <Input 
-                    value={profileData.phone || ""} 
-                    onChange={e => setProfileData({...profileData, phone: e.target.value})}
-                    className="rounded-xl border-border bg-secondary"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-500 ml-1">PAN Card</label>
-                  <Input 
-                    value={profileData.metadata?.panCard || ""} 
-                    onChange={e => setProfileData({...profileData, metadata: {...profileData.metadata, panCard: e.target.value.toUpperCase()}})}
-                    className="rounded-xl border-border bg-secondary uppercase"
-                    maxLength={10}
-                  />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Location & Professional</p>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-500 ml-1">City</label>
-                    <Input 
-                      value={profileData.city || ""} 
-                      onChange={e => setProfileData({...profileData, city: e.target.value})}
-                      className="rounded-xl border-border bg-secondary"
-                    />
+    if (activeTab === "Personal Info") {
+      return (
+        <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-xl">
+          <div className="flex items-center gap-6 mb-10">
+            <div className="relative group">
+              <div className="w-24 h-24 rounded-3xl bg-slate-200 dark:bg-white/10 flex items-center justify-center border-2 border-primary overflow-hidden">
+                {profileData.profilePictureUrl ? (
+                  <img src={profileData.profilePictureUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-12 h-12 text-slate-400" />
+                )}
+                {isUploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-white" />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-500 ml-1">State</label>
-                    <Input 
-                      value={profileData.state || ""} 
-                      onChange={e => setProfileData({...profileData, state: e.target.value})}
-                      className="rounded-xl border-border bg-secondary"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-500 ml-1">Monthly Income (₹)</label>
-                  <Input 
-                    type="number"
-                    value={profileData.metadata?.monthlyIncome || ""} 
-                    onChange={e => setProfileData({...profileData, metadata: {...profileData.metadata, monthlyIncome: e.target.value}})}
-                    className="rounded-xl border-border bg-secondary"
-                  />
-                </div>
+                )}
               </div>
-            </div>
-
-            <div className="mt-10">
-              <Button 
-                onClick={handleUpdateProfile} 
-                disabled={isSaving}
-                className="rounded-xl h-12 px-8 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20"
+              <div className="absolute w-24 h-24 bg-blue-400/20 rounded-full blur-2xl flex-shrink-0" />
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                className="hidden" 
+                accept="image/jpeg,image/png" 
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="absolute -bottom-2 -right-2 p-2 bg-primary text-white rounded-xl shadow-lg hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
               >
-                {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
-              </Button>
+                <Camera className="w-4 h-4" />
+              </button>
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold text-foreground uppercase tracking-tight">{profileData.fullName || profileData.email?.split("@")[0] || "Member"}</h2>
+              <p className="text-slate-500 dark:text-slate-400">{profileData.email}</p>
+              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-bold border border-blue-500/20">
+                 <Shield className="w-3 h-3" /> VERIFIED ACCOUNT
+              </div>
             </div>
           </div>
-        );
 
-      case "KYC Status":
-        const hasPan = !!profileData.metadata?.panCard;
-        const hasAadhar = !!profileData.metadata?.aadhar; // assuming metadata might have this
-        
-        return (
-          <div className="space-y-8">
-            <div className={`p-8 rounded-[2.5rem] ${hasPan ? 'bg-green-500/5 border-green-500/20' : 'bg-amber-500/5 border-amber-500/20'} border flex gap-6 items-center`}>
-              <div className={`w-14 h-14 rounded-2xl ${hasPan ? 'bg-green-500/10' : 'bg-amber-500/10'} flex items-center justify-center shrink-0`}>
-                {hasPan ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <Shield className="w-6 h-6 text-amber-500" />}
-              </div>
-              <div className="flex-1">
-                <h4 className={`text-lg font-semibold ${hasPan ? 'text-green-900 dark:text-green-400' : 'text-amber-900 dark:text-amber-400'}`}>
-                  {hasPan ? "KYC Verification Complete" : "KYC Verification Incomplete"}
-                </h4>
-                <p className={`text-sm ${hasPan ? 'text-green-900/70 dark:text-green-400/60' : 'text-amber-900/70 dark:text-amber-400/60'} mt-1`}>
-                  {hasPan ? "Your identity has been verified. You have access to instant pre-approved offers." : "Update your PAN Card in Personal Info to unlock instant pre-approved offers from 5 top banks."}
-                </p>
-              </div>
-              {!hasPan && (
-                <Button variant="outline" onClick={() => setActiveTab("Personal Info")} className="text-amber-600 border-amber-500/30 hover:bg-amber-500/10">
-                  Update PAN <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              )}
-            </div>
-          </div>
-        );
-
-      case "Bank Accounts":
-        return (
-          <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-xl text-center py-20">
-            <CreditCard className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Linked Accounts</h3>
-            <p className="text-slate-500 max-w-sm mx-auto mb-8">Link your primary bank account for faster disbursals and auto-repayment setup.</p>
-            <Button variant="outline" className="rounded-xl">Link Bank Account</Button>
-          </div>
-        );
-
-      case "Preferences":
-        return (
-          <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-xl">
-            <h3 className="text-xl font-semibold mb-6">Notification Preferences</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              {[
-                { key: "appUpdates", title: "Application Updates", desc: "Get notified when your loan status changes." },
-                { key: "newOffers", title: "New Offers", desc: "Alert me when a better interest rate is available." },
-                { key: "emiReminders", title: "EMI Reminders", desc: "Receive reminders 3 days before EMI is due." }
-              ].map((item) => {
-                const checked = profileData.metadata?.preferences?.[item.key] ?? true;
-                return (
-                  <div key={item.key} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/50 border border-border">
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-slate-500">{item.desc}</p>
-                    </div>
-                    <div 
-                      onClick={() => handleTogglePreference(item.key)}
-                      className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
-                        checked ? "bg-primary dark:bg-[#103783]" : "bg-slate-300 dark:bg-white/[0.1]"
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${
-                          checked ? "left-[24px]" : "left-[4px]"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Identity Details</p>
+              
+              <div className="space-y-1">
+                <label className="text-xs text-slate-500 ml-1">Full Name</label>
+                <Input 
+                  value={profileData.fullName || ""} 
+                  onChange={e => setProfileData({...profileData, fullName: e.target.value})}
+                  className="rounded-xl border-border bg-secondary"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-slate-500 ml-1">Phone Number</label>
+                <Input 
+                  value={profileData.phone || ""} 
+                  onChange={e => setProfileData({...profileData, phone: e.target.value})}
+                  className="rounded-xl border-border bg-secondary"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-slate-500 ml-1">PAN Card</label>
+                <Input 
+                  value={profileData.PanCard || profileData.metadata?.panCard || ""} 
+                  onChange={e => setProfileData({...profileData, metadata: {...profileData.metadata, panCard: e.target.value.toUpperCase()}})}
+                  className="rounded-xl border-border bg-secondary uppercase"
+                  maxLength={10}
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Location & Professional</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-500 ml-1">City</label>
+                  <Input 
+                    value={profileData.city || ""} 
+                    onChange={e => setProfileData({...profileData, city: e.target.value})}
+                    className="rounded-xl border-border bg-secondary"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-500 ml-1">State</label>
+                  <Input 
+                    value={profileData.state || ""} 
+                    onChange={e => setProfileData({...profileData, state: e.target.value})}
+                    className="rounded-xl border-border bg-secondary"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-slate-500 ml-1">Monthly Income (₹)</label>
+                <Input 
+                  type="number"
+                  value={profileData.metadata?.monthlyIncome || ""} 
+                  onChange={e => setProfileData({...profileData, metadata: {...profileData.metadata, monthlyIncome: e.target.value}})}
+                  className="rounded-xl border-border bg-secondary"
+                />
+              </div>
             </div>
           </div>
-        );
 
-      default:
-        return null;
+          <div className="mt-10">
+            <Button 
+              onClick={handleUpdateProfile} 
+              disabled={isSaving}
+              className="rounded-xl h-12 px-8 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20"
+            >
+              {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
+            </Button>
+          </div>
+        </div>
+      );
     }
+    return null;
   };
 
   return (
@@ -401,10 +283,7 @@ const Profile = () => {
               {/* Sidebar Nav */}
               <div className="w-full md:w-64 space-y-2 shrink-0">
                 {[
-                  { icon: User, label: "Personal Info" },
-                  { icon: Shield, label: "KYC Status" },
-                  { icon: CreditCard, label: "Bank Accounts" },
-                  { icon: Bell, label: "Preferences" },
+                  { icon: User, label: "Personal Info" }
                 ].map((item) => (
                   <button 
                     key={item.label}
