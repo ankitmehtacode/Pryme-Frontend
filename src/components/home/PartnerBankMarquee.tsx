@@ -24,17 +24,6 @@ const PartnerBankMarquee = memo(() => {
   return (
     <div className="w-full overflow-hidden relative">
 
-      {/* Section Header */}
-      <div className="container mx-auto px-4 mb-12 text-center">
-        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Lending Partners
-        </span>
-        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
-          TRUSTED BY OVER 15+ PREMIUM BANKS & NBFCs
-        </p>
-      </div>
-
       {/* PERF FIX: Replaced max-w-[100vw] with w-full.
            100vw includes scrollbar width on Windows/Linux (17px) → horizontal overflow.
            w-full respects the parent's content-box → no overflow ever. */}
@@ -104,6 +93,17 @@ const PartnerBankMarquee = memo(() => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Section Header */}
+      <div className="container mx-auto px-4 mt-10 mb-4 text-center">
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          Lending Partners
+        </span>
+        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
+          TRUSTED BY OVER 15+ PREMIUM BANKS & NBFCs
+        </p>
       </div>
     </div>
   );
