@@ -437,7 +437,7 @@ const HeroSection = memo(() => {
 
         {/* 🧠 200 IQ Inline Trust Metrics Row — Static (Outside AnimatePresence) */}
         <div className="relative z-30 pb-3.5 sm:pb-5 md:pb-6 pointer-events-auto shrink-0 w-full text-center">
-          <div className="inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/40 hover:bg-white/50 transition-colors border border-white/50 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm">
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 hover:bg-white/15 transition-colors border border-white/20 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm">
             <div className="flex items-center gap-1.5">
               <Coins className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
               <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
