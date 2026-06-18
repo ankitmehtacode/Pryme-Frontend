@@ -21,8 +21,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import pryme2Logo from "@/assets/Pryme2.svg";
-import prymeWordmark from "@/assets/pryme-wordmark.svg";
+import prymeLogo from "@/assets/pryme-typo-logo.svg";
 
 /**
  * GSAP → PURE JS/CSS MIGRATION
@@ -201,18 +200,12 @@ const Header = memo(() => {
           )}
         >
 
-          {/* Logo — Icon mark + SVG wordmark lockup */}
-          <Link to="/" className="flex items-center gap-[28px] shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          {/* Logo — Single SVG lockup */}
+          <Link to="/" className="flex items-center shrink-0 group pointer-events-auto" aria-label="PRYME Home" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <img
-              src={pryme2Logo}
-              alt=""
-              aria-hidden="true"
-              className="h-8 md:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
-            />
-            <img
-              src={prymeWordmark}
+              src={prymeLogo}
               alt="PRYME"
-              className="h-[18px] md:h-5 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="h-8 md:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
