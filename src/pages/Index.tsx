@@ -123,7 +123,7 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="section-contained relative z-20 pt-8 md:pt-12 bg-slate-50 dark:bg-[#080d1e]">
+            <div id="products" className="section-contained relative z-20 pt-2 md:pt-3 bg-slate-50 dark:bg-[#080d1e]">
               <ProductSelectorGrid />
               
               {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}

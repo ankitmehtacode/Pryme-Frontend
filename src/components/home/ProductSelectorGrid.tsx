@@ -116,7 +116,7 @@ const ProductSelectorGrid = memo(() => {
       <BackgroundBeams />
 
       {/* Typography Section */}
-      <div className="container mx-auto px-4 text-center pt-8 md:pt-12 relative z-10">
+      <div className="container mx-auto px-4 text-center pt-1 md:pt-2 relative z-10">
         <motion.div
           initial={headingInitial}
           whileInView={headingWhileInView}
