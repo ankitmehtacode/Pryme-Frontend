@@ -85,15 +85,15 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
       <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-6">
         
-        {/* Horizontal Assembly — CSS-only animated border */}
+        {/* Squircle Assembly — CSS-only animated border */}
         <motion.div
           initial={{ scale: 0.8, y: 20, opacity: 0, filter: "blur(20px)" }}
           animate={{ scale: 1, y: 0, opacity: 1, filter: "blur(0px)" }}
           transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.1 }}
-          className="relative w-72 h-24 sm:w-80 sm:h-28 mb-12 flex items-center justify-center rounded-3xl shadow-[0_20px_60px_-15px_rgba(16,55,131,0.3)] z-10 group"
+          className="relative w-40 h-40 md:w-48 md:h-48 mb-12 flex items-center justify-center rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(16,55,131,0.3)] z-10 group"
         >
           {/* CSS Conic Gradient Border — replaces the motion.div rotate */}
-          <div className="absolute inset-0 rounded-3xl overflow-hidden">
+          <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden">
             <div 
               className="absolute top-1/2 left-1/2 w-[200%] h-[200%]"
               style={{
@@ -110,19 +110,19 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             />
           </div>
           
-          {/* Main Content Badge */}
-          <div className="absolute inset-[2px] bg-white/80 backdrop-blur-sm rounded-[1.35rem] flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.8)] overflow-hidden">
+          {/* Main Content Squircle */}
+          <div className="absolute inset-[2px] bg-white/80 backdrop-blur-sm rounded-[2.4rem] flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.8)] overflow-hidden">
             {/* CSS shimmer — replaces motion.div x animation */}
             <div 
               className="absolute inset-0 w-[250%] h-full bg-gradient-to-r from-transparent via-blue-200/40 to-transparent"
               style={{ animation: "splashShimmerSlide 3.5s ease-in-out infinite 1.5s" }}
             />
-            <div className="absolute w-48 h-12 bg-blue-400/20 rounded-full blur-2xl flex-shrink-0" />
+            <div className="absolute w-24 h-24 bg-blue-400/20 rounded-full blur-2xl flex-shrink-0" />
             
             <img 
               src={typo2Logo} 
               alt="Pryme Loading" 
-              className="w-56 sm:w-64 h-auto relative z-10 filter drop-shadow-[0_4px_10px_rgba(16,55,131,0.15)]" 
+              className="w-20 md:w-24 h-auto relative z-10 filter drop-shadow-[0_4px_10px_rgba(16,55,131,0.15)]" 
             />
           </div>
         </motion.div>
