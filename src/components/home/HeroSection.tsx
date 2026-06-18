@@ -156,7 +156,7 @@ const HeroSection = memo(() => {
     queryFn: () => PrymeAPI.getHeroOffers().then(res => res.offers || res.data || res)
   });
 
-  const activeOffers = dynamicOffers.length > 0 ? dynamicOffers.map((offer: any, i: number) => {
+  const activeOffers = dynamicOffers.length > 0 ? dynamicOffers.map((offer: { title?: string; lenderName?: string; tag?: string; desc?: string; logoType?: string }, i: number) => {
     const baseVisual = initialOffers[i % initialOffers.length];
     const mappedLogo = offer.logoType && LOGO_MAP[offer.logoType.toLowerCase()]
       ? LOGO_MAP[offer.logoType.toLowerCase()]
@@ -439,7 +439,7 @@ const HeroSection = memo(() => {
         <div className="relative z-30 pb-3.5 sm:pb-5 md:pb-6 pointer-events-auto shrink-0 w-full text-center">
           <div className="inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 hover:bg-white/15 transition-colors border border-white/20 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm">
             <div className="flex items-center gap-1.5">
-              <Coins className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+              <TrendingUp className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
               <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
                 <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
               </span>
