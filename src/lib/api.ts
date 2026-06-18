@@ -185,13 +185,18 @@ export const PrymeAPI = {
 
   login: async (...args: any[]) => {
     let email, password;
+    let rememberMe = false;
 
     if (args.length >= 2 && typeof args[0] === 'string') {
       email = args[0]; password = args[1];
+      if (args.length >= 3 && typeof args[2] === 'boolean') {
+        rememberMe = args[2];
+      }
     } else if (args.length === 1 && typeof args[0] === 'object') {
       const obj = args[0];
       email = obj.email || obj.username;
       password = obj.password || obj.securityKey || obj.key;
+      rememberMe = !!obj.rememberMe;
     }
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
@@ -201,7 +206,7 @@ export const PrymeAPI = {
     // plants the PRYME_SID HttpOnly cookie — the sole session proof.
     return fetchWithAuth("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, rememberMe }),
     });
   },
 

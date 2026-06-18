@@ -26,6 +26,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -35,7 +36,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
   const onSubmit = async (data: LoginData) => {
     setIsLoading(true);
     
-    const { error, user: loggedInUser } = await signIn(data.email, data.password);
+    const { error, user: loggedInUser } = await signIn(data.email, data.password, rememberMe);
     
     if (error) {
       const errorMessage = error.message?.toLowerCase() || "";
@@ -142,11 +143,22 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
         </AnimatePresence>
       </div>
 
-      <div className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group">
-          <div className="w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border border-[#10B981] flex items-center justify-center cursor-pointer transition-colors group-hover:bg-[#10B981]/10">
-            <div className="w-2 h-2 rounded-[2px] bg-[#10B981]" />
+      <div 
+        onClick={() => setRememberMe(!rememberMe)}
+        className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group cursor-pointer select-none"
+      >
+          <div className={cn(
+            "w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border flex items-center justify-center transition-colors",
+            rememberMe ? "border-[#10B981] bg-white" : "border-slate-300 hover:border-[#10B981]/50"
+          )}>
+            {rememberMe && <div className="w-2 h-2 rounded-[2px] bg-[#10B981]" />}
           </div>
-          <span className="text-[11px] sm:text-xs font-bold text-slate-500 cursor-pointer transition-colors group-hover:text-[#103783]">Keep me logged in</span>
+          <span className={cn(
+            "text-[11px] sm:text-xs font-bold transition-colors",
+            rememberMe ? "text-[#103783]" : "text-slate-500 group-hover:text-slate-700"
+          )}>
+            Keep me logged in
+          </span>
       </div>
 
       <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">

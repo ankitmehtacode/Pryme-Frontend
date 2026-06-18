@@ -57,9 +57,9 @@ export const useAuth = () => {
   // forward Set-Cookie headers, so the old flow (login → /auth/me) always
   // got a 401 on the second call. This eliminates that entirely.
   const signIn = useCallback(
-    async (email: string, password: string): Promise<{ error: Error | null; user: MeResponse | null; isNewUser?: boolean }> => {
+    async (email: string, password: string, rememberMe?: boolean): Promise<{ error: Error | null; user: MeResponse | null; isNewUser?: boolean }> => {
       try {
-        const loginResponse = await PrymeAPI.login({ email, password });
+        const loginResponse = await PrymeAPI.login({ email, password, rememberMe });
         // The backend now embeds the full MeResponse inside LoginResponse.user
         const userData: MeResponse = loginResponse.user;
         if (userData) {
