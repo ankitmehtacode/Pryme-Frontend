@@ -424,33 +424,6 @@ const HeroSection = memo(() => {
 
               </div>
 
-              {/* 🧠 200 IQ Inline Trust Metrics Row */}
-              <div className="mt-3.5 md:mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/40 hover:bg-white/50 transition-colors border border-white/50 rounded-2xl shadow-sm backdrop-blur-sm pointer-events-auto max-w-xl sm:max-w-2xl mx-auto drop-shadow-sm">
-                <div className="flex items-center gap-1.5">
-                  <Coins className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                    <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
-                  </span>
-                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Loans Facilitated</span>
-                </div>
-                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                    <MiniCountUp to={10000} suffix="+" formatComma={true} />
-                  </span>
-                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Happy Customers</span>
-                </div>
-                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
-                <div className="flex items-center gap-1.5">
-                  <Landmark className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
-                  <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
-                    <MiniCountUp to={15} suffix="+" />
-                  </span>
-                  <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Banking Partners</span>
-                </div>
-              </div>
-
               {/* Tagline */}
               <div className="mt-1.5 md:mt-3 flex items-center justify-center px-4 max-w-lg">
                 <p className="text-[9px] md:text-[10px] text-slate-800/80 font-semibold tracking-wide drop-shadow-[0_1px_10px_rgba(255,255,255,0.6)]">
@@ -460,6 +433,35 @@ const HeroSection = memo(() => {
               
             </motion.div>
           </AnimatePresence>
+        </div>
+
+        {/* 🧠 200 IQ Inline Trust Metrics Row — Static (Outside AnimatePresence) */}
+        <div className="relative z-30 pb-3.5 sm:pb-5 md:pb-6 pointer-events-auto shrink-0 w-full text-center">
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/40 hover:bg-white/50 transition-colors border border-white/50 rounded-2xl shadow-sm backdrop-blur-sm drop-shadow-sm">
+            <div className="flex items-center gap-1.5">
+              <Coins className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
+              </span>
+              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Loans Facilitated</span>
+            </div>
+            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                <MiniCountUp to={10000} suffix="+" formatComma={true} />
+              </span>
+              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Happy Customers</span>
+            </div>
+            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#103783]/20" />
+            <div className="flex items-center gap-1.5">
+              <Landmark className="w-3.5 h-3.5 text-[#103783]" strokeWidth={2.5} />
+              <span className="text-[11px] sm:text-xs font-extrabold text-[#0a1530]">
+                <MiniCountUp to={15} suffix="+" />
+              </span>
+              <span className="text-[9px] text-slate-700 font-bold uppercase tracking-wider">Banking Partners</span>
+            </div>
+          </div>
         </div>
 
         {/* ────────────── MARQUEE ────────────── */}
