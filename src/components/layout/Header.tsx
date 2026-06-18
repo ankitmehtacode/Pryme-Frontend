@@ -205,7 +205,7 @@ const Header = memo(() => {
             <img
               src={prymeLogo}
               alt="PRYME"
-              className="h-8 md:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="h-6 md:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
