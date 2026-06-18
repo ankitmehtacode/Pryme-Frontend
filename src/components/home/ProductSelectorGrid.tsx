@@ -115,7 +115,25 @@ const ProductSelectorGrid = memo(() => {
       {/* 🧠 4K React Bits Style Beams Background */}
       <BackgroundBeams />
 
-      <div className="container mx-auto px-4 max-w-[1300px] relative z-20">
+      {/* Typography Section */}
+      <div className="container mx-auto px-4 text-center pt-8 md:pt-12 relative z-10">
+        <motion.div
+          initial={headingInitial}
+          whileInView={headingWhileInView}
+          viewport={viewportHeading}
+          transition={headingTransition}
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Explore More Products
+          </span>
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-6 uppercase leading-none">
+            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
+          </h2>
+        </motion.div>
+      </div>
+
+      <div className="container mx-auto px-4 max-w-[1300px] relative z-20 mt-4">
 
         {/* 🧠 CLIPPING ERADICATED: 
             Changed to flex-wrap. NO overflow classes anywhere. 
@@ -200,26 +218,8 @@ const ProductSelectorGrid = memo(() => {
         </motion.div>
       </div>
 
-      {/* Typography Section */}
-      <div className="container mx-auto px-4 text-center mt-10 md:mt-12 relative z-10">
-        <motion.div
-          initial={headingInitial}
-          whileInView={headingWhileInView}
-          viewport={viewportHeading}
-          transition={headingTransition}
-        >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Our Products
-          </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-6 uppercase leading-none">
-            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
-          </h2>
-        </motion.div>
-      </div>
-
       {/* Infinite Scrolling Offers Ticker */}
-      <div className="w-full overflow-hidden mt-2 relative z-10 bg-primary/5 py-4 border-y border-primary/10">
+      <div className="w-full overflow-hidden mt-8 md:mt-12 relative z-10 bg-primary/5 py-4 border-y border-primary/10">
         {/* Soft edge gradient masks */}
         <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none" />
