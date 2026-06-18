@@ -71,7 +71,16 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
   if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
     const d = fin.data;
     if (!d.businessName || d.businessName.trim().length < 2) errors.businessName = "Enter your business name";
-    if (!d.vintageYears || d.vintageYears <= 0) errors.vintageYears = "Enter your business vintage in years";
+    if (!d.gstRegistrationDate) {
+      errors.gstRegistrationDate = "Enter your GST registration date";
+    } else {
+      const regDate = new Date(d.gstRegistrationDate);
+      if (isNaN(regDate.getTime())) {
+        errors.gstRegistrationDate = "Enter a valid registration date";
+      } else if (regDate.getTime() > Date.now()) {
+        errors.gstRegistrationDate = "Registration date cannot be in the future";
+      }
+    }
     if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";
   }
 
@@ -147,6 +156,7 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   netMonthlyIncome: 'section-employment',
   businessName: 'section-employment',
   vintageYears: 'section-employment',
+  gstRegistrationDate: 'section-employment',
 };
 
 export const STAGE_LABELS_FRIENDLY: Record<string, string> = {

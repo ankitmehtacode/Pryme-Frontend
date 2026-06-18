@@ -158,6 +158,7 @@ export interface BusinessDetails {
   entityType: 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PVT_LTD' | 'OPC';
   industryType: string;
   vintageYears: number;          // Business age
+  gstRegistrationDate?: string;  // GST Registration Date YYYY-MM-DD
   businessAddress: string;
 
   // ── ITR-Based ──

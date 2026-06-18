@@ -131,6 +131,7 @@ const defaultBusiness: BusinessDetails = {
   entityType: 'PROPRIETORSHIP',
   industryType: '',
   vintageYears: 0,
+  gstRegistrationDate: undefined,
   businessAddress: '',
   // ITR fields
   annualTurnover: 0,

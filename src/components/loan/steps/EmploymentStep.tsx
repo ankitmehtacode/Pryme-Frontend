@@ -15,6 +15,16 @@ import type {
   BusinessSubType, HomePropertyType, CommercialPropertyType, IndustrialPropertyType, PropertyType
 } from "@/lib/applicationTypes";
 
+const calculateVintageYears = (dateStr: string): number => {
+  if (!dateStr) return 0;
+  const regDate = new Date(dateStr);
+  if (isNaN(regDate.getTime())) return 0;
+  const diffTime = Date.now() - regDate.getTime();
+  if (diffTime < 0) return 0;
+  const diffYears = diffTime / (365.25 * 24 * 60 * 60 * 1000);
+  return Math.floor(diffYears);
+};
+
 interface EmploymentStepProps {
   cardCn: string;
 }
@@ -399,14 +409,25 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       error={errors.businessName}
                     />
                     <ValidatedInput
-                      label="Business Vintage (Years)"
-                      type="number"
-                      placeholder="5"
+                      label="GST Registration Date"
+                      type="date"
                       icon={Calendar}
-                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.vintageYears || "") : ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBusinessDetails({ vintageYears: Number(e.target.value) })}
-                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.vintageYears || 0 : 0) > 0}
-                      error={errors.vintageYears}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.gstRegistrationDate || "") : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const dateVal = e.target.value;
+                        const years = calculateVintageYears(dateVal);
+                        store.updateBusinessDetails({ 
+                          gstRegistrationDate: dateVal,
+                          vintageYears: years
+                        });
+                      }}
+                      isValid={(() => {
+                        const regDateStr = store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.gstRegistrationDate : "";
+                        if (!regDateStr) return false;
+                        const regDate = new Date(regDateStr);
+                        return !isNaN(regDate.getTime()) && regDate.getTime() <= Date.now();
+                      })()}
+                      error={errors.gstRegistrationDate}
                     />
                   </div>
                 </div>

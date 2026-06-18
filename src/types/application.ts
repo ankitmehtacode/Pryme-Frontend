@@ -98,6 +98,7 @@ export interface BusinessData {
   businessType: 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PRIVATE_LIMITED' | 'OPC';
   industryType: string;
   businessVintageYears: number;             // How old is the business
+  gstRegistrationDate?: string;             // GST Registration Date YYYY-MM-DD
   businessAddress: string;
 
   // ── ITR-Based Fields ──
