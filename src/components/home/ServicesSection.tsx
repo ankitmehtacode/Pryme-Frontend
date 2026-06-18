@@ -105,7 +105,7 @@ const ServicesSection = () => {
                 {/* CTA */}
                   <Link to={service.href} className="block w-full mt-8">
                     <Button className="w-full bg-transparent hover:bg-white/5 border border-white/20 text-white rounded-xl h-12 font-medium transition-all group-hover:border-primary/40 group-hover:bg-primary/10">
-                      Apply Now
+                      See My Loan Options
                     </Button>
                   </Link>
               </div>

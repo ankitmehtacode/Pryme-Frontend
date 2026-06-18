@@ -375,7 +375,7 @@ const HeroSection = memo(() => {
                     to="/apply"
                     className="relative overflow-hidden bg-[#0a1530] text-white px-5 md:px-7 py-1.5 md:py-2 rounded-full font-bold text-[11px] md:text-xs tracking-wide flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                   >
-                    Apply Now
+                    See My Loan Options
                     <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
                       <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-[2px] transition-transform" />
                     </span>
