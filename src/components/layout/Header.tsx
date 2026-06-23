@@ -39,8 +39,8 @@ import prymeLogo from "@/assets/pryme-typo-logo.svg";
  * Visual output is identical to the GSAP version.
  */
 
-const CONTACT_PHONE = "1800-309-4001";
-const CONTACT_PHONE_LINK = "tel:18003094001";
+const CONTACT_PHONE = "+91 92432 94291";
+const CONTACT_PHONE_LINK = "tel:+919243294291";
 
 const productLinks = [
   { href: "/apply?type=home", label: "Home Loans", icon: Home, description: "Make your dream home real" },

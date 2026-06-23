@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { Shield, Lock, CheckCircle, Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
 import prymeLogo from "@/assets/Pryme2.svg";
 
-const CONTACT_PHONE = "1800-309-4001";
-const CONTACT_PHONE_LINK = "tel:18003094001";
+const CONTACT_PHONE = "+91 92432 94291";
+const CONTACT_PHONE_LINK = "tel:+919243294291";
 const CONTACT_EMAIL = "hello@gopryme.in";
 
 const COMPANY_ADDRESS_NODE = (
