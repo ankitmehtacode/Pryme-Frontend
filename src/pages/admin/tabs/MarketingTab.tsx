@@ -387,23 +387,29 @@ export const MarketingTab: React.FC = () => {
             {/* Tech grid pattern overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{ backgroundImage: "linear-gradient(to right, rgba(16, 55, 131, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 55, 131, 0.05) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             
-            {/* Left side: Hero Illustration Mockup */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative p-2 z-0 h-[260px] overflow-hidden">
-              <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider z-10 bg-white/70 shadow-sm">
-                Hero Illustration
-              </span>
-              
+            {/* Mockup centered background illustration (Aligned from Top to Bottom) */}
+            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 h-full w-auto pointer-events-none z-0 overflow-hidden flex items-center justify-center">
               <img
                 src={formData.heroImageUrl || heroBankImg}
-                alt="Hero Illustration preview"
-                className="h-full w-auto object-contain"
+                alt="Hero Background Illustration preview"
+                className="h-full w-auto object-contain opacity-[0.98]"
                 style={{
-                  WebkitMaskImage: 'linear-gradient(to bottom, black 75%, transparent 96%)',
-                  maskImage: 'linear-gradient(to bottom, black 75%, transparent 96%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+                  maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+                  WebkitMaskComposite: 'destination-in',
+                  maskComposite: 'intersect',
                 }}
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
-              <span className="absolute bottom-3 left-3 text-[7px] text-slate-500 font-bold uppercase tracking-widest z-10 bg-white/70 px-2 py-0.5 rounded-full border border-[#103783]/5 shadow-sm">
+            </div>
+            
+            {/* Left side: Spacer overlay */}
+            <div className="md:col-span-5 flex flex-col justify-between relative p-2 z-10 h-[260px]">
+              <span className="self-start px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider bg-white/70 shadow-sm">
+                Hero Illustration
+              </span>
+              
+              <span className="self-start text-[7px] text-slate-500 font-bold uppercase tracking-widest bg-white/70 px-2 py-0.5 rounded-full border border-[#103783]/5 shadow-sm">
                 {formData.heroImageUrl ? "Custom Illustration" : "Default Bank Building"}
               </span>
             </div>
