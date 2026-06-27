@@ -189,8 +189,14 @@ const AdminDashboard = () => {
     // Failsafe to prevent body background color showing as white/light-grey
     const originalBg = document.body.style.backgroundColor;
     document.body.style.backgroundColor = "#050508";
+
+    // Set zoom to 100% (1) exclusively for the CRM layout, bypassing global site scale
+    const originalZoom = (document.documentElement.style as any).zoom;
+    (document.documentElement.style as any).zoom = "1";
+
     return () => {
       document.body.style.backgroundColor = originalBg;
+      (document.documentElement.style as any).zoom = originalZoom;
     };
   }, []);
 
