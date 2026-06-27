@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Plus, Edit2, Trash2, Sparkles, CheckCircle2, Zap, 
@@ -21,6 +21,11 @@ import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 import heroBankImg from "@/assets/hero-bank-building.png";
 
+// Import fallback banner images (matches HeroSection.tsx initialOffers)
+import axisBanner from "@/assets/axis_festive_banner.png";
+import hdfcBanner from "@/assets/hdfc_preferred_banner.png";
+import idbiBanner from "@/assets/idbi_personal_banner.png";
+
 const LOGO_MAP: Record<string, string> = {
   idbi: idbiLogo,
   axis: axisLogo,
@@ -30,6 +35,21 @@ const LOGO_MAP: Record<string, string> = {
   yes: yesLogo,
   tata: tataLogo,
 };
+
+// Fallback banner images per logoType — exact match of HeroSection defaults
+const BANNER_MAP: Record<string, string> = {
+  axis: axisBanner,
+  hdfc: hdfcBanner,
+  idbi: idbiBanner,
+};
+
+// Default hero offers that always display on the homepage carousel
+// These are the source-of-truth fallbacks from HeroSection.tsx
+const DEFAULT_HERO_OFFERS = [
+  { logoType: "axis", bank: "AXIS BANK", tag: "SPECIAL FESTIVE OFFER", title: "Axis Bank Special Festive Offer", highlights: "Zero documentation (salary a/c) | Disbursed within 3 hours | Dedicated Relationship Manager", orderIndex: 1, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
+  { logoType: "hdfc", bank: "HDFC BANK", tag: "PREFERRED OFFER", title: "HDFC Preferred Loan Offer Interest rates from 10.5% p.a.", highlights: "Flexible repayment options | Paperless process | Approval in 24 hours", orderIndex: 2, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
+  { logoType: "idbi", bank: "IDBI BANK", tag: "ZERO FEE OFFER", title: "Zero Processing Fee on Personal Loans", highlights: "Quick digital sanction in 4 hours | Foreclosure charges waived off | No hidden charges", orderIndex: 3, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
+];
 
 // Preset colors and gradients for the live preview cards based on chosen bank
 const THEME_PRESETS: Record<string, { accentColor: string; bgGradient: string }> = {
@@ -184,9 +204,27 @@ export const MarketingTab: React.FC = () => {
     }
   };
 
+  // ── Merge defaults into configured offers so all 3 are always visible ──
+  const mergedOffers = useMemo(() => {
+    const list = [...offers] as any[];
+    DEFAULT_HERO_OFFERS.forEach((def) => {
+      const exists = list.some(
+        (o: any) =>
+          o.logoType?.toLowerCase() === def.logoType.toLowerCase() ||
+          o.bank?.toUpperCase() === def.bank.toUpperCase()
+      );
+      if (!exists) {
+        list.push({ ...def, id: `default-${def.logoType}`, _isDefault: true });
+      }
+    });
+    return list.sort((a: any, b: any) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+  }, [offers]);
+
   // Determine current active preview properties
   const activePreset = THEME_PRESETS[formData.logoType.toLowerCase()] || THEME_PRESETS.default;
   const currentLogo = LOGO_MAP[formData.logoType.toLowerCase()];
+  // Resolve banner: explicit URL > fallback asset by logoType
+  const resolvedBanner = formData.bannerImageUrl || BANNER_MAP[formData.logoType.toLowerCase()] || "";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in slide-in-from-bottom-2">
@@ -426,107 +464,61 @@ export const MarketingTab: React.FC = () => {
 
             {/* Right side: Offer Card Mockup (Replicating Homepage Premium glassmorphic look) */}
             <div className="md:col-span-7 h-full flex flex-col justify-center z-10">
-              {formData.bannerImageUrl ? (
-                /* ─── IMAGE BANNER PREVIEW ─── */
-                <div
-                  className="w-full rounded-3xl overflow-hidden relative min-h-[220px] border border-white/60 shadow-xl flex flex-col justify-between group transition-all duration-300"
-                  style={{
-                    boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${activePreset.accentColor}15`
-                  }}
-                >
+              {/* ─── BANNER IMAGE PREVIEW (always resolves via BANNER_MAP fallback) ─── */}
+              <div
+                className="w-full rounded-3xl overflow-hidden relative min-h-[260px] border border-white/60 shadow-xl flex flex-col justify-between group transition-all duration-300"
+                style={{
+                  boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${activePreset.accentColor}15`
+                }}
+              >
+                {resolvedBanner ? (
                   <img 
-                    src={formData.bannerImageUrl} 
-                    alt="Banner preview" 
-                    className="absolute inset-0 w-full h-full object-cover min-h-[220px]" 
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect fill="%23f0f4ff" width="400" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="10">Image failed to load</text></svg>'; }}
+                    src={resolvedBanner} 
+                    alt={`${formData.bank} banner preview`} 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 via-black/10 to-transparent pointer-events-none" />
-                  
-                  {/* Floating FOMO badge */}
-                  <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border bg-amber-500/10 text-amber-700 border-amber-500/20 backdrop-blur-md">
-                    <span className="w-1 h-1 rounded-full bg-current animate-pulse" />
-                    Closing in 2 hours
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                    <span className="text-xs text-slate-400 font-semibold">No banner configured</span>
+                  </div>
+                )}
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 via-black/10 to-transparent pointer-events-none" />
+                
+                {/* Floating FOMO badge */}
+                <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border bg-amber-500/10 text-amber-700 border-amber-500/20 backdrop-blur-md bg-white/70 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                  {formData.tag || "LIVE OFFER"}
+                </span>
+
+                {/* Tag indicating source */}
+                {!formData.bannerImageUrl && resolvedBanner && (
+                  <span className="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-full text-[7px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-600 border border-blue-500/20 backdrop-blur-md bg-white/70 shadow-sm">
+                    Default Banner
                   </span>
+                )}
 
-                  <div className="mt-auto p-3.5 z-10 flex justify-between items-center w-full">
-                    <span className="text-[7px] text-white font-bold uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">Image Mode</span>
-                    <button type="button" className="bg-[#103783] text-white px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-wider transition-all shadow-md hover:scale-[1.02]" style={{ backgroundColor: activePreset.accentColor, boxShadow: `0 4px 10px ${activePreset.accentColor}30` }}>
-                      Apply Now
-                    </button>
-                  </div>
+                <div className="mt-auto p-3.5 z-10 flex justify-between items-center w-full">
+                  <span className="text-[7px] text-white font-bold uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">{formData.bank || "BANK"}</span>
+                  <button type="button" className="bg-[#103783] text-white px-3.5 py-1.5 rounded-full text-[8px] font-black uppercase tracking-wider transition-all shadow-md hover:scale-[1.02]" style={{ backgroundColor: activePreset.accentColor, boxShadow: `0 4px 10px ${activePreset.accentColor}30` }}>
+                    Apply Now
+                  </button>
                 </div>
-              ) : (
-                /* ─── PREMIUM GLASSMORPHIC CARD PREVIEW (Matches HeroSection.tsx) ─── */
-                <div 
-                  className="w-full bg-white/40 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden p-5 flex flex-col justify-between min-h-[220px] transition-all duration-300"
-                  style={{
-                    boxShadow: `0 8px 32px 0 rgba(16,55,131,0.04), inset 0 1px 1px 0 rgba(255,255,255,0.8), 0 20px 40px -10px ${activePreset.accentColor}12`
-                  }}
-                >
-                  {/* Top Header Row with Bank Logo & FOMO Badge */}
-                  <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100/50 shrink-0">
-                    {/* Enlarged Bank Logo */}
-                    <div className="h-8 w-24 bg-white/70 backdrop-blur-sm border border-white shadow-sm p-1 rounded-xl flex items-center justify-center overflow-hidden">
-                      {currentLogo ? (
-                        <img src={currentLogo} alt={formData.bank} className="h-full w-auto object-contain object-left max-w-[80px]" />
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] font-bold text-slate-700 tracking-tight uppercase">{formData.bank || "PRYME"}</span>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* Pulse FOMO Tag */}
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-extrabold uppercase tracking-wider border bg-amber-500/10 text-amber-700 border-amber-500/20 backdrop-blur-md">
-                      <span className="w-1 h-1 rounded-full bg-current animate-pulse shrink-0" />
-                      Closing in 2 hours
-                    </span>
-                  </div>
-
-                  {/* Middle Content: Title, Tagline, Highlights */}
-                  <div className="flex-1 flex flex-col justify-center py-2">
-                    <div className="mb-2">
-                      <div className="inline-block px-1.5 py-0.5 mb-1.5 rounded bg-[#103783]/5 text-[#103783] text-[7.5px] font-black uppercase tracking-wider" style={{ color: activePreset.accentColor, backgroundColor: `${activePreset.accentColor}10` }}>
-                        {formData.tag || "PREFERRED OFFER"}
-                      </div>
-                      <h3 className="text-xs font-bold text-[#0a1530]/80 leading-snug">
-                        {formData.title || "Pre-Approved Loan Limits & Offers"}
-                      </h3>
-                      {formData.highlights && (
-                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-2 leading-tight">
-                          {formData.highlights}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Bottom Action Row */}
-                  <div className="pt-2 border-t border-slate-100/50 flex items-center justify-between shrink-0">
-                    <span className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">Interactive Preview</span>
-                    <button 
-                      type="button" 
-                      className="bg-[#103783] text-white px-3 py-1.5 rounded-xl text-[8.5px] font-bold uppercase tracking-wider transition-all shadow-md"
-                      style={{ 
-                        backgroundColor: activePreset.accentColor,
-                        boxShadow: `0 6px 12px -2px ${activePreset.accentColor}30`
-                      }}
-                    >
-                      Apply Now
-                    </button>
-                  </div>
-                </div>
-              )}
+                {/* Techy shimmer sweep */}
+                <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-[1200ms] ease-out pointer-events-none" />
+              </div>
             </div>
 
           </div>
         </div>
 
-        {/* 2. Configured Offers Table */}
+        {/* 2. Configured Offers — Always shows all 3 (DB + defaults merged) */}
         <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden">
           <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
             <h3 className="font-semibold text-white">Configured Offers</h3>
             <span className="text-xs text-slate-400 font-semibold bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/[0.06]">
-              Total: {offers.length}
+              Total: {mergedOffers.length}
             </span>
           </div>
 
@@ -537,7 +529,7 @@ export const MarketingTab: React.FC = () => {
                   <th className="px-4 py-3 text-center">Rank</th>
                   <th className="px-4 py-3">Bank</th>
                   <th className="px-4 py-3">Tagline & Offer</th>
-                  <th className="px-4 py-3">Image</th>
+                  <th className="px-4 py-3">Banner</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
@@ -545,97 +537,105 @@ export const MarketingTab: React.FC = () => {
               <tbody className="divide-y divide-white/[0.04] text-xs">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-slate-500">
+                    <td colSpan={6} className="p-8 text-center text-slate-500">
                       <div className="flex justify-center items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                         Loading offers database...
                       </div>
                     </td>
                   </tr>
-                ) : offers.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="p-12 text-center text-slate-500">
-                      <div className="flex flex-col items-center gap-2">
-                        <Sparkles className="w-6 h-6 text-slate-600" />
-                        <p>No custom marketing offers configured.</p>
-                        <p className="text-[10px] text-slate-600">The home page is currently running on the automatic fallback (Top Active Products).</p>
-                      </div>
-                    </td>
-                  </tr>
                 ) : (
-                  offers.map((offer: any) => (
-                    <tr key={offer.id} className="hover:bg-white/[0.02] transition-colors group">
-                      <td className="px-4 py-3 text-center font-bold font-mono text-slate-400">
-                        {offer.orderIndex}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-semibold text-white">{offer.bank}</p>
-                          <p className="text-[9px] text-slate-500 tracking-wide uppercase mt-0.5">{offer.tag}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 max-w-[200px] truncate">
-                        <div>
-                          <p className="text-white truncate font-medium">{offer.title}</p>
-                          <p className="text-[10px] text-slate-500 truncate mt-0.5">{offer.highlights}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        {offer.bannerImageUrl ? (
-                          <div className="flex items-center gap-1.5">
-                            <img src={offer.bannerImageUrl} alt="Banner" className="w-10 h-6 object-cover rounded border border-white/10" />
-                            <span className="text-[9px] text-violet-400 font-bold uppercase">Image</span>
+                  mergedOffers.map((offer: any) => {
+                    const isDefault = !!offer._isDefault;
+                    const offerBanner = offer.bannerImageUrl || BANNER_MAP[offer.logoType?.toLowerCase()] || "";
+                    return (
+                      <tr key={offer.id} className="hover:bg-white/[0.02] transition-colors group">
+                        <td className="px-4 py-3 text-center font-bold font-mono text-slate-400">
+                          {offer.orderIndex}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div>
+                              <p className="font-semibold text-white">{offer.bank}</p>
+                              <p className="text-[9px] text-slate-500 tracking-wide uppercase mt-0.5">{offer.tag}</p>
+                            </div>
+                            {isDefault && (
+                              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">Default</span>
+                            )}
                           </div>
-                        ) : (
-                          <span className="text-[10px] text-slate-500 font-mono">Text</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => toggleStatusMutation.mutate(offer)}
-                          className={cn(
-                            "flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold transition-all",
-                            offer.active 
-                              ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" 
-                              : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
+                        </td>
+                        <td className="px-4 py-3 max-w-[200px] truncate">
+                          <div>
+                            <p className="text-white truncate font-medium">{offer.title}</p>
+                            <p className="text-[10px] text-slate-500 truncate mt-0.5">{offer.highlights}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {offerBanner ? (
+                            <div className="flex items-center gap-1.5">
+                              <img src={offerBanner} alt="Banner" className="w-12 h-7 object-cover rounded-md border border-white/10 shadow-sm" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                              <span className="text-[9px] text-violet-400 font-bold uppercase">{offer.bannerImageUrl ? "Custom" : "Default"}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-slate-500 font-mono">None</span>
                           )}
-                          disabled={toggleStatusMutation.isPending}
-                        >
-                          {offer.active ? (
-                            <>
+                        </td>
+                        <td className="px-4 py-3">
+                          {isDefault ? (
+                            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold bg-green-500/10 text-green-400 border-green-500/20">
                               <ToggleRight className="w-3.5 h-3.5" />
                               Active
-                            </>
+                            </span>
                           ) : (
-                            <>
-                              <ToggleLeft className="w-3.5 h-3.5" />
-                              Inactive
-                            </>
+                            <button
+                              onClick={() => toggleStatusMutation.mutate(offer)}
+                              className={cn(
+                                "flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold transition-all",
+                                offer.active 
+                                  ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" 
+                                  : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
+                              )}
+                              disabled={toggleStatusMutation.isPending}
+                            >
+                              {offer.active ? (
+                                <>
+                                  <ToggleRight className="w-3.5 h-3.5" />
+                                  Active
+                                </>
+                              ) : (
+                                <>
+                                  <ToggleLeft className="w-3.5 h-3.5" />
+                                  Inactive
+                                </>
+                              )}
+                            </button>
                           )}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex gap-1 justify-end opacity-60 group-hover:opacity-100 transition-opacity">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-7 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-2"
-                            onClick={() => handleEditClick(offer)}
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
-                            onClick={() => handleDelete(offer.id, offer.bank)}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex gap-1 justify-end opacity-60 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-2"
+                              onClick={() => handleEditClick(offer)}
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </Button>
+                            {!isDefault && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
+                                onClick={() => handleDelete(offer.id, offer.bank)}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
