@@ -158,7 +158,7 @@ export default function Offers() {
   // ── Engine Data Mapper ──────────────────────────────────────────────────
   const dynamicOffers = useMemo((): BankOffer[] => {
     if (!leadData || !leadData.engineResults || leadData.engineResults.length === 0) return [];
-    
+
     // Filter only eligible offers returned by Matrix Engine (Java)
     const eligibleResults = leadData.engineResults.filter((r: any) => r.eligible === true || r.isEligible === true);
 
@@ -167,7 +167,7 @@ export default function Offers() {
       // Resolve the correct bank theme and logo based on the bank's name
       const resolveBankTheme = (bankName: string, productCode: string, lenderName?: string) => {
         const name = `${lenderName || ""} ${bankName || ""} ${productCode || ""}`.toUpperCase();
-        
+
         if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo };
         if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo };
         if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo };
@@ -180,7 +180,7 @@ export default function Offers() {
         if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: undefined }; // L&T Yellow
         if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: undefined };
         if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: undefined }; // ABFL Red
-        
+
         // Generic fallback colors using a stable hash so it doesn't change on re-render
         const fallbacks = [
           { c: "bg-[#1e293b]", x: "#1e293b", img: undefined }, // Slate
@@ -189,7 +189,7 @@ export default function Offers() {
         ];
         return fallbacks[name.length % fallbacks.length];
       };
-      
+
       const theme = resolveBankTheme(er.productName || er.lenderName, er.productCode, er.lenderName);
 
       // Map dynamic backend fields without hardcoded fallbacks
@@ -199,11 +199,11 @@ export default function Offers() {
       return {
         id: er.productCode || er.lenderId || Math.random().toString(),
         bankName: er.productName || er.lenderName || "Partner Bank",
-        logoColor: theme.c, 
+        logoColor: theme.c,
         brandHex: theme.x,
         logoUrl: theme.img,
         interestRate: parseFloat(roiPercent.toFixed(2)),
-        processingFee: parseFloat(processingFee.toFixed(2)), 
+        processingFee: parseFloat(processingFee.toFixed(2)),
         maxTenure: (er.tenureMonths || 60) / 12,
         maxLoanAmount: er.maxEligibleAmount || leadData.loanAmount,
         approvalOdds: 98,
@@ -395,20 +395,20 @@ export default function Offers() {
               We evaluated your profile against our partner network. Unfortunately, we could not find an eligible loan match right now.
             </p>
           </div>
-          
+
           <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
-             <div className="font-semibold text-foreground flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
-             </div>
-             <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
-               {rawViolations.length > 0 ? (
-                 rawViolations.map((reason: string, idx: number) => (
-                   <li key={idx}>{reason}</li>
-                 ))
-               ) : (
-                 <li>Applicant profile does not meet standard eligibility criteria.</li>
-               )}
-             </ul>
+            <div className="font-semibold text-foreground flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
+            </div>
+            <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
+              {rawViolations.length > 0 ? (
+                rawViolations.map((reason: string, idx: number) => (
+                  <li key={idx}>{reason}</li>
+                ))
+              ) : (
+                <li>Applicant profile does not meet standard eligibility criteria.</li>
+              )}
+            </ul>
           </div>
 
           <Button onClick={() => navigate("/")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
