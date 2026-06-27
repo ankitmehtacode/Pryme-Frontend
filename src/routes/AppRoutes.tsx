@@ -91,7 +91,7 @@ export const AppRoutes = () => {
             />
           }
         >
-          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
 
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
