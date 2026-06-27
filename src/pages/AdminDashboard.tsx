@@ -734,8 +734,8 @@ const AdminDashboard = () => {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-b from-[#050508] to-[#08080e]">
-            <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex-grow flex flex-col p-8 bg-gradient-to-b from-[#050508] to-[#08080e] overflow-hidden">
+            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col min-h-0 space-y-6">
 
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>

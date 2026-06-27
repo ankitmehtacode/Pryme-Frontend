@@ -14,8 +14,8 @@ interface CompanyTabProps {
 
 export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmin, authUser, roleMutation, deleteUserMutation }) => {
   return (
-    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-      <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
+    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
+      <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] shrink-0 rounded-t-2xl">
         <h3 className="font-semibold text-white">Team Members</h3>
         <span className="text-xs text-slate-500 font-medium">{teamMembers.length} team members{!isSuperAdmin && " • Role changes require SUPER_ADMIN"}</span>
       </div>
@@ -24,7 +24,8 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
           <Loader2 className="w-3 h-3 animate-spin" /> {roleMutation.isPending ? "Updating role in database..." : "Deleting team member..."}
         </div>
       )}
-      <table className="w-full text-left border-collapse">
+      <div className="flex-1 overflow-auto relative">
+        <table className="w-full text-left border-collapse">
         <thead className="bg-white/[0.02] border-b border-white/[0.04]">
           <tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
             <th className="px-6 py-4">Member</th>
@@ -115,6 +116,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

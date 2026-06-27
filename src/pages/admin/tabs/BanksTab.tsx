@@ -21,8 +21,8 @@ export const BanksTab: React.FC<BanksTabProps> = ({
   toggleBankMutation, refetchBanks, onAddBank, onEditBank, onDeleteBank
 }) => {
   return (
-    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-      <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
+    <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
+      <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] shrink-0 rounded-t-2xl">
         <div className="flex items-center gap-3">
           <h3 className="font-semibold text-white">Partner Bank Network</h3>
           <Select value={bankStatusFilter} onValueChange={(v: any) => setBankStatusFilter(v)}>
@@ -40,7 +40,8 @@ export const BanksTab: React.FC<BanksTabProps> = ({
           <Plus className="w-4 h-4 mr-2" /> Add Bank
         </Button>
       </div>
-      <table className="w-full text-left border-collapse">
+      <div className="flex-1 overflow-auto relative">
+        <table className="w-full text-left border-collapse">
         <thead className="bg-white/[0.02] border-b border-white/[0.04]">
           <tr className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
             <th className="px-6 py-4">Bank</th>
@@ -147,6 +148,7 @@ export const BanksTab: React.FC<BanksTabProps> = ({
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };
