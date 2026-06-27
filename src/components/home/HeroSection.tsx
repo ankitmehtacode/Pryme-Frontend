@@ -304,16 +304,18 @@ const OfferCard = memo(({ offer, compact = false }: { offer: typeof initialOffer
           </motion.div>
 
           {/* Highlights */}
-          <motion.div variants={childVariants} className="space-y-2">
-            {offer.highlights.map((h, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          {offer.highlights && offer.highlights.filter(Boolean).length > 0 && (
+            <motion.div variants={childVariants} className="space-y-2">
+              {offer.highlights.filter(Boolean).map((h, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  </div>
+                  <span className="text-xs text-slate-600 font-semibold leading-tight">{h}</span>
                 </div>
-                <span className="text-xs text-slate-600 font-semibold leading-tight">{h}</span>
-              </div>
-            ))}
-          </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
 
         {/* CTA Button using brand-color overlay */}
