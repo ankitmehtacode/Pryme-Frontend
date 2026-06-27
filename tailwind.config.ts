@@ -19,8 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["Gilroy", "Inter", "system-ui", "sans-serif"],
+        display: ["Transducer", "Space Grotesk", "system-ui", "sans-serif"],
+        heading: ["Transducer", "Space Grotesk", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Menlo", "monospace"],
       },
       colors: {

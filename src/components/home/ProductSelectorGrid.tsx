@@ -127,13 +127,13 @@ const ProductSelectorGrid = memo(() => {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Explore More Products
           </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-6 uppercase leading-none">
+          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-2 uppercase leading-none">
             Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
           </h2>
         </motion.div>
       </div>
 
-      <div className="container mx-auto px-4 max-w-[1300px] relative z-20 mt-4">
+      <div className="container mx-auto px-4 max-w-[1300px] relative z-20 mt-1">
 
         {/* 🧠 CLIPPING ERADICATED: 
             Changed to flex-wrap. NO overflow classes anywhere. 
@@ -143,7 +143,7 @@ const ProductSelectorGrid = memo(() => {
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce}
-          className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-10 pt-6 relative z-10"
+          className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-10 pt-2 relative z-10"
         >
           {products.map((product) => (
             <motion.div 

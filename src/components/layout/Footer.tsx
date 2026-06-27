@@ -188,7 +188,7 @@ const Footer = () => {
                   <a href={CONTACT_PHONE_LINK} className="text-sm text-zinc-400 hover:text-[#9BAFD9] transition-colors block">
                     {CONTACT_PHONE}
                   </a>
-                  <span className="text-[10px] text-zinc-600">Toll-free, 9 AM - 9 PM</span>
+                  <span className="text-[10px] text-zinc-600">Support, 9 AM - 9 PM</span>
                 </div>
               </li>
               <li className="flex items-start gap-2">

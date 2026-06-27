@@ -143,12 +143,12 @@ const Index = () => {
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
-                <div className="text-center mb-12 md:mb-16 lg:mb-20">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
+                <div className="text-center mb-6 md:mb-8 lg:mb-10">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
                   </span>
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground mb-4 md:mb-6 tracking-tighter">
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground mb-2 md:mb-3 tracking-tighter">
                     Calculate & Evaluate
                   </h2>
                   <p className="text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">

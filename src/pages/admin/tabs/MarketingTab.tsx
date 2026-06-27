@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Plus, Edit2, Trash2, Sparkles, CheckCircle2, Zap, 
-  Percent, ShieldCheck, Loader2, Eye, ToggleLeft, ToggleRight
+  Percent, ShieldCheck, Loader2, Eye, ToggleLeft, ToggleRight,
+  ImageIcon, Link2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -50,6 +51,9 @@ interface HeroOfferFormData {
   highlights: string;
   active: boolean;
   orderIndex: number;
+  bannerImageUrl: string;
+  heroImageUrl: string;
+  targetUrl: string;
 }
 
 const initialFormState: HeroOfferFormData = {
@@ -60,6 +64,9 @@ const initialFormState: HeroOfferFormData = {
   highlights: "Zero documentation for salary accounts | Funds disbursed within 3 hours",
   active: true,
   orderIndex: 0,
+  bannerImageUrl: "",
+  heroImageUrl: "",
+  targetUrl: "",
 };
 
 export const MarketingTab: React.FC = () => {
@@ -158,6 +165,9 @@ export const MarketingTab: React.FC = () => {
       highlights: offer.highlights || "",
       active: offer.active ?? true,
       orderIndex: offer.orderIndex ?? 0,
+      bannerImageUrl: offer.bannerImageUrl || "",
+      heroImageUrl: offer.heroImageUrl || "",
+      targetUrl: offer.targetUrl || "",
     });
     setIsEditing(true);
   };
@@ -262,6 +272,77 @@ export const MarketingTab: React.FC = () => {
             <p className="text-[10px] text-slate-500 mt-1">Separate multiple bullet points with the pipe symbol ( | ).</p>
           </div>
 
+          {/* ─── Image URLs Section ─── */}
+          <div className="pt-3 border-t border-white/[0.06]">
+            <div className="flex items-center gap-2 mb-3">
+              <ImageIcon className="w-4 h-4 text-violet-400" />
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Banner Images (Optional)</span>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Offer Banner Image URL</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="url" 
+                      value={formData.bannerImageUrl} 
+                      onChange={e => setFormData({ ...formData, bannerImageUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="https://cdn.example.com/offer-banner.png"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px (.png/.webp) — This replaces the text card with a full-bleed image.</p>
+                {formData.bannerImageUrl && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
+                    <img src={formData.bannerImageUrl} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Hero Illustration URL (Optional)</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="url" 
+                      value={formData.heroImageUrl} 
+                      onChange={e => setFormData({ ...formData, heroImageUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="https://cdn.example.com/hero-illustration.png"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Recommended: 640×800px (.png/.webp) — Overrides the center bank illustration.</p>
+                {formData.heroImageUrl && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
+                    <img src={formData.heroImageUrl} alt="Hero preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Redirect / Target Link URL</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="text" 
+                      value={formData.targetUrl} 
+                      onChange={e => setFormData({ ...formData, targetUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="/apply or https://example.com"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Redirection destination for the CTA button (defaults to /apply if left empty).</p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-slate-400 block mb-1">Display Rank/Order Index</label>
@@ -332,71 +413,92 @@ export const MarketingTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Premium Glassmorphic Hero Card Mockup */}
-          <div 
-            className="w-full rounded-[24px] overflow-hidden p-6 relative flex flex-col justify-between min-h-[200px] border border-white/20 shadow-2xl transition-all duration-500 ease-out"
-            style={{ contain: "layout style paint" }}
-          >
-            {/* Aurora Background Effect */}
+          {/* Premium Glassmorphic Hero Card Mockup — Image or Text Mode */}
+          {formData.bannerImageUrl ? (
+            /* ─── IMAGE MODE PREVIEW ─── */
+            <div className="w-full rounded-[24px] overflow-hidden relative min-h-[200px] border border-white/20 shadow-2xl transition-all duration-500 ease-out group">
+              <img 
+                src={formData.bannerImageUrl} 
+                alt="Banner preview" 
+                className="w-full h-full object-cover min-h-[200px] transition-transform duration-700 group-hover:scale-[1.02]" 
+                onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect fill="%23111" width="400" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14">Image failed to load</text></svg>'; }}
+              />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 via-black/10 to-transparent pointer-events-none" />
+              <div className="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[9px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <ImageIcon className="w-2.5 h-2.5" />
+                Image Mode
+              </div>
+              <div className="absolute bottom-2 inset-x-0 z-10 flex items-center justify-center">
+                <span className="text-[7px] text-white/60 font-bold uppercase tracking-widest bg-black/30 px-2 py-0.5 rounded-full backdrop-blur-sm">Live Preview — Image Banner</span>
+              </div>
+            </div>
+          ) : (
+            /* ─── TEXT MODE PREVIEW (existing glassmorphic layout) ─── */
             <div 
-              className="absolute inset-[-10%] opacity-40 blur-3xl pointer-events-none transition-all duration-500"
-              style={{ background: activePreset.bgGradient }}
-            />
+              className="w-full rounded-[24px] overflow-hidden p-6 relative flex flex-col justify-between min-h-[200px] border border-white/20 shadow-2xl transition-all duration-500 ease-out"
+              style={{ contain: "layout style paint" }}
+            >
+              {/* Aurora Background Effect */}
+              <div 
+                className="absolute inset-[-10%] opacity-40 blur-3xl pointer-events-none transition-all duration-500"
+                style={{ background: activePreset.bgGradient }}
+              />
 
-            {/* Specular glare overlay */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none opacity-80" />
+              {/* Specular glare overlay */}
+              <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none opacity-80" />
 
-            {/* Top Bar Mockup */}
-            <div className="relative z-10 flex items-center justify-between pointer-events-none shrink-0 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-[1.5px] bg-slate-800/40 rounded-full shrink-0" />
-                <span className="text-[8px] font-mono tracking-widest uppercase text-slate-800/80 font-bold">
-                  Instant Capital. Zero Friction.
-                </span>
-              </div>
-              <div className="w-1.5 h-1.5 rounded-full bg-slate-800/30" />
-            </div>
-
-            {/* Center Billboard Mockup */}
-            <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center pointer-events-none select-none">
-              {/* Badge Tagline & Bank */}
-              <div className="flex items-center justify-center gap-2 px-3 py-1 mb-2.5 rounded-full bg-white/40 border border-white/50 shadow-sm">
-                <div className="px-1.5 py-0.5 rounded-full bg-white text-slate-800 text-[8px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-xs">
-                  <Zap className="w-2 h-2" style={{ color: activePreset.accentColor }} />
-                  {formData.tag || "LIVE OFFER"}
+              {/* Top Bar Mockup */}
+              <div className="relative z-10 flex items-center justify-between pointer-events-none shrink-0 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-[1.5px] bg-slate-800/40 rounded-full shrink-0" />
+                  <span className="text-[8px] font-mono tracking-widest uppercase text-slate-800/80 font-bold">
+                    Instant Capital. Zero Friction.
+                  </span>
                 </div>
-                {currentLogo ? (
-                  <img src={currentLogo} className="h-3.5 object-contain" alt={formData.bank} />
-                ) : (
-                  <span className="text-[9px] font-bold text-slate-800 tracking-wider">{formData.bank || "BANK NETWORK"}</span>
-                )}
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-800/30" />
               </div>
 
-              {/* Title Tagline */}
-              <h2 className="text-sm sm:text-base md:text-lg font-extrabold text-[#0a1530] tracking-tight leading-tight mb-2.5 max-w-xl">
-                {formData.title || "Pre-Approved Loan Limits & Offers"}
-              </h2>
+              {/* Center Billboard Mockup */}
+              <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center pointer-events-none select-none">
+                {/* Badge Tagline & Bank */}
+                <div className="flex items-center justify-center gap-2 px-3 py-1 mb-2.5 rounded-full bg-white/40 border border-white/50 shadow-sm">
+                  <div className="px-1.5 py-0.5 rounded-full bg-white text-slate-800 text-[8px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-xs">
+                    <Zap className="w-2 h-2" style={{ color: activePreset.accentColor }} />
+                    {formData.tag || "LIVE OFFER"}
+                  </div>
+                  {currentLogo ? (
+                    <img src={currentLogo} className="h-3.5 object-contain" alt={formData.bank} />
+                  ) : (
+                    <span className="text-[9px] font-bold text-slate-800 tracking-wider">{formData.bank || "BANK NETWORK"}</span>
+                  )}
+                </div>
 
-              {/* Highlights Bullet List */}
-              <div className="flex flex-wrap items-center justify-center gap-1.5">
-                {(formData.highlights ? formData.highlights.split('|') : ["Premium live preview updates", "Instant CRM publishing"])
-                  .map((h, i) => (
-                    <div key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/5 border border-slate-900/10 text-[#0a1530]/90 text-[8px] font-bold tracking-wide">
-                      <CheckCircle2 className="w-2 h-2 text-slate-800/70" style={{ color: activePreset.accentColor }} />
-                      {h.trim()}
-                    </div>
-                  ))
-                }
+                {/* Title Tagline */}
+                <h2 className="text-sm sm:text-base md:text-lg font-extrabold text-[#0a1530] tracking-tight leading-tight mb-2.5 max-w-xl">
+                  {formData.title || "Pre-Approved Loan Limits & Offers"}
+                </h2>
+
+                {/* Highlights Bullet List */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {(formData.highlights ? formData.highlights.split('|') : ["Premium live preview updates", "Instant CRM publishing"])
+                    .map((h, i) => (
+                      <div key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/5 border border-slate-900/10 text-[#0a1530]/90 text-[8px] font-bold tracking-wide">
+                        <CheckCircle2 className="w-2 h-2 text-slate-800/70" style={{ color: activePreset.accentColor }} />
+                        {h.trim()}
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              {/* Bottom Bar Marquee Spacer */}
+              <div className="relative z-10 w-full border-t-[0.5px] border-white/30 bg-white/20 mt-4 pt-1 rounded-b-2xl pointer-events-none">
+                <div className="flex items-center justify-center py-1">
+                  <span className="text-[7px] text-slate-600 font-bold uppercase tracking-widest">Live Preview — Text Mode</span>
+                </div>
               </div>
             </div>
-
-            {/* Bottom Bar Marquee Spacer */}
-            <div className="relative z-10 w-full border-t-[0.5px] border-white/30 bg-white/20 mt-4 pt-1 rounded-b-2xl pointer-events-none">
-              <div className="flex items-center justify-center py-1">
-                <span className="text-[7px] text-slate-600 font-bold uppercase tracking-widest">Live Preview Interface mockup</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* 2. Configured Offers Table */}
@@ -415,7 +517,7 @@ export const MarketingTab: React.FC = () => {
                   <th className="px-4 py-3 text-center">Rank</th>
                   <th className="px-4 py-3">Bank</th>
                   <th className="px-4 py-3">Tagline & Offer</th>
-                  <th className="px-4 py-3">Logo Preset</th>
+                  <th className="px-4 py-3">Image</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
@@ -423,7 +525,7 @@ export const MarketingTab: React.FC = () => {
               <tbody className="divide-y divide-white/[0.04] text-xs">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-slate-500">
+                    <td colSpan={7} className="p-8 text-center text-slate-500">
                       <div className="flex justify-center items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                         Loading offers database...
@@ -432,7 +534,7 @@ export const MarketingTab: React.FC = () => {
                   </tr>
                 ) : offers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-12 text-center text-slate-500">
+                    <td colSpan={7} className="p-12 text-center text-slate-500">
                       <div className="flex flex-col items-center gap-2">
                         <Sparkles className="w-6 h-6 text-slate-600" />
                         <p>No custom marketing offers configured.</p>
@@ -458,8 +560,15 @@ export const MarketingTab: React.FC = () => {
                           <p className="text-[10px] text-slate-500 truncate mt-0.5">{offer.highlights}</p>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-[10px] text-slate-400 capitalize">
-                        {offer.logoType || "none"}
+                      <td className="px-4 py-3">
+                        {offer.bannerImageUrl ? (
+                          <div className="flex items-center gap-1.5">
+                            <img src={offer.bannerImageUrl} alt="Banner" className="w-10 h-6 object-cover rounded border border-white/10" />
+                            <span className="text-[9px] text-violet-400 font-bold uppercase">Image</span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-mono">Text</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <button

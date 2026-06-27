@@ -3,17 +3,101 @@
 @tailwind utilities;
 
 @layer base {
-  /* Font import REMOVED — already loaded via <link> in index.html.
-     Duplicate @import caused the browser to download Inter + Space Grotesk twice. */
+  /* ═══════════════════════════════════════════════════════════════
+     SELF-HOSTED PREMIUM FONTS
+     Transducer — headings (h1/h2/h3)
+     Gilroy — body text (via tailwind sans token)
+     font-display: swap → FOUT over FOIT (text visible immediately)
+     Fallback chain: Transducer → Space Grotesk → system-ui
+                     Gilroy → Inter → system-ui
+     ═══════════════════════════════════════════════════════════════ */
+
+  @font-face {
+    font-family: 'Transducer';
+    src: url('./fonts/Transducer-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Transducer';
+    src: url('./fonts/Transducer-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
 
   html {
     scroll-behavior: smooth;
+    zoom: 0.8; /* Default zoom for desktop/laptops */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Responsive zoom overrides to maintain readability on mobile & tablets */
+  @media (max-width: 1023px) {
+    html {
+      zoom: 0.85; /* Tablet layout scale */
+    }
+  }
+
+  @media (max-width: 767px) {
+    html {
+      zoom: 0.95; /* Mobile layout scale - stays legible & friendly for touch targets */
+    }
   }
 
   h1,
   h2,
   h3 {
-    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-family: "Transducer", "Space Grotesk", system-ui, sans-serif;
+    letter-spacing: -0.02em; /* cleaner kerning under zoomed scales */
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 200-IQ legibility enhancement: boost letter-spacing for small text sizes when scaled down */
+  .text-xs,
+  .text-\[9px\],
+  .text-\[10px\] {
+    letter-spacing: 0.015em;
   }
 
   :root {
@@ -320,6 +404,33 @@
 
   .animate-pulse-glow {
     animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes shiny-text {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .shiny-text-fomo {
+    color: rgba(217, 119, 6, 0.7);
+    background: linear-gradient(
+      to right,
+      rgba(217, 119, 6, 0.7) 20%,
+      #f59e0b 40%,
+      #fef08a 50%,
+      #f59e0b 60%,
+      rgba(217, 119, 6, 0.7) 80%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shiny-text 2.5s linear infinite;
   }
 
   /* ─── CHROME COMPOSITOR PERFORMANCE ─────────────────────────────

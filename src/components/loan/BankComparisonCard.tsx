@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink } from "lucide-react";
+import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface BankOfferDTO {
@@ -30,6 +30,7 @@ interface BankComparisonCardProps {
   onToggleExpand: () => void;
   onApply: (providerId: string) => Promise<void>;
   isGlobalLocking: boolean;
+  isRecommended?: boolean;
 }
 
 export function BankComparisonCard({
@@ -44,6 +45,7 @@ export function BankComparisonCard({
   onToggleExpand,
   onApply,
   isGlobalLocking,
+  isRecommended = false,
 }: BankComparisonCardProps) {
   const [localStatus, setLocalStatus] = useState<"idle" | "processing" | "resolved">("idle");
   const [logoError, setLogoError] = useState(false);
@@ -97,7 +99,7 @@ export function BankComparisonCard({
 
         <div className="pl-6 pr-5 py-6 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Desktop Grid ───────────────────────────── */}
-          <div className="grid grid-cols-[1fr] xl:grid-cols-[230px_120px_170px_1fr_auto] items-center gap-4 xl:gap-6">
+          <div className="grid grid-cols-[1fr] xl:grid-cols-[170px_90px_120px_1fr_auto] 2xl:grid-cols-[200px_110px_150px_1fr_auto] items-center gap-4 xl:gap-3 2xl:gap-4">
 
             {/* ── Bank Identity ────────────────────────────── */}
             <div className="flex items-center gap-4">
@@ -124,6 +126,11 @@ export function BankComparisonCard({
                 )}
               </div>
               <div className="min-w-0 flex flex-col justify-center">
+                {isRecommended && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
+                  </span>
+                )}
                 <h3 className="text-base sm:text-lg font-extrabold text-foreground truncate tracking-tight">{offer.bankName}</h3>
                 <span className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
                   <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 stroke-[2.5]" /> {offer.approvalOdds}% approval
@@ -169,17 +176,17 @@ export function BankComparisonCard({
             </div>
 
             {/* ── Metrics Chips ────────────────────────────── */}
-            <div className="hidden xl:flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2 2xl:gap-3">
               {[
                 { label: "Interest", value: `${offer.interestRate}%` },
                 { label: "Tenure", value: `${offer.maxTenure} yrs` },
-                { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
+                { label: "Processing Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
               ].map((m, i) => (
                 <div
                   key={i}
-                  className="px-3.5 py-2.5 rounded-[1rem] bg-slate-50/80 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-md shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
+                  className="px-2.5 py-2 2xl:px-3.5 2xl:py-2.5 rounded-[1rem] bg-slate-50/80 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-md shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5">{m.label}</p>
+                  <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5">{m.label}</p>
                   <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight">{m.value}</p>
                 </div>
               ))}
@@ -187,7 +194,7 @@ export function BankComparisonCard({
 
             {/* ── CTA ──────────────────────────────────────── */}
             <div className="flex items-center gap-3 justify-end w-full xl:w-auto mt-5 xl:mt-0 xl:col-start-5">
-              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[160px]">
+              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[150px]">
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
@@ -241,7 +248,7 @@ export function BankComparisonCard({
               { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
               { label: "Interest", value: `${offer.interestRate}%` },
               { label: "Tenure", value: `${offer.maxTenure} yrs` },
-              { label: "Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
+              { label: "Processing Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
             ].map((m, i) => (
               <div
                 key={i}

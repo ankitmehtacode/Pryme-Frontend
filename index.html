@@ -34,12 +34,14 @@
 
     <!--
       FONT STRATEGY:
-      - Inter: body text (sans-serif in tailwind.config.ts)
-      - Space Grotesk: display headings (display font in tailwind.config.ts + h1/h2/h3 in index.css)
-      - Playfair Display removed — it was never referenced in the design system.
-      - JetBrains Mono NOT loaded here — only used in code blocks; browser falls back to Menlo fine.
-      - display=swap prevents blank text during font download (FOUT over FOIT).
+      - Transducer: display headings (h1/h2/h3) — self-hosted .woff2
+      - Gilroy: body text (sans-serif in tailwind.config.ts) — self-hosted .woff2
+      - Inter: fallback body text (loaded from Google Fonts)
+      - Space Grotesk: fallback headings (loaded from Google Fonts)
+      - font-display: swap prevents blank text during font download (FOUT over FOIT).
     -->
+    <link rel="preload" href="/src/fonts/Transducer-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/fonts/Gilroy-Medium.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 

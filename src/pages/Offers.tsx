@@ -371,7 +371,7 @@ export default function Offers() {
           <Header />
           <main className="flex-1 pt-24 md:pt-28 pb-24">
             <div className="container mx-auto px-4 max-w-6xl space-y-4">
-              <SkeletonCard isHero delay={0} />
+              <SkeletonCard delay={0} />
               <SkeletonCard delay={0.1} />
               <SkeletonCard delay={0.15} />
             </div>
@@ -400,15 +400,14 @@ export default function Offers() {
              <div className="font-semibold text-foreground flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
              </div>
-             {rawViolations.length > 0 && (
-               <div className="mb-2 text-destructive/90 bg-destructive/10 p-2 rounded text-xs overflow-hidden">
-                 {rawViolations.join(', ')}
-               </div>
-             )}
              <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
-               <li>Reduce your existing monthly EMI obligations.</li>
-               <li>Ensure your properties are assessed accurately against FOIR parameters.</li>
-               <li>Apply with a co-applicant to pool higher monthly income.</li>
+               {rawViolations.length > 0 ? (
+                 rawViolations.map((reason: string, idx: number) => (
+                   <li key={idx}>{reason}</li>
+                 ))
+               ) : (
+                 <li>Applicant profile does not meet standard eligibility criteria.</li>
+               )}
              </ul>
           </div>
 
@@ -495,7 +494,7 @@ export default function Offers() {
           <AnimatePresence>
             {showSkeleton && (
               <motion.div exit={{ opacity: 0 }} className="space-y-4 mb-4">
-                <SkeletonCard isHero delay={0} />
+                <SkeletonCard delay={0} />
                 <SkeletonCard delay={0.1} />
                 <SkeletonCard delay={0.15} />
               </motion.div>
@@ -504,197 +503,35 @@ export default function Offers() {
 
           {!showSkeleton && (
             <div className="space-y-4">
+              <AppErrorBoundary>
+                <div className="space-y-3">
+                  {dynamicOffers.map((offer, idx) => {
+                    const emi = emis[offer.id] || 0;
+                    const totalRep = totalRepayments[offer.id] || 0;
+                    const emiDiffFromHero = idx === 0 ? 0 : emi - (emis[heroOffer.id] || 0);
+                    const totalDiffFromHero = idx === 0 ? 0 : totalRep - (totalRepayments[heroOffer.id] || 0);
+                    const isExpanded = expandedCard === offer.id;
 
-              {/* ═══════════════════════════════════════════════════════
-                  🏆 HERO CARD — 1.4x larger, dominant, gradient bg
-                  This IS the decision. Everything else is secondary.
-                  ═══════════════════════════════════════════════════════ */}
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 0.1, ...spring }}
-                className="relative rounded-[2rem] overflow-hidden"
-                style={{ boxShadow: `0 24px 60px ${heroOffer.brandHex}18, 0 0 0 1px ${heroOffer.brandHex}15` }}
-              >
-                {/* Dynamic gradient bg — Uses hero bank's brand colour */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${heroOffer.brandHex} 0%, ${heroOffer.brandHex}dd 40%, ${heroOffer.brandHex}aa 100%)`,
-                  }}
-                />
-                {/* Glass overlay for depth */}
-                <div className="absolute inset-0 bg-black/10 backdrop-transform-gpu" />
-
-                {/* Shimmer sweep */}
-                <ShimmerEffect />
-
-                {/* Glassmorphic border */}
-                <div className="absolute inset-0 rounded-[2rem] border border-white/15 pointer-events-none z-10" />
-
-                <div className="relative z-10 p-7 md:p-10">
-
-                  {/* ── Top: Identity + Recommended Label ──────────── */}
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl ring-2 ring-white/30 p-2 overflow-hidden">
-                        {heroOffer.logoUrl ? (
-                          <img src={heroOffer.logoUrl} alt={heroOffer.bankName} className="w-full h-full object-contain" />
-                        ) : (
-                          <Building2 className="w-7 h-7" style={{ color: heroOffer.brandHex }} />
-                        )}
-                      </div>
-                      <div>
-                        <h2 className="text-xl md:text-2xl font-bold text-white">{heroOffer.bankName}</h2>
-                        <div className="flex items-center gap-2.5 mt-1">
-                          <span className="text-[11px] font-bold text-emerald-300 flex items-center gap-1">
-                            <TrendingUp className="w-3 h-3" /> {heroOffer.approvalOdds}% approval
-                          </span>
-                          <span className="text-white/20">•</span>
-                          <span className="text-[11px] text-white/50 flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {heroOffer.processingTime}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Recommended badge — frosted glass */}
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[11px] font-bold uppercase tracking-wider shrink-0">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> Recommended for you
-                    </div>
-                  </div>
-
-                  {/* ── Savings callout — Comparison intelligence ───── */}
-                  {savingsVsNext.totalDiff > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-                      <span className="text-[12px] font-bold text-white">
-                        You save ₹{savingsVsNext.totalDiff.toLocaleString("en-IN")} vs {savingsVsNext.comparedTo}
-                      </span>
-                    </motion.div>
-                  )}
-
-                  {/* ── EMI — PRIMARY METRIC (giant) ───────────────── */}
-                  <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10 mb-7">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40 mb-1">Monthly EMI</p>
-                      <p className="text-[44px] md:text-[52px] font-extrabold text-white tracking-tight leading-none tabular-nums">
-                        <span className="text-xl font-semibold text-white/50 mr-1">₹</span>{(emis[heroOffer.id] || 0).toLocaleString("en-IN")}
-                      </p>
-                    </div>
-
-                    {/* Frosted glass metric chips */}
-                    <div className="flex flex-wrap gap-3 pb-1">
-                      {[
-                        { label: "Total Repayment", value: `₹${(totalRepayments[heroOffer.id] || 0).toLocaleString("en-IN")}` },
-                        { label: "Interest", value: `${heroOffer.interestRate}%` },
-                        { label: "Tenure", value: `${heroOffer.maxTenure} yrs` },
-                        { label: "Processing Fee", value: heroOffer.processingFee >= 100 ? `₹${Math.round(heroOffer.processingFee).toLocaleString("en-IN")}` : `${heroOffer.processingFee}%` },
-                      ].map((m, i) => (
-                        <div key={i} className="px-3.5 py-2 rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.1]">
-                          <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-white/35 leading-none mb-1">{m.label}</p>
-                          <p className="text-sm font-bold text-white/90 tabular-nums leading-none">{m.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ── Inline reasons — Why this is best ──────────── */}
-                  <div className="flex flex-wrap gap-x-6 gap-y-2 mb-7">
-                    {[
-                      "Lowest total repayment",
-                      `${heroOffer.approvalOdds}% approval probability`,
-                      `Fast disbursal (${heroOffer.processingTime})`,
-                    ].map((reason, i) => (
-                      <span key={i} className="flex items-center gap-1.5 text-[12px] font-medium text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" /> {reason}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* ── Value Score Bar ─────────────────────────────── */}
-                  <div className="mb-8 max-w-sm">
-                    <ValueScoreBar score={heroValueScore} />
-                  </div>
-
-                  {/* ── CTA + Trust — Glassmorphic button ──────────── */}
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                      <Button
-                        onClick={() => handleUnlock(heroOffer)}
-                        disabled={isLocking !== null}
-                        className="rounded-xl h-14 px-10 text-base font-bold bg-white/95 backdrop-blur-sm text-foreground hover:bg-white shadow-2xl shadow-black/10 hover:shadow-black/15 transition-all hover:scale-[1.02] active:scale-[0.99] border border-white/60 w-full sm:w-auto"
-                        style={{ color: heroOffer.brandHex }}
-                      >
-                        {isLocking === heroOffer.id ? (
-                          <span className="flex items-center gap-2 justify-center"><Loader2 className="w-5 h-5 animate-spin" /> Securing...</span>
-                        ) : (
-                          <span className="flex items-center gap-2 justify-center">Apply with Pryme <ArrowRight className="w-5 h-5" /></span>
-                        )}
-                      </Button>
-                      <button
-                        className="rounded-xl h-14 px-6 text-sm font-semibold transition-all border backdrop-blur-md bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:text-white flex items-center justify-center gap-2 w-full sm:w-auto"
-                        title={`Apply directly on ${heroOffer.bankName} website`}
-                      >
-                        Apply Directly <ExternalLink className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-[10px] text-white/35 flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-emerald-300/60" /> No impact on credit score
-                      </span>
-                      <span className="text-[10px] text-white/35 flex items-center gap-1">
-                        <Users className="w-3 h-3 text-white/35" /> Trusted by 2L+ users
-                      </span>
-                    </div>
-                  </div>
+                    return (
+                      <BankComparisonCard
+                        key={offer.id}
+                        offer={offer as BankOfferDTO}
+                        emi={emi}
+                        totalRepayment={totalRep}
+                        emiDiffFromHero={emiDiffFromHero}
+                        totalDiffFromHero={totalDiffFromHero}
+                        heroBankName={heroOffer.bankName}
+                        principalAmount={leadData.loanAmount}
+                        isExpanded={isExpanded}
+                        onToggleExpand={() => setExpandedCard(isExpanded ? null : offer.id)}
+                        onApply={async (providerId) => await handleUnlock(dynamicOffers.find(o => o.id === providerId)!)}
+                        isGlobalLocking={isLocking !== null}
+                        isRecommended={idx === 0}
+                      />
+                    );
+                  })}
                 </div>
-              </motion.div>
-
-              {/* ═══════════════════════════════════════════════════════
-                  OTHER OPTIONS — Flat, neutral, smaller = secondary
-                  ═══════════════════════════════════════════════════════ */}
-              {otherOffers.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 mb-4 ml-1">
-                    Other options
-                  </p>
-                  <AppErrorBoundary>
-                    <div className="space-y-3">
-                      {otherOffers.map((offer) => {
-                        const emi = emis[offer.id] || 0;
-                        const totalRep = totalRepayments[offer.id] || 0;
-                        const emiDiffFromHero = emi - (emis[heroOffer.id] || 0);
-                        const totalDiffFromHero = totalRep - (totalRepayments[heroOffer.id] || 0);
-                        const isExpanded = expandedCard === offer.id;
-
-                        return (
-                          <BankComparisonCard
-                            key={offer.id}
-                            offer={offer as BankOfferDTO}
-                            emi={emi}
-                            totalRepayment={totalRep}
-                            emiDiffFromHero={emiDiffFromHero}
-                            totalDiffFromHero={totalDiffFromHero}
-                            heroBankName={heroOffer.bankName}
-                            principalAmount={leadData.loanAmount}
-                            isExpanded={isExpanded}
-                            onToggleExpand={() => setExpandedCard(isExpanded ? null : offer.id)}
-                            onApply={async (providerId) => await handleUnlock(dynamicOffers.find(o => o.id === providerId)!)}
-                            isGlobalLocking={isLocking !== null}
-                          />
-                        );
-                      })}
-                    </div>
-                  </AppErrorBoundary>
-                </div>
-              )}
+              </AppErrorBoundary>
 
               {/* ── Bottom trust bar ─────────────────────────────────── */}
               <motion.div
