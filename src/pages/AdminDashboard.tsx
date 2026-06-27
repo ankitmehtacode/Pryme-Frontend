@@ -185,6 +185,15 @@ const AdminDashboard = () => {
     setSearchQuery("");
   }, [activeTab]);
 
+  useEffect(() => {
+    // Failsafe to prevent body background color showing as white/light-grey
+    const originalBg = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = "#050508";
+    return () => {
+      document.body.style.backgroundColor = originalBg;
+    };
+  }, []);
+
 
   // 🧠 Active/Inactive filter states for entity management
   const [bankStatusFilter, setBankStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -608,10 +617,10 @@ const AdminDashboard = () => {
     <>
       <Helmet><title>PRYME Admin — Command Center</title></Helmet>
 
-      <div className="min-h-screen flex bg-[#050508] font-sans text-slate-100 transition-colors duration-300">
+      <div className="min-h-screen flex-1 flex bg-[#050508] font-sans text-slate-100 transition-colors duration-300">
 
         {/* Sidebar */}
-        <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed h-full z-20">
+        <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed inset-y-0 left-0 z-20">
           <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
             <Link to="/" className="flex items-center gap-[28px] transition-transform duration-300 hover:scale-[1.02]">
               <img
