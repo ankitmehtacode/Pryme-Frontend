@@ -402,105 +402,115 @@ export const MarketingTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Side-by-Side Preview Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-[#07070a] p-4 rounded-2xl border border-white/[0.04]">
+          {/* Side-by-Side Preview Layout (Replicated from Homepage Hero Section) */}
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-b from-[#f0f4ff] via-white to-[#fafafa] p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center shadow-inner min-h-[300px]">
+            {/* Tech grid pattern overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{ backgroundImage: "linear-gradient(to right, rgba(16, 55, 131, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 55, 131, 0.05) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             
             {/* Left side: Hero Illustration Mockup */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] bg-slate-950/20 rounded-xl p-4 border border-white/[0.02] overflow-hidden">
-              <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] font-extrabold uppercase tracking-wider">
+            <div className="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] p-2 z-10">
+              <span className="absolute top-0 left-0 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider">
                 Hero Illustration
               </span>
               
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <div className="absolute w-[120px] h-[120px] rounded-full border border-[#103783]/[0.02]" />
-                <div className="absolute w-[180px] h-[180px] rounded-full border border-[#103783]/[0.01]" />
-              </div>
-
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full max-w-[150px] h-auto object-contain z-10 filter drop-shadow(0 4px 12px rgba(16,55,131,0.1))"
+                className="w-full max-w-[150px] h-auto object-contain filter drop-shadow(0 8px 24px rgba(16,55,131,0.12))"
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
-              <span className="text-[7px] text-slate-600 font-bold uppercase tracking-widest mt-2 z-10">
+              <span className="text-[7px] text-slate-500 font-bold uppercase tracking-widest mt-3">
                 {formData.heroImageUrl ? "Custom Illustration" : "Default Bank Building"}
               </span>
             </div>
 
-            {/* Right side: Offer Card Mockup (Banner or Text Card) */}
-            <div className="md:col-span-7 h-full flex flex-col justify-center">
+            {/* Right side: Offer Card Mockup (Replicating Homepage Premium glassmorphic look) */}
+            <div className="md:col-span-7 h-full flex flex-col justify-center z-10">
               {formData.bannerImageUrl ? (
-                /* ─── IMAGE MODE PREVIEW ─── */
-                <div className="w-full rounded-2xl overflow-hidden relative min-h-[220px] border border-white/10 shadow-2xl flex flex-col justify-between">
+                /* ─── IMAGE BANNER PREVIEW ─── */
+                <div
+                  className="w-full rounded-3xl overflow-hidden relative min-h-[220px] border border-white/60 shadow-xl flex flex-col justify-between group transition-all duration-300"
+                  style={{
+                    boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${activePreset.accentColor}15`
+                  }}
+                >
                   <img 
                     src={formData.bannerImageUrl} 
                     alt="Banner preview" 
                     className="absolute inset-0 w-full h-full object-cover min-h-[220px]" 
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect fill="%23111" width="400" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="10">Image failed to load</text></svg>'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect fill="%23f0f4ff" width="400" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="10">Image failed to load</text></svg>'; }}
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
-                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[8px] font-extrabold uppercase tracking-wider flex items-center gap-1">
-                    <ImageIcon className="w-2.5 h-2.5" />
-                    Image Mode
-                  </div>
-                  <div className="mt-auto p-3 z-10 flex justify-between items-center w-full">
-                    <span className="text-[7px] text-white/60 font-bold uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">Image Banner</span>
-                    <button type="button" className="bg-white/95 text-slate-900 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-wider hover:bg-white transition-all shadow-md">
-                      Apply
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 via-black/10 to-transparent pointer-events-none" />
+                  
+                  {/* Floating FOMO badge */}
+                  <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border bg-amber-500/10 text-amber-700 border-amber-500/20 backdrop-blur-md">
+                    <span className="w-1 h-1 rounded-full bg-current animate-pulse" />
+                    Closing in 2 hours
+                  </span>
+
+                  <div className="mt-auto p-3.5 z-10 flex justify-between items-center w-full">
+                    <span className="text-[7px] text-white font-bold uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">Image Mode</span>
+                    <button type="button" className="bg-[#103783] text-white px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-wider transition-all shadow-md hover:scale-[1.02]" style={{ backgroundColor: activePreset.accentColor, boxShadow: `0 4px 10px ${activePreset.accentColor}30` }}>
+                      Apply Now
                     </button>
                   </div>
                 </div>
               ) : (
-                /* ─── TEXT MODE PREVIEW (glassmorphic layout) ─── */
+                /* ─── PREMIUM GLASSMORPHIC CARD PREVIEW (Matches HeroSection.tsx) ─── */
                 <div 
-                  className="w-full rounded-2xl overflow-hidden p-4 relative flex flex-col justify-between min-h-[220px] border border-white/10 shadow-2xl"
-                  style={{ contain: "layout style paint" }}
+                  className="w-full bg-white/40 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden p-5 flex flex-col justify-between min-h-[220px] transition-all duration-300"
+                  style={{
+                    boxShadow: `0 8px 32px 0 rgba(16,55,131,0.04), inset 0 1px 1px 0 rgba(255,255,255,0.8), 0 20px 40px -10px ${activePreset.accentColor}12`
+                  }}
                 >
-                  {/* Aurora Background Effect */}
-                  <div 
-                    className="absolute inset-[-10%] opacity-30 blur-3xl pointer-events-none"
-                    style={{ background: activePreset.bgGradient }}
-                  />
-
-                  {/* Specular glare overlay */}
-                  <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none opacity-80" />
-
-                  {/* Top Bar Mockup */}
-                  <div className="relative z-10 flex items-center justify-between pointer-events-none shrink-0 mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-[1px] bg-slate-800/40 rounded-full shrink-0" />
-                      <span className="text-[7px] font-mono tracking-wider uppercase text-slate-800/80 font-bold">
-                        Instant Capital
-                      </span>
-                    </div>
-                    <div className="w-1 h-1 rounded-full bg-slate-800/30" />
-                  </div>
-
-                  {/* Center Billboard Mockup */}
-                  <div className="relative z-10 flex-1 flex flex-col items-start justify-center text-left pointer-events-none select-none my-2">
-                    {/* Badge Tagline & Bank */}
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 mb-1.5 rounded-full bg-white/40 border border-white/50 shadow-xs">
-                      <div className="px-1 py-0.5 rounded-full bg-white text-slate-800 text-[7px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-2xs">
-                        <Zap className="w-1.5 h-1.5" style={{ color: activePreset.accentColor }} />
-                        {formData.tag || "LIVE OFFER"}
-                      </div>
+                  {/* Top Header Row with Bank Logo & FOMO Badge */}
+                  <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100/50 shrink-0">
+                    {/* Enlarged Bank Logo */}
+                    <div className="h-8 w-24 bg-white/70 backdrop-blur-sm border border-white shadow-sm p-1 rounded-xl flex items-center justify-center overflow-hidden">
                       {currentLogo ? (
-                        <img src={currentLogo} className="h-2.5 object-contain" alt={formData.bank} />
+                        <img src={currentLogo} alt={formData.bank} className="h-full w-auto object-contain object-left max-w-[80px]" />
                       ) : (
-                        <span className="text-[7px] font-bold text-slate-800 tracking-wider">{formData.bank || "BANK NETWORK"}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-bold text-slate-700 tracking-tight uppercase">{formData.bank || "PRYME"}</span>
+                        </div>
                       )}
                     </div>
 
-                    {/* Title Tagline */}
-                    <h2 className="text-xs sm:text-sm font-extrabold text-[#0a1530] tracking-tight leading-tight mb-2 max-w-[220px]">
-                      {formData.title || "Pre-Approved Loan Limits & Offers"}
-                    </h2>
+                    {/* Pulse FOMO Tag */}
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-extrabold uppercase tracking-wider border bg-amber-500/10 text-amber-700 border-amber-500/20 backdrop-blur-md">
+                      <span className="w-1 h-1 rounded-full bg-current animate-pulse shrink-0" />
+                      Closing in 2 hours
+                    </span>
                   </div>
 
-                  {/* Bottom Bar Marquee Spacer */}
-                  <div className="relative z-10 w-full border-t-[0.5px] border-white/20 bg-white/10 pt-1.5 flex items-center justify-between pointer-events-none">
-                    <span className="text-[7px] text-slate-600 font-bold uppercase tracking-widest">Text Mode Preview</span>
-                    <button type="button" className="bg-[#103783] text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-wider transition-all shadow-md" style={{ backgroundColor: activePreset.accentColor }}>
+                  {/* Middle Content: Title, Tagline, Highlights */}
+                  <div className="flex-1 flex flex-col justify-center py-2">
+                    <div className="mb-2">
+                      <div className="inline-block px-1.5 py-0.5 mb-1.5 rounded bg-[#103783]/5 text-[#103783] text-[7.5px] font-black uppercase tracking-wider" style={{ color: activePreset.accentColor, backgroundColor: `${activePreset.accentColor}10` }}>
+                        {formData.tag || "PREFERRED OFFER"}
+                      </div>
+                      <h3 className="text-xs font-bold text-[#0a1530]/80 leading-snug">
+                        {formData.title || "Pre-Approved Loan Limits & Offers"}
+                      </h3>
+                      {formData.highlights && (
+                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-2 leading-tight">
+                          {formData.highlights}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bottom Action Row */}
+                  <div className="pt-2 border-t border-slate-100/50 flex items-center justify-between shrink-0">
+                    <span className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">Interactive Preview</span>
+                    <button 
+                      type="button" 
+                      className="bg-[#103783] text-white px-3 py-1.5 rounded-xl text-[8.5px] font-bold uppercase tracking-wider transition-all shadow-md"
+                      style={{ 
+                        backgroundColor: activePreset.accentColor,
+                        boxShadow: `0 6px 12px -2px ${activePreset.accentColor}30`
+                      }}
+                    >
                       Apply Now
                     </button>
                   </div>
