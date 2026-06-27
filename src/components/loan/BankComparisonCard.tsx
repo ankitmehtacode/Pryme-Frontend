@@ -99,7 +99,7 @@ export function BankComparisonCard({
 
         <div className="pl-6 pr-5 py-6 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Desktop Grid ───────────────────────────── */}
-          <div className="grid grid-cols-[1fr] xl:grid-cols-[170px_90px_120px_1fr_auto] 2xl:grid-cols-[200px_110px_150px_1fr_auto] items-center gap-4 xl:gap-3 2xl:gap-4">
+          <div className="grid grid-cols-[1fr] xl:grid-cols-[170px_125px_135px_1fr_auto] 2xl:grid-cols-[200px_145px_165px_1fr_auto] items-center gap-4 xl:gap-3 2xl:gap-4">
 
             {/* ── Bank Identity ────────────────────────────── */}
             <div className="flex items-center gap-4">
