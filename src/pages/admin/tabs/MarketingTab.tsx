@@ -383,12 +383,12 @@ export const MarketingTab: React.FC = () => {
           </div>
 
           {/* Side-by-Side Preview Layout (Replicated from Homepage Hero Section) */}
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-b from-[#f0f4ff] via-white to-[#fafafa] p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center shadow-inner min-h-[300px]">
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-b from-[#f0f4ff] via-white to-[#fafafa] p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch shadow-inner min-h-[300px]">
             {/* Tech grid pattern overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{ backgroundImage: "linear-gradient(to right, rgba(16, 55, 131, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 55, 131, 0.05) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             
             {/* Left side: Hero Illustration Mockup */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] p-2 z-0 overflow-visible">
+            <div className="md:col-span-5 flex flex-col items-center justify-center relative p-2 z-0 h-[260px]">
               <span className="absolute top-0 left-0 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider z-10">
                 Hero Illustration
               </span>
@@ -396,10 +396,10 @@ export const MarketingTab: React.FC = () => {
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full max-w-[280px] h-auto object-contain filter drop-shadow(0 8px 24px rgba(16,55,131,0.12)) md:-mr-16 md:scale-[1.4] origin-center"
+                className="h-full w-auto object-contain filter drop-shadow(0 8px 24px rgba(16,55,131,0.12))"
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
-              <span className="text-[7px] text-slate-500 font-bold uppercase tracking-widest mt-3 z-10">
+              <span className="text-[7px] text-slate-500 font-bold uppercase tracking-widest mt-2 z-10">
                 {formData.heroImageUrl ? "Custom Illustration" : "Default Bank Building"}
               </span>
             </div>
