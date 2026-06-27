@@ -744,7 +744,7 @@ const AdminDashboard = () => {
               {/* MAIN CONTENT AREA */}
               <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-blue-500 animate-spin" /></div>}>
                 {activeTab === "overview" && (
-                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} />
+                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} applications={applications} />
                 )}
 
                 {activeTab === "applications" && (
