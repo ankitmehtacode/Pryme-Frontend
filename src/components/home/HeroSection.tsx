@@ -417,7 +417,20 @@ const HeroSection = memo(() => {
       className="relative w-full overflow-hidden bg-gradient-to-b from-[#f0f4ff] via-white to-[#fafafa]"
       style={{ contain: 'layout style paint' }}
     >
-
+      {/* ────────────── HERO CENTERED BACKGROUND ILLUSTRATION (Aligned from Top to Bottom) ────────────── */}
+      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 h-full w-auto pointer-events-none z-0 overflow-hidden flex items-center justify-center">
+        <img
+          src={currentOffer.heroImageUrl || heroBankImg}
+          alt="Hero Background Illustration"
+          className="h-full w-auto object-contain opacity-[0.98]"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+            WebkitMaskComposite: 'destination-in',
+            maskComposite: 'intersect',
+          }}
+        />
+      </div>
 
       {/* ────────────── SUBTLE BACKGROUND DECORATION ────────────── */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#103783]/[0.03] rounded-full pointer-events-none" style={{ transform: 'translate(30%, -30%)' }} />
@@ -618,27 +631,8 @@ const HeroSection = memo(() => {
             </motion.div>
           </div>
 
-          {/* ─────── CENTER: Bank Building Illustration (Stretched vertically to touch navbar and product window) ─────── */}
-          <div className="hidden lg:flex lg:col-span-3 items-center justify-center relative">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -top-8 -bottom-8 left-1/2 -translate-x-1/2 h-[calc(100%+4rem)] w-auto pointer-events-none z-0 flex items-center justify-center overflow-visible"
-            >
-              <img
-                src={currentOffer.heroImageUrl || heroBankImg}
-                alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
-                className="h-full w-auto object-contain filter drop-shadow(0 8px 30px rgba(16,55,131,0.06))"
-                loading="eager"
-                fetchPriority="high"
-                style={{
-                  WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
-                  maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
-                }}
-              />
-            </motion.div>
-          </div>
+          {/* ─────── CENTER: Spacer for background illustration ─────── */}
+          <div className="hidden lg:block lg:col-span-3 relative" />
 
           {/* ─────── RIGHT PANEL: Rotating Offer Cards ─────── */}
           <div className="lg:col-span-4 flex flex-col gap-3 order-2 lg:order-3 relative mt-8 lg:mt-0 lg:h-full justify-between">
