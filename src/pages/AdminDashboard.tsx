@@ -16,8 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import pryme2Logo from "@/assets/Pryme2.svg";
-import prymeWordmark from "@/assets/pryme-wordmark.svg";
+import prymeLogo from "@/assets/pryme-typo-logo.svg";
 import { PrymeAPI } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -628,21 +627,14 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="w-64 bg-[#0a0a10]/95 backdrop-blur-2xl border-r border-white/[0.06] flex-col hidden lg:flex fixed inset-y-0 left-0 z-20">
           <div className="h-16 flex items-center px-6 border-b border-white/[0.06]">
-            <Link to="/" className="flex items-center gap-[28px] transition-transform duration-300 hover:scale-[1.02]">
+            <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-[1.02]">
               <img
-                src={pryme2Logo}
-                alt=""
-                aria-hidden="true"
-                className="h-7 w-auto object-contain"
+                src={prymeLogo}
+                alt="PRYME"
+                className="h-6 md:h-7 w-auto object-contain"
+                style={{ filter: "brightness(0) invert(1)" }}
               />
-              <div className="flex items-center">
-                <img
-                  src={prymeWordmark}
-                  alt="PRYME"
-                  className="h-[14px] w-auto object-contain brightness-0 invert"
-                />
-                <span className="text-slate-400 font-medium ml-1.5 text-xs tracking-wide uppercase translate-y-[1px] border border-white/10 bg-white/5 px-1.5 py-0.5 rounded">CRM</span>
-              </div>
+              <span className="text-slate-400 font-medium text-[10px] tracking-wide uppercase border border-white/10 bg-white/5 px-1.5 py-0.5 rounded shrink-0">CRM</span>
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
