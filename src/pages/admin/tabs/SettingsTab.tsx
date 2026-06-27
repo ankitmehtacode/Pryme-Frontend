@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import OffersTab from "./OffersTab";
 import { ConfirmAction } from "@/components/ui/confirm-action";
+import { motion } from "framer-motion";
 
 /* ══════════════════════════════════════════════════════════════════════
    UNIFIED POLICY MATRIX TAB
