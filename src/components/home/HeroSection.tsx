@@ -635,7 +635,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -top-8 -bottom-8 left-1/2 -translate-x-1/2 h-[calc(100%+4rem)] w-auto pointer-events-none z-0 flex items-center justify-center overflow-visible"
+              className="absolute -top-10 left-1/2 -translate-x-1/2 h-[550px] xl:h-[600px] w-auto pointer-events-none z-0 flex items-center justify-center overflow-visible"
             >
               <img
                 src={currentOffer.heroImageUrl || heroBankImg}
