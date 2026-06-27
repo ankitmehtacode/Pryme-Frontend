@@ -227,11 +227,147 @@ export const MarketingTab: React.FC = () => {
   const resolvedBanner = formData.bannerImageUrl || BANNER_MAP[formData.logoType.toLowerCase()] || "";
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in slide-in-from-bottom-2">
+      
+      {/* LEFT COLUMN: Configuration Form (Streamlined — no text-only fields) */}
+      <div className="lg:col-span-5 bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden p-6 space-y-6">
+        <div>
+          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-blue-500 animate-pulse" />
+            {isEditing ? "Edit Marketing Offer" : "New Marketing Offer"}
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">Upload banners, set illustrations, and configure offer layouts.</p>
+        </div>
 
-      {/* Live Interactive Mockup & Configured Offers */}
-      <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
 
+          {/* ─── Image URLs Section ─── */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <ImageIcon className="w-4 h-4 text-violet-400" />
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Banner Images (Optional)</span>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Offer Banner Image URL</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="url" 
+                      value={formData.bannerImageUrl} 
+                      onChange={e => setFormData({ ...formData, bannerImageUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="https://cdn.example.com/offer-banner.png"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px (.png/.webp) — This replaces the text card with a full-bleed image.</p>
+                {formData.bannerImageUrl && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
+                    <img src={formData.bannerImageUrl} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Hero Illustration URL (Optional)</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="url" 
+                      value={formData.heroImageUrl} 
+                      onChange={e => setFormData({ ...formData, heroImageUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="https://cdn.example.com/hero-illustration.png"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Recommended: 640×800px (.png/.webp) — Overrides the center bank illustration.</p>
+                {formData.heroImageUrl && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
+                    <img src={formData.heroImageUrl} alt="Hero preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Redirect / Target Link URL</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="text" 
+                      value={formData.targetUrl} 
+                      onChange={e => setFormData({ ...formData, targetUrl: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
+                      placeholder="/apply or https://example.com"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">Redirection destination for the CTA button (defaults to /apply if left empty).</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-semibold text-slate-400 block mb-1">Display Rank/Order Index</label>
+              <input 
+                type="number" 
+                value={formData.orderIndex} 
+                onChange={e => setFormData({ ...formData, orderIndex: parseInt(e.target.value) || 0 })}
+                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500/40"
+                required
+              />
+            </div>
+            <div className="flex flex-col justify-end pb-1">
+              <label className="text-xs font-semibold text-slate-400 block mb-2">Publish Status</label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, active: !formData.active })}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-xl text-xs border transition-all font-semibold w-full justify-center",
+                    formData.active 
+                      ? "bg-green-500/10 text-green-400 border-green-500/25" 
+                      : "bg-slate-500/10 text-slate-400 border-slate-500/25"
+                  )}
+                >
+                  {formData.active ? "Published & Active" : "Draft (Inactive)"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t border-white/[0.06]">
+            {isEditing && (
+              <Button type="button" variant="outline" className="flex-1 border-white/[0.08] text-slate-300" onClick={handleCancel}>
+                Cancel
+              </Button>
+            )}
+            <Button 
+              type="submit" 
+              className="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-bold"
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
+              {(createMutation.isPending || updateMutation.isPending) ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                isEditing ? "Save Updates" : "Publish Offer"
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      {/* RIGHT COLUMN: Live Interactive Mockup & List */}
+      <div className="lg:col-span-7 space-y-6">
         
         {/* 1. Live Premium Mockup */}
         <div className="bg-[#0a0a0f] rounded-2xl border border-white/[0.06] p-6 space-y-4">
