@@ -160,7 +160,7 @@ export default function Offers() {
     if (!leadData || !leadData.engineResults || leadData.engineResults.length === 0) return [];
 
     // Filter only eligible offers returned by Matrix Engine (Java)
-    const eligibleResults = leadData.engineResults.filter((r: any) => r.eligible === true || r.isEligible === true);
+    const eligibleResults = leadData.engineResults.filter((r: any) => r && (r.eligible === true || r.isEligible === true));
 
     return eligibleResults.map((er: any, index: number) => {
       // Map Matrix response onto our UI BankOffer structure
@@ -190,22 +190,22 @@ export default function Offers() {
         return fallbacks[name.length % fallbacks.length];
       };
 
-      const theme = resolveBankTheme(er.productName || er.lenderName, er.productCode, er.lenderName);
+      const theme = resolveBankTheme(er?.productName || er?.lenderName, er?.productCode, er?.lenderName);
 
       // Map dynamic backend fields without hardcoded fallbacks
-      const roiPercent = er.roi != null ? (er.roi < 1 ? er.roi * 100 : er.roi) : 0;
-      const processingFee = er.processingFee != null ? er.processingFee : 0;
+      const roiPercent = er?.roi != null ? (er.roi < 1 ? er.roi * 100 : er.roi) : 0;
+      const processingFee = er?.processingFee != null ? er.processingFee : 0;
 
       return {
-        id: er.productCode || er.lenderId || Math.random().toString(),
-        bankName: er.productName || er.lenderName || "Partner Bank",
+        id: er?.productCode || er?.lenderId || Math.random().toString(),
+        bankName: er?.productName || er?.lenderName || "Partner Bank",
         logoColor: theme.c,
         brandHex: theme.x,
         logoUrl: theme.img,
         interestRate: parseFloat(roiPercent.toFixed(2)),
         processingFee: parseFloat(processingFee.toFixed(2)),
-        maxTenure: (er.tenureMonths || 60) / 12,
-        maxLoanAmount: er.maxEligibleAmount || leadData.loanAmount,
+        maxTenure: (er?.tenureMonths || 60) / 12,
+        maxLoanAmount: er?.maxEligibleAmount || leadData.loanAmount,
         approvalOdds: 98,
         processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],

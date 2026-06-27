@@ -55,14 +55,17 @@ export const OffersTab: React.FC<OffersTabProps> = ({
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const searchFilteredProducts = useMemo(() => {
+    const list = filteredProducts || [];
     const q = (globalSearchQuery || searchQuery).toLowerCase().trim();
-    if (!q) return filteredProducts;
-    return filteredProducts.filter((p: any) =>
-      (p.lenderName?.toLowerCase() ?? "").includes(q) ||
-      (p.productCode?.toLowerCase() ?? "").includes(q) ||
-      (p.productName?.toLowerCase() ?? "").includes(q) ||
-      (p.campaignName?.toLowerCase() ?? "").includes(q) ||
-      (p.loanType?.toLowerCase() ?? "").includes(q)
+    if (!q) return list;
+    return list.filter((p: any) =>
+      p && (
+        (p.lenderName?.toLowerCase() ?? "").includes(q) ||
+        (p.productCode?.toLowerCase() ?? "").includes(q) ||
+        (p.productName?.toLowerCase() ?? "").includes(q) ||
+        (p.campaignName?.toLowerCase() ?? "").includes(q) ||
+        (p.loanType?.toLowerCase() ?? "").includes(q)
+      )
     );
   }, [filteredProducts, searchQuery, globalSearchQuery]);
 
@@ -96,7 +99,7 @@ export const OffersTab: React.FC<OffersTabProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
-              <SelectItem value="all" className="text-xs">All ({products.length})</SelectItem>
+              <SelectItem value="all" className="text-xs">All ({products?.length || 0})</SelectItem>
               <SelectItem value="active" className="text-xs text-green-400">Active</SelectItem>
               <SelectItem value="inactive" className="text-xs text-slate-400">Inactive</SelectItem>
             </SelectContent>

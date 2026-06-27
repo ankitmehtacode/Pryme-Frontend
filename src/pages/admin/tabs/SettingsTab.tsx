@@ -57,20 +57,23 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
 
   const searchFilteredRules = useMemo(() => {
+    const list = filteredEligibilityRules || [];
     const q = (searchQuery || ruleSearchQuery).toLowerCase().trim();
-    if (!q) return filteredEligibilityRules;
-    return filteredEligibilityRules.filter((rule: any) =>
-      (rule.bankName?.toLowerCase() ?? "").includes(q) ||
-      (rule.productCode?.toLowerCase() ?? "").includes(q) ||
-      (rule.employmentType?.toLowerCase() ?? "").includes(q) ||
-      (rule.incomeType?.toLowerCase() ?? "").includes(q) ||
-      (rule.conditions?.toLowerCase() ?? "").includes(q)
+    if (!q) return list;
+    return list.filter((rule: any) =>
+      rule && (
+        (rule.bankName?.toLowerCase() ?? "").includes(q) ||
+        (rule.productCode?.toLowerCase() ?? "").includes(q) ||
+        (rule.employmentType?.toLowerCase() ?? "").includes(q) ||
+        (rule.incomeType?.toLowerCase() ?? "").includes(q) ||
+        (rule.conditions?.toLowerCase() ?? "").includes(q)
+      )
     );
   }, [filteredEligibilityRules, ruleSearchQuery, searchQuery]);
 
   const subSections: { id: SubSection; label: string; icon: React.ElementType; count: number }[] = [
-    { id: "rules", label: "Engine Rules", icon: Zap, count: eligibilityRules.length },
-    { id: "products", label: "Product Matrix", icon: CreditCard, count: products.length },
+    { id: "rules", label: "Engine Rules", icon: Zap, count: eligibilityRules?.length || 0 },
+    { id: "products", label: "Product Matrix", icon: CreditCard, count: products?.length || 0 },
   ];
 
   return (
