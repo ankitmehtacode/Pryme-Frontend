@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Wallet, Activity, CheckCircle2, Users, TrendingUp, TrendingDown, ArrowUpRight, CalendarDays } from "lucide-react";
 import {
-  PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid
 } from "recharts";
 
@@ -275,21 +275,59 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
         </div>
 
         {/* Portfolio Mix */}
-        <div className="bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06] flex flex-col"><h3 className="font-semibold text-white mb-6">Portfolio Mix</h3><div className="flex-1 min-h-[250px]">
+        <div className="bg-[#0d0d14] p-6 rounded-2xl border border-white/[0.06] flex flex-col">
+          <h3 className="font-semibold text-white mb-4">Portfolio Mix</h3>
+          <div className="flex-1">
           {portfolioData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={280}>
               <PieChart>
-                <Pie data={portfolioData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value">
-                  {portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                <Pie
+                  data={portfolioData}
+                  cx="50%"
+                  cy="45%"
+                  innerRadius={55}
+                  outerRadius={80}
+                  paddingAngle={4}
+                  dataKey="value"
+                  label={({ name, value, cx, cy, midAngle, outerRadius: oR }) => {
+                    const RADIAN = Math.PI / 180;
+                    const radius = oR + 18;
+                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                    return (
+                      <text x={x} y={y} textAnchor={x > cx ? "start" : "end"} dominantBaseline="central" fill="#94a3b8" fontSize={11} fontWeight={500}>
+                        {value}%
+                      </text>
+                    );
+                  }}
+                  labelLine={false}
+                >
+                  {portfolioData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />)}
                 </Pie>
-                <RechartsTooltip contentStyle={{ backgroundColor: '#0d0d14', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#e2e8f0' }} itemStyle={{ color: '#e2e8f0' }} labelStyle={{ color: '#94a3b8' }} formatter={(value) => [`${value}%`, 'Share']} />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px' }} formatter={(value) => <span style={{ color: '#94a3b8' }}>{value}</span>} />
+                <RechartsTooltip
+                  contentStyle={{ backgroundColor: '#111118', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#e2e8f0', fontSize: '12px' }}
+                  itemStyle={{ color: '#e2e8f0' }}
+                  formatter={(value: any, name: any) => [`${value}%`, name]}
+                />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm">No data available</div>
+            <div className="h-64 flex items-center justify-center text-slate-500 text-sm">No data available</div>
           )}
-        </div></div>
+          </div>
+          {/* Custom legend below chart */}
+          {portfolioData.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-white/[0.04]">
+              {portfolioData.map((entry, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                  <span className="text-xs text-slate-400">{entry.name}</span>
+                  <span className="text-xs text-slate-600">({entry.value}%)</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

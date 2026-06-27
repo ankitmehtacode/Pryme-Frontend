@@ -299,7 +299,7 @@ const AdminDashboard = () => {
       const res = await PrymeAPI.getAdminUsers();
       return Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
     },
-    enabled: activeTab === "users" || activeTab === "company"
+    enabled: activeTab === "overview" || activeTab === "users" || activeTab === "company"
   });
 
   // 🧠 ARCHITECTURAL SPLIT: Customers vs Team Members
