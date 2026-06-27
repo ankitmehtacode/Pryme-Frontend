@@ -635,7 +635,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-[340px] xl:max-w-[380px]"
+              className="relative w-full max-w-[480px] xl:max-w-[540px] lg:-mr-16 xl:-mr-24 lg:scale-[1.4] xl:scale-[1.5] origin-center z-0"
             >
               <img
                 src={currentOffer.heroImageUrl || heroBankImg}
@@ -644,8 +644,8 @@ const HeroSection = memo(() => {
                 loading="eager"
                 fetchPriority="high"
                 style={{
-                  WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 98%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-                  maskImage: 'linear-gradient(to bottom, black 70%, transparent 98%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 98%), linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
+                  maskImage: 'linear-gradient(to bottom, black 70%, transparent 98%), linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
                   WebkitMaskComposite: 'destination-in',
                   maskComposite: 'intersect',
                   filter: 'drop-shadow(0 4px 20px rgba(16,55,131,0.08))',

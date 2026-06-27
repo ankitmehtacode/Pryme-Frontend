@@ -388,18 +388,18 @@ export const MarketingTab: React.FC = () => {
             <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{ backgroundImage: "linear-gradient(to right, rgba(16, 55, 131, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 55, 131, 0.05) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             
             {/* Left side: Hero Illustration Mockup */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] p-2 z-10">
-              <span className="absolute top-0 left-0 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider">
+            <div className="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] p-2 z-0 overflow-visible">
+              <span className="absolute top-0 left-0 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider z-10">
                 Hero Illustration
               </span>
               
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full max-w-[150px] h-auto object-contain filter drop-shadow(0 8px 24px rgba(16,55,131,0.12))"
+                className="w-full max-w-[280px] h-auto object-contain filter drop-shadow(0 8px 24px rgba(16,55,131,0.12)) md:-mr-16 md:scale-[1.4] origin-center"
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
-              <span className="text-[7px] text-slate-500 font-bold uppercase tracking-widest mt-3">
+              <span className="text-[7px] text-slate-500 font-bold uppercase tracking-widest mt-3 z-10">
                 {formData.heroImageUrl ? "Custom Illustration" : "Default Bank Building"}
               </span>
             </div>
