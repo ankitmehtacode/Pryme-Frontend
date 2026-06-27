@@ -635,17 +635,18 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full h-[340px] flex items-center justify-center z-10"
+              className="relative w-full h-[340px] z-10"
             >
               <img
                 src={currentOffer.heroImageUrl || heroBankImg}
                 alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
-                className="h-full w-auto object-contain filter drop-shadow(0 8px 30px rgba(16,55,131,0.08))"
+                className="w-full h-full object-cover rounded-3xl"
                 loading="eager"
                 fetchPriority="high"
                 style={{
-                  WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-                  maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 98%)',
+                  maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 98%)',
+                  filter: 'drop-shadow(0 8px 30px rgba(16,55,131,0.06))',
                 }}
               />
             </motion.div>
