@@ -74,10 +74,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   ];
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6">
+    <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col flex-1 min-h-0 space-y-6">
 
       {/* ── Sub-Section Segmented Toggle ──────────────────────────────── */}
-      <div className="flex items-center gap-1 bg-[#0d0d14] p-1.5 rounded-xl border border-white/[0.06] w-fit shadow-xl">
+      <div className="flex items-center gap-1 bg-[#0d0d14] p-1.5 rounded-xl border border-white/[0.06] w-fit shadow-xl shrink-0">
         {subSections.map((s) => (
           <button
             key={s.id}
@@ -90,12 +90,16 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             )}
           >
             {activeSubSection === s.id && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-500 rounded-r-full shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+              <motion.div
+                layoutId="activeSubTab"
+                className="absolute inset-0 bg-white/[0.04] rounded-lg border border-white/[0.08]"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
             )}
             <s.icon className={cn("w-4 h-4", activeSubSection === s.id ? "text-blue-400" : "text-slate-600")} />
             {s.label}
             <span className={cn(
-              "text-[10px] px-1.5 py-0.5 rounded-full font-semibold",
+              "text-[10px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
               activeSubSection === s.id ? "bg-blue-500/15 text-blue-400" : "bg-white/[0.04] text-slate-600"
             )}>
               {s.count}
@@ -110,7 +114,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       {activeSubSection === "rules" && (
         <>
           {/* Header & Actions */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] shadow-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] shadow-xl shrink-0">
             <div>
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <Zap className="w-5 h-5 text-blue-500" /> Eligibility Engine Rules
@@ -153,10 +157,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           </div>
 
           {/* Rules Datatable */}
-          <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] shadow-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
+          <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-auto relative">
+              <table className="w-full text-left border-collapse">
+                <thead className="sticky top-0 bg-[#0d0d14] shadow-[0_1px_0_0_rgba(255,255,255,0.06)] z-10">
                   <tr className="border-b border-white/[0.06] bg-slate-900/40 text-[10px] uppercase tracking-widest text-slate-400">
                     <th className="px-6 py-4 font-semibold">Bank / Product</th>
                     <th className="px-6 py-4 font-semibold">Base Criteria</th>
