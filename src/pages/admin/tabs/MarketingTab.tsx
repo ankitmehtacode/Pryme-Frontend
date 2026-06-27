@@ -388,7 +388,7 @@ export const MarketingTab: React.FC = () => {
             <div className="absolute inset-0 pointer-events-none opacity-40 z-0" style={{ backgroundImage: "linear-gradient(to right, rgba(16, 55, 131, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 55, 131, 0.05) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             
             {/* Left side: Hero Illustration Mockup */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative p-0 z-0 h-[260px] rounded-3xl overflow-hidden border border-white/60 shadow-md">
+            <div className="md:col-span-5 flex flex-col items-center justify-center relative p-2 z-0 h-[260px] overflow-hidden">
               <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-[#103783]/5 border border-[#103783]/10 text-[#103783] text-[8px] font-extrabold uppercase tracking-wider z-10 bg-white/70 shadow-sm">
                 Hero Illustration
               </span>
@@ -396,10 +396,10 @@ export const MarketingTab: React.FC = () => {
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full h-full object-cover"
+                className="h-full w-auto object-contain"
                 style={{
-                  WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 98%)',
-                  maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 98%)',
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 75%, transparent 96%)',
+                  maskImage: 'linear-gradient(to bottom, black 75%, transparent 96%)',
                 }}
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
