@@ -681,7 +681,6 @@ const AdminDashboard = () => {
 
                 <PopoverContent 
                   align="end" 
-                  sideOffset={8}
                   className="w-80 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-4 flex flex-col gap-3 text-left"
                 >
                   <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
