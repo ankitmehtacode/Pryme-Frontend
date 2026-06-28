@@ -75,17 +75,7 @@
     html { zoom: 0.95; /* Mobile */ }
   }
 
-  /*
-   * FAILPROOF DROPDOWN FIX:
-   * Radix UI portals render inside [data-radix-popper-content-wrapper].
-   * When html has CSS zoom, Floating UI's getBoundingClientRect() returns
-   * zoomed coords but position:fixed elements re-apply the zoom → double offset.
-   * Setting zoom:1 on the portal wrapper resets to 1x so Floating UI's
-   * math stays correct. This is the canonical fix used by Radix UI itself.
-   */
-  [data-radix-popper-content-wrapper] {
-    zoom: 1 !important;
-  }
+
 
   h1,
   h2,
