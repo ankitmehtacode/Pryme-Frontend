@@ -22,6 +22,7 @@ import heroBankImg from "@/assets/hero-bank-building.png";
 import axisBanner from "@/assets/axis_festive_banner.png";
 import hdfcBanner from "@/assets/hdfc_preferred_banner.png";
 import idbiBanner from "@/assets/idbi_personal_banner.png";
+import HeroIllustration from "./HeroIllustration";
 
 const LOGO_MAP: Record<string, string> = {
   idbi: idbiLogo,
@@ -618,37 +619,10 @@ const HeroSection = memo(() => {
 
           {/* ─────── CENTER: Bank Building Illustration ─────── */}
           <div className="hidden lg:flex lg:col-span-3 lg:items-center justify-center lg:order-2 relative">
-            {/* Barely-visible ambient light — adds depth without being "decorative" */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: 'radial-gradient(ellipse 60% 50% at 50% 55%, rgba(16,55,131,0.04) 0%, transparent 100%)',
-              }}
+            <HeroIllustration
+              src={currentOffer.heroImageUrl || heroBankImg}
+              alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
             />
-            {/* Concentric decorative tech circles behind the building to frame it */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-              <div className="absolute w-[220px] h-[220px] rounded-full border border-[#103783]/[0.02]" />
-              <div className="absolute w-[330px] h-[330px] rounded-full border border-[#103783]/[0.015]" />
-              <div className="absolute w-[440px] h-[440px] rounded-full border border-[#103783]/[0.008]" />
-            </div>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute top-1/2 -translate-y-[62%] -mt-6 -left-20 xl:-left-28 w-[420px] xl:w-[460px] h-[360px] xl:h-[400px] pointer-events-none z-0 overflow-hidden flex items-center justify-center"
-              style={{
-                WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)',
-                maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)',
-              }}
-            >
-              <img
-                src={currentOffer.heroImageUrl || heroBankImg}
-                alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
-                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.33] translate-x-[18px] -translate-y-[22px]"
-                loading="eager"
-                fetchPriority="high"
-              />
-            </motion.div>
           </div>
 
           {/* ─────── RIGHT PANEL: Rotating Offer Cards ─────── */}
