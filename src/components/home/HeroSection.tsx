@@ -35,7 +35,7 @@ const LOGO_MAP: Record<string, string> = {
   hdfc: hdfcLogo,
 };
 
-import { BANK_OFFERS } from "./ProductSelectorGrid";
+import { BANK_OFFERS, products as loanProducts } from "./ProductSelectorGrid";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 🧠 Animated Counter for Trust Metrics Row
@@ -479,7 +479,7 @@ const HeroSection = memo(() => {
             MAIN HERO GRID — 3-Column Split Panel
             Left: Static text | Center: Illustration | Right: Offer cards
             ════════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-4 lg:items-stretch items-center pt-8 md:pt-12 lg:pt-8 pb-6 lg:pb-8 min-h-[420px] lg:min-h-[480px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 lg:gap-4 lg:items-stretch items-center pt-4 md:pt-12 lg:pt-8 pb-3 md:pb-6 lg:pb-8 min-h-0 lg:min-h-[480px]">
 
           {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
           <div className="lg:col-span-5 flex flex-col justify-center order-1 lg:order-1">
@@ -505,7 +505,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[2rem] sm:text-[2.5rem] md:text-[2.75rem] lg:text-[2.5rem] xl:text-[3rem] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-3"
+              className="text-[1.75rem] sm:text-[2.5rem] md:text-[2.75rem] lg:text-[2.5rem] xl:text-[3rem] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-2 md:mb-3"
               style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
             >
               FIND THE<br />
@@ -518,7 +518,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="text-sm sm:text-[15px] text-slate-500 font-medium leading-relaxed mb-4 max-w-md"
+              className="text-sm sm:text-[15px] text-slate-500 font-medium leading-relaxed mb-3 md:mb-4 max-w-md"
             >
               Get matched with the best loan offers from 15+ banks
               based on your real eligibility — without harming your credit score.
@@ -529,7 +529,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="flex flex-wrap items-start gap-3 sm:gap-4 mb-4"
+              className="hidden md:flex flex-wrap items-start gap-3 sm:gap-4 mb-4"
             >
               {trustBadges.map((badge, i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 text-center min-w-[60px]">
@@ -548,7 +548,7 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="flex flex-wrap items-center gap-x-4 gap-y-2"
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-0"
             >
               <Link
                 to="/apply"
@@ -570,12 +570,36 @@ const HeroSection = memo(() => {
               </div>
             </motion.div>
 
+            {/* ─── MOBILE: Inline Loan Products Grid (conversion-first) ─── */}
+            <div className="md:hidden mt-4 order-last">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Explore Loan Products</p>
+              <div className="grid grid-cols-2 gap-2">
+                {loanProducts.map((product, idx) => (
+                  <Link
+                    key={product.id}
+                    to={product.href}
+                    className={`flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-slate-100 rounded-xl px-3 py-2.5 hover:border-[#103783]/20 hover:bg-white transition-all active:scale-[0.97] ${
+                      idx === loanProducts.length - 1 ? 'col-span-2' : ''
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-50">
+                      <img src={product.image} alt={product.label} className="w-full h-full object-cover" loading="eager" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-extrabold text-[#0a1530] uppercase tracking-wide leading-tight block truncate">{product.label}</span>
+                      <span className="text-[8px] font-bold text-[#103783]/60 uppercase tracking-wider">{product.tag}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
             {/* Trust Metrics Row */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-wrap items-center justify-start gap-x-6 gap-y-4 mt-5 pt-4 border-t border-slate-100/80"
+              className="flex flex-wrap items-center justify-start gap-x-4 md:gap-x-6 gap-y-3 md:gap-y-4 mt-3 md:mt-5 pt-3 md:pt-4 border-t border-slate-100/80"
             >
               {/* Metric 1: Customers */}
               <div className="flex items-center gap-2">
@@ -627,7 +651,7 @@ const HeroSection = memo(() => {
           </div>
 
           {/* ─────── RIGHT PANEL: Rotating Offer Cards ─────── */}
-          <div className="lg:col-span-3 flex flex-col gap-3 order-2 lg:order-3 relative mt-8 lg:mt-0 lg:h-full justify-between">
+          <div className="lg:col-span-3 flex flex-col gap-3 order-last lg:order-3 relative mt-6 lg:mt-0 lg:h-full justify-between">
 
             {/* Ambient brand glow behind the card */}
             {currentOffer && (

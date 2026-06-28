@@ -19,7 +19,7 @@ export const BANK_OFFERS = [
   "Home Loan Balance Transfer at 8.45% from Axis Bank"
 ];
 
-const products = [
+export const products = [
   {
     id: "personal",
     label: "PERSONAL LOAN",
