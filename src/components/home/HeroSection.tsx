@@ -644,7 +644,7 @@ const HeroSection = memo(() => {
               <img
                 src={currentOffer.heroImageUrl || heroBankImg}
                 alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
-                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.25] translate-x-[25px] -translate-y-[10px]"
+                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.33] translate-x-[18px] -translate-y-[22px]"
                 loading="eager"
                 fetchPriority="high"
               />

@@ -401,7 +401,7 @@ export const MarketingTab: React.FC = () => {
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.25] translate-x-[25px] -translate-y-[10px]"
+                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.33] translate-x-[18px] -translate-y-[22px]"
                 onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
               <span className="absolute bottom-3 left-3 text-[7px] text-slate-500 font-bold uppercase tracking-widest z-10 bg-white/70 px-2 py-0.5 rounded-full border border-[#103783]/5 shadow-sm">
