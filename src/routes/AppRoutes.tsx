@@ -5,12 +5,8 @@ import { ViewportLayout } from "@/layouts/ViewportLayout";
 import { AnimatePresence, motion } from "framer-motion";
 
 // All routes are lazy-loaded for optimal code splitting.
-// Index and Auth were previously synchronous — moving them to lazy cuts ~60KB
-// from the critical-path main bundle (index-*.js).
 const Index = lazy(() => import("@/pages/Index"));
 const Auth = lazy(() => import("@/pages/Auth"));
-
-// Secondary Routes (Aggressively Lazy-Loaded)
 const Apply = lazy(() => import("@/pages/Apply"));
 const About = lazy(() => import("@/pages/About"));
 const Services = lazy(() => import("@/pages/Services"));
@@ -21,15 +17,9 @@ const Offers = lazy(() => import("@/pages/Offers"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 // Tools
-const EMICalculatorPage = lazy(
-  () => import("@/pages/tools/EMICalculatorPage")
-);
-const RewardsCalculatorPage = lazy(
-  () => import("@/pages/tools/RewardsCalculatorPage")
-);
-const PrepaymentCalculatorPage = lazy(
-  () => import("@/pages/tools/PrepaymentCalculatorPage")
-);
+const EMICalculatorPage = lazy(() => import("@/pages/tools/EMICalculatorPage"));
+const RewardsCalculatorPage = lazy(() => import("@/pages/tools/RewardsCalculatorPage"));
+const PrepaymentCalculatorPage = lazy(() => import("@/pages/tools/PrepaymentCalculatorPage"));
 
 // Authenticated Client Portal
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -45,10 +35,19 @@ const pageVariants = {
   exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
 };
 
-const PageWrapper = ({ children }: { children: React.ReactNode }) => (
-  <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="w-full h-full min-h-screen">
-    {children}
-  </motion.div>
+/**
+ * Wraps page components with page transitions and explicitly manages their viewport mode.
+ * The viewport mode is attached directly to the route definition, ensuring it stays
+ * correct even if routes are moved across authentication boundaries.
+ * 
+ * Default is "scaled" (for marketing pages).
+ */
+const PageWrapper = ({ children, viewport = "scaled" }: { children: React.ReactNode, viewport?: "scaled" | "native" }) => (
+  <ViewportLayout mode={viewport}>
+    <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="w-full h-full min-h-screen">
+      {children}
+    </motion.div>
+  </ViewportLayout>
 );
 
 export const AppRoutes = () => {
@@ -59,53 +58,42 @@ export const AppRoutes = () => {
       <Routes location={location} key={location.pathname}>
 
         {/* ════════════════════════════════════════════════════════════
-            VIEWPORT: SCALED
-            Marketing & content pages — desktop zoom for visual density.
+            MARKETING LAYER (Scaled by default)
             ════════════════════════════════════════════════════════════ */}
-        <Route element={<ViewportLayout mode="scaled" />}>
-          <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
-          <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
-          <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
-          <Route path="/blogs" element={<PageWrapper><Blogs /></PageWrapper>} />
-          <Route path="/blogs/:slug" element={<PageWrapper><BlogDetail /></PageWrapper>} />
-          <Route path="/offers" element={<PageWrapper><Offers /></PageWrapper>} />
-          <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
-          <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
-          <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
-        </Route>
+        <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+        <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+        <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+        <Route path="/blogs" element={<PageWrapper><Blogs /></PageWrapper>} />
+        <Route path="/blogs/:slug" element={<PageWrapper><BlogDetail /></PageWrapper>} />
+        <Route path="/offers" element={<PageWrapper><Offers /></PageWrapper>} />
+        <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
+        <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
+        <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
 
         {/* ════════════════════════════════════════════════════════════
-            VIEWPORT: NATIVE
-            Application pages — native 1:1 browser coordinates.
-            All interactive surfaces (Select, Popover, Dialog, DatePicker,
-            tooltips, OTP modals, file upload overlays) require accurate
-            viewport positioning. No zoom. No transform. No compensation.
+            APPLICATION LAYER (Native 1:1 Coordinates)
             ════════════════════════════════════════════════════════════ */}
-        <Route element={<ViewportLayout mode="native" />}>
-          <Route path="/apply" element={<PageWrapper><Apply /></PageWrapper>} />
-          <Route path="/auth" element={<PageWrapper><Auth /></PageWrapper>} />
+        <Route path="/apply" element={<PageWrapper viewport="native"><Apply /></PageWrapper>} />
+        <Route path="/auth" element={<PageWrapper viewport="native"><Auth /></PageWrapper>} />
 
-          {/* Authenticated Client Portal */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-            <Route path="/notifications" element={<PageWrapper><Notifications /></PageWrapper>} />
-          </Route>
-
-          {/* Admin Tier (RBAC) */}
-          <Route
-            element={
-              <ProtectedRoute
-                allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
-              />
-            }
-          >
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Route>
-
-          <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<PageWrapper viewport="native"><Dashboard /></PageWrapper>} />
+          <Route path="/profile" element={<PageWrapper viewport="native"><Profile /></PageWrapper>} />
+          <Route path="/notifications" element={<PageWrapper viewport="native"><Notifications /></PageWrapper>} />
         </Route>
+
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
+            />
+          }
+        >
+          <Route path="/admin" element={<PageWrapper viewport="native"><AdminDashboard /></PageWrapper>} />
+        </Route>
+
+        <Route path="*" element={<PageWrapper viewport="native"><NotFound /></PageWrapper>} />
 
       </Routes>
     </AnimatePresence>
