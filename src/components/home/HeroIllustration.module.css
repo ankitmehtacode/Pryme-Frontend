@@ -1,38 +1,57 @@
 /* ─────────────────────────────────────────────────────────
    HeroIllustration — decorative background element
    
-   Architecture:
-     .wrapper  → defines the visible region inside the
-                  center grid column. Sized to naturally
-                  accommodate the PNG at ~1:1 scale.
-     .image    → fills the wrapper. The PNG's own
-                  transparent margins provide the edge
-                  blending — no CSS mask needed.
-   
+   Strategy:
+     The center grid column (col-span-3) is the ANCHOR,
+     not the clipping boundary.  The wrapper is sized
+     LARGER than the column and overflows it so the
+     illustration feels embedded in the hero — exactly
+     like decorative artwork on Stripe / Linear / Vercel
+     landing pages.
+
+     The parent column already has `relative` and the
+     default `overflow: visible`, so the wrapper extends
+     naturally beyond the cell.
+
    Primary target: 1920×1080 · Chrome · 70 % zoom
    ────────────────────────────────────────────────────── */
 
 .wrapper {
   position: absolute;
-  inset: 0;
   pointer-events: none;
   z-index: 0;
-  overflow: hidden;
+
+  /* ── Sizing ──
+     Extend beyond the col-span-3 cell to give the
+     illustration room to breathe. The negative insets
+     let the wrapper overflow left/right/top/bottom
+     while remaining anchored to the column center.    */
+  top: -10%;
+  bottom: -10%;
+  left: -45%;
+  right: -45%;
+
+  /* No clipping — the artwork is allowed to extend
+     beyond its logical grid cell.                     */
+  overflow: visible;
 }
 
 /* ── Inner image ── */
 .image {
+  /* Center the PNG inside the oversized wrapper.
+     Height fills the wrapper; width follows the
+     natural aspect ratio.                             */
   position: absolute;
-  /* Let the image fill the full column height and use
-     its natural aspect ratio for width. Center it
-     horizontally, nudged 8 px toward the offer card. */
   top: 50%;
-  left: calc(50% + 8px);
+  left: 50%;
   transform: translate(-50%, -50%);
-  height: 105%;
+  height: 100%;
   width: auto;
-  object-fit: contain;
+  max-width: none;
 
-  /* Subtle architectural shadow */
-  filter: drop-shadow(0 8px 24px rgba(16, 55, 131, 0.04));
+  /* The PNG's own transparent margins provide
+     edge blending — no CSS mask needed.               */
+
+  /* Subtle architectural depth                        */
+  filter: drop-shadow(0 6px 20px rgba(16, 55, 131, 0.035));
 }
