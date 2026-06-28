@@ -62,21 +62,31 @@
 
   html {
     scroll-behavior: smooth;
-    zoom: 0.8; /* Default zoom for desktop/laptops */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
 
-  /* Responsive zoom overrides to maintain readability on mobile & tablets */
+  /* Apply zoom on body so Radix/Floating UI portals (which render into <body>)
+     share the same coordinate space. Zoom on <html> breaks portal positioning
+     because getBoundingClientRect() returns zoomed coords but fixed-position
+     children get double-zoomed. Zoom on <body> keeps everything consistent. */
+  body {
+    zoom: 0.8; /* Default zoom for desktop/laptops */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Responsive zoom overrides */
   @media (max-width: 1023px) {
-    html {
+    body {
       zoom: 0.85; /* Tablet layout scale */
     }
   }
 
   @media (max-width: 767px) {
-    html {
-      zoom: 0.95; /* Mobile layout scale - stays legible & friendly for touch targets */
+    body {
+      zoom: 0.95; /* Mobile layout scale */
     }
   }
 
@@ -85,12 +95,6 @@
   h3 {
     font-family: "Transducer", "Space Grotesk", system-ui, sans-serif;
     letter-spacing: -0.02em; /* cleaner kerning under zoomed scales */
-  }
-
-  body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 
   /* 200-IQ legibility enhancement: boost letter-spacing for small text sizes when scaled down */
