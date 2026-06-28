@@ -59,31 +59,36 @@
     font-style: normal;
     font-display: swap;
   }
-
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    
-    /* We map zoom to a standard transform scale to fix all positioning bugs natively */
-    --app-scale: 0.8;
   }
 
-  /* Responsive zoom overrides */
+  /* ═══════════════════════════════════════════════════════════════
+     VIEWPORT MODE: SCALED
+     Marketing & content pages use desktop zoom for visual density.
+     Controlled by <html data-viewport="scaled"> set via ViewportLayout.
+     ═══════════════════════════════════════════════════════════════ */
+  html[data-viewport="scaled"] {
+    zoom: 0.8;
+  }
   @media (max-width: 1023px) {
-    html { --app-scale: 0.85; /* Tablet */ }
+    html[data-viewport="scaled"] { zoom: 0.85; }
   }
   @media (max-width: 767px) {
-    html { --app-scale: 0.95; /* Mobile */ }
+    html[data-viewport="scaled"] { zoom: 0.95; }
   }
 
-  /* Apply the scale cleanly at the body level so Radix portals inherit it naturally */
-  body {
-    transform: scale(var(--app-scale));
-    transform-origin: top left;
-    width: calc(100vw / var(--app-scale));
-    min-height: calc(100vh / var(--app-scale));
-    overflow-x: hidden;
+  /* ═══════════════════════════════════════════════════════════════
+     VIEWPORT MODE: NATIVE
+     Application pages render at true 1:1 browser coordinates.
+     No zoom. No transform. No compensation. No viewport hacks.
+     Radix, Floating UI, portals, and all interactive surfaces
+     operate in a standard browser coordinate system.
+     ═══════════════════════════════════════════════════════════════ */
+  html[data-viewport="native"] {
+    zoom: 1;
   }
 
 

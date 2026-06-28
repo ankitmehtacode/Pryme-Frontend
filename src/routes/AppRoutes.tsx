@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ViewportLayout } from "@/layouts/ViewportLayout";
 import { AnimatePresence, motion } from "framer-motion";
 
 // All routes are lazy-loaded for optimal code splitting.
@@ -56,45 +57,56 @@ export const AppRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* ============================
-            ZONE 1: PUBLIC ACQUISITION LAYER
-            ============================ */}
-        <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
-        <Route path="/apply" element={<PageWrapper><Apply /></PageWrapper>} />
-        <Route path="/auth" element={<PageWrapper><Auth /></PageWrapper>} />
-        <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
-        <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
-        <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
-        <Route path="/blogs" element={<PageWrapper><Blogs /></PageWrapper>} />
-        <Route path="/blogs/:slug" element={<PageWrapper><BlogDetail /></PageWrapper>} />
-        <Route path="/offers" element={<PageWrapper><Offers /></PageWrapper>} />
-        <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
-        <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
-        <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
 
-        {/* ============================
-            ZONE 2: STANDARD USER TIER
-            ============================ */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-          <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-          <Route path="/notifications" element={<PageWrapper><Notifications /></PageWrapper>} />
+        {/* ════════════════════════════════════════════════════════════
+            VIEWPORT: SCALED
+            Marketing & content pages — desktop zoom for visual density.
+            ════════════════════════════════════════════════════════════ */}
+        <Route element={<ViewportLayout mode="scaled" />}>
+          <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
+          <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+          <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+          <Route path="/blogs" element={<PageWrapper><Blogs /></PageWrapper>} />
+          <Route path="/blogs/:slug" element={<PageWrapper><BlogDetail /></PageWrapper>} />
+          <Route path="/offers" element={<PageWrapper><Offers /></PageWrapper>} />
+          <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
+          <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
+          <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
         </Route>
 
-        {/* ============================
-            ZONE 3: ADMIN TIER (RBAC)
-            ============================ */}
-        <Route
-          element={
-            <ProtectedRoute
-              allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
-            />
-          }
-        >
-          <Route path="/admin" element={<AdminDashboard />} />
+        {/* ════════════════════════════════════════════════════════════
+            VIEWPORT: NATIVE
+            Application pages — native 1:1 browser coordinates.
+            All interactive surfaces (Select, Popover, Dialog, DatePicker,
+            tooltips, OTP modals, file upload overlays) require accurate
+            viewport positioning. No zoom. No transform. No compensation.
+            ════════════════════════════════════════════════════════════ */}
+        <Route element={<ViewportLayout mode="native" />}>
+          <Route path="/apply" element={<PageWrapper><Apply /></PageWrapper>} />
+          <Route path="/auth" element={<PageWrapper><Auth /></PageWrapper>} />
+
+          {/* Authenticated Client Portal */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+            <Route path="/notifications" element={<PageWrapper><Notifications /></PageWrapper>} />
+          </Route>
+
+          {/* Admin Tier (RBAC) */}
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={["ADMIN", "SUPER_ADMIN", "EMPLOYEE"]}
+              />
+            }
+          >
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+
+          <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
         </Route>
 
-        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );
