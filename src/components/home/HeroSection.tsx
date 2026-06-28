@@ -481,7 +481,7 @@ const HeroSection = memo(() => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-4 lg:items-stretch items-center pt-8 md:pt-12 lg:pt-8 pb-6 lg:pb-8 min-h-[420px] lg:min-h-[480px]">
 
           {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
-          <div className="lg:col-span-5 flex flex-col justify-center order-1 lg:order-1">
+          <div className="lg:col-span-4 flex flex-col justify-center order-1 lg:order-1">
 
             {/* Eyebrow badges */}
             <motion.div
@@ -618,7 +618,7 @@ const HeroSection = memo(() => {
           </div>
 
           {/* ─────── CENTER: Bank Building Illustration ─────── */}
-          <div className="hidden lg:flex lg:col-span-3 lg:items-center justify-center lg:order-2 relative">
+          <div className="hidden lg:flex lg:col-span-4 lg:items-center justify-center lg:order-2 relative">
             <HeroIllustration
               src={currentOffer.heroImageUrl || heroBankImg}
               alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
