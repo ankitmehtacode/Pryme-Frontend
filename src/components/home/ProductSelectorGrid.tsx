@@ -125,7 +125,7 @@ const ProductSelectorGrid = memo(() => {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Choose Your Loan
+            Explore More Products
           </span>
           <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-2 uppercase leading-none">
             Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>

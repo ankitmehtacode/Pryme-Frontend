@@ -121,23 +121,16 @@ const PrepaymentCalculator = ({ showTerminology = true }: PrepaymentCalculatorPr
     <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col w-full">
 
       <div className="flex-1 flex flex-col lg:min-h-[580px] justify-between relative z-10 w-full">
-        {/* Header — Lead with Outcome */}
-        <div className="flex items-center justify-between flex-wrap gap-3 mb-5 relative z-10 w-full shrink-0">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
-              <TrendingDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">Reduce Interest Burden</h3>
-              <p className="text-[10px] font-semibold text-muted-foreground">Smart prepayment simulator</p>
-            </div>
+        {/* Header */}
+        <div className="flex items-center gap-3.5 mb-5 relative z-10 w-full shrink-0">
+          <div className="w-11 h-11 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
+            <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
-
-          <div className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 rounded-xl px-3.5 py-2 flex items-center gap-2">
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Potential Savings:</span>
-            <span className="text-sm md:text-base font-extrabold text-emerald-600 dark:text-emerald-400" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-              {formatShortCurrency(calculations.interestSaved)}
-            </span>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">Prepayment Analysis</h3>
+            <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-sm inline-block leading-none">
+              REDUCE INTEREST BURDEN
+            </p>
           </div>
         </div>
 
