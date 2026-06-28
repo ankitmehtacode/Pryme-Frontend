@@ -396,7 +396,7 @@ export const MarketingTab: React.FC = () => {
               <img
                 src={formData.heroImageUrl || heroBankImg}
                 alt="Hero Illustration preview"
-                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) md:-mr-8 scale-[1.2]"
+                className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) md:-mr-4 scale-[1.0] -mt-3"
                 style={{
                   WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)',
                   maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)',
