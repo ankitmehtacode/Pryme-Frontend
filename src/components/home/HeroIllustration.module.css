@@ -3,15 +3,9 @@
    
    Strategy:
      The center grid column (col-span-3) is the ANCHOR,
-     not the clipping boundary.  The wrapper is sized
-     LARGER than the column and overflows it so the
-     illustration feels embedded in the hero — exactly
-     like decorative artwork on Stripe / Linear / Vercel
-     landing pages.
-
-     The parent column already has `relative` and the
-     default `overflow: visible`, so the wrapper extends
-     naturally beyond the cell.
+     not the clipping boundary.  The wrapper overflows
+     the cell so the illustration feels embedded in the
+     hero — like decorative artwork on Stripe / Linear.
 
    Primary target: 1920×1080 · Chrome · 70 % zoom
    ────────────────────────────────────────────────────── */
@@ -21,37 +15,33 @@
   pointer-events: none;
   z-index: 0;
 
-  /* ── Sizing ──
-     Extend beyond the col-span-3 cell to give the
-     illustration room to breathe. The negative insets
-     let the wrapper overflow left/right/top/bottom
-     while remaining anchored to the column center.    */
-  top: -10%;
-  bottom: -10%;
-  left: -45%;
-  right: -45%;
+  /* ── Overflow sizing ──
+     Extend beyond the col-span-3 cell.  The values
+     are tuned so the bank is visually dominant but
+     does not compete with the offer card.             */
+  top: -4%;
+  bottom: -4%;
+  left: -36%;
+  right: -36%;
 
-  /* No clipping — the artwork is allowed to extend
-     beyond its logical grid cell.                     */
   overflow: visible;
 }
 
 /* ── Inner image ── */
 .image {
-  /* Center the PNG inside the oversized wrapper.
-     Height fills the wrapper; width follows the
-     natural aspect ratio.                             */
   position: absolute;
-  top: 50%;
-  left: 50%;
+
+  /* Center, then nudge:
+     +18 px right  → comfortable gap from headline
+     +12 px down   → roof aligns with offer card top  */
+  top: calc(50% + 12px);
+  left: calc(50% + 18px);
   transform: translate(-50%, -50%);
+
   height: 100%;
   width: auto;
   max-width: none;
 
-  /* The PNG's own transparent margins provide
-     edge blending — no CSS mask needed.               */
-
-  /* Subtle architectural depth                        */
+  /* Subtle architectural depth */
   filter: drop-shadow(0 6px 20px rgba(16, 55, 131, 0.035));
 }
