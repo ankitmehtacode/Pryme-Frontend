@@ -62,39 +62,36 @@
 
   html {
     scroll-behavior: smooth;
+    zoom: 0.8; /* Default desktop/laptop scale */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
 
-  /* Apply zoom on body so Radix/Floating UI portals (which render into <body>)
-     share the same coordinate space. Zoom on <html> breaks portal positioning
-     because getBoundingClientRect() returns zoomed coords but fixed-position
-     children get double-zoomed. Zoom on <body> keeps everything consistent. */
-  body {
-    zoom: 0.8; /* Default zoom for desktop/laptops */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
   /* Responsive zoom overrides */
   @media (max-width: 1023px) {
-    body {
-      zoom: 0.85; /* Tablet layout scale */
-    }
+    html { zoom: 0.85; /* Tablet */ }
+  }
+  @media (max-width: 767px) {
+    html { zoom: 0.95; /* Mobile */ }
   }
 
-  @media (max-width: 767px) {
-    body {
-      zoom: 0.95; /* Mobile layout scale */
-    }
+  /*
+   * FAILPROOF DROPDOWN FIX:
+   * Radix UI portals render inside [data-radix-popper-content-wrapper].
+   * When html has CSS zoom, Floating UI's getBoundingClientRect() returns
+   * zoomed coords but position:fixed elements re-apply the zoom → double offset.
+   * Setting zoom:1 on the portal wrapper resets to 1x so Floating UI's
+   * math stays correct. This is the canonical fix used by Radix UI itself.
+   */
+  [data-radix-popper-content-wrapper] {
+    zoom: 1 !important;
   }
 
   h1,
   h2,
   h3 {
     font-family: "Transducer", "Space Grotesk", system-ui, sans-serif;
-    letter-spacing: -0.02em; /* cleaner kerning under zoomed scales */
+    letter-spacing: -0.02em;
   }
 
   /* 200-IQ legibility enhancement: boost letter-spacing for small text sizes when scaled down */
