@@ -123,19 +123,19 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="section-contained relative z-20 pt-2 md:pt-3 bg-slate-50 dark:bg-[#080d1e]">
+            <div id="products" className="section-contained relative z-20 pt-0 md:pt-3 bg-slate-50 dark:bg-[#080d1e] hidden md:block">
               <ProductSelectorGrid />
-              
-              {/* 🧠 3. STATIC PARTNERSHIP BAR (Immediately below grid) */}
-              <div className="pt-0 pb-0 w-full transition-all">
-                <PartnerBankMarquee />
-              </div>
             </div>
             </ScrollReveal>
 
+            {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
+            <div className="section-contained relative z-20 pt-0 pb-0 bg-slate-50 dark:bg-[#080d1e]">
+              <PartnerBankMarquee />
+            </div>
+
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
-            <section className="section-contained pt-2 pb-12 md:pt-4 md:pb-16 lg:pt-6 lg:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <section className="section-contained pt-2 pb-8 md:pt-4 md:pb-16 lg:pt-6 lg:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
@@ -143,7 +143,7 @@ const Index = () => {
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
               <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
-                <div className="text-center mb-6 md:mb-8 lg:mb-10">
+                <div className="text-center mb-4 md:mb-8 lg:mb-10">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Financial Planning
@@ -157,7 +157,7 @@ const Index = () => {
                 </div>
 
                 {/* Full Width Stack: EMI & Prepayment (Side-by-Side) -> Rewards */}
-                <div className="flex flex-col gap-10 md:gap-14 lg:gap-16 items-start w-full">
+                <div className="flex flex-col gap-6 md:gap-14 lg:gap-16 items-start w-full">
                   
                   {/* Grid layout for Calculators side by side on large screens */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-start">
@@ -209,7 +209,7 @@ const Index = () => {
               </div>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
-              <section className="section-contained py-16 md:py-20 lg:py-24 container mx-auto px-4">
+              <section className="section-contained py-10 md:py-16 lg:py-24 container mx-auto px-4">
                 <div className="flex flex-col items-center justify-center text-center mb-12">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
                     <BookOpen className="w-4 h-4" />
@@ -241,7 +241,7 @@ const Index = () => {
               </section>
 
               {/* Generic FAQ Accordion */}
-              <section className="section-contained py-16 container mx-auto px-4 max-w-3xl">
+              <section className="section-contained py-10 md:py-16 container mx-auto px-4 max-w-3xl">
                 <div className="text-center mb-10">
                   <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Frequently Asked Questions</h2>
                 </div>
