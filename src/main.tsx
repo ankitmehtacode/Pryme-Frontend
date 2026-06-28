@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { initGlobalZoomFix } from "@/lib/zoom-fix";
 
 // 🧠 SILICON-GRADE ARCHITECTURE
 // All legacy Supabase dependencies and environment blockers have been fully eradicated. 
@@ -15,6 +16,9 @@ window.addEventListener('error', (e) => {
     window.location.reload(); 
   }
 });
+
+// Initialize the global zoom correction engine for Chrome
+initGlobalZoomFix();
 
 const rootElement = document.getElementById("root");
 
