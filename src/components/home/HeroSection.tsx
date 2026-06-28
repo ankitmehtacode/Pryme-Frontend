@@ -484,12 +484,12 @@ const HeroSection = memo(() => {
           {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
           <div className="lg:col-span-5 flex flex-col justify-center order-1 lg:order-1">
 
-            {/* Eyebrow badges */}
+            {/* Eyebrow badges — hidden on mobile to reduce cognitive load */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex flex-wrap items-center gap-2 mb-3"
+              className="hidden md:flex flex-wrap items-center gap-2 mb-3"
             >
               {["INSTANT ELIGIBILITY", "ZERO SPAM", "NO HIDDEN CHARGES"].map((badge, i) => (
                 <span key={i} className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#103783]">
@@ -500,17 +500,27 @@ const HeroSection = memo(() => {
               ))}
             </motion.div>
 
-            {/* H1 Headline — Transducer font */}
+            {/* H1 Headline — Transducer font
+                Mobile: 2 lines ("FIND THE RIGHT BANK" / "BEFORE YOU APPLY.")
+                Desktop: 3 lines (original)  */}
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[1.75rem] sm:text-[2.5rem] md:text-[2.75rem] lg:text-[2.5rem] xl:text-[3rem] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-2 md:mb-3"
+              className="text-[1.65rem] sm:text-[2.5rem] md:text-[2.75rem] lg:text-[2.5rem] xl:text-[3rem] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-1.5 md:mb-3"
               style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
             >
-              FIND THE<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
-              BEFORE YOU APPLY.
+              {/* Mobile: 2-line layout */}
+              <span className="md:hidden">
+                FIND THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
+                BEFORE YOU APPLY.
+              </span>
+              {/* Desktop: original 3-line layout */}
+              <span className="hidden md:inline">
+                FIND THE<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
+                BEFORE YOU APPLY.
+              </span>
             </motion.h1>
 
             {/* Subheadline — Gilroy body font */}
@@ -518,10 +528,12 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="text-sm sm:text-[15px] text-slate-500 font-medium leading-relaxed mb-3 md:mb-4 max-w-md"
+              className="text-[13px] sm:text-sm md:text-[15px] text-slate-500 font-medium leading-relaxed mb-2 md:mb-4 max-w-md"
             >
-              Get matched with the best loan offers from 15+ banks
-              based on your real eligibility — without harming your credit score.
+              {/* Mobile: shorter copy */}
+              <span className="md:hidden">Compare loan offers from 15+ banks without affecting your credit score.</span>
+              {/* Desktop: original copy */}
+              <span className="hidden md:inline">Get matched with the best loan offers from 15+ banks based on your real eligibility — without harming your credit score.</span>
             </motion.p>
 
             {/* Trust Badges Row */}
@@ -548,58 +560,82 @@ const HeroSection = memo(() => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-0"
+              className="flex flex-col items-start gap-1.5 md:gap-0 mb-0"
             >
-              <Link
-                to="/apply"
-                className="inline-flex items-center gap-2 bg-[#103783] text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg shadow-[#103783]/20 hover:shadow-[#103783]/30 hover:bg-[#0c2a66] hover:scale-[1.02] active:scale-[0.98] transition-all"
-              >
-                See My Loan Options
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <Link
+                  to="/apply"
+                  className="inline-flex items-center gap-2 bg-[#103783] text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg shadow-[#103783]/20 hover:shadow-[#103783]/30 hover:bg-[#0c2a66] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  See My Loan Options
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
 
-              {/* FOMO Animated Shiny Text */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-600"></span>
-                </span>
-                <span className="shiny-text-fomo">
-                  Only 3 pre-approved slots remaining today
-                </span>
+                {/* FOMO — desktop: inline badge */}
+                <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
+                  <span className="relative flex h-1.5 w-1.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-600"></span>
+                  </span>
+                  <span className="shiny-text-fomo">
+                    Only 3 pre-approved slots remaining today
+                  </span>
+                </div>
               </div>
+
+              {/* FOMO — mobile: subtle caption below CTA */}
+              <span className="md:hidden inline-flex items-center gap-1 text-[9px] font-semibold text-amber-600/80 ml-1">
+                <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                Only 3 pre-approved slots remaining today
+              </span>
             </motion.div>
 
             {/* ─── MOBILE: Inline Loan Products Grid (conversion-first) ─── */}
-            <div className="md:hidden mt-4 order-last">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Explore Loan Products</p>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="md:hidden mt-3">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Explore Loan Products</p>
+              <div className="grid grid-cols-2 gap-1.5">
                 {loanProducts.map((product, idx) => (
                   <Link
                     key={product.id}
                     to={product.href}
-                    className={`flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-slate-100 rounded-xl px-3 py-2.5 hover:border-[#103783]/20 hover:bg-white transition-all active:scale-[0.97] ${
+                    className={`flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-slate-100 rounded-lg px-2.5 py-2 hover:border-[#103783]/20 hover:bg-white transition-all active:scale-[0.97] ${
                       idx === loanProducts.length - 1 ? 'col-span-2' : ''
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-50">
+                    <div className="w-9 h-9 rounded-md overflow-hidden shrink-0 bg-slate-50">
                       <img src={product.image} alt={product.label} className="w-full h-full object-cover" loading="eager" />
                     </div>
                     <div className="min-w-0">
-                      <span className="text-[10px] font-extrabold text-[#0a1530] uppercase tracking-wide leading-tight block truncate">{product.label}</span>
-                      <span className="text-[8px] font-bold text-[#103783]/60 uppercase tracking-wider">{product.tag}</span>
+                      <span className="text-[9px] font-extrabold text-[#0a1530] uppercase tracking-wide leading-tight block truncate">{product.label}</span>
+                      <span className="text-[7px] font-bold text-[#103783]/60 uppercase tracking-wider">{product.tag}</span>
                     </div>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Trust Metrics Row */}
+            {/* Trust Metrics Row
+                Mobile: compressed single-row, no subtitles
+                Desktop: original layout with icons + subtitles */}
+
+            {/* ── MOBILE metrics: compact inline row ── */}
+            <div className="md:hidden flex items-center justify-start gap-3 mt-2 pt-2 border-t border-slate-100/60">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0a1530]">
+                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                4.8
+              </span>
+              <span className="w-px h-3 bg-slate-200" />
+              <span className="text-[10px] font-bold text-[#0a1530]">10k+ Users</span>
+              <span className="w-px h-3 bg-slate-200" />
+              <span className="text-[10px] font-bold text-[#0a1530]">₹500Cr+ Loans</span>
+            </div>
+
+            {/* ── DESKTOP metrics: original layout with icons ── */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-wrap items-center justify-start gap-x-4 md:gap-x-6 gap-y-3 md:gap-y-4 mt-3 md:mt-5 pt-3 md:pt-4 border-t border-slate-100/80"
+              className="hidden md:flex flex-wrap items-center justify-start gap-x-6 gap-y-4 mt-5 pt-4 border-t border-slate-100/80"
             >
               {/* Metric 1: Customers */}
               <div className="flex items-center gap-2">
