@@ -195,16 +195,17 @@ const OfferCard = memo(({ offer, compact = false }: { offer: typeof initialOffer
   if (offer.bannerImageUrl) {
     return (
       <div
-        className="relative h-full rounded-3xl overflow-hidden group cursor-default transition-all duration-500 hover:shadow-[0_24px_60px_rgba(0,0,0,0.12)] hover:-translate-y-1"
+        className="relative h-full max-h-[340px] rounded-3xl overflow-hidden group cursor-default transition-all duration-500 hover:shadow-[0_24px_60px_rgba(0,0,0,0.12)] hover:-translate-y-1"
         style={{
-          boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${offer.accentColor}15`
+          boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${offer.accentColor}15`,
+          backgroundColor: offer.accentColor ? `${offer.accentColor}08` : '#f8fafc'
         }}
       >
         {/* Full-bleed image */}
         <img
           src={offer.bannerImageUrl}
           alt={`${offer.bank} — ${offer.title}`}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           loading="eager"
         />
 
@@ -618,7 +619,7 @@ const HeroSection = memo(() => {
           </div>
 
           {/* ─────── CENTER: Bank Building Illustration ─────── */}
-          <div className="hidden lg:flex lg:col-span-3 lg:items-center justify-center lg:order-2 relative">
+          <div className="hidden lg:flex lg:col-span-4 lg:items-center justify-center lg:order-2 relative">
             <HeroIllustration
               src={currentOffer.heroImageUrl || heroBankImg}
               alt={currentOffer.heroImageUrl ? `${currentOffer.bank} hero illustration` : "Professional walking toward a bank building"}
@@ -626,7 +627,7 @@ const HeroSection = memo(() => {
           </div>
 
           {/* ─────── RIGHT PANEL: Rotating Offer Cards ─────── */}
-          <div className="lg:col-span-4 flex flex-col gap-3 order-2 lg:order-3 relative mt-8 lg:mt-0 lg:h-full justify-between">
+          <div className="lg:col-span-3 flex flex-col gap-3 order-2 lg:order-3 relative mt-8 lg:mt-0 lg:h-full justify-between">
 
             {/* Ambient brand glow behind the card */}
             {currentOffer && (
