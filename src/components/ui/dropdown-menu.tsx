@@ -50,7 +50,7 @@ const DropdownMenuSubContent = React.forwardRef<
       } else if (ref) {
         ref.current = node;
       }
-      zoomRef.current = node;
+      zoomRef(node);
     },
     [ref, zoomRef]
   );
@@ -85,7 +85,7 @@ const DropdownMenuContent = React.forwardRef<
       } else if (ref) {
         ref.current = node;
       }
-      zoomRef.current = node;
+      zoomRef(node);
     },
     [ref, zoomRef]
   );

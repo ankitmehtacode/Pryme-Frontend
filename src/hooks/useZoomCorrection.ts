@@ -1,27 +1,23 @@
-import { useRef, useEffect } from "react";
+import { useRef, useCallback } from "react";
 
 /**
  * useZoomCorrection — React hook to automatically adjust absolute/fixed
  * positioned elements when document-level CSS zoom is active.
  *
- * Why this is needed:
- * ──────────────────
- * When CSS `zoom` is active on `html` or `body` (e.g. `zoom: 0.8`), coordinate
- * calculation libraries like Floating UI / Popper.js compute coordinates relative
- * to the viewport, which are already scaled by the browser.
- * When they write these raw pixel coordinates to inline styles (e.g. `left: 500px`),
- * the browser applies the CSS zoom *again* to the inline style, rendering it at
- * `500 * 0.8 = 400px` (double-zoomed/misaligned).
- *
- * This hook acts as a MutationObserver proxy. It intercepts style mutations,
- * parses raw positioning coordinates (`left`, `top`, `transform`), divides them by
- * the active zoom factor, and updates them dynamically using `calc(value / zoom)`.
+ * This hook returns a callback ref to set up a MutationObserver on the element
+ * when it mounts, correcting absolute coordinates (left, top, transform translate)
+ * by dividing them by the active document zoom factor.
  */
 export function useZoomCorrection() {
-  const elementRef = useRef<HTMLElement | null>(null);
+  const observerRef = useRef<MutationObserver | null>(null);
 
-  useEffect(() => {
-    const el = elementRef.current;
+  const refCallback = useCallback((el: HTMLElement | null) => {
+    // Cleanup previous observer if any
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+
     if (!el) return;
 
     const getZoomFactor = () => {
@@ -44,7 +40,7 @@ export function useZoomCorrection() {
       const topStyle = el.style.top;
       const transformStyle = el.style.transform;
 
-      // 1. Correct inline left
+      // 1. Correct left offset
       if (leftStyle && leftStyle.endsWith("px") && !leftStyle.includes("calc")) {
         const val = parseFloat(leftStyle);
         if (!isNaN(val)) {
@@ -52,7 +48,7 @@ export function useZoomCorrection() {
         }
       }
 
-      // 2. Correct inline top
+      // 2. Correct top offset
       if (topStyle && topStyle.endsWith("px") && !topStyle.includes("calc")) {
         const val = parseFloat(topStyle);
         if (!isNaN(val)) {
@@ -60,7 +56,7 @@ export function useZoomCorrection() {
         }
       }
 
-      // 3. Correct inline transform coordinates
+      // 3. Correct transform translate3d/translate coordinates
       if (transformStyle && transformStyle.includes("translate") && !transformStyle.includes("calc")) {
         const newTransform = transformStyle.replace(/(-?\d+(?:\.\d+)?px)/g, (match) => {
           const val = parseFloat(match);
@@ -78,10 +74,10 @@ export function useZoomCorrection() {
       isAdjusting = false;
     };
 
-    // Initial check
+    // Initial check on mount
     adjustPosition();
 
-    // Listen to Floating UI style changes
+    // Observe layout/position styling updates by Floating UI
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         if (mutation.type === "attributes" && mutation.attributeName === "style") {
@@ -91,11 +87,8 @@ export function useZoomCorrection() {
     });
 
     observer.observe(el, { attributes: true, attributeFilter: ["style"] });
-
-    return () => {
-      observer.disconnect();
-    };
+    observerRef.current = observer;
   }, []);
 
-  return elementRef;
+  return refCallback;
 }

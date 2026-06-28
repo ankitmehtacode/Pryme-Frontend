@@ -71,7 +71,7 @@ const SelectContent = React.forwardRef<
       } else if (ref) {
         ref.current = node;
       }
-      zoomRef.current = node;
+      zoomRef(node);
     },
     [ref, zoomRef]
   );
