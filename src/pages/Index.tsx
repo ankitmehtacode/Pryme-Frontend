@@ -146,7 +146,7 @@ const Index = () => {
                 <div className="text-center mb-4 md:mb-8 lg:mb-10">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    Financial Planning
+                    Calculate Your EMI
                   </span>
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground mb-2 md:mb-3 tracking-tighter">
                     Calculate & Evaluate

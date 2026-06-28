@@ -699,38 +699,41 @@ const HeroSection = memo(() => {
               />
             )}
 
-            {/* Pagination dots */}
-            <div className="flex items-center justify-end gap-1.5 mb-1 z-10 shrink-0">
-              {Array.from({ length: totalSlides }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setIsAutoPlaying(false);
-                    setPage([i, i > activeIndex ? 1 : -1]);
-                  }}
-                  className={`rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    i === activeIndex
-                      ? "bg-[#103783] w-5 h-1.5"
-                      : "bg-slate-300 w-1.5 h-1.5 hover:bg-slate-400"
-                  }`}
-                  aria-label={`Show offer ${i + 1}`}
-                />
-              ))}
-              <div className="flex items-center gap-1 ml-2">
-                <button
-                  onClick={() => paginate(-1)}
-                  className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-[#103783] transition-colors shadow-sm"
-                  aria-label="Previous offers"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => paginate(1)}
-                  className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-[#103783] transition-colors shadow-sm"
-                  aria-label="Next offers"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+            {/* Header + Pagination dots */}
+            <div className="flex items-center justify-between gap-1.5 mb-1 z-10 shrink-0">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Recommended Offers</span>
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: totalSlides }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setIsAutoPlaying(false);
+                      setPage([i, i > activeIndex ? 1 : -1]);
+                    }}
+                    className={`rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      i === activeIndex
+                        ? "bg-[#103783] w-5 h-1.5"
+                        : "bg-slate-300 w-1.5 h-1.5 hover:bg-slate-400"
+                    }`}
+                    aria-label={`Show offer ${i + 1}`}
+                  />
+                ))}
+                <div className="flex items-center gap-1 ml-2">
+                  <button
+                    onClick={() => paginate(-1)}
+                    className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-[#103783] transition-colors shadow-sm"
+                    aria-label="Previous offers"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => paginate(1)}
+                    className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-[#103783] transition-colors shadow-sm"
+                    aria-label="Next offers"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
 
