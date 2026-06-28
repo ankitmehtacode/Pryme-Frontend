@@ -675,7 +675,7 @@ const HeroSection = memo(() => {
             </div>
 
             {/* Animated single card */}
-            <div className="relative flex-1 min-h-[290px] lg:min-h-0 lg:h-full z-10">
+            <div className="relative min-h-[290px] lg:min-h-0 lg:h-[340px] mt-auto z-10">
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={activeIndex}
