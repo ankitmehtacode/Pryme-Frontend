@@ -24,6 +24,21 @@ export default {
         heading: ["Transducer", "Space Grotesk", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Menlo", "monospace"],
       },
+      width: {
+        screen: 'calc(100vw / var(--app-scale, 1))',
+      },
+      maxWidth: {
+        screen: 'calc(100vw / var(--app-scale, 1))',
+      },
+      height: {
+        screen: 'calc(100vh / var(--app-scale, 1))',
+      },
+      minHeight: {
+        screen: 'calc(100vh / var(--app-scale, 1))',
+      },
+      maxHeight: {
+        screen: 'calc(100vh / var(--app-scale, 1))',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

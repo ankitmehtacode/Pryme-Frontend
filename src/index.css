@@ -62,17 +62,28 @@
 
   html {
     scroll-behavior: smooth;
-    zoom: 0.8; /* Default desktop/laptop scale */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    
+    /* We map zoom to a standard transform scale to fix all positioning bugs natively */
+    --app-scale: 0.8;
   }
 
   /* Responsive zoom overrides */
   @media (max-width: 1023px) {
-    html { zoom: 0.85; /* Tablet */ }
+    html { --app-scale: 0.85; /* Tablet */ }
   }
   @media (max-width: 767px) {
-    html { zoom: 0.95; /* Mobile */ }
+    html { --app-scale: 0.95; /* Mobile */ }
+  }
+
+  /* Apply the scale cleanly at the body level so Radix portals inherit it naturally */
+  body {
+    transform: scale(var(--app-scale));
+    transform-origin: top left;
+    width: calc(100vw / var(--app-scale));
+    min-height: calc(100vh / var(--app-scale));
+    overflow-x: hidden;
   }
 
 
