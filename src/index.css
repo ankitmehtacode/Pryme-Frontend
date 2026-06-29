@@ -171,34 +171,71 @@
     --input: var(--theme-input);
     --ring: var(--theme-ring);
     
-    /* --- SEMANTIC SPACING & LAYOUT TOKENS --- */
-    --layout-page-inline: clamp(16px, 4vw, 64px);
-    --layout-page-block: clamp(16px, 3vw, 48px);
+    /* --- SEMANTIC CONTAINER TOKENS --- */
+    --container-xs: 65ch;
+    --container-sm: 800px;
+    --container-md: 1000px;
+    --container-lg: 1400px;
+    --container-xl: 100%;
     
-    --space-page: clamp(32px, 5vw, 96px);
-    --space-section: clamp(24px, 4vw, 64px);
-    --space-4: 1rem;
-    --space-8: 2rem;
-    
-    --container-max: 1600px;
-    --content-readable: 420px;
-    --content-comfort: 600px;
-
-    /* --- SEMANTIC SURFACE TOKENS --- */
-    --surface-radius: clamp(16px, 2vw, 24px);
-    --surface-shadow: 0 12px 36px rgba(15,23,42,0.07);
-    --radius: 0.75rem; /* Legacy alias */
+    /* --- SEMANTIC SPACING SCALE --- */
+    --space-xs: clamp(12px, 1vw, 16px);
+    --space-sm: clamp(16px, 1.5vw, 24px);
+    --space-md: clamp(24px, 3vw, 48px);
+    --space-lg: clamp(48px, 5vw, 72px);
+    --space-xl: clamp(64px, 7vw, 96px);
+    --space-2xl: clamp(80px, 9vw, 120px);
 
     /* --- SEMANTIC TYPOGRAPHY --- */
-    --text-display: clamp(32px, 4vw, 40px);
+    --text-display: clamp(48px, 4vw, 72px);
     --text-title: clamp(28px, 3.5vw, 36px);
     --text-heading: clamp(24px, 3vw, 32px);
+    --text-body: clamp(16px, 1.1vw, 20px);
+
+    /* --- SEMANTIC SURFACE TOKENS --- */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: clamp(16px, 2vw, 24px);
+    --radius: var(--radius-md); /* Legacy alias */
     
-    /* --- SEMANTIC MOTION TOKENS --- */
+    --shadow-sm: 0 4px 12px rgba(15,23,42,0.05);
+    --shadow-md: 0 12px 36px rgba(15,23,42,0.07);
+    --shadow-lg: 0 24px 60px rgba(15,23,42,0.12);
+
+    --border-thin: 1px;
+    --border-thick: 2px;
+    
+    --blur-sm: 4px;
+    --blur-md: 12px;
+
+    /* --- SEMANTIC MOTION & INTERACTION TOKENS --- */
     --motion-fast: 150ms ease-out;
     --motion-standard: 250ms ease-out;
-    --motion-emphasized: 400ms cubic-bezier(0.2, 0, 0, 1);
-    --motion-page: 300ms ease-in-out;
+    --motion-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
+    
+    --hover-opacity: 0.9;
+    --disabled-opacity: 0.5;
+    --active-scale: 0.98;
+    --focus-ring: 0 0 0 3px rgba(16, 55, 131, 0.3);
+    --focus-offset: 2px;
+
+    /* --- Z-AXIS TOKENS --- */
+    --z-overlay: 40;
+    --z-dropdown: 50;
+    --z-popover: 60;
+    --z-modal: 100;
+    --z-toast: 200;
+    --z-tooltip: 300;
+
+    /* --- ARTWORK TOKENS --- */
+    --hero-focal-x: center;
+    --hero-focal-y: center;
+
+    /* --- UI DENSITY & ACCESSIBILITY TOKENS --- */
+    --density-compact: 0.875;
+    --density-comfortable: 1;
+    --opacity-disabled: 0.5;
+    --transition-hover: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     
     /* --- DEPRECATED: COMPATIBILITY ALIASES (Phase 3.5) --- */
     /* DO NOT USE these tokens in new code. They will be removed in Phase 4. */
@@ -355,6 +392,18 @@
   /* --- Form Inputs --- */
   .input-modern {
     @apply bg-white/80 border-slate-200 focus:border-[#103783] focus:ring-4 focus:ring-blue-700/10 transition-all duration-200 rounded-xl placeholder:text-slate-400;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     PRYME LAYOUT PRIMITIVES
+     ───────────────────────────────────────────────────────────────────────────── */
+  .pryme-section {
+    padding-block: var(--section-spacing, var(--space-xl));
+    container-type: var(--section-container-type, normal);
+  }
+
+  .pryme-columns > *, .pryme-autogrid > * {
+    min-width: 0; /* Intrinsic blowout protection */
   }
 }
 

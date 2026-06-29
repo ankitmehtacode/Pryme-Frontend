@@ -34,11 +34,13 @@ const useAnimatedCounter = (target: number, duration: number = 2000, startOnView
   return count;
 };
 
-// Layout & Core Utilities (above-the-fold — must be eager)
 import Header from "@/components/layout/Header";
 import SmoothScroll from "@/components/SmoothScroll";
 import Footer from "@/components/layout/Footer";
 import ScrollToTop from "@/components/ui/ScrollToTop";
+import { PageShell } from "@/components/layout/PageShell";
+import { Section, Container } from "@/components/layout/Primitives";
+import { SectionBackground } from "@/components/layout/SectionBackground";
 
 // Above-the-fold components (eager)
 import HeroSection from "@/components/home/HeroSection";
@@ -110,39 +112,46 @@ const Index = () => {
 
       {/* Safe Smooth Scrolling wrapper */}
       <SmoothScroll>
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary overflow-hidden">
+        <PageShell className="bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary">
           
           <Header />
           
           <main className="flex-1 w-full pt-16 md:pt-20">
             
             {/* 🧠 1. HERO SECTION: The Billboard */}
-            <div className="relative z-30">
-              <HeroSection />
-            </div>
+            <Section bleed spacing="xl" className="relative z-30 pt-0">
+              <SectionBackground variant="hero" />
+              <Container size="xl">
+                <HeroSection />
+              </Container>
+            </Section>
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <div id="products" className="section-contained relative z-20 pt-0 md:pt-3 bg-slate-50 dark:bg-[#080d1e] hidden md:block">
-              <ProductSelectorGrid />
-            </div>
+            <Section spacing="sm" id="products" className="relative z-20 pt-0 md:pt-3 bg-slate-50 dark:bg-[#080d1e] hidden md:block">
+              <Container size="xl">
+                <ProductSelectorGrid />
+              </Container>
+            </Section>
             </ScrollReveal>
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
-            <div className="section-contained relative z-20 pt-0 pb-0 bg-slate-50 dark:bg-[#080d1e]">
-              <PartnerBankMarquee />
-            </div>
+            <Section spacing="xs" className="relative z-20 pt-0 pb-0 bg-slate-50 dark:bg-[#080d1e]">
+              <Container size="xl">
+                <PartnerBankMarquee />
+              </Container>
+            </Section>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
-            <section className="section-contained pt-2 pb-8 md:pt-4 md:pb-16 lg:pt-6 lg:pb-20 bg-slate-50 dark:bg-[#030303] relative z-10">
+            <Section spacing="xl" className="bg-slate-50 dark:bg-[#030303] relative z-10">
               {/* Gradient section divider */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
               {/* Subtle background glow to connect the sections */}
               <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 transform-gpu rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, -30%, 0)", willChange: "transform" }} />
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
-              <div className="container mx-auto px-4 max-w-[1400px] relative z-10">
+              <Container size="lg" className="relative z-10">
                 <div className="text-center mb-4 md:mb-8 lg:mb-10">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -188,29 +197,30 @@ const Index = () => {
                   </div>
                   
                 </div>
-              </div>
+              </Container>
               </ScrollReveal>
-            </section>
+            </Section>
             </Suspense>
 
             {/* 5. BOTTOM OF FUNNEL: Closing the deal (Process & Trust) */}
             <Suspense fallback={<div className="min-h-[200px]" />}>
             <div className="relative z-10 bg-slate-50 dark:bg-[#030303]">
-              <div className="section-contained">
-                <ProcessSection />
-              </div>
+              <Section spacing="lg">
+                <Container size="lg"><ProcessSection /></Container>
+              </Section>
               <ScrollReveal direction="up" duration={1}>
-                <div className="section-contained">
-                  <TrustMonologue />
-                </div>
+                <Section spacing="lg">
+                  <Container size="lg"><TrustMonologue /></Container>
+                </Section>
               </ScrollReveal>
-              <div className="section-contained">
-                <CustomerReviews />
-              </div>
+              <Section spacing="lg">
+                <Container size="lg"><CustomerReviews /></Container>
+              </Section>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
-              <section className="section-contained py-10 md:py-16 lg:py-24 container mx-auto px-4">
-                <div className="flex flex-col items-center justify-center text-center mb-12">
+              <Section spacing="xl">
+                <Container size="lg">
+                  <div className="flex flex-col items-center justify-center text-center mb-12">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
                     <BookOpen className="w-4 h-4" />
                     Pryme Insights
@@ -238,11 +248,13 @@ const Index = () => {
                     <Link to="/blogs">View All Articles <ArrowRight className="w-3.5 h-3.5" /></Link>
                   </Button>
                 </div>
-              </section>
+                </Container>
+              </Section>
 
               {/* Generic FAQ Accordion */}
-              <section className="section-contained py-10 md:py-16 container mx-auto px-4 max-w-3xl">
-                <div className="text-center mb-10">
+              <Section spacing="lg">
+                <Container size="md">
+                  <div className="text-center mb-10">
                   <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Frequently Asked Questions</h2>
                 </div>
                 <div className="space-y-4">
@@ -264,7 +276,8 @@ const Index = () => {
                     </details>
                   ))}
                 </div>
-              </section>
+                </Container>
+              </Section>
 
             </div>
             </Suspense>
@@ -273,7 +286,7 @@ const Index = () => {
           
           <Footer />
           <ScrollToTop />
-        </div>
+        </PageShell>
       </SmoothScroll>
     </LocalErrorBoundary>
   );

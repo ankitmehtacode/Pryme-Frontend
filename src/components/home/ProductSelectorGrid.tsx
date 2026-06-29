@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/BackgroundBeams";
+import { AutoGrid } from "@/components/layout/Primitives";
 
 // Assets safely imported from local directory
 // Assets safely imported from local directory
@@ -135,16 +136,14 @@ const ProductSelectorGrid = memo(() => {
 
       <div className="container mx-auto px-4 max-w-[1300px] relative z-20 mt-1">
 
-        {/* 🧠 CLIPPING ERADICATED: 
-            Changed to flex-wrap. NO overflow classes anywhere. 
-            This guarantees zero clipping, and easily supports 6+ products. */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce}
-          className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-10 pt-2 relative z-10"
+          className="w-full"
         >
+          <AutoGrid minItemWidth="clamp(140px, 16vw, 200px)" gap="md" className="pt-2 relative z-10 justify-items-center">
           {products.map((product) => (
             <motion.div 
               key={product.id} 
@@ -215,6 +214,7 @@ const ProductSelectorGrid = memo(() => {
               </Link>
             </motion.div>
           ))}
+          </AutoGrid>
         </motion.div>
       </div>
 

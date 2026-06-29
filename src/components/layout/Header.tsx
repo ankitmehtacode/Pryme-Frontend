@@ -374,7 +374,7 @@ const Header = memo(() => {
             "h-20 px-4 sm:px-6 flex items-center justify-between pointer-events-auto",
             "transition-all duration-400 ease-[cubic-bezier(0.33,1,0.68,1)]",
             isScrolled
-              ? "w-[90%] max-w-[1200px] rounded-3xl translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]"
+              ? "w-[calc(100%-var(--space-md)*2)] max-w-[var(--container-lg)] rounded-[var(--radius-lg)] translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[var(--shadow-md)]"
               : "w-full max-w-full rounded-none translate-y-0 bg-transparent border border-transparent shadow-none backdrop-blur-0"
           )}
         >

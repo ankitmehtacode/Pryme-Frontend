@@ -7,11 +7,13 @@ export interface PageShellProps extends React.HTMLAttributes<HTMLDivElement> {
 export function PageShell({ children, className = "", style, ...props }: PageShellProps) {
   return (
     <div
-      className={`w-full mx-auto ${className}`}
+      className={`w-full ${className}`}
       style={{
-        maxWidth: "var(--container-max)",
-        paddingInline: "var(--layout-page-inline)",
-        paddingBlock: "var(--layout-page-block)",
+        paddingInline: "var(--space-md)",
+        overflowX: "hidden", // Prevent horizontal scroll on mobile
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
         ...style,
       }}
       {...props}

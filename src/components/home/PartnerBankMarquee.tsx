@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Container } from "@/components/layout/Primitives";
 import iciciLogo from "@/assets/icici.svg";
 import axisLogo from "@/assets/axis-bank-logo-1.svg";
 import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
@@ -115,7 +116,7 @@ const PartnerBankMarquee = memo(() => {
       </div>
 
       {/* Section Header */}
-      <div className="container mx-auto px-4 mt-6 mb-2 text-center">
+      <Container size="xl" className="mt-6 mb-2 text-center">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           Lending Partners
@@ -123,7 +124,7 @@ const PartnerBankMarquee = memo(() => {
         <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
           TRUSTED BY OVER 15+ PREMIUM BANKS & NBFCs
         </p>
-      </div>
+      </Container>
     </div>
   );
 });
