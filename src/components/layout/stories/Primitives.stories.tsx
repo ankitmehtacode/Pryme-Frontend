@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line storybook/no-renderer-packages
 import type { Meta, StoryObj } from '@storybook/react';
 import { PageShell, Surface, Stack, Inline, ContentContainer, SplitLayout, MediaPanel } from '../index';
 

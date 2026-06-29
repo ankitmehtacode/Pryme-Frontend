@@ -162,8 +162,7 @@ export default function TrustMonologue() {
             </div>
           </TooltipProvider>
         </div>
-        </div>
       </div>
     </div>
   );
-};
+}

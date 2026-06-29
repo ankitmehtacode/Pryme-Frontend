@@ -333,7 +333,7 @@ const Apply = () => {
                     if (myApps && myApps.length > 0) {
                         setActiveApplicationId(myApps[0].applicationId);
                     }
-                } catch (e) {}
+                } catch (e) { /* ignore */ }
             }
         } else {
             // No lead? Check if they already have an application
@@ -342,7 +342,7 @@ const Apply = () => {
                 if (myApps && myApps.length > 0) {
                     setActiveApplicationId(myApps[0].applicationId);
                 }
-            } catch (e) {}
+            } catch (e) { /* ignore */ }
         }
     }
 

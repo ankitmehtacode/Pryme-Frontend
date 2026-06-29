@@ -24,7 +24,7 @@ export const DynamicPolicyInput: React.FC<DynamicPolicyInputProps> = ({
 }) => {
   // Safe clamping function for numerics
   const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let rawVal = e.target.value;
+    const rawVal = e.target.value;
     
     // Allow empty string to let user backspace
     if (rawVal === "") {
