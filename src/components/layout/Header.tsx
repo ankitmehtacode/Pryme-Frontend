@@ -7,13 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -137,6 +131,134 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 });
 MobileMenu.displayName = "MobileMenu";
 
+// --- Profile Menu Component ---
+const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!isOpen) {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    const items = Array.from(
+      menuRef.current?.querySelectorAll('[role="menuitem"]') || []
+    ) as HTMLElement[];
+    
+    if (items.length === 0) return;
+
+    const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+      items[nextIndex]?.focus();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+      items[nextIndex]?.focus();
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      items[0]?.focus();
+    } else if (e.key === "End") {
+      e.preventDefault();
+      items[items.length - 1]?.focus();
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      setTimeout(() => {
+        const firstItem = menuRef.current?.querySelector('[role="menuitem"]') as HTMLElement;
+        firstItem?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
+
+  const handleAction = (action: () => void) => {
+    setIsOpen(false);
+    action();
+  };
+
+  return (
+    <div className="relative" ref={menuRef} onKeyDown={handleKeyDown}>
+      <Button 
+        ref={triggerRef}
+        variant="ghost" 
+        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        className="rounded-full pl-2 pr-4 border border-slate-200 hover:bg-slate-50 h-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        <div className="w-6 h-6 rounded-full bg-[#103783]/10 flex items-center justify-center mr-2">
+          <User className="w-3 h-3 text-[#103783]" />
+        </div>
+        <span className="text-sm font-medium">{user.name.split(' ')[0]}</span>
+        <ChevronDown className={cn("w-3 h-3 ml-2 text-slate-400 transition-transform duration-[180ms]", isOpen ? "rotate-180" : "")} />
+      </Button>
+
+      <div 
+        role="menu"
+        aria-orientation="vertical"
+        className={cn(
+          "absolute right-0 top-[calc(100%+8px)] min-w-[220px] bg-white rounded-xl border border-slate-200 shadow-xl z-50",
+          "origin-top-right transition-all duration-[180ms] ease-out",
+          isOpen ? "opacity-100 scale-100 translate-y-0 visible" : "opacity-0 scale-[0.98] -translate-y-[6px] invisible pointer-events-none"
+        )}
+      >
+        <div className="p-1.5 flex flex-col gap-0.5">
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/dashboard"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
+            <Briefcase className="w-4 h-4 mr-3 text-slate-500" /> Application Tracker
+          </button>
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/profile"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
+            <User className="w-4 h-4 mr-3 text-slate-500" /> My Profile
+          </button>
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/notifications"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
+            <Bell className="w-4 h-4 mr-3 text-slate-500" /> Notifications
+          </button>
+          {isAdmin && (
+            <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/admin"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
+              <Settings className="w-4 h-4 mr-3 text-slate-500" /> Admin Console
+            </button>
+          )}
+          <div className="h-px bg-slate-100 my-1 mx-1" role="separator" />
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(async () => { await signOut(); navigate("/"); })} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-red-50 focus:bg-red-50 focus:text-red-600 text-red-500">
+            <LogOut className="w-4 h-4 mr-3" /> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+});
+ProfileMenu.displayName = "ProfileMenu";
+
 // --- Header Component ---
 const Header = memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -257,22 +379,7 @@ const Header = memo(() => {
           <div className="hidden lg:flex items-center gap-4">
             <a href={CONTACT_PHONE_LINK} className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-[#103783] transition-colors"><Phone className="w-4 h-4" /><span>{CONTACT_PHONE}</span></a>
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="rounded-full pl-2 pr-4 border border-slate-200 hover:bg-slate-50 h-10">
-                    <div className="w-6 h-6 rounded-full bg-[#103783]/10 flex items-center justify-center mr-2"><User className="w-3 h-3 text-[#103783]" /></div>
-                    <span className="text-sm font-medium">{user.name.split(' ')[0]}</span><ChevronDown className="w-3 h-3 ml-2 text-slate-400" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")}><Briefcase className="w-4 h-4 mr-2" /> Application Tracker</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/profile")}><User className="w-4 h-4 mr-2" /> My Profile</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/notifications")}><Bell className="w-4 h-4 mr-2" /> Notifications</DropdownMenuItem>
-                  {isAdmin && <DropdownMenuItem onClick={() => navigate("/admin")}><Settings className="w-4 h-4 mr-2" /> Admin Console</DropdownMenuItem>}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={async () => { await signOut(); navigate("/"); }} className="text-red-500"><LogOut className="w-4 h-4 mr-2" /> Sign Out</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ProfileMenu user={user} isAdmin={isAdmin} signOut={signOut} navigate={navigate} />
             ) : (
               <Link to="/auth" className="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-[#103783] bg-slate-50 hover:bg-[#103783]/5 border border-slate-200 hover:border-[#103783]/30 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">Log In</Link>
             )}
