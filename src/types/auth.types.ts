@@ -37,6 +37,9 @@ export interface MeResponse {
   email: string;
   role: AppRole;
   permissions: Permission[];
+  phone?: string;
+  customerId?: string;
+  employeeId?: string;
 }
 
 /**

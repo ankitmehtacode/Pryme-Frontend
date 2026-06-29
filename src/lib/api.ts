@@ -186,6 +186,8 @@ export const PrymeAPI = {
   login: async (...args: any[]) => {
     let email, password;
     let rememberMe = false;
+    let leadId = localStorage.getItem("pryme_pending_lead_id") || undefined;
+    let deviceId = localStorage.getItem("pryme_device_id") || undefined;
 
     if (args.length >= 2 && typeof args[0] === 'string') {
       email = args[0]; password = args[1];
@@ -197,6 +199,8 @@ export const PrymeAPI = {
       email = obj.email || obj.username;
       password = obj.password || obj.securityKey || obj.key;
       rememberMe = !!obj.rememberMe;
+      leadId = obj.leadId || leadId;
+      deviceId = obj.deviceId || deviceId;
     }
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
@@ -206,7 +210,7 @@ export const PrymeAPI = {
     // plants the PRYME_SID HttpOnly cookie — the sole session proof.
     return fetchWithAuth("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password, rememberMe }),
+      body: JSON.stringify({ email, password, rememberMe, leadId, deviceId }),
     });
   },
 
@@ -219,9 +223,11 @@ export const PrymeAPI = {
    * a session cookie + LoginResponse identical to password login.
    */
   googleSignIn: async (idToken: string) => {
+    const leadId = localStorage.getItem("pryme_pending_lead_id") || undefined;
+    const deviceId = localStorage.getItem("pryme_device_id") || undefined;
     return fetchWithAuth("/auth/google", {
       method: "POST",
-      body: JSON.stringify({ idToken }),
+      body: JSON.stringify({ idToken, leadId, deviceId }),
     });
   },
 
