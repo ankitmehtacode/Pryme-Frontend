@@ -232,50 +232,15 @@ const Auth = () => {
           {/* ========================================================= */}
           {/* LEFT PANEL: High-Fidelity Photography */}
           {/* ========================================================= */}
-          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col justify-between overflow-hidden border-r border-slate-100 bg-black p-12 lg:p-20">
-            <img 
-              src={authHeroImg} 
-              alt="" 
-              aria-hidden="true"
-              loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover object-[40%_center] z-0 opacity-90" 
-            />
-            
-            {/* Logo & Headline */}
-            <div className="relative z-10 w-full flex flex-col max-w-[400px]">
-              <div 
-                className="cursor-pointer mb-[72px]" 
-                onClick={() => navigate("/")}
-              >
-                 <img src={prymeLogo} alt="Pryme Logo" className="h-[32px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-              </div>
-
-              <div>
-                <h1 className="text-[40px] lg:text-[44px] font-bold text-white leading-[1.05] tracking-tight mb-4" style={{ fontFamily: 'Transducer, sans-serif' }}>
-                  Business lending, reimagined.
-                </h1>
-                <p className="text-[16px] text-white/80 font-normal leading-relaxed max-w-[34ch] font-sans">
-                  Compare offers from India's leading banks with one secure application.
-                </p>
-              </div>
-            </div>
-
-            {/* Bottom Statistics Strip */}
-            <div className="relative z-10 w-full opacity-85">
-              <div className="inline-flex items-center gap-4 text-white text-[13px] font-semibold">
-                <div className="flex items-center gap-1 text-[#10B981]">
-                  <span className="text-[14px]">★</span>
-                  <span className="text-[14px]">★</span>
-                  <span className="text-[14px]">★</span>
-                  <span className="text-[14px]">★</span>
-                  <span className="text-[14px]">★</span>
-                  <span className="ml-1 text-white">4.8</span>
-                </div>
-                <div className="w-[4px] h-[4px] rounded-full bg-white/40"></div>
-                <span>10,000+ businesses</span>
-                <div className="w-[4px] h-[4px] rounded-full bg-white/40"></div>
-                <span>15+ lending partners</span>
-              </div>
+          <div className="relative hidden w-full lg:flex lg:w-[48%] overflow-hidden border-r border-slate-100 bg-black">
+            <div className="relative h-full w-full overflow-hidden rounded-l-3xl">
+              <img
+                src={authHeroImg}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover object-center"
+                aria-hidden="true"
+                draggable={false}
+              />
             </div>
           </div>
           
