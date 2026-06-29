@@ -102,7 +102,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
   }, [isAutoPlaying, isInView]);
 
   return (
-    <div className="flex-1 w-full lg:max-w-[340px] flex flex-col gap-3 relative justify-between h-full">
+    <div className="w-full lg:w-[340px] flex flex-col gap-3 relative justify-between h-full shrink-0">
 
       {/* Ambient brand glow behind the card */}
       {currentOffer && (

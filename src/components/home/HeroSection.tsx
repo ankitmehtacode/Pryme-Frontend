@@ -24,7 +24,7 @@ const HeroSection = memo(() => {
         <HeroContent />
 
         {/* ─────── RIGHT PANEL: Illustration + Offer Cards ─────── */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 order-2 lg:order-2 w-full lg:h-full mt-6 lg:mt-0">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 order-2 lg:order-2 w-full lg:h-full mt-6 lg:mt-0 relative">
           {/* Center: Bank Building Illustration */}
           <HeroArtwork currentOffer={currentOffer} />
 

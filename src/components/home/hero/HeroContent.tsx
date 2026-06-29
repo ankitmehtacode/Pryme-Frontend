@@ -31,8 +31,11 @@ export const HeroContent = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="text-[1.65rem] sm:text-[2.5rem] md:text-[2.75rem] lg:text-[2.5rem] xl:text-[3rem] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-1.5 md:mb-3"
-        style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
+        className="text-[clamp(2.5rem,4vw,3.5rem)] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-1.5 md:mb-3"
+        style={{ 
+          fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif',
+          maxInlineSize: "40ch"
+        }}
       >
         {/* Mobile: 2-line layout */}
         <span className="md:hidden">
@@ -47,17 +50,18 @@ export const HeroContent = () => {
         </span>
       </motion.h1>
 
-      {/* Subheadline — Gilroy body font */}
+      {/* Subheadline — Gilroy font */}
       <motion.p
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.25 }}
-        className="text-[13px] sm:text-sm md:text-[15px] text-slate-500 font-medium leading-relaxed mb-2 md:mb-4 w-full"
+        transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="text-[clamp(1.125rem,2vw,1.35rem)] text-[#3b4764] leading-relaxed mb-6 md:mb-8 font-medium"
+        style={{ 
+          fontFamily: '"Gilroy", "Inter", system-ui, sans-serif',
+          maxInlineSize: "45ch"
+        }}
       >
-        {/* Mobile: shorter copy */}
-        <span className="md:hidden">Compare loan offers from 15+ banks without affecting your credit score.</span>
-        {/* Desktop: original copy */}
-        <span className="hidden md:inline">Get matched with the best loan offers from 15+ banks based on your real eligibility — without harming your credit score.</span>
+        We analyze your profile against 25+ top banks to find the highest approval odds—without affecting your credit score.
       </motion.p>
 
       {/* Trust Badges Row */}

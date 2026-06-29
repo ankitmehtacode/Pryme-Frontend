@@ -171,12 +171,13 @@
     --input: var(--theme-input);
     --ring: var(--theme-ring);
     
-    /* --- SEMANTIC CONTAINER TOKENS --- */
-    --container-xs: 65ch;
-    --container-sm: 800px;
-    --container-md: 1000px;
-    --container-lg: 1400px;
-    --container-xl: 100%;
+    /* --- SEMANTIC CONTAINER TOKENS (Optical Widths) --- */
+    --container-readable: 65ch;
+    --container-content: 1000px;
+    --container-wide: 1500px;
+    --container-expanded: 1700px;
+    --container-max: 1800px;
+    --container-bleed: 100%;
     
     /* --- SEMANTIC SPACING SCALE --- */
     --space-xs: clamp(12px, 1vw, 16px);
@@ -248,10 +249,20 @@
     --auth-art-min-w: 48%;
     --auth-form-min-w: 52%;
     --auth-panel-pad: clamp(32px, 4vw, 64px);
+
+    /* --- SEMANTIC GRID COLUMN TOKENS --- */
+    --columns-hero-left: minmax(38ch, max-content);
+    --columns-hero-right: minmax(40rem, 1fr);
   }
 
   * {
     @apply border-border;
+  }
+
+  /* Global Overflow Contract */
+  img, video {
+    max-inline-size: 100%;
+    height: auto;
   }
 
   body {

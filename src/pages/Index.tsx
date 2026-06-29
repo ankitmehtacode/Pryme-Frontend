@@ -121,7 +121,7 @@ const Index = () => {
             {/* 🧠 1. HERO SECTION: The Billboard */}
             <Section bleed spacing="xl" className="relative z-30 pt-0">
               <SectionBackground variant="hero" />
-              <Container size="xl">
+              <Container size="wide">
                 <HeroSection />
               </Container>
             </Section>
@@ -129,7 +129,7 @@ const Index = () => {
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
             <Section spacing="sm" id="products" className="relative z-20 pt-0 md:pt-3 bg-slate-50 dark:bg-[#080d1e] hidden md:block">
-              <Container size="xl">
+              <Container size="expanded">
                 <ProductSelectorGrid />
               </Container>
             </Section>
@@ -137,7 +137,7 @@ const Index = () => {
 
             {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
             <Section spacing="xs" className="relative z-20 pt-0 pb-0 bg-slate-50 dark:bg-[#080d1e]">
-              <Container size="xl">
+              <Container size="max">
                 <PartnerBankMarquee />
               </Container>
             </Section>
@@ -151,7 +151,7 @@ const Index = () => {
               <div className="absolute top-0 left-1/2 w-full max-w-4xl h-[400px] bg-primary/5 transform-gpu rounded-full pointer-events-none" style={{ transform: "translate3d(-50%, -30%, 0)", willChange: "transform" }} />
 
               <ScrollReveal direction="up" duration={1} stagger={0.15}>
-              <Container size="lg" className="relative z-10">
+              <Container size="wide" className="relative z-10">
                 <div className="text-center mb-4 md:mb-8 lg:mb-10">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -206,20 +206,20 @@ const Index = () => {
             <Suspense fallback={<div className="min-h-[200px]" />}>
             <div className="relative z-10 bg-slate-50 dark:bg-[#030303]">
               <Section spacing="lg">
-                <Container size="lg"><ProcessSection /></Container>
+                <Container size="wide"><ProcessSection /></Container>
               </Section>
               <ScrollReveal direction="up" duration={1}>
                 <Section spacing="lg">
-                  <Container size="lg"><TrustMonologue /></Container>
+                  <Container size="wide"><TrustMonologue /></Container>
                 </Section>
               </ScrollReveal>
               <Section spacing="lg">
-                <Container size="lg"><CustomerReviews /></Container>
+                <Container size="wide"><CustomerReviews /></Container>
               </Section>
 
               {/* 🧠 6. BLOG PREVIEW: Financial Intelligence (Flowchart Placement) */}
               <Section spacing="xl">
-                <Container size="lg">
+                <Container size="wide">
                   <div className="flex flex-col items-center justify-center text-center mb-12">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
                     <BookOpen className="w-4 h-4" />
@@ -253,7 +253,7 @@ const Index = () => {
 
               {/* Generic FAQ Accordion */}
               <Section spacing="lg">
-                <Container size="md">
+                <Container size="content">
                   <div className="text-center mb-10">
                   <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Frequently Asked Questions</h2>
                 </div>

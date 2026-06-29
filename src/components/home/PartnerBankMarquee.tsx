@@ -116,15 +116,15 @@ const PartnerBankMarquee = memo(() => {
       </div>
 
       {/* Section Header */}
-      <Container size="xl" className="mt-6 mb-2 text-center">
+      <div className="w-full mt-6 mb-2 text-center">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-4 border border-primary/20">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           Lending Partners
         </span>
-        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
+        <p className="text-[clamp(0.6rem,1vw,0.75rem)] font-medium text-muted-foreground uppercase tracking-[0.3em] mt-3">
           TRUSTED BY OVER 15+ PREMIUM BANKS & NBFCs
         </p>
-      </Container>
+      </div>
     </div>
   );
 });

@@ -43,12 +43,12 @@ Section.displayName = "Section";
 // Never Does: Vertical spacing, background colors, flex/grid align.
 // ─────────────────────────────────────────────────────────────────────────────
 interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  size?: "readable" | "content" | "wide" | "expanded" | "max" | "bleed" | "xs" | "sm" | "md" | "lg" | "xl";
   maxInlineSize?: string | number;
 }
 
 export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
-  ({ children, size = "md", maxInlineSize, className = "", style, ...props }, ref) => {
+  ({ children, size = "content", maxInlineSize, className = "", style, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -90,7 +90,7 @@ export const Columns = React.forwardRef<HTMLDivElement, ColumnsProps>(
     if (left && right) {
       gridTemplateColumns = `${left} ${right}`;
     } else if (preset === "hero") {
-      gridTemplateColumns = "repeat(auto-fit, minmax(min(100%, 28rem), 1fr))"; 
+      gridTemplateColumns = "var(--columns-hero-left, minmax(38ch, max-content)) var(--columns-hero-right, minmax(40rem, 1fr))"; 
     } else if (preset === "split") {
       gridTemplateColumns = "minmax(400px, 1fr) minmax(400px, 2fr)";
     } else if (preset === "equal") {
@@ -128,7 +128,7 @@ interface AutoGridProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const AutoGrid = React.forwardRef<HTMLDivElement, AutoGridProps>(
-  ({ children, minItemWidth = "clamp(240px, 22vw, 320px)", gap = "md", className = "", style, ...props }, ref) => {
+  ({ children, minItemWidth = "clamp(220px, 18vw, 300px)", gap = "md", className = "", style, ...props }, ref) => {
     return (
       <div
         ref={ref}

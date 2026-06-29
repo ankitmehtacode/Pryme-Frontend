@@ -8,7 +8,7 @@ interface HeroArtworkProps {
 
 export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer }) => {
   return (
-    <div className="hidden lg:flex flex-1 items-center justify-center relative h-full">
+    <div className="hidden lg:flex items-center justify-center relative h-full">
       <HeroIllustration
         src={currentOffer?.heroImageUrl || heroBankImg}
         alt={currentOffer?.heroImageUrl ? `${currentOffer?.bank} hero illustration` : "Professional walking toward a bank building"}
