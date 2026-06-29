@@ -87,11 +87,10 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Email</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Email</Label>
         <Input
           type="email"
           placeholder="you@company.com"
-          className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
           {...form.register("email")}
         />
         {form.formState.errors.email && (
@@ -100,7 +99,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Password</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Password</Label>
         <motion.div 
           className="relative"
           animate={isShaking ? { x: [-5, 5, -5, 5, -3, 3, 0], transition: { duration: 0.4 } } : {}}
@@ -108,12 +107,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
           <Input
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
-            className={cn(
-              "h-[52px] w-full border-0 border-b rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]",
-              form.formState.errors.password 
-                ? "border-rose-500/50 focus-visible:border-rose-500 text-rose-600" 
-                : "border-[#103783]/10 hover:border-[#103783]/30 focus-visible:border-[#10B981]"
-            )}
+             className={cn(form.formState.errors.password ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : "")}
             {...form.register("password", {
               onChange: () => {
                 if (form.formState.errors.password) {
@@ -141,14 +135,14 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
             </motion.div>
           )}
         </AnimatePresence>
-        <button type="button" onClick={onForgotPassword} className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[150ms] ease-out pl-1 mt-2 text-left">
+        <button type="button" onClick={onForgotPassword} className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[150ms] ease-out mt-2 text-left">
           Forgot password?
         </button>
       </div>
 
       <div 
         onClick={() => setRememberMe(!rememberMe)}
-        className="flex items-center gap-2 mt-5 sm:mt-6 pl-1 group cursor-pointer select-none"
+        className="flex items-center gap-2 mt-5 sm:mt-6 group cursor-pointer select-none"
       >
           <div className={cn(
             "w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border flex items-center justify-center transition-colors",
@@ -165,7 +159,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
       </div>
 
       <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">
-        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-full transition-all duration-[160ms] ease-out text-[12px] sm:text-[11px] flex items-center justify-center gap-2" size="sm">
+        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-[14px] transition-all duration-[160ms] ease-out text-[16px] flex items-center justify-center gap-2" size="sm">
           {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
             <>
               Sign in →

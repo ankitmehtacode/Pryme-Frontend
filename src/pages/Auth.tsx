@@ -226,7 +226,7 @@ const Auth = () => {
           className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] shadow-[0_12px_36px_rgba(15,23,42,0.07)] border border-slate-900/5 flex flex-col lg:flex-row overflow-hidden bg-white z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
         >
           
           {/* ========================================================= */}
@@ -242,39 +242,39 @@ const Auth = () => {
             />
             
             {/* Logo & Headline */}
-            <div className="relative z-10 w-full flex flex-col gap-10 max-w-[400px]">
+            <div className="relative z-10 w-full flex flex-col max-w-[400px]">
               <div 
-                className="cursor-pointer" 
+                className="cursor-pointer mb-[72px]" 
                 onClick={() => navigate("/")}
               >
                  <img src={prymeLogo} alt="Pryme Logo" className="h-[32px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
               </div>
 
               <div>
-                <h1 className="text-[40px] font-bold text-white leading-[1.05] tracking-tight mb-4">
-                  Capital for the modern business.
+                <h1 className="text-[40px] lg:text-[44px] font-bold text-white leading-[1.05] tracking-tight mb-4" style={{ fontFamily: 'Transducer, sans-serif' }}>
+                  Business lending, reimagined.
                 </h1>
-                <p className="text-[16px] text-white/80 font-normal leading-relaxed max-w-[34ch]">
-                  Unlock growth with fast, secure, and flexible financing built for scale.
+                <p className="text-[16px] text-white/80 font-normal leading-relaxed max-w-[34ch] font-sans">
+                  Compare offers from India's leading banks with one secure application.
                 </p>
               </div>
             </div>
 
             {/* Bottom Statistics Strip */}
-            <div className="relative z-10 w-full">
-              <div className="inline-flex items-center gap-4 px-6 py-3.5 bg-white/85 backdrop-blur-md rounded-full text-[#0a1530] text-[13px] font-semibold">
+            <div className="relative z-10 w-full opacity-85">
+              <div className="inline-flex items-center gap-4 text-white text-[13px] font-semibold">
                 <div className="flex items-center gap-1 text-[#10B981]">
                   <span className="text-[14px]">★</span>
                   <span className="text-[14px]">★</span>
                   <span className="text-[14px]">★</span>
                   <span className="text-[14px]">★</span>
                   <span className="text-[14px]">★</span>
-                  <span className="ml-1 text-[#0a1530]">4.8</span>
+                  <span className="ml-1 text-white">4.8</span>
                 </div>
-                <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
-                <span>10,000+ Customers</span>
-                <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
-                <span>15+ Banks</span>
+                <div className="w-[4px] h-[4px] rounded-full bg-white/40"></div>
+                <span>10,000+ businesses</span>
+                <div className="w-[4px] h-[4px] rounded-full bg-white/40"></div>
+                <span>15+ lending partners</span>
               </div>
             </div>
           </div>
@@ -304,7 +304,7 @@ const Auth = () => {
                   ) : (
                     <motion.div key="auth" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                       
-                      <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-2 tracking-tight">
+                      <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-3 tracking-tight">
                         {view === "login" ? "Welcome back" : "Create your account"}
                       </h2>
                       <p className="text-[16px] font-normal text-slate-500 mb-8">
@@ -314,7 +314,7 @@ const Auth = () => {
                       {view === "login" ? (
                         <LoginForm onForgotPassword={() => setView("forgot-password")} from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-12">
+                          <div className="relative mt-[48px] mb-[48px]">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
@@ -332,7 +332,7 @@ const Auth = () => {
                               type="button"
                               onClick={handleGoogleSignIn}
                               disabled={isGoogleLoading}
-                              className="w-full h-[40px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-full text-[14px] font-medium text-slate-700 transition-all duration-[160ms] ease-out"
+                              className="w-full h-[56px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-[14px] text-[16px] font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
                             >
                               <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -357,7 +357,7 @@ const Auth = () => {
                       ) : (
                         <SignupForm from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-12">
+                          <div className="relative mt-[48px] mb-[48px]">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
@@ -375,7 +375,7 @@ const Auth = () => {
                               type="button"
                               onClick={handleGoogleSignIn}
                               disabled={isGoogleLoading}
-                              className="w-full h-[40px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-full text-[14px] font-medium text-slate-700 transition-all duration-[160ms] ease-out"
+                              className="w-full h-[56px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-[14px] text-[16px] font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
                             >
                               <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -411,12 +411,12 @@ const Auth = () => {
                 >
                    <div className="flex items-center gap-2">
                       <Shield className="w-[18px] h-[18px] text-slate-400" strokeWidth={1.5} />
-                      <span className="text-[13px] font-medium tracking-wide">RBI Compliant</span>
+                      <span className="text-[12px] font-medium">RBI Compliant</span>
                    </div>
                    <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
                    <div className="flex items-center gap-2">
                       <Lock className="w-[18px] h-[18px] text-slate-400" strokeWidth={1.5} />
-                      <span className="text-[13px] font-medium tracking-wide">256-bit Encryption</span>
+                      <span className="text-[12px] font-medium">256-bit Encryption</span>
                    </div>
                 </motion.div>
              </div>

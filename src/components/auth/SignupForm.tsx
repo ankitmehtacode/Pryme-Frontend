@@ -73,11 +73,10 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Name</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Name</Label>
         <Input
           type="text"
           placeholder="John Doe"
-          className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
           {...form.register("fullName")}
         />
         {form.formState.errors.fullName && (
@@ -86,11 +85,10 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Email</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Email</Label>
         <Input
           type="email"
           placeholder="you@email.com"
-          className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
           {...form.register("email")}
         />
         {form.formState.errors.email && (
@@ -99,12 +97,11 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Mobile Number</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Mobile Number</Label>
         <Input
           type="tel"
           placeholder="9876543210"
           maxLength={10}
-          className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
           {...form.register("mobileNumber")}
         />
         {form.formState.errors.mobileNumber && (
@@ -113,12 +110,11 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Pass</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Pass</Label>
         <div className="relative">
           <Input
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
-            className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
             {...form.register("password")}
           />
           <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
@@ -131,12 +127,11 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Confirm</Label>
+        <Label className="text-[13px] font-semibold text-slate-700">Confirm</Label>
         <div className="relative">
           <Input
             type={showConfirmPw ? "text" : "password"}
             placeholder="••••••••"
-            className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]"
             {...form.register("confirmPassword")}
           />
           <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#103783] transition-colors" tabIndex={-1}>
@@ -149,7 +144,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="pt-6 flex flex-col items-start w-full">
-        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-full transition-all duration-[160ms] ease-out text-[12px] sm:text-[11px] flex items-center justify-center gap-2" size="sm">
+        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-[14px] transition-all duration-[160ms] ease-out text-[16px] flex items-center justify-center gap-2" size="sm">
           {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
             <>
               Create account →
