@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
+import authHeroImg from "@/assets/images/auth-hero.jpg";
 // pryme2Logo removed — loading gate eliminated (Auth is a public page)
 
 // 🧠 Closed-Loop Security Context & API
@@ -251,49 +252,22 @@ const Auth = () => {
         >
           
           {/* ========================================================= */}
-          {/* LEFT PANEL: High-Fidelity Photography & Glass Overlay */}
+          {/* LEFT PANEL: High-Fidelity Photography */}
           {/* ========================================================= */}
-          <div className="relative hidden w-full lg:flex lg:w-1/2 flex-col items-center justify-center p-14 overflow-hidden border-r border-white/20">
-            {/* Cinematic Background Image */}
+          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col items-center justify-center overflow-hidden border-r border-slate-200/50 bg-black">
             <img 
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" 
-              alt="Pryme Finance Corporate" 
-              className="absolute inset-0 w-full h-full object-cover z-0 scale-105" 
+              src={authHeroImg} 
+              alt="" 
+              aria-hidden="true"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover object-center z-0" 
             />
-            
-            {/* Elegant Glassmorphic Pryme Overlay with Heavy Fade */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/90 via-[#103783]/70 to-[#10B981]/50 z-0"></div>
-            <div className="absolute inset-0 bg-[#103783]/30 backdrop-transform-gpu z-0"></div>
-
-            {/* Logo Centralized (White version over dark overlay) */}
-            <div className="relative z-10 flex flex-col items-center cursor-pointer mb-2 drop-shadow-2xl" onClick={() => navigate("/")}>
-               <img 
-                 src={prymeLogo} 
-                 alt="Pryme Logo" 
-                 className="h-[64px] w-auto transition-duration-500 hover:scale-110 hover:-translate-y-1" 
-                 style={{ filter: 'brightness(0) invert(1) drop-shadow(0px 8px 16px rgba(0,0,0,0.6))' }} 
-               /> 
-            </div>
-
-            {/* Premium Typography Tagline */}
-            <p className="relative z-10 mt-8 text-white font-medium text-[16px] leading-[1.6] text-center max-w-[340px] tracking-wide opacity-95 drop-shadow-md">
-               Experience the future of financial agility. Extremely secure, seamless, and uniquely yours.
-               <br/><br/><span className="text-[#10B981] font-bold tracking-[0.25em] text-[10px] uppercase drop-shadow-[0_0_12px_rgba(16,185,129,0.8)]">Powering Innovation</span>
-            </p>
-
-            {/* Subtle Footer Links */}
-            <div className="absolute bottom-10 flex gap-6 text-[10px] font-bold text-white/80 uppercase tracking-widest z-10">
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">About</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Privacy</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">Terms</span>
-              <span className="hover:text-white cursor-pointer transition-all duration-300 backdrop-blur-sm px-4 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">FAQ</span>
-            </div>
           </div>
           
           {/* ========================================================= */}
           {/* RIGHT PANEL: Auth Form Overlay */}
           {/* ========================================================= */}
-          <div className="w-full lg:w-1/2 bg-white/70 backdrop-transform-gpu shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
+          <div className="w-full lg:w-[52%] bg-white/70 backdrop-transform-gpu shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
              
              <div className="w-full max-w-[320px] z-10 flex flex-col w-[100%] items-stretch">
                 {/* Mobile Header (Hidden on LG) */}
