@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo, useLayoutEffect, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Menu, X, Phone, User, LogOut, Settings, ChevronDown,
@@ -160,12 +160,23 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
     };
   }, [isOpen]);
 
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const firstItem = menuRef.current?.querySelector('[role="menuitem"]') as HTMLElement;
+    firstItem?.focus();
+  }, [isOpen]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!isOpen) {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         setIsOpen(true);
       }
+      return;
+    }
+
+    if (e.key === "Tab") {
+      setIsOpen(false);
       return;
     }
 
@@ -194,21 +205,36 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
     }
   };
 
-  useEffect(() => {
-    if (isOpen && menuRef.current) {
-      setTimeout(() => {
-        const firstItem = menuRef.current?.querySelector('[role="menuitem"]') as HTMLElement;
-        firstItem?.focus();
-      }, 0);
-    }
-  }, [isOpen]);
-
   const handleAction = (action: () => void) => {
     setIsOpen(false);
     action();
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname.startsWith(path);
+
+  const menuItems = useMemo(() => {
+    const items = [
+      { id: "dashboard", icon: Briefcase, label: "Application Tracker", href: "/dashboard" },
+      { id: "profile", icon: User, label: "My Profile", href: "/profile" },
+      { id: "notifications", icon: Bell, label: "Notifications", href: "/notifications" },
+    ];
+    if (isAdmin) {
+      items.push({ id: "admin", icon: Settings, label: "Admin Console", href: "/admin" });
+    }
+    return items;
+  }, [isAdmin]);
+
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const userName = user?.name || "User";
+  const userEmail = user?.email || "";
 
   return (
     <div className="relative" ref={menuRef} onKeyDown={handleKeyDown}>
@@ -220,52 +246,68 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
         aria-haspopup="true"
         className="rounded-full pl-2 pr-4 border border-slate-200 hover:bg-slate-50 h-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
       >
-        <div className="w-6 h-6 rounded-full bg-[#103783]/10 flex items-center justify-center mr-2">
-          <User className="w-3 h-3 text-[#103783]" />
+        <div className="w-6 h-6 rounded-full bg-[#103783]/10 flex items-center justify-center mr-2 text-[10px] font-bold text-[#103783] tracking-wider">
+          {getInitials(userName)}
         </div>
-        <span className="text-sm font-medium">{user.name.split(' ')[0]}</span>
-        <ChevronDown className={cn("w-3 h-3 ml-2 text-slate-400 transition-transform duration-[180ms] ease-out", isOpen ? "rotate-180" : "")} />
+        <span className="text-sm font-medium">{userName.split(' ')[0]}</span>
+        <ChevronDown className={cn("w-3 h-3 ml-2 text-slate-400 transition-transform duration-[160ms] ease-out", isOpen ? "rotate-180" : "")} />
       </Button>
 
       <div 
         role="menu"
         aria-orientation="vertical"
         className={cn(
-          "absolute right-0 top-[calc(100%+4px)] min-w-[220px] bg-white rounded-2xl border border-slate-200 shadow-[0_6px_18px_rgba(15,23,42,0.08),0_20px_40px_rgba(15,23,42,0.08)] z-50",
-          "origin-top-right transition-all duration-[180ms] ease-out",
-          isOpen ? "opacity-100 scale-100 translate-y-0 visible" : "opacity-0 scale-[0.98] -translate-y-[6px] invisible pointer-events-none"
+          "absolute right-0 top-[calc(100%+6px)] w-[248px] bg-white rounded-2xl border border-slate-200 shadow-[0_6px_18px_rgba(15,23,42,0.08),0_20px_40px_rgba(15,23,42,0.08)] z-50",
+          "origin-top-right transition-all duration-[160ms] ease-out",
+          isOpen ? "opacity-100 scale-100 translate-y-0 visible" : "opacity-0 scale-[0.985] -translate-y-1 invisible pointer-events-none"
         )}
       >
-        <div className="p-1.5 flex flex-col gap-0.5">
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/dashboard"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
-            <div className="flex items-center">
-              <Briefcase className="w-4 h-4 mr-3 text-slate-400" /> Application Tracker
-            </div>
-            {isActive("/dashboard") && <CheckCircle className="w-4 h-4 text-blue-500" />}
-          </button>
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/profile"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
-            <div className="flex items-center">
-              <User className="w-4 h-4 mr-3 text-slate-400" /> My Profile
-            </div>
-            {isActive("/profile") && <CheckCircle className="w-4 h-4 text-blue-500" />}
-          </button>
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/notifications"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
-            <div className="flex items-center">
-              <Bell className="w-4 h-4 mr-3 text-slate-400" /> Notifications
-            </div>
-            {isActive("/notifications") && <CheckCircle className="w-4 h-4 text-blue-500" />}
-          </button>
-          {isAdmin && (
-            <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/admin"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
-              <div className="flex items-center">
-                <Settings className="w-4 h-4 mr-3 text-slate-400" /> Admin Console
-              </div>
-              {isActive("/admin") && <CheckCircle className="w-4 h-4 text-blue-500" />}
-            </button>
-          )}
-          <div className="h-px bg-slate-100 my-1 mx-1" role="separator" />
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(async () => { await signOut(); navigate("/"); })} className="relative flex w-full cursor-default select-none items-center rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-red-50 focus:bg-red-50 focus:text-red-600 text-red-500">
-            <LogOut className="w-4 h-4 mr-3" /> Sign Out
+        {/* Pointer Triangle */}
+        <div className="absolute -top-[5px] right-6 w-2.5 h-2.5 bg-white border-t border-l border-slate-200 rotate-45 rounded-tl-[2px]" />
+
+        {/* User Identity Header */}
+        <div className="p-4 border-b border-slate-100 relative z-10 bg-white rounded-t-2xl">
+          <p className="text-sm font-semibold text-slate-900 truncate">{userName}</p>
+          {userEmail && <p className="text-xs text-slate-500 truncate mt-0.5">{userEmail}</p>}
+        </div>
+
+        <div className="p-1.5 flex flex-col gap-0.5 relative z-10">
+          {menuItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <button
+                key={item.id}
+                role="menuitem"
+                tabIndex={isOpen ? 0 : -1}
+                onClick={() => handleAction(() => navigate(item.href))}
+                className={cn(
+                  "relative flex w-full cursor-default select-none items-center rounded-lg px-3 py-2 text-sm font-medium outline-none transition-all group",
+                  active 
+                    ? "bg-blue-50/50 text-[#103783]" 
+                    : "hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700"
+                )}
+              >
+                {active && (
+                  <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#103783] rounded-r-full" />
+                )}
+                <item.icon className={cn(
+                  "w-4 h-4 mr-3 transition-colors",
+                  active ? "text-[#103783]" : "text-slate-400 group-hover:text-[#103783]"
+                )} />
+                {item.label}
+              </button>
+            );
+          })}
+          
+          <div className="h-px bg-slate-100 my-1 mx-2" role="separator" />
+          
+          <button 
+            role="menuitem" 
+            tabIndex={isOpen ? 0 : -1} 
+            onClick={() => handleAction(async () => { await signOut(); navigate("/"); })} 
+            className="group relative flex w-full cursor-default select-none items-center rounded-lg px-3 py-2 text-sm font-medium outline-none transition-all hover:bg-red-50 focus:bg-red-50 focus:text-red-600 text-red-500"
+          >
+            <LogOut className="w-4 h-4 mr-3 text-red-400 group-hover:text-red-500 transition-colors" /> Sign Out
           </button>
         </div>
       </div>
