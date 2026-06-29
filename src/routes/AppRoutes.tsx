@@ -15,6 +15,7 @@ const Blogs = lazy(() => import("@/pages/Blogs"));
 const BlogDetail = lazy(() => import("@/pages/BlogDetail"));
 const Offers = lazy(() => import("@/pages/Offers"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
 
 // Tools
 const EMICalculatorPage = lazy(() => import("@/pages/tools/EMICalculatorPage"));
@@ -93,7 +94,9 @@ export const AppRoutes = () => {
           <Route path="/admin" element={<PageWrapper viewport="native"><AdminDashboard /></PageWrapper>} />
         </Route>
 
+        <Route path="/design-system" element={<PageWrapper viewport="native"><DesignSystemShowcase /></PageWrapper>} />
         <Route path="*" element={<PageWrapper viewport="native"><NotFound /></PageWrapper>} />
+
 
       </Routes>
     </AnimatePresence>

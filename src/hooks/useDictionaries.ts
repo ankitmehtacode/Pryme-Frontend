@@ -26,6 +26,12 @@ const FALLBACK_DICTIONARIES: DictionaryMap = {
     { value: "ICICI", label: "ICICI Bank" },
     { value: "LT_FINANCE", label: "L&T Finance" },
     { value: "AXIS", label: "Axis Bank" },
+    { value: "RBL", label: "RBL Bank" },
+    { value: "BAJAJ", label: "Bajaj Finserv" },
+    { value: "BANDHAN", label: "Bandhan Bank" },
+    { value: "ABFL", label: "Aditya Birla Finance" },
+    { value: "SC", label: "Standard Chartered" },
+    { value: "INDUSIND", label: "IndusInd Bank" },
   ],
   employmentCategories: [
     { value: "SALARIED", label: "Salaried" },

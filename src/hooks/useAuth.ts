@@ -182,9 +182,12 @@ export const useAuth = () => {
     });
 
     eventSource.onerror = () => {
-      // EventSource will auto-reconnect. If the session is truly dead,
-      // the reconnection will fail with 401, and the api.ts interceptor
-      // will fire pryme_auth_expired — which is already handled above.
+      // 🧠 DEFENSIVE: If the SSE connection fails (CORS blocked, 401, network down),
+      // close it to prevent EventSource's built-in auto-reconnect from flooding the
+      // console with repeated CORS/network errors. The api.ts interceptor will handle
+      // session expiry via the pryme_auth_expired event independently.
+      if (eventSource.readyState === EventSource.CLOSED) return;
+      eventSource.close();
     };
 
     return () => eventSource.close();

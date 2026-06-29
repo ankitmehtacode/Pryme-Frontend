@@ -1,64 +1,23 @@
+@layer reset, tokens, theme, base, primitives, components, utilities;
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   /* ═══════════════════════════════════════════════════════════════
-     SELF-HOSTED PREMIUM FONTS
-     Transducer — headings (h1/h2/h3)
-     Gilroy — body text (via tailwind sans token)
-     font-display: swap → FOUT over FOIT (text visible immediately)
-     Fallback chain: Transducer → Space Grotesk → system-ui
-                     Gilroy → Inter → system-ui
+     FONT STRATEGY (Silicon Valley Grade)
+     
+     Primary stack loaded from Google Fonts (preconnect + stylesheet in index.html):
+       Headings: Space Grotesk 500/600/700
+       Body:     Inter 400/500/600/700
+     
+     The @font-face declarations for Transducer and Gilroy have been removed
+     because the .woff2 files are not present in the repository. If re-added
+     in the future, restore the @font-face rules and the fonts will take
+     priority via the CSS cascade.
      ═══════════════════════════════════════════════════════════════ */
 
-  @font-face {
-    font-family: 'Transducer';
-    src: url('./fonts/Transducer-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Transducer';
-    src: url('./fonts/Transducer-SemiBold.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Gilroy';
-    src: url('./fonts/Gilroy-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Gilroy';
-    src: url('./fonts/Gilroy-Medium.woff2') format('woff2');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Gilroy';
-    src: url('./fonts/Gilroy-SemiBold.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Gilroy';
-    src: url('./fonts/Gilroy-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-  }
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -73,11 +32,17 @@
   html[data-viewport="scaled"] {
     zoom: 0.8;
   }
+
   @media (max-width: 1023px) {
-    html[data-viewport="scaled"] { zoom: 0.85; }
+    html[data-viewport="scaled"] {
+      zoom: 0.85;
+    }
   }
+
   @media (max-width: 767px) {
-    html[data-viewport="scaled"] { zoom: 0.95; }
+    html[data-viewport="scaled"] {
+      zoom: 0.95;
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -91,12 +56,10 @@
     zoom: 1;
   }
 
-
-
   h1,
   h2,
   h3 {
-    font-family: "Transducer", "Space Grotesk", system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 
@@ -106,57 +69,148 @@
   .text-\[10px\] {
     letter-spacing: 0.015em;
   }
+}
 
+@layer tokens {
   :root {
-    /* --- BRAND IDENTITY: Pryme Blue & Gold (Bank Grade) --- */
+    /* --- BRAND TOKENS (Immutable core values) --- */
+    --brand-primary: 216 77% 30%; /* PRYME Deep Blue (#103783) */
+    --brand-accent: 48 100% 50%; /* Premium Gold (#ffd600) */
+    
+    --brand-surface: 0 0% 100%; /* Pure White */
+    --brand-background: 0 0% 96.5%; /* Pryme Light Grey #F6F6F6 */
+    
+    --brand-text: 222 47% 11%;
+    --brand-text-muted: 215 16% 47%;
+    
+    --brand-slate-light: 210 40% 96.1%;
+    --brand-slate-dark: 222 47% 11.2%;
+    
+    --brand-error: 0 84.2% 60.2%;
+    --brand-error-text: 210 40% 98%;
+    
+    --brand-success: 147 61% 42%;
+    --brand-success-text: 0 0% 100%;
+    
+    --brand-warning: 38 92% 50%;
+    
+    --brand-border: 214.3 31.8% 91.4%;
+  }
+}
 
-    /* Background: Pryme Light Grey #F6F6F6 */
-    --background: 0 0% 96.5%;
-    --foreground: 222 47% 11%;
+@layer theme {
+  :root {
+    /* --- LIGHT THEME (Maps Brand -> Theme) --- */
+    --theme-primary: var(--brand-primary);
+    --theme-primary-foreground: var(--brand-surface);
+    
+    --theme-accent: var(--brand-accent);
+    --theme-accent-foreground: var(--brand-text);
+    
+    --theme-background: var(--brand-background);
+    --theme-foreground: var(--brand-text);
+    
+    --theme-surface: var(--brand-surface);
+    --theme-surface-foreground: var(--brand-text);
+    
+    --theme-secondary: var(--brand-slate-light);
+    --theme-secondary-foreground: var(--brand-slate-dark);
+    
+    --theme-muted: var(--brand-slate-light);
+    --theme-muted-foreground: var(--brand-text-muted);
+    
+    --theme-destructive: var(--brand-error);
+    --theme-destructive-foreground: var(--brand-error-text);
+    
+    --theme-success: var(--brand-success);
+    --theme-success-foreground: var(--brand-success-text);
+    
+    --theme-warning: var(--brand-warning);
+    --theme-warning-foreground: var(--brand-text);
+    
+    --theme-border: var(--brand-border);
+    --theme-input: var(--brand-border);
+    --theme-ring: var(--brand-primary);
+  }
+}
 
-    /* Card: Pure White */
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+@layer base {
+  :root {
+    /* --- SEMANTIC COLOR TOKENS (Maps Theme -> Component Consumption) --- */
+    --background: var(--theme-background);
+    --foreground: var(--theme-foreground);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --card: var(--theme-surface);
+    --card-foreground: var(--theme-surface-foreground);
 
-    /* Primary: PRYME Deep Blue (#103783) */
-    --primary: 216 77% 30%;
-    --primary-foreground: 0 0% 100%;
+    --popover: var(--theme-surface);
+    --popover-foreground: var(--theme-surface-foreground);
 
-    /* Accent: Premium Gold (#ffd600) */
-    --accent: 48 100% 50%;
-    --accent-foreground: 222 47% 11%;
+    --primary: var(--theme-primary);
+    --primary-foreground: var(--theme-primary-foreground);
 
-    /* Secondary: Sophisticated Slate */
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
+    --accent: var(--theme-accent);
+    --accent-foreground: var(--theme-accent-foreground);
 
-    /* Muted: Text & Borders */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    --secondary: var(--theme-secondary);
+    --secondary-foreground: var(--theme-secondary-foreground);
 
-    /* Destructive */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --muted: var(--theme-muted);
+    --muted-foreground: var(--theme-muted-foreground);
 
-    /* Success */
-    --success: 147 61% 42%;
-    --success-foreground: 0 0% 100%;
+    --destructive: var(--theme-destructive);
+    --destructive-foreground: var(--theme-destructive-foreground);
 
-    /* Warning */
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --success: var(--theme-success);
+    --success-foreground: var(--theme-success-foreground);
 
-    /* Borders & Inputs */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --warning: var(--theme-warning);
+    --warning-foreground: var(--theme-warning-foreground);
 
-    /* Focus Rings */
-    --ring: 216 77% 30%;
+    --border: var(--theme-border);
+    --input: var(--theme-input);
+    --ring: var(--theme-ring);
+    
+    /* --- SEMANTIC SPACING & LAYOUT TOKENS --- */
+    --layout-page-inline: clamp(16px, 4vw, 64px);
+    --layout-page-block: clamp(16px, 3vw, 48px);
+    
+    --space-page: clamp(32px, 5vw, 96px);
+    --space-section: clamp(24px, 4vw, 64px);
+    --space-4: 1rem;
+    --space-8: 2rem;
+    
+    --container-max: 1600px;
+    --content-readable: 420px;
+    --content-comfort: 600px;
 
-    --radius: 0.75rem;
+    /* --- SEMANTIC SURFACE TOKENS --- */
+    --surface-radius: clamp(16px, 2vw, 24px);
+    --surface-shadow: 0 12px 36px rgba(15,23,42,0.07);
+    --radius: 0.75rem; /* Legacy alias */
+
+    /* --- SEMANTIC TYPOGRAPHY --- */
+    --text-display: clamp(32px, 4vw, 40px);
+    --text-title: clamp(28px, 3.5vw, 36px);
+    --text-heading: clamp(24px, 3vw, 32px);
+    
+    /* --- SEMANTIC MOTION TOKENS --- */
+    --motion-fast: 150ms ease-out;
+    --motion-standard: 250ms ease-out;
+    --motion-emphasized: 400ms cubic-bezier(0.2, 0, 0, 1);
+    --motion-page: 300ms ease-in-out;
+    
+    /* --- DEPRECATED: COMPATIBILITY ALIASES (Phase 3.5) --- */
+    /* DO NOT USE these tokens in new code. They will be removed in Phase 4. */
+    /* Use the equivalent --layout-* or --surface-* tokens instead. */
+    --auth-page-pad-x: var(--layout-page-inline);
+    --auth-page-pad-y: var(--layout-page-block);
+    --auth-card-radius: var(--surface-radius);
+    --auth-card-shadow: var(--surface-shadow);
+    --auth-form-max-w: var(--content-readable);
+    --auth-art-min-w: 48%;
+    --auth-form-min-w: 52%;
+    --auth-panel-pad: clamp(32px, 4vw, 64px);
   }
 
   * {
@@ -177,6 +231,7 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
   input[type="number"] {
     -moz-appearance: textfield;
   }
@@ -212,8 +267,10 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
   input[type="number"] {
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
+    /* Firefox */
   }
 }
 
@@ -370,7 +427,7 @@
   .doc-card-pending {
     @apply border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-[#103783]/30 transition-all duration-300;
   }
-  
+
   .doc-card-dragover {
     @apply border-2 border-dashed border-[#103783] bg-[#103783]/5 scale-[1.02] shadow-lg shadow-[#103783]/10 transition-all duration-200;
   }
@@ -388,9 +445,11 @@
       stroke-dashoffset: 48;
       opacity: 0;
     }
+
     10% {
       opacity: 1;
     }
+
     100% {
       stroke-dashoffset: 0;
       opacity: 1;
@@ -405,8 +464,15 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 55, 131, 0.1); }
-    50% { box-shadow: 0 0 0 8px rgba(16, 55, 131, 0.05); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 55, 131, 0.1);
+    }
+
+    50% {
+      box-shadow: 0 0 0 8px rgba(16, 55, 131, 0.05);
+    }
   }
 
   .animate-pulse-glow {
@@ -417,6 +483,7 @@
     0% {
       background-position: 200% 0;
     }
+
     100% {
       background-position: -200% 0;
     }
@@ -424,14 +491,12 @@
 
   .shiny-text-fomo {
     color: rgba(217, 119, 6, 0.7);
-    background: linear-gradient(
-      to right,
-      rgba(217, 119, 6, 0.7) 20%,
-      #f59e0b 40%,
-      #fef08a 50%,
-      #f59e0b 60%,
-      rgba(217, 119, 6, 0.7) 80%
-    );
+    background: linear-gradient(to right,
+        rgba(217, 119, 6, 0.7) 20%,
+        #f59e0b 40%,
+        #fef08a 50%,
+        #f59e0b 60%,
+        rgba(217, 119, 6, 0.7) 80%);
     background-size: 200% auto;
     background-clip: text;
     text-fill-color: transparent;
@@ -466,6 +531,7 @@ button[role="combobox"] .select-item-icon {
    power-saving mode — both cases want zero animation overhead.
    ───────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

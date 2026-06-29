@@ -23,6 +23,13 @@ import sbiLogo from "@/assets/sbi.svg";
 import bobLogo from "@/assets/bob.svg";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
 import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
+import rblLogo from "@/assets/rbl-bank.svg";
+import bajajLogo from "@/assets/bajaj-finserv.svg";
+import ltLogo from "@/assets/lt-finance.svg";
+import bandhanLogo from "@/assets/bandhan-bank.svg";
+import abflLogo from "@/assets/abfl.svg";
+import scLogo from "@/assets/sc.svg";
+import indusindLogo from "@/assets/indusind.svg";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -176,10 +183,13 @@ export default function Offers() {
         if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo };
         if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo };
         if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo };
-        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: undefined };
-        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: undefined }; // L&T Yellow
-        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: undefined };
-        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: undefined }; // ABFL Red
+        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: bajajLogo };
+        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: ltLogo };
+        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: bandhanLogo };
+        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: abflLogo };
+        if (name.includes("RBL")) return { c: "bg-[#0A387E]", x: "#0A387E", img: rblLogo };
+        if (name.includes("SC") || name.includes("STANDARD")) return { c: "bg-[#00a546]", x: "#00a546", img: scLogo };
+        if (name.includes("INDUSIND")) return { c: "bg-[#8a1921]", x: "#8a1921", img: indusindLogo };
 
         // Generic fallback colors using a stable hash so it doesn't change on re-render
         const fallbacks = [

@@ -7,17 +7,36 @@ import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.sv
 import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
+import hdfcLogo from "@/assets/hdfc.svg";
+import sbiLogo from "@/assets/sbi.svg";
+import bobLogo from "@/assets/bob.svg";
+import scLogo from "@/assets/sc.svg";
+import indusindLogo from "@/assets/indusind.svg";
+import rblLogo from "@/assets/rbl-bank.svg";
+import bajajLogo from "@/assets/bajaj-finserv.svg";
+import ltLogo from "@/assets/lt-finance.svg";
+import bandhanLogo from "@/assets/bandhan-bank.svg";
+import abflLogo from "@/assets/abfl.svg";
 
 export const banks = [
   { name: "Axis Bank", logo: axisLogo },
   { name: "IDBI Bank", logo: idbiLogo },
-  { name: "HDFC Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=hdfcbank.com&sz=256" },
+  { name: "HDFC Bank", logo: hdfcLogo },
   { name: "Union Bank", logo: unionLogo },
-  { name: "State Bank of India", logo: "https://s2.googleusercontent.com/s2/favicons?domain=onlinesbi.sbi&sz=256" },
-  { name: "Bank of Baroda", logo: "https://s2.googleusercontent.com/s2/favicons?domain=bankofbaroda.in&sz=256" },
-  { name: "Standard Chartered", logo: "https://s2.googleusercontent.com/s2/favicons?domain=sc.com&sz=256" },
-  { name: "IndusInd Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=indusind.com&sz=256" },
-  { name: "RBL Bank", logo: "https://s2.googleusercontent.com/s2/favicons?domain=rblbank.com&sz=256" },
+  { name: "State Bank of India", logo: sbiLogo },
+  { name: "Bank of Baroda", logo: bobLogo },
+  { name: "Standard Chartered", logo: scLogo },
+  { name: "IndusInd Bank", logo: indusindLogo },
+  { name: "RBL Bank", logo: rblLogo },
+  { name: "ICICI Bank", logo: iciciLogo },
+  { name: "Kotak Mahindra", logo: kotakLogo },
+  { name: "Yes Bank", logo: yesLogo },
+  { name: "Punjab National Bank", logo: pnbLogo },
+  { name: "Tata Capital", logo: tataLogo },
+  { name: "Bajaj Finserv", logo: bajajLogo },
+  { name: "L&T Finance", logo: ltLogo },
+  { name: "Bandhan Bank", logo: bandhanLogo },
+  { name: "Aditya Birla Finance", logo: abflLogo },
 ];
 
 const PartnerBankMarquee = memo(() => {

@@ -1,0 +1,1 @@
+export const PRYME_UI_FOUNDATION_VERSION = "1.0.0";

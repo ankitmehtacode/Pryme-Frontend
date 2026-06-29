@@ -1,8 +1,15 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   server: {
     host: true,
@@ -16,21 +23,18 @@ export default defineConfig({
       '/api': {
         target: 'http://187.127.138.20',
         changeOrigin: true,
-        secure: false,
-      },
-    },
+        secure: false
+      }
+    }
   },
-
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+      "@": path.resolve(__dirname, "./src")
+    }
   },
   optimizeDeps: {
-    exclude: ["optimize_typography.py", "refactor_theme.cjs"],
+    exclude: ["optimize_typography.py", "refactor_theme.cjs"]
   },
   build: {
     // Target broadly supported environments for the Indian market
@@ -47,38 +51,42 @@ export default defineConfig({
         manualChunks: {
           // Core React — loaded on every page
           "vendor-react": ["react", "react-dom"],
-          
           // Animation library — Framer Motion only (GSAP removed)
           "vendor-animation": ["framer-motion"],
-          
           // Radix UI primitives — shared across many components
-          "vendor-radix": [
-            "@radix-ui/react-accordion",
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-navigation-menu",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-tooltip",
-            "@radix-ui/react-select",
-            "@radix-ui/react-scroll-area",
-            "@radix-ui/react-slot",
-          ],
-          
+          "vendor-radix": ["@radix-ui/react-accordion", "@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-navigation-menu", "@radix-ui/react-popover", "@radix-ui/react-tabs", "@radix-ui/react-toast", "@radix-ui/react-tooltip", "@radix-ui/react-select", "@radix-ui/react-scroll-area", "@radix-ui/react-slot"],
           // Data layer — cacheable separately
           "vendor-query": ["@tanstack/react-query"],
-          
           // Router — loaded on every page but small
           "vendor-router": ["react-router-dom"],
-          
           // Charts — only needed on dashboard/calculator pages
           "vendor-charts": ["recharts"],
-          
           // Form validation — only needed on apply/auth pages
-          "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"],
-        },
-      },
-    },
+          "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"]
+        }
+      }
+    }
   },
+  test: {
+    projects: [{
+      extends: true,
+      plugins: [
+      // The plugin will run tests for the stories defined in your Storybook config
+      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+      storybookTest({
+        configDir: path.join(dirname, '.storybook')
+      })],
+      test: {
+        name: 'storybook',
+        browser: {
+          enabled: true,
+          headless: true,
+          provider: playwright({}),
+          instances: [{
+            browser: 'chromium'
+          }]
+        }
+      }
+    }]
+  }
 });
