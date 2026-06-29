@@ -101,7 +101,7 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-[#0a1530] overflow-hidden">
+    <div className="w-full relative overflow-hidden">
       {/* Background Trust Image */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -119,8 +119,8 @@ export default function TrustMonologue() {
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/10 md:bg-[#103783]/20 transform-gpu rounded-full pointer-events-none"
       />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-5xl mx-auto">
+      <div className="w-full relative z-10">
+        <div className="w-full">
           {/* Trust Quote */}
           <motion.div
             initial={headlineInitial}
@@ -162,7 +162,8 @@ export default function TrustMonologue() {
             </div>
           </TooltipProvider>
         </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };

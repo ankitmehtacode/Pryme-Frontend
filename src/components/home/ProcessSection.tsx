@@ -73,9 +73,7 @@ const ProcessSection = () => {
   };
 
   return (
-    <section className="py-24 md:py-32 bg-[#030303] relative z-10 border-t border-white/5" style={{ contain: "content" }}>
-      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
-        
+    <div className="w-full relative z-10">
         {/* Header */}
         <div className="flex flex-col items-center mb-20 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#103783]/30 bg-[#103783]/10 text-xs font-semibold text-[#9BAFD9] uppercase tracking-[0.3em] mb-6">
@@ -167,8 +165,7 @@ const ProcessSection = () => {
 
           </div>
         </div>
-      </div>
-    </section>
+    </div>
   );
 };
 

@@ -119,15 +119,14 @@ const CustomerReviews = () => {
   const x2 = useTransform(progress, [0, 100], ["-50%", "0%"]);
 
   return (
-    <section
+    <div
       ref={sectionRef}
-      className="py-24 md:py-32 overflow-hidden relative bg-[#030303]"
-      style={{ contain: "content" }}
+      className="w-full overflow-hidden relative"
       onMouseEnter={() => isHovered.current = true}
       onMouseLeave={() => isHovered.current = false}
     >
       {/* Section Header */}
-      <div className="container mx-auto px-4 mb-14 text-center relative z-10">
+      <div className="w-full mb-14 text-center relative z-10">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#103783]/30 bg-[#103783]/10 text-xs font-semibold text-[#9BAFD9] uppercase tracking-[0.3em] mb-6">
           Verified Success
         </span>
@@ -162,7 +161,7 @@ const CustomerReviews = () => {
       </div>
 
       {/* 200 IQ Scrub Slider */}
-      <div className="mt-14 container mx-auto px-4 max-w-md relative z-30 flex flex-col items-center gap-4">
+      <div className="mt-14 w-full max-w-md mx-auto relative z-30 flex flex-col items-center gap-4">
         <p className="text-[9px] uppercase tracking-[0.2em] text-[#9BAFD9]/50 font-bold">Slide to explore reviews</p>
         <div className="w-full relative flex items-center" ref={wrapperRef}>
           {/* Custom Range Track Background */}
@@ -199,7 +198,7 @@ const CustomerReviews = () => {
       {/* Edge fades — matched to exact bg color */}
       <div className="absolute top-0 bottom-0 left-0 w-24 md:w-40 bg-gradient-to-r from-[#030303] to-transparent z-20 pointer-events-none" />
       <div className="absolute top-0 bottom-0 right-0 w-24 md:w-40 bg-gradient-to-l from-[#030303] to-transparent z-20 pointer-events-none" />
-    </section>
+    </div>
   );
 };
 

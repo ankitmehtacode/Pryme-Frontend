@@ -1,122 +1,19 @@
-import React, { useRef, useEffect, useState, lazy, Suspense } from "react";
-import ScrollReveal from "@/components/ui/ScrollReveal";
-import { Helmet } from "react-helmet-async";
-import { Building2 } from "lucide-react";
-import { motion, useInView } from "framer-motion";
+import re
 
-// 🧠 Animated Counter Hook — drives the number-tick animation
-const useAnimatedCounter = (target: number, duration: number = 2000, startOnView: boolean = false, isInView: boolean = true) => {
-  const [count, setCount] = useState(0);
-  const hasAnimated = useRef(false);
+with open("src/pages/Index.tsx", "r") as f:
+    content = f.read()
 
-  useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    if (startOnView) hasAnimated.current = true;
+# Fix imports
+content = content.replace(
+    'import { Section, Container } from "@/components/layout/Primitives";',
+    'import { Surface, Section, Container } from "@/components/layout/Primitives";'
+)
 
-    let startTime: number | null = null;
-    let animationId: number;
+# Find the main tag
+main_start = content.find('<main className="flex-1 w-full pt-16 md:pt-20">')
+main_end = content.find('</main>', main_start) + len('</main>')
 
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Ease-out cubic for a satisfying deceleration
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
-      if (progress < 1) {
-        animationId = requestAnimationFrame(step);
-      }
-    };
-
-    animationId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationId);
-  }, [target, duration, isInView, startOnView]);
-
-  return count;
-};
-
-import Header from "@/components/layout/Header";
-import SmoothScroll from "@/components/SmoothScroll";
-import Footer from "@/components/layout/Footer";
-import ScrollToTop from "@/components/ui/ScrollToTop";
-import { PageShell } from "@/components/layout/PageShell";
-import { Surface, Section, Container } from "@/components/layout/Primitives";
-import { SectionBackground } from "@/components/layout/SectionBackground";
-
-// Above-the-fold components (eager)
-import HeroSection from "@/components/home/HeroSection";
-import ProductSelectorGrid from "@/components/home/ProductSelectorGrid";
-import PartnerBankMarquee from "@/components/home/PartnerBankMarquee"; 
-
-// Below-the-fold components (lazy-loaded — won't block initial paint)
-const ProcessSection = lazy(() => import("@/components/home/ProcessSection"));
-const TrustMonologue = lazy(() => import("@/components/home/TrustMonologue"));
-const TestimonialsSlider = lazy(() => import("@/components/home/TestimonialsSlider"));
-const CustomerReviews = lazy(() => import("@/components/home/CustomerReviews"));
-
-import { BookOpen, ArrowRight, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { blogs } from "@/data/blogs";
-
-// Loan Utility Components (below-the-fold — lazy-loaded)
-const EMICalculator = lazy(() => import("@/components/loan/EMICalculator"));
-const PrepaymentCalculator = lazy(() => import("@/components/loan/PrepaymentCalculator"));
-const OffersRewards = lazy(() => import("@/components/loan/OffersRewards"));
-const CibilTips = lazy(() => import("@/components/loan/CibilTips"));
-
-// 🧠 1. NATIVE ERROR BOUNDARY: Localized crash protection. 
-class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
-  }
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error("Index Page Component Crash:", error, errorInfo);
-    this.setState({ errorInfo });
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10 font-mono">
-          <h2 className="text-xl text-destructive font-medium mb-4">UI Component Crash Prevented</h2>
-          <pre className="bg-muted p-6 rounded-xl border border-destructive/50 max-w-4xl w-full overflow-auto text-sm text-foreground">
-            {this.state.error?.toString()}
-          </pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-
-
-const Index = () => {
-  return (
-    <LocalErrorBoundary>
-      <Helmet>
-        <title>PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks</title>
-        <meta
-          name="description"
-          content="Compare loan offers from 15+ banks. Personal loans, business loans, home loans with competitive rates. Quick approval, transparent process. Apply now!"
-        />
-        <meta name="keywords" content="personal loan, business loan, home loan, loan against property, compare loans, best interest rates, quick loan approval" />
-        <meta property="og:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
-        <meta property="og:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://www.gopryme.tech" />
-      </Helmet>
-
-      {/* Safe Smooth Scrolling wrapper */}
-      <SmoothScroll>
-        <PageShell className="bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary">
-          
-          <Header />
-          
-                    <main className="flex-1 w-full pt-16 md:pt-20">
+new_main = """          <main className="flex-1 w-full pt-16 md:pt-20">
             
             {/* 1. TOP OF FUNNEL (Hero, Products, Partners) */}
             <Surface variant="default">
@@ -290,14 +187,9 @@ const Index = () => {
                 </Container>
               </Section>
             </Surface>
-          </main>
-          
-          <Footer />
-          <ScrollToTop />
-        </PageShell>
-      </SmoothScroll>
-    </LocalErrorBoundary>
-  );
-};
+          </main>"""
 
-export default Index;
+content = content[:main_start] + new_main + content[main_end:]
+
+with open("src/pages/Index.tsx", "w") as f:
+    f.write(content)
