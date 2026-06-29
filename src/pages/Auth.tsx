@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
-import authHeroImg from "@/assets/images/auth-hero.jpg";
+import authHeroImg from "@/assets/images/auth-hero-v2.png";
 // pryme2Logo removed — loading gate eliminated (Auth is a public page)
 
 // 🧠 Closed-Loop Security Context & API
@@ -233,12 +233,27 @@ const Auth = () => {
           {/* LEFT PANEL: High-Fidelity Photography */}
           {/* ========================================================= */}
           <div className="relative hidden w-full lg:flex lg:w-[48%] overflow-hidden border-r border-slate-100 bg-black">
+            {/* Official Header Logo Overlay */}
+            <div 
+              className="absolute top-[56px] left-[56px] z-10 cursor-pointer pointer-events-auto" 
+              onClick={() => navigate("/")}
+            >
+              <img
+                src={prymeLogo}
+                alt="PRYME"
+                className="h-6 md:h-7 w-auto object-contain"
+              />
+            </div>
+
+            {/* Pure Hero Artwork Container */}
             <div className="relative h-full w-full overflow-hidden rounded-l-3xl">
               <img
                 src={authHeroImg}
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover object-center"
                 aria-hidden="true"
+                loading="eager"
+                decoding="async"
                 draggable={false}
               />
             </div>
