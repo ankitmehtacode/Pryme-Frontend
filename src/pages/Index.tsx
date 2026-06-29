@@ -50,7 +50,7 @@ import PartnerBankMarquee from "@/components/home/PartnerBankMarquee";
 // Below-the-fold components (lazy-loaded — won't block initial paint)
 const ProcessSection = lazy(() => import("@/components/home/ProcessSection"));
 const TrustMonologue = lazy(() => import("@/components/home/TrustMonologue"));
-const TestimonialsSlider = lazy(() => import("@/components/home/TestimonialsSlider"));
+
 const CustomerReviews = lazy(() => import("@/components/home/CustomerReviews"));
 
 import { BookOpen, ArrowRight, Clock } from "lucide-react";
@@ -220,9 +220,6 @@ const Index = () => {
               </ScrollReveal>
               <Section spacing="lg">
                 <Container size="wide"><CustomerReviews /></Container>
-              </Section>
-              <Section spacing="lg">
-                <Container size="wide"><TestimonialsSlider /></Container>
               </Section>
             </Surface>
             </Suspense>
