@@ -102,7 +102,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
   }, [isAutoPlaying, isInView]);
 
   return (
-    <div className="w-full lg:w-[340px] flex flex-col gap-3 relative justify-between h-full shrink-0">
+    <div className="w-full lg:w-[340px] flex flex-col gap-2 relative justify-between h-full shrink-0">
 
       {/* Ambient brand glow behind the card */}
       {currentOffer && (
@@ -114,8 +114,27 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
         />
       )}
 
-      {/* Pagination dots */}
-      <div className="flex items-center justify-end gap-1.5 mb-1 z-10 shrink-0">
+      {/* Animated single card */}
+      <div className="relative min-h-[260px] lg:min-h-0 lg:h-[300px] z-10">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={activeIndex}
+            variants={containerVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-0 flex flex-col transform-gpu"
+            style={{ willChange: 'transform, opacity' }}
+          >
+            {currentOffer && (
+              <OfferCard offer={currentOffer} compact={false} />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Pagination dots + controls — below the card, attached to it */}
+      <div className="flex items-center justify-end gap-1.5 mt-1 z-10 shrink-0">
         {Array.from({ length: totalSlides }).map((_, i) => (
           <button
             key={i}
@@ -147,25 +166,6 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
-      </div>
-
-      {/* Animated single card */}
-      <div className="relative min-h-[290px] lg:min-h-0 lg:h-[340px] mt-auto z-10">
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={activeIndex}
-            variants={containerVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="absolute inset-0 flex flex-col transform-gpu"
-            style={{ willChange: 'transform, opacity' }}
-          >
-            {currentOffer && (
-              <OfferCard offer={currentOffer} compact={false} />
-            )}
-          </motion.div>
-        </AnimatePresence>
       </div>
     </div>
   );

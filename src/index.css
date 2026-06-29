@@ -250,11 +250,26 @@
     --auth-form-min-w: 52%;
     --auth-panel-pad: clamp(32px, 4vw, 64px);
 
+    /* --- HERO VISUAL BUDGET (Apple-grade composition) ---
+       Content column:  34–38% of hero width
+       Whitespace:       8–10%
+       Artwork:         42–46%
+       Offer Card:      14–18%
+       Decorations:      5–7%
+       ------------------------------------------------------ */
+
     /* --- SEMANTIC GRID COLUMN TOKENS --- */
-    --hero-content-min: 32rem;
-    --hero-content-max: 40ch;
-    --hero-artwork-min: 44rem;
-    --hero-grid: minmax(var(--hero-content-min), max-content) minmax(var(--hero-artwork-min), 1fr);
+    --hero-content-min: 28rem;
+    --hero-content-max: max-content;
+    --hero-artwork-min: 38rem;
+    --hero-artwork-max: 1fr;
+    --hero-grid:
+      minmax(var(--hero-content-min), var(--hero-content-max))
+      minmax(var(--hero-artwork-min), var(--hero-artwork-max));
+
+    /* --- OFFER CARD ANCHOR TOKENS --- */
+    --offer-anchor-x: clamp(8px, 2%, 40px);
+    --offer-anchor-y: clamp(-16px, -6%, -56px);
   }
 
   * {

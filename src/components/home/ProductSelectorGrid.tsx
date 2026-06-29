@@ -111,13 +111,13 @@ const viewportHeading = { once: true };
 
 const ProductSelectorGrid = memo(() => {
   return (
-    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-2 pt-0 overflow-x-clip">
+    <section className="relative z-30 flex flex-col items-center justify-center bg-transparent pb-0 pt-0 overflow-x-clip">
       
       {/* 🧠 4K React Bits Style Beams Background */}
       <BackgroundBeams />
 
       {/* Typography Section */}
-      <div className="w-full text-center pt-1 md:pt-2 relative z-10">
+      <div className="w-full text-center pt-0 relative z-10">
         <motion.div
           initial={headingInitial}
           whileInView={headingWhileInView}
@@ -143,7 +143,7 @@ const ProductSelectorGrid = memo(() => {
           viewport={viewportOnce}
           className="w-full"
         >
-          <AutoGrid minItemWidth="clamp(140px, 16vw, 200px)" gap="md" className="pt-2 relative z-10 justify-items-center">
+          <AutoGrid minItemWidth="clamp(180px, 16vw, 250px)" gap="lg" className="pt-2 relative z-10 justify-items-center">
           {products.map((product) => (
             <motion.div 
               key={product.id} 

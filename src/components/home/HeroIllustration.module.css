@@ -25,10 +25,10 @@
      Extend beyond the col-span-3 cell.  The values
      are tuned so the bank is visually dominant but
      does not compete with the offer card.             */
-  top: -4%;
-  bottom: -4%;
-  left: -36%;
-  right: -36%;
+  top: -8%;
+  bottom: -6%;
+  left: -40%;
+  right: -30%;
 
   overflow: visible;
 }
@@ -40,8 +40,8 @@
   /* Center, then nudge:
      +18 px right  → comfortable gap from headline
      +12 px down   → roof aligns with offer card top  */
-  top: calc(50% + 12px);
-  left: calc(50% + 18px);
+  top: calc(50% + 6px);
+  left: calc(50% + 10px);
   transform: translate(-50%, -50%);
 
   height: 100%;

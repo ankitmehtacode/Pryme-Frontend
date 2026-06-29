@@ -58,7 +58,7 @@ export const HeroMetrics = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="hidden md:flex flex-wrap items-center justify-start gap-x-6 gap-y-4 mt-5 pt-4 border-t border-slate-100/80"
+        className="hidden md:flex flex-wrap items-center justify-start gap-x-6 gap-y-4 mt-3 pt-3 border-t border-slate-100/80"
       >
         {/* Metric 1: Customers */}
         <div className="flex items-center gap-2">

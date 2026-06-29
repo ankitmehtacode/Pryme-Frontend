@@ -15,7 +15,7 @@ export const HeroBadges = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.35 }}
-      className="hidden md:flex flex-wrap items-start gap-3 sm:gap-4 mb-4"
+      className="hidden md:flex flex-wrap items-start gap-3 sm:gap-4 mb-2"
     >
       {trustBadges.map((badge, i) => (
         <div key={i} className="flex flex-col items-center gap-1.5 text-center min-w-[60px]">

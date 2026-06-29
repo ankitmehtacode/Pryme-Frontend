@@ -15,13 +15,13 @@ export const HeroContent = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="hidden md:flex flex-wrap items-center gap-2 mb-3"
+        className="hidden md:flex items-center gap-1.5 mb-2 opacity-60"
       >
         {["INSTANT ELIGIBILITY", "ZERO SPAM", "NO HIDDEN CHARGES"].map((badge, i) => (
-          <span key={i} className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#103783]">
-            {i === 0 && <Zap className="w-3 h-3 text-amber-500" />}
+          <span key={i} className="inline-flex items-center gap-1 text-[7px] font-bold uppercase tracking-wider text-[#103783]/70">
+            {i === 0 && <Zap className="w-2.5 h-2.5 text-amber-500/70" />}
             {badge}
-            {i < 2 && <span className="text-slate-300 ml-1">•</span>}
+            {i < 2 && <span className="text-slate-300/60 ml-0.5">•</span>}
           </span>
         ))}
       </motion.div>
@@ -55,7 +55,7 @@ export const HeroContent = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="text-[clamp(1.125rem,2vw,1.35rem)] text-[#3b4764] leading-relaxed mb-6 md:mb-8 font-medium"
+        className="text-[clamp(1.125rem,2vw,1.35rem)] text-[#3b4764] leading-relaxed mb-4 md:mb-5 font-medium"
         style={{ 
           fontFamily: '"Gilroy", "Inter", system-ui, sans-serif',
           maxInlineSize: "45ch"

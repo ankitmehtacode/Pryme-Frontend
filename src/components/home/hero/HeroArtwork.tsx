@@ -9,17 +9,25 @@ interface HeroArtworkProps {
 
 export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children }) => {
   return (
-    <div className="hidden lg:flex items-center justify-center relative h-full w-full">
+    <div 
+      className="hidden lg:flex items-center justify-center relative h-full w-full order-2"
+      style={{
+        maxInlineSize: "clamp(620px, 58vw, 920px)",
+        overflow: "hidden",
+        isolation: "isolate",
+      }}
+    >
       <HeroIllustration
         src={currentOffer?.heroImageUrl || heroBankImg}
         alt={currentOffer?.heroImageUrl ? `${currentOffer?.bank} hero illustration` : "Professional walking toward a bank building"}
       />
       {children && (
         <div 
-          className="absolute z-20" 
-          style={{ 
-            insetInlineEnd: "clamp(24px, 4%, 64px)", 
-            insetBlockEnd: "clamp(36px, 10%, 96px)" 
+          className="absolute z-20"
+          style={{
+            insetInlineEnd: 0,
+            insetBlockEnd: 0,
+            transform: "translate(var(--offer-anchor-x), var(--offer-anchor-y))",
           }}
         >
           {children}

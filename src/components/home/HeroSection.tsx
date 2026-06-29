@@ -11,25 +11,22 @@ const HeroSection = memo(() => {
   const [currentOffer, setCurrentOffer] = useState<any>(null);
 
   return (
-    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(620px, 72vh, 760px)" }}>
+    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(560px, 62vh, 700px)" }}>
       {/* ════════════════════════════════════════════════════════════
           MAIN HERO GRID — 2-Column Split Panel via <Columns>
           Left: Static text | Right: Illustration + Offer cards
           ════════════════════════════════════════════════════════════ */}
       <Columns 
         preset="hero" 
-        className="pt-4 md:pt-12 lg:pt-8 pb-3 md:pb-6 lg:pb-8 min-h-0 lg:min-h-[480px] w-full"
+        className="pt-2 md:pt-4 lg:pt-4 pb-2 md:pb-4 lg:pb-4 min-h-0 lg:min-h-[440px] w-full"
       >
         {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
         <HeroContent />
 
-        {/* ─────── RIGHT PANEL: Illustration + Offer Cards ─────── */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 order-2 lg:order-2 w-full lg:h-full mt-6 lg:mt-0 relative">
-          {/* Center: Bank Building Illustration + Offer Cards acting as a single optical object */}
-          <HeroArtwork currentOffer={currentOffer}>
-            <HeroCarousel isInView={isInView} onActiveOfferChange={setCurrentOffer} />
-          </HeroArtwork>
-        </div>
+        {/* ─────── RIGHT PANEL: Illustration + Offer Cards (direct child — no wrapper) ─────── */}
+        <HeroArtwork currentOffer={currentOffer}>
+          <HeroCarousel isInView={isInView} onActiveOfferChange={setCurrentOffer} />
+        </HeroArtwork>
       </Columns>
     </div>
   );
