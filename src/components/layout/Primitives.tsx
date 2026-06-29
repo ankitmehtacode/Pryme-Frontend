@@ -90,7 +90,7 @@ export const Columns = React.forwardRef<HTMLDivElement, ColumnsProps>(
     if (left && right) {
       gridTemplateColumns = `${left} ${right}`;
     } else if (preset === "hero") {
-      gridTemplateColumns = "var(--columns-hero-left, minmax(38ch, max-content)) var(--columns-hero-right, minmax(40rem, 1fr))"; 
+      gridTemplateColumns = "var(--hero-grid)"; 
     } else if (preset === "split") {
       gridTemplateColumns = "minmax(400px, 1fr) minmax(400px, 2fr)";
     } else if (preset === "equal") {

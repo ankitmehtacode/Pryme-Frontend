@@ -251,8 +251,10 @@
     --auth-panel-pad: clamp(32px, 4vw, 64px);
 
     /* --- SEMANTIC GRID COLUMN TOKENS --- */
-    --columns-hero-left: minmax(38ch, max-content);
-    --columns-hero-right: minmax(40rem, 1fr);
+    --hero-content-min: 32rem;
+    --hero-content-max: 40ch;
+    --hero-artwork-min: 44rem;
+    --hero-grid: minmax(var(--hero-content-min), max-content) minmax(var(--hero-artwork-min), 1fr);
   }
 
   * {

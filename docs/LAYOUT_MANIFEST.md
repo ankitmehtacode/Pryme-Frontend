@@ -106,3 +106,24 @@ Every primitive has a rigid set of responsibilities. If you need a behavior that
    - **Patch**: Bug fixes (no API changes).
    - **Minor**: New optional props to primitives.
    - **Major**: Modifying existing primitive contracts (requires architecture review).
+
+## Optical Design Laws (Enterprise Responsive System v3.0)
+
+To maintain Apple x Stripe grade optical layouts, the following visual laws are immutable:
+
+1. **Optical Anchor Rule**: Every Hero must have exactly one primary visual anchor (e.g., Bank Building). Everything else (offer cards, badges, floating chips) must orbit that anchor. Nothing floats independently.
+2. **Hero Height Contract**: The Hero section must never consume more than **70–72% of the initial viewport height**. The remaining viewport must always expose the subsequent sections (e.g., Products and Trust/Partners).
+3. **Hero Artwork Rule**: Artwork must occupy **52–58%** of the available Hero width. It must never exceed 60% and never shrink below 45%.
+4. **Progressive Scaling Hierarchy**: Desktop scaling must follow this exact order:
+   1. Typography scales.
+   2. Vertical rhythm interpolates.
+   3. Gap interpolation.
+   4. Artwork scaling.
+   5. Container expansion.
+5. **Optical Weight Budget (Hero)**: Future hero iterations must adhere to this weight distribution:
+   - Headline: ≈18%
+   - Whitespace: ≈12%
+   - Illustration: ≈45%
+   - Offer Card: ≈18%
+   - Decorations: ≈7%
+

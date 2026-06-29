@@ -119,7 +119,7 @@ const Index = () => {
           <main className="flex-1 w-full pt-16 md:pt-20">
             
             {/* 🧠 1. HERO SECTION: The Billboard */}
-            <Section bleed spacing="xl" className="relative z-30 pt-0">
+            <Section bleed spacing="xl" className="relative z-30 pt-0" style={{ paddingBlockEnd: "clamp(32px, 4vh, 40px)" }}>
               <SectionBackground variant="hero" />
               <Container size="wide">
                 <HeroSection />
@@ -128,7 +128,7 @@ const Index = () => {
 
             {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
             <ScrollReveal direction="up" duration={0.8}>
-            <Section spacing="sm" id="products" className="relative z-20 pt-0 md:pt-3 bg-slate-50 dark:bg-[#080d1e] hidden md:block">
+            <Section spacing="sm" id="products" className="relative z-20 pt-0 pb-6 md:pb-8 bg-slate-50 dark:bg-[#080d1e] hidden md:block" style={{ paddingBlockStart: 0 }}>
               <Container size="expanded">
                 <ProductSelectorGrid />
               </Container>

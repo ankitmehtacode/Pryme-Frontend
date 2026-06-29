@@ -11,7 +11,7 @@ const HeroSection = memo(() => {
   const [currentOffer, setCurrentOffer] = useState<any>(null);
 
   return (
-    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center">
+    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(620px, 72vh, 760px)" }}>
       {/* ════════════════════════════════════════════════════════════
           MAIN HERO GRID — 2-Column Split Panel via <Columns>
           Left: Static text | Right: Illustration + Offer cards
@@ -25,11 +25,10 @@ const HeroSection = memo(() => {
 
         {/* ─────── RIGHT PANEL: Illustration + Offer Cards ─────── */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 order-2 lg:order-2 w-full lg:h-full mt-6 lg:mt-0 relative">
-          {/* Center: Bank Building Illustration */}
-          <HeroArtwork currentOffer={currentOffer} />
-
-          {/* Right: Rotating Offer Cards */}
-          <HeroCarousel isInView={isInView} onActiveOfferChange={setCurrentOffer} />
+          {/* Center: Bank Building Illustration + Offer Cards acting as a single optical object */}
+          <HeroArtwork currentOffer={currentOffer}>
+            <HeroCarousel isInView={isInView} onActiveOfferChange={setCurrentOffer} />
+          </HeroArtwork>
         </div>
       </Columns>
     </div>
