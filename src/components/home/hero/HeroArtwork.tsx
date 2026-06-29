@@ -25,9 +25,8 @@ export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children
         <div 
           className="absolute z-20"
           style={{
-            insetInlineEnd: 0,
-            insetBlockEnd: 0,
-            transform: "translate(var(--offer-anchor-x), var(--offer-anchor-y))",
+            insetInlineEnd: "var(--offer-anchor-right, clamp(24px, 4%, 64px))",
+            insetBlockEnd: "var(--offer-anchor-bottom, clamp(32px, 8%, 96px))",
           }}
         >
           {children}

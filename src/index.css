@@ -268,8 +268,8 @@
       minmax(var(--hero-artwork-min), var(--hero-artwork-max));
 
     /* --- OFFER CARD ANCHOR TOKENS --- */
-    --offer-anchor-x: clamp(8px, 2%, 40px);
-    --offer-anchor-y: clamp(-16px, -6%, -56px);
+    --offer-anchor-right: clamp(24px, 4%, 64px);
+    --offer-anchor-bottom: clamp(32px, 8%, 96px);
   }
 
   * {
