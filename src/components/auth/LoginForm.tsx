@@ -87,7 +87,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Email</Label>
         <Input
           type="email"
           placeholder="you@company.com"
@@ -100,7 +100,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Password</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Password</Label>
         <motion.div 
           className="relative"
           animate={isShaking ? { x: [-5, 5, -5, 5, -3, 3, 0], transition: { duration: 0.4 } } : {}}

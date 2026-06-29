@@ -73,7 +73,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Name</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Name</Label>
         <Input
           type="text"
           placeholder="John Doe"
@@ -86,7 +86,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Email</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Email</Label>
         <Input
           type="email"
           placeholder="you@email.com"
@@ -99,7 +99,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Mobile Number</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Mobile Number</Label>
         <Input
           type="tel"
           placeholder="9876543210"
@@ -113,7 +113,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pass</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Pass</Label>
         <div className="relative">
           <Input
             type={showPw ? "text" : "password"}
@@ -131,7 +131,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Confirm</Label>
+        <Label className="text-[13px] font-semibold text-slate-700 pl-1">Confirm</Label>
         <div className="relative">
           <Input
             type={showConfirmPw ? "text" : "password"}

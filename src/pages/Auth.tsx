@@ -221,111 +221,68 @@ const Auth = () => {
           }}
         />
 
-        {/* 🧠 PERF FIX: Replaced blur+mix-blend-multiply blobs with radial-gradient.
-             blur() + forces Chrome to rasterize 700px bitmaps
-             on CPU every animation frame. radial-gradient is compositor-native. */}
+        {/* MAIN SPLIT CARD - Premium Static Architecture */}
         <motion.div 
-          className="absolute top-[0%] left-[0%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] rounded-full pointer-events-none opacity-40"
-          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.6) 0%, rgba(30,77,171,0.3) 50%, transparent 70%)' }}
-          animate={{ x: [0, 100, -50, 0], y: [0, -50, 100, 0], scale: [1, 1.1, 0.95, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-[0%] right-[0%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] rounded-full pointer-events-none opacity-35"
-          style={{ background: 'radial-gradient(circle, rgba(16,55,131,0.6) 0%, rgba(16,185,129,0.3) 50%, transparent 70%)' }}
-          animate={{ x: [0, -120, 80, 0], y: [0, 80, -100, 0], scale: [1, 1.15, 0.85, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute top-[25%] left-[30%] w-[350px] md:w-[500px] h-[350px] md:h-[500px] rounded-full pointer-events-none opacity-50"
-          style={{ background: 'radial-gradient(circle, rgba(219,234,254,0.7) 0%, rgba(219,234,254,0.2) 50%, transparent 70%)' }}
-          animate={{ x: [0, 80, -90, 0], y: [0, 120, -60, 0], scale: [1, 0.9, 1.1, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        {/* MAIN SPLIT CARD - Flawless Glassmorphism & Micro-animations */}
-        <motion.div 
-          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] sm:rounded-[32px] shadow-[0_24px_60px_rgba(16,55,131,0.15),0_0_0_1px_rgba(255,255,255,0.6)_inset] flex flex-col lg:flex-row overflow-hidden bg-white/10 backdrop-transform-gpu saturate-[1.2] z-10"
-          initial={{ opacity: 0, scale: 0.96, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }} // Hyper-smooth spring curve
+          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] shadow-[0_16px_48px_rgba(15,23,42,0.08)] border border-slate-900/5 flex flex-col lg:flex-row overflow-hidden bg-white z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
         >
           
           {/* ========================================================= */}
           {/* LEFT PANEL: High-Fidelity Photography */}
           {/* ========================================================= */}
-          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col items-center justify-center overflow-hidden border-r border-slate-200/50 bg-black">
+          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col items-center justify-center overflow-hidden border-r border-slate-100 bg-black">
             <img 
               src={authHeroImg} 
               alt="" 
               aria-hidden="true"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover object-center z-0" 
+              className="absolute inset-0 w-full h-full object-cover object-[40%_center] z-0" 
             />
           </div>
           
           {/* ========================================================= */}
           {/* RIGHT PANEL: Auth Form Overlay */}
           {/* ========================================================= */}
-          <div className="w-full lg:w-[52%] bg-white/70 backdrop-transform-gpu shadow-[-20px_0_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
+          <div className="w-full lg:w-[52%] bg-white flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 relative z-10 overflow-y-auto w-[100%]">
              
-             <div className="w-full max-w-[320px] z-10 flex flex-col w-[100%] items-stretch">
+             <div className="w-full max-w-[360px] z-10 flex flex-col w-[100%] items-stretch">
                 {/* Mobile Header (Hidden on LG) */}
-                <div className="lg:hidden flex justify-center cursor-pointer mb-8 sm:mb-10" onClick={() => navigate("/")}>
-                   <img src={prymeLogo} alt="Pryme Logo" className="h-[34px] sm:h-8 auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
+                <div className="lg:hidden flex justify-start cursor-pointer mb-8 sm:mb-10" onClick={() => navigate("/")}>
+                   <img src={prymeLogo} alt="Pryme Logo" className="h-[28px] sm:h-[32px] auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
                 </div>
-
-                {/* Premium Segmented Control Auth Toggle (In Flow) */}
-                {view !== "forgot-password" && (
-                   <div className="w-full flex p-1 mb-8 bg-black/5 border border-black/5 backdrop-blur-md rounded-full relative z-20">
-                      <button 
-                        onClick={() => setView("login")} 
-                        className={cn("relative z-10 flex-1 h-[36px] sm:h-[40px] flex items-center justify-center text-[11px] sm:text-xs font-extrabold rounded-full transition-colors uppercase tracking-wider", view === "login" ? "text-white" : "text-slate-500 hover:text-slate-800")}
-                      >
-                        {view === "login" && (
-                          <motion.div layoutId="auth-toggle-pill" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="absolute inset-0 bg-[#103783] rounded-full shadow-md -z-10" />
-                        )}
-                        Log in
-                      </button>
-                      <button 
-                        onClick={() => setView("signup")} 
-                        className={cn("relative z-10 flex-1 h-[36px] sm:h-[40px] flex items-center justify-center text-[11px] sm:text-xs font-extrabold rounded-full transition-colors uppercase tracking-wider", view === "signup" ? "text-white" : "text-slate-500 hover:text-slate-800")}
-                      >
-                        {view === "signup" && (
-                          <motion.div layoutId="auth-toggle-pill" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="absolute inset-0 bg-[#10B981] rounded-full shadow-md -z-10" />
-                        )}
-                        Register
-                      </button>
-                   </div>
-                )}
 
                 <AnimatePresence mode="wait">
                   {view === "forgot-password" ? (
-                    <motion.div key="fp" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
-                      <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-800 mb-6 transition-colors uppercase tracking-wider">
-                        <ArrowLeft className="w-3.5 h-3.5" /> Back
+                    <motion.div key="fp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-6 transition-all duration-[160ms] ease-out">
+                        <ArrowLeft className="w-4 h-4" /> Back to sign in
                       </button>
-                      <h2 className="text-[24px] sm:text-[26px] font-extrabold text-[#103783] mb-2 tracking-tight">Reset Password</h2>
-                      <p className="text-slate-500 mb-8 text-[11px] sm:text-xs font-medium">Enter your email and we'll send a secure reset link.</p>
+                      <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-3 tracking-tight">Reset password</h2>
+                      <p className="text-slate-500 mb-8 text-[16px] font-normal">Enter your email and we'll send a secure reset link.</p>
 
                       <ForgotPasswordForm onSuccess={() => setView("login")} />
                     </motion.div>
                   ) : (
-                    <motion.div key="auth" initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: 0.3 }}>
+                    <motion.div key="auth" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                       
-                      <h2 className="text-[28px] sm:text-[32px] font-black text-[#103783] mb-8 sm:mb-10 tracking-tight drop-shadow-sm">
-                        {view === "login" ? "Welcome Back" : "Create Account"}
+                      <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-2 tracking-tight">
+                        {view === "login" ? "Welcome back" : "Create your account"}
                       </h2>
+                      <p className="text-[16px] font-normal text-slate-500 mb-8">
+                        {view === "login" ? "Continue to Pryme." : "Join Pryme today."}
+                      </p>
 
                       {view === "login" ? (
                         <LoginForm onForgotPassword={() => setView("forgot-password")} from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-6">
+                          <div className="relative my-8">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
-                            <div className="relative flex justify-center text-[10px]">
-                              <span className="bg-white/70 backdrop-blur-sm px-4 text-slate-400 font-bold uppercase tracking-widest">or</span>
+                            <div className="relative flex justify-center text-[12px]">
+                              <span className="bg-white px-4 text-slate-500 font-medium">or</span>
                             </div>
                           </div>
 
@@ -338,9 +295,9 @@ const Auth = () => {
                               type="button"
                               onClick={handleGoogleSignIn}
                               disabled={isGoogleLoading}
-                              className="w-full h-[42px] flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-slate-300 rounded-full text-[12px] sm:text-[11px] font-bold text-slate-600 hover:text-slate-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                              className="w-full h-[40px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-full text-[14px] font-medium text-slate-700 transition-all duration-[160ms] ease-out"
                             >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -349,16 +306,26 @@ const Auth = () => {
                               {isGoogleLoading ? "Signing in..." : "Continue with Google"}
                             </button>
                           )}
+                          
+                          <div className="mt-8 text-center">
+                            <span className="text-[14px] text-slate-500">Don't have an account? </span>
+                            <button 
+                              onClick={() => setView("signup")}
+                              className="text-[14px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
+                            >
+                              Create account &rarr;
+                            </button>
+                          </div>
                         </LoginForm>
                       ) : (
                         <SignupForm from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-6">
+                          <div className="relative my-8">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
-                            <div className="relative flex justify-center text-[10px]">
-                              <span className="bg-white/70 backdrop-blur-sm px-4 text-slate-400 font-bold uppercase tracking-widest">or</span>
+                            <div className="relative flex justify-center text-[12px]">
+                              <span className="bg-white px-4 text-slate-500 font-medium">or</span>
                             </div>
                           </div>
 
@@ -371,9 +338,9 @@ const Auth = () => {
                               type="button"
                               onClick={handleGoogleSignIn}
                               disabled={isGoogleLoading}
-                              className="w-full h-[42px] flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-slate-300 rounded-full text-[12px] sm:text-[11px] font-bold text-slate-600 hover:text-slate-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                              className="w-full h-[40px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-full text-[14px] font-medium text-slate-700 transition-all duration-[160ms] ease-out"
                             >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -382,6 +349,16 @@ const Auth = () => {
                               {isGoogleLoading ? "Signing in..." : "Sign up with Google"}
                             </button>
                           )}
+                          
+                          <div className="mt-8 text-center">
+                            <span className="text-[14px] text-slate-500">Already have an account? </span>
+                            <button 
+                              onClick={() => setView("login")}
+                              className="text-[14px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
+                            >
+                              Sign in &rarr;
+                            </button>
+                          </div>
                         </SignupForm>
                       )}
                     </motion.div>
@@ -392,26 +369,23 @@ const Auth = () => {
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="mt-8 pt-6 border-t border-slate-200 flex flex-col items-center gap-2"
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                  className="mt-10 flex items-center justify-center gap-3 w-full text-slate-400"
                 >
-                   <div className="flex items-center justify-center gap-3 sm:gap-4 w-full">
-                     <div className="flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-                        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-slate-400 uppercase mt-[1px]">RBI Compliant</span>
-                     </div>
-                     <div className="w-[3px] h-[3px] rounded-full bg-slate-300"></div>
-                     <div className="flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-[#103783]/50" />
-                        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-slate-400 uppercase mt-[1px]">SHA-256 Secure</span>
-                     </div>
+                   <div className="flex items-center gap-1.5">
+                      <span className="text-[14px]">🛡</span>
+                      <span className="text-[12px] font-medium tracking-wide">RBI Compliant</span>
+                   </div>
+                   <div className="w-[3px] h-[3px] rounded-full bg-slate-300"></div>
+                   <div className="flex items-center gap-1.5">
+                      <span className="text-[14px]">🔒</span>
+                      <span className="text-[12px] font-medium tracking-wide">256-bit Encryption</span>
                    </div>
                 </motion.div>
              </div>
           </div>
         </motion.div>
-      </div>
-    </>
+      </div></>
   );
 };
 
