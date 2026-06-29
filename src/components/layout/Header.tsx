@@ -136,6 +136,7 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -207,6 +208,8 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
     action();
   };
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <div className="relative" ref={menuRef} onKeyDown={handleKeyDown}>
       <Button 
@@ -221,35 +224,47 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
           <User className="w-3 h-3 text-[#103783]" />
         </div>
         <span className="text-sm font-medium">{user.name.split(' ')[0]}</span>
-        <ChevronDown className={cn("w-3 h-3 ml-2 text-slate-400 transition-transform duration-[180ms]", isOpen ? "rotate-180" : "")} />
+        <ChevronDown className={cn("w-3 h-3 ml-2 text-slate-400 transition-transform duration-[180ms] ease-out", isOpen ? "rotate-180" : "")} />
       </Button>
 
       <div 
         role="menu"
         aria-orientation="vertical"
         className={cn(
-          "absolute right-0 top-[calc(100%+8px)] min-w-[220px] bg-white rounded-xl border border-slate-200 shadow-xl z-50",
+          "absolute right-0 top-[calc(100%+4px)] min-w-[220px] bg-white rounded-2xl border border-slate-200 shadow-[0_6px_18px_rgba(15,23,42,0.08),0_20px_40px_rgba(15,23,42,0.08)] z-50",
           "origin-top-right transition-all duration-[180ms] ease-out",
           isOpen ? "opacity-100 scale-100 translate-y-0 visible" : "opacity-0 scale-[0.98] -translate-y-[6px] invisible pointer-events-none"
         )}
       >
         <div className="p-1.5 flex flex-col gap-0.5">
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/dashboard"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
-            <Briefcase className="w-4 h-4 mr-3 text-slate-500" /> Application Tracker
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/dashboard"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
+            <div className="flex items-center">
+              <Briefcase className="w-4 h-4 mr-3 text-slate-400" /> Application Tracker
+            </div>
+            {isActive("/dashboard") && <CheckCircle className="w-4 h-4 text-blue-500" />}
           </button>
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/profile"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
-            <User className="w-4 h-4 mr-3 text-slate-500" /> My Profile
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/profile"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
+            <div className="flex items-center">
+              <User className="w-4 h-4 mr-3 text-slate-400" /> My Profile
+            </div>
+            {isActive("/profile") && <CheckCircle className="w-4 h-4 text-blue-500" />}
           </button>
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/notifications"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
-            <Bell className="w-4 h-4 mr-3 text-slate-500" /> Notifications
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/notifications"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
+            <div className="flex items-center">
+              <Bell className="w-4 h-4 mr-3 text-slate-400" /> Notifications
+            </div>
+            {isActive("/notifications") && <CheckCircle className="w-4 h-4 text-blue-500" />}
           </button>
           {isAdmin && (
-            <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/admin"))} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 text-slate-700">
-              <Settings className="w-4 h-4 mr-3 text-slate-500" /> Admin Console
+            <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(() => navigate("/admin"))} className="relative flex w-full cursor-default select-none items-center justify-between rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 text-slate-700">
+              <div className="flex items-center">
+                <Settings className="w-4 h-4 mr-3 text-slate-400" /> Admin Console
+              </div>
+              {isActive("/admin") && <CheckCircle className="w-4 h-4 text-blue-500" />}
             </button>
           )}
           <div className="h-px bg-slate-100 my-1 mx-1" role="separator" />
-          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(async () => { await signOut(); navigate("/"); })} className="relative flex w-full cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors hover:bg-red-50 focus:bg-red-50 focus:text-red-600 text-red-500">
+          <button role="menuitem" tabIndex={isOpen ? 0 : -1} onClick={() => handleAction(async () => { await signOut(); navigate("/"); })} className="relative flex w-full cursor-default select-none items-center rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-red-50 focus:bg-red-50 focus:text-red-600 text-red-500">
             <LogOut className="w-4 h-4 mr-3" /> Sign Out
           </button>
         </div>
