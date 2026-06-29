@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, ShieldCheck, Lock } from "lucide-react";
+import { ArrowLeft, Shield, Lock } from "lucide-react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
@@ -223,7 +223,7 @@ const Auth = () => {
 
         {/* MAIN SPLIT CARD - Premium Static Architecture */}
         <motion.div 
-          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] shadow-[0_16px_48px_rgba(15,23,42,0.08)] border border-slate-900/5 flex flex-col lg:flex-row overflow-hidden bg-white z-10"
+          className="relative w-full max-w-[1000px] min-h-[600px] rounded-[24px] shadow-[0_12px_36px_rgba(15,23,42,0.07)] border border-slate-900/5 flex flex-col lg:flex-row overflow-hidden bg-white z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
@@ -232,14 +232,51 @@ const Auth = () => {
           {/* ========================================================= */}
           {/* LEFT PANEL: High-Fidelity Photography */}
           {/* ========================================================= */}
-          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col items-center justify-center overflow-hidden border-r border-slate-100 bg-black">
+          <div className="relative hidden w-full lg:flex lg:w-[48%] flex-col justify-between overflow-hidden border-r border-slate-100 bg-black p-12 lg:p-20">
             <img 
               src={authHeroImg} 
               alt="" 
               aria-hidden="true"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover object-[40%_center] z-0" 
+              className="absolute inset-0 w-full h-full object-cover object-[40%_center] z-0 opacity-90" 
             />
+            
+            {/* Logo & Headline */}
+            <div className="relative z-10 w-full flex flex-col gap-10 max-w-[400px]">
+              <div 
+                className="cursor-pointer" 
+                onClick={() => navigate("/")}
+              >
+                 <img src={prymeLogo} alt="Pryme Logo" className="h-[32px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
+              </div>
+
+              <div>
+                <h1 className="text-[40px] font-bold text-white leading-[1.05] tracking-tight mb-4">
+                  Capital for the modern business.
+                </h1>
+                <p className="text-[16px] text-white/80 font-normal leading-relaxed max-w-[34ch]">
+                  Unlock growth with fast, secure, and flexible financing built for scale.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom Statistics Strip */}
+            <div className="relative z-10 w-full">
+              <div className="inline-flex items-center gap-4 px-6 py-3.5 bg-white/85 backdrop-blur-md rounded-full text-[#0a1530] text-[13px] font-semibold">
+                <div className="flex items-center gap-1 text-[#10B981]">
+                  <span className="text-[14px]">★</span>
+                  <span className="text-[14px]">★</span>
+                  <span className="text-[14px]">★</span>
+                  <span className="text-[14px]">★</span>
+                  <span className="text-[14px]">★</span>
+                  <span className="ml-1 text-[#0a1530]">4.8</span>
+                </div>
+                <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
+                <span>10,000+ Customers</span>
+                <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
+                <span>15+ Banks</span>
+              </div>
+            </div>
           </div>
           
           {/* ========================================================= */}
@@ -277,7 +314,7 @@ const Auth = () => {
                       {view === "login" ? (
                         <LoginForm onForgotPassword={() => setView("forgot-password")} from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-8">
+                          <div className="relative my-12">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
@@ -320,7 +357,7 @@ const Auth = () => {
                       ) : (
                         <SignupForm from={from}>
                           {/* Google Sign-In Divider + Button */}
-                          <div className="relative my-8">
+                          <div className="relative my-12">
                             <div className="absolute inset-0 flex items-center">
                               <div className="w-full border-t border-slate-200"></div>
                             </div>
@@ -370,16 +407,16 @@ const Auth = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.3 }}
-                  className="mt-10 flex items-center justify-center gap-3 w-full text-slate-400"
+                  className="mt-12 flex items-center justify-center gap-4 w-full text-slate-400"
                 >
-                   <div className="flex items-center gap-1.5">
-                      <span className="text-[14px]">🛡</span>
-                      <span className="text-[12px] font-medium tracking-wide">RBI Compliant</span>
+                   <div className="flex items-center gap-2">
+                      <Shield className="w-[18px] h-[18px] text-slate-400" strokeWidth={1.5} />
+                      <span className="text-[13px] font-medium tracking-wide">RBI Compliant</span>
                    </div>
-                   <div className="w-[3px] h-[3px] rounded-full bg-slate-300"></div>
-                   <div className="flex items-center gap-1.5">
-                      <span className="text-[14px]">🔒</span>
-                      <span className="text-[12px] font-medium tracking-wide">256-bit Encryption</span>
+                   <div className="w-[4px] h-[4px] rounded-full bg-slate-300"></div>
+                   <div className="flex items-center gap-2">
+                      <Lock className="w-[18px] h-[18px] text-slate-400" strokeWidth={1.5} />
+                      <span className="text-[13px] font-medium tracking-wide">256-bit Encryption</span>
                    </div>
                 </motion.div>
              </div>

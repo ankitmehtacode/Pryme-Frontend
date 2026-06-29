@@ -91,7 +91,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
         <Input
           type="email"
           placeholder="you@company.com"
-          className="h-10 sm:h-9 w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
+          className="h-[52px] w-full border-0 border-b border-[#103783]/10 hover:border-[#103783]/30 rounded-none bg-transparent px-1 font-medium text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-[#10B981] transition-colors shadow-none text-[14px] sm:text-[13px]"
           {...form.register("email")}
         />
         {form.formState.errors.email && (
@@ -109,7 +109,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
             className={cn(
-              "h-10 sm:h-9 w-full border-0 border-b rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]",
+              "h-[52px] w-full border-0 border-b rounded-none bg-transparent px-1 pr-9 font-bold text-[#103783] placeholder:text-slate-400 focus-visible:ring-0 transition-colors shadow-none tracking-[0.2em] text-[16px] xl:text-[20px]",
               form.formState.errors.password 
                 ? "border-rose-500/50 focus-visible:border-rose-500 text-rose-600" 
                 : "border-[#103783]/10 hover:border-[#103783]/30 focus-visible:border-[#10B981]"
@@ -141,6 +141,9 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
             </motion.div>
           )}
         </AnimatePresence>
+        <button type="button" onClick={onForgotPassword} className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[150ms] ease-out pl-1 mt-2 text-left">
+          Forgot password?
+        </button>
       </div>
 
       <div 
@@ -162,17 +165,13 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
       </div>
 
       <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">
-        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[46px] sm:h-[42px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-extrabold tracking-widest rounded-full shadow-[0_8px_24px_rgba(16,55,131,0.25)] hover:shadow-[0_12px_28px_rgba(16,55,131,0.35)] hover:-translate-y-[2px] transition-all duration-300 text-[12px] sm:text-[11px] uppercase flex items-center justify-center gap-2" size="sm">
+        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-full transition-all duration-[160ms] ease-out text-[12px] sm:text-[11px] flex items-center justify-center gap-2" size="sm">
           {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
             <>
-              Continue <ArrowRight className="w-4 h-4 ml-1" />
+              Sign in →
             </>
           )}
         </Button>
-        
-        <button type="button" onClick={onForgotPassword} className="text-[11px] sm:text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors pl-1">
-          Forgot Password?
-        </button>
       </div>
 
       {children}
