@@ -11,7 +11,7 @@ const HeroSection = memo(() => {
   const [currentOffer, setCurrentOffer] = useState<any>(null);
 
   return (
-    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(560px, 62vh, 700px)" }}>
+    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(480px, 55vh, 600px)" }}>
       {/* ════════════════════════════════════════════════════════════
           MAIN HERO GRID — 2-Column Split Panel via <Columns>
           Left: Static text | Right: Illustration + Offer cards
