@@ -66,12 +66,7 @@ export const HeroContent = () => {
           maxInlineSize: "43ch"
         }}
       >
-        <span className="md:hidden">
-          We analyze your profile against 25+ top banks to find the highest approval odds—without affecting your credit score.
-        </span>
-        <span className="hidden md:inline">
-          Get matched with the best loan offers from 15+ banks based on your real eligibility — without harming your credit score.
-        </span>
+        Get matched with the best loan offers from 15+ banks based on your real eligibility — without harming your credit score.
       </motion.p>
 
       {/* Trust Badges Row */}

@@ -362,7 +362,7 @@ const Header = memo(() => {
       >
         <div
           className={cn(
-            "h-20 px-4 sm:px-6 flex items-center justify-between pointer-events-auto",
+            "h-16 px-4 sm:px-6 flex items-center justify-between pointer-events-auto",
             "transition-all duration-400 ease-[cubic-bezier(0.33,1,0.68,1)]",
             isScrolled
               ? "w-[calc(100%-var(--space-md)*2)] max-w-[var(--container-expanded)] rounded-[var(--radius-lg)] translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[var(--shadow-md)]"

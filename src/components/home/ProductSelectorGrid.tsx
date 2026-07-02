@@ -128,9 +128,6 @@ const ProductSelectorGrid = memo(() => {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Explore More Products
           </span>
-          <h2 className="text-2xl md:text-2xl lg:text-xl font-semibold text-foreground tracking-tighter mb-1 uppercase leading-none">
-            Find The Right <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-blue-400">Loan.</span>
-          </h2>
         </motion.div>
       </div>
 

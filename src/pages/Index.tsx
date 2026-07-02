@@ -117,33 +117,36 @@ const Index = () => {
           
           <Header />
           
-                    <main className="flex-1 w-full pt-16 md:pt-20">
+          <main className="flex-1 w-full pt-10 md:pt-12">
             
             {/* 1. TOP OF FUNNEL (Hero, Products, Partners) */}
             <Surface variant="default">
-              {/* 🧠 1. HERO SECTION: The Billboard */}
-              <Section bleed spacing="xl" className="relative z-30 pt-0" style={{ paddingBlockStart: 0, paddingBlockEnd: "var(--landing-hero-section-end, clamp(16px, 2vh, 24px))", overflow: "visible" }}>
+              <div className="flex flex-col justify-start md:justify-between md:h-[calc(100vh-64px)] md:min-h-[680px] w-full relative">
                 <SectionBackground variant="hero" />
-                <Container size="expanded">
-                  <HeroSection />
-                </Container>
-              </Section>
-
-              {/* 🧠 2. THE DYNAMIC PRODUCT GRID & PARTNERS REGION */}
-              <ScrollReveal direction="up" duration={0.8}>
-                <Section spacing="sm" id="products" className="relative z-20 pt-0 pb-2 md:pb-4 hidden md:block" style={{ paddingBlockStart: 0 }}>
+                
+                {/* 🧠 1. HERO SECTION: The Billboard */}
+                <Section bleed spacing="xs" className="relative z-30 pt-0 pb-0" style={{ paddingBlockStart: 0, paddingBlockEnd: 0, overflow: "visible" }}>
                   <Container size="expanded">
-                    <ProductSelectorGrid />
+                    <HeroSection />
                   </Container>
                 </Section>
-              </ScrollReveal>
 
-              {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
-              <Section spacing="xs" className="relative z-20 pt-0 pb-0">
-                <Container size="expanded">
-                  <PartnerBankMarquee />
-                </Container>
-              </Section>
+                {/* 🧠 2. THE DYNAMIC PRODUCT GRID */}
+                <ScrollReveal direction="up" duration={0.8} className="hidden md:block w-full">
+                  <Section spacing="xs" id="products" className="relative z-20 pt-0 pb-0" style={{ paddingBlockStart: 0 }}>
+                    <Container size="expanded">
+                      <ProductSelectorGrid />
+                    </Container>
+                  </Section>
+                </ScrollReveal>
+
+                {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
+                <Section spacing="xs" className="relative z-20 pt-0 pb-3 md:pb-5 w-full">
+                  <Container size="expanded">
+                    <PartnerBankMarquee />
+                  </Container>
+                </Section>
+              </div>
             </Surface>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
