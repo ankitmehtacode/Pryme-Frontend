@@ -102,20 +102,36 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
   }, [isAutoPlaying, isInView]);
 
   return (
-    <div className="w-full lg:w-[340px] flex flex-col gap-2 relative justify-between h-full shrink-0">
+    <div
+      className="w-full flex flex-col gap-2 relative justify-between h-full shrink-0"
+      style={{ inlineSize: "var(--landing-offer-width, 360px)", overflow: "visible" }}
+    >
 
-      {/* Ambient brand glow behind the card */}
+      {/* Ambient brand glow behind the card (Intensified layered system) */}
       {currentOffer && (
-        <div 
-          className="absolute -inset-6 rounded-[40px] blur-3xl opacity-20 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{
-            background: `radial-gradient(circle at center, ${currentOffer.accentColor} 0%, transparent 65%)`,
-          }}
-        />
+        <>
+          {/* Inner core intense glow */}
+          <div 
+            className="absolute -inset-8 rounded-[40px] blur-2xl opacity-40 dark:opacity-35 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] mix-blend-multiply dark:mix-blend-screen"
+            style={{
+              background: `radial-gradient(circle at center, ${currentOffer.accentColor} 0%, transparent 65%)`,
+            }}
+          />
+          {/* Outer atmospheric soft glow */}
+          <div 
+            className="absolute -inset-20 rounded-[60px] blur-[80px] opacity-20 dark:opacity-15 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] mix-blend-multiply dark:mix-blend-screen"
+            style={{
+              background: `radial-gradient(circle at center, ${currentOffer.accentColor} 0%, transparent 70%)`,
+            }}
+          />
+        </>
       )}
 
       {/* Animated single card */}
-      <div className="relative min-h-[260px] lg:min-h-0 lg:h-[300px] z-10">
+      <div
+        className="relative min-h-[200px] lg:min-h-0 z-10"
+        style={{ blockSize: "var(--landing-offer-height, 302px)" }}
+      >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={activeIndex}

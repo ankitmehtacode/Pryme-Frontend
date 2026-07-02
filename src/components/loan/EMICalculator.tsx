@@ -52,11 +52,6 @@ const EMICalculator = ({
   }, [amount, rate, months]);
 
   const formatCurrency = (value: number) => {
-    if (value >= 10000000) {
-      return `₹${(value / 10000000).toFixed(2)} Cr`;
-    } else if (value >= 100000) {
-      return `₹${(value / 100000).toFixed(2)} L`;
-    }
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
@@ -65,10 +60,11 @@ const EMICalculator = ({
   };
 
   const formatShortCurrency = (value: number) => {
-    if (value >= 10000000) return `₹${(value / 10000000).toFixed(1).replace(/\.0$/, '')}Cr`;
-    if (value >= 100000) return `₹${(value / 100000).toFixed(1).replace(/\.0$/, '')}L`;
-    if (value >= 1000) return `₹${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`;
-    return `₹${Math.round(value)}`;
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
   const terminology = [
@@ -157,7 +153,7 @@ const EMICalculator = ({
                     max={360}
                     min={6}
                   />
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:inline-block">({(months / 12).toFixed(1)} Yrs)</span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:inline-block whitespace-nowrap">({(months / 12).toFixed(1)} Yrs)</span>
                 </div>
               </div>
               <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={6} max={360} step={6} className="cursor-pointer py-1" />
@@ -173,7 +169,7 @@ const EMICalculator = ({
             
             <div className="flex flex-col items-center gap-4 w-full mb-4 md:mb-6">
               {/* Glowing Pie Chart */}
-              <div className="relative w-[110px] h-[110px] md:w-32 md:h-32 shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto">
+              <div className="relative w-[140px] h-[140px] md:w-[160px] md:h-[160px] shrink-0 drop-shadow-md dark:drop-shadow-lg mx-auto">
                 <svg className="w-full h-full -rotate-90 dark:drop-shadow-[0_0_10px_rgba(124,58,237,0.3)]" viewBox="0 0 140 140">
                   <circle cx="70" cy="70" r={radius} fill="none" className="stroke-slate-200 dark:stroke-[#222]" strokeWidth="12" />
                   <circle
@@ -189,7 +185,7 @@ const EMICalculator = ({
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider md:tracking-widest text-[#103783] mb-0.5 md:mb-1 whitespace-nowrap">Monthly EMI</span>
-                  <span className="text-xl font-bold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
+                  <span className="text-lg md:text-xl font-extrabold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
                 </div>
               </div>
 
@@ -216,21 +212,32 @@ const EMICalculator = ({
 
             {/* Principal & Interest Cards */}
             <div className="grid grid-cols-2 gap-4 w-full mt-auto">
-              <div className="p-4 bg-background dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-background dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
+                <div className="flex items-center justify-between mb-3">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
                   <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
                 </div>
-                <p className="text-base sm:text-lg font-bold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-2.5">{formatCurrency(amount)}</p>
+                <div className="relative mb-2 w-full">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-bold text-foreground">₹</span>
+                  <input
+                    type="text"
+                    value={amount === 0 ? "" : amount.toLocaleString("en-IN")}
+                    onChange={(e) => {
+                      const cleanVal = e.target.value.replace(/[^0-9]/g, "");
+                      setAmount(Number(cleanVal));
+                    }}
+                    className="w-full pl-3 pr-0 py-1 text-xs sm:text-sm md:text-base font-extrabold text-foreground bg-transparent border-b border-dashed border-slate-350 focus:border-[#103783] focus:outline-none"
+                  />
+                </div>
                 <span className="inline-block text-[10px] font-bold text-[#103783] bg-[#103783]/10 px-2.5 py-1 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
               </div>
 
-              <div className="p-4 bg-background dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-background dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
+                <div className="flex items-center justify-between mb-3">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
                 </div>
-                <p className="text-base sm:text-lg font-bold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-2.5">{formatCurrency(totalInterest)}</p>
+                <p className="text-xs sm:text-sm md:text-base font-extrabold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-3">{formatCurrency(totalInterest)}</p>
                 <span className="inline-block text-[10px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
               </div>
             </div>

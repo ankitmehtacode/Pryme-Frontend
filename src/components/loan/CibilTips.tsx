@@ -97,6 +97,7 @@ const impactColors: Record<string, string> = {
 const CibilTips = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [showAll, setShowAll] = useState(false);
 
   const filteredTips = filter === "all" ? tips : tips.filter(t => t.category === filter);
 
@@ -179,9 +180,9 @@ const CibilTips = () => {
       </div>
 
       {/* Tips Accordion - Constrained Height with Custom Scrollbar */}
-      <div className="space-y-3 relative z-10 max-h-[60vh] overflow-y-auto overflow-x-hidden pb-4 pr-3 overscroll-contain [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
+      <div className="space-y-3 relative z-10 max-h-[60vh] overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
         <AnimatePresence mode="popLayout">
-          {filteredTips.map((tip, index) => {
+          {(showAll ? filteredTips : filteredTips.slice(0, 3)).map((tip, index) => {
             const isExpanded = expandedIndex === index;
             const Icon = tip.icon;
             const colors = impactColors[tip.impactType];
@@ -292,6 +293,19 @@ const CibilTips = () => {
           })}
         </AnimatePresence>
       </div>
+
+      {/* See All / Show Less button */}
+      {filteredTips.length > 3 && (
+        <div className="flex justify-center mt-4 mb-2 relative z-10">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="w-full sm:w-auto bg-primary/10 dark:bg-[#103783]/20 border border-primary/20 dark:border-[#103783]/40 hover:bg-primary/20 dark:hover:bg-[#103783]/30 text-primary dark:text-[#3876f2] font-bold text-[10px] md:text-xs px-6 py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+          >
+            <span>{showAll ? "See Less" : `See All Tips (+${filteredTips.length - 3})`}</span>
+            <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", showAll && "rotate-180")} />
+          </button>
+        </div>
+      )}
 
       {/* Footer note */}
       <div className="mt-5 pt-4 border-t border-border dark:border-white/5 relative z-10">

@@ -53,6 +53,7 @@ const toolLinks = [
 
 const navLinks = [
   { href: "/about", label: "About" },
+  { href: "/faq", label: "FAQ" },
   { href: "/blogs", label: "Insights" },
 ];
 
@@ -338,18 +339,8 @@ const Header = memo(() => {
         // Morphed state: past 100px scroll
         setIsScrolled(currentY > 100);
 
-        // Hide/show on scroll direction (only when scrolled past 100px)
-        if (currentY > 100) {
-          if (currentY > lastScrollY.current + 5) {
-            // Scrolling DOWN — hide
-            setIsHidden(true);
-          } else if (currentY < lastScrollY.current - 5) {
-            // Scrolling UP — show
-            setIsHidden(false);
-          }
-        } else {
-          setIsHidden(false);
-        }
+        // Hide navbar past 100px scroll; show only when scrolled back to top
+        setIsHidden(currentY > 100);
 
         lastScrollY.current = currentY;
         ticking.current = false;
@@ -365,8 +356,8 @@ const Header = memo(() => {
       <header
         className={cn(
           "fixed top-0 left-0 w-full z-50 flex justify-center pt-0 pointer-events-none",
-          "transition-transform duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]",
-          isHidden && "-translate-y-full"
+          "transition-all duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]",
+          isHidden ? "-translate-y-[150%] opacity-0" : "translate-y-0 opacity-100"
         )}
       >
         <div
@@ -374,7 +365,7 @@ const Header = memo(() => {
             "h-20 px-4 sm:px-6 flex items-center justify-between pointer-events-auto",
             "transition-all duration-400 ease-[cubic-bezier(0.33,1,0.68,1)]",
             isScrolled
-              ? "w-[calc(100%-var(--space-md)*2)] max-w-[var(--container-lg)] rounded-[var(--radius-lg)] translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[var(--shadow-md)]"
+              ? "w-[calc(100%-var(--space-md)*2)] max-w-[var(--container-expanded)] rounded-[var(--radius-lg)] translate-y-3 bg-white/85 backdrop-blur-2xl border border-black/5 shadow-[var(--shadow-md)]"
               : "w-full max-w-full rounded-none translate-y-0 bg-transparent border border-transparent shadow-none backdrop-blur-0"
           )}
         >

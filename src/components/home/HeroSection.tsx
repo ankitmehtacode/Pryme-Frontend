@@ -11,14 +11,19 @@ const HeroSection = memo(() => {
   const [currentOffer, setCurrentOffer] = useState<any>(null);
 
   return (
-    <div ref={heroRef as any} className="w-full relative z-10 h-full flex flex-col justify-center" style={{ minBlockSize: "clamp(392px, 43vh, 490px)" }}>
+    <div
+      ref={heroRef as any}
+      className="w-full relative z-10 h-full flex flex-col justify-center"
+      style={{ minBlockSize: "var(--landing-hero-height, clamp(392px, 43vh, 490px))" }}
+    >
       {/* ════════════════════════════════════════════════════════════
           MAIN HERO GRID — 2-Column Split Panel via <Columns>
           Left: Static text | Right: Illustration + Offer cards
           ════════════════════════════════════════════════════════════ */}
       <Columns 
         preset="hero" 
-        className="pt-2 md:pt-4 lg:pt-4 pb-2 md:pb-4 lg:pb-4 min-h-0 lg:min-h-[310px] w-full"
+        className="pt-2 md:pt-3 lg:pt-2 pb-2 md:pb-2 lg:pb-1 min-h-0 lg:min-h-[310px] w-full"
+        style={{ gap: "var(--landing-hero-gap, var(--space-lg))" }}
       >
         {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
         <HeroContent />

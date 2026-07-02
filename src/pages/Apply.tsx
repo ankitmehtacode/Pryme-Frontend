@@ -82,6 +82,7 @@ const Apply = () => {
     // Sync back to localStorage for persistence across the user session
     localStorage.setItem("pryme_lead_name", leadName);
     localStorage.setItem("pryme_lead_phone", leadPhone);
+    localStorage.setItem("pryme_lead_pincode", data.pinCode || "");
 
     setApplicationData({
       cibilScore: data.cibilScore,
@@ -290,8 +291,7 @@ const Apply = () => {
   };
 
   const handleApplyDirect = (bankId: string) => {
-    const bank = bankOffers.find(b => b.id === bankId);
-    toast({ title: "Redirecting to Bank", description: `Opening ${bank?.bankName} application page...` });
+    navigate(`/apply-direct/${bankId}`);
   };
 
   // 🧠 THE CORE GATEWAY: Pushes intent -> Auth -> Inline Progressive Continuation
@@ -416,7 +416,7 @@ const Apply = () => {
                     Unlock Your Premium <span className="text-primary dark:text-blue-500">Offers</span>
                   </h1>
                   <p className="text-xs md:text-sm font-medium text-muted-foreground flex items-center justify-center gap-2 leading-relaxed">
-                    Check eligibility across 15+ premier lenders instantly. Zero impact on your CIBIL score.
+                    Check eligibility across 15+ premium banks instantly. Zero impact on your CIBIL score.
                   </p>
                 </div>
 

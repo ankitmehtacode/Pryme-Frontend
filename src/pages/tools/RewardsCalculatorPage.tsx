@@ -6,6 +6,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import OffersRewards from "@/components/loan/OffersRewards";
 import { Gift, Sparkles, Coins, Zap } from "lucide-react";
+import rewardsBgImg from "@/assets/rewards-bg.png";
 
 const RewardsCalculatorPage = () => {
   return (
@@ -32,12 +33,21 @@ const RewardsCalculatorPage = () => {
               </div>
             </ScrollReveal>
 
-            <div className="max-w-5xl mx-auto">
-              <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-8 shadow-2xl relative overflow-hidden">
+            <div className="w-full max-w-5xl mx-auto relative rounded-[2rem] border border-slate-200/80 dark:border-[#103783]/20 overflow-hidden shadow-xl py-8 md:py-10 px-6 md:px-12 bg-[#edf4ff] dark:bg-[#0b1021]">
+              {/* Background Image Layer with 75% opacity */}
+              <div 
+                className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none opacity-75"
+                style={{ 
+                  backgroundImage: `url(${rewardsBgImg})`,
+                  backgroundSize: "cover"
+                }}
+              />
+              <div className="max-w-3xl mx-auto relative z-10">
                 <OffersRewards />
               </div>
+            </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
                 {[
                   { icon: Coins, title: "Cashbacks", text: "Direct statement credits on successful disbursement." },
                   { icon: Sparkles, title: "Gold Tier", text: "Exclusive access to airport lounges and concierge." },
@@ -54,7 +64,6 @@ const RewardsCalculatorPage = () => {
                   </ScrollReveal>
                 ))}
               </div>
-            </div>
           </section>
         </main>
         <Footer />

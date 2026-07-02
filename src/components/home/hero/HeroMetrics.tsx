@@ -53,49 +53,49 @@ export const HeroMetrics = () => {
         <span className="text-[10px] font-bold text-[#0a1530]">₹500Cr+ Loans</span>
       </div>
 
-      {/* ── DESKTOP metrics: original layout with icons ── */}
+      {/* ── DESKTOP metrics: super-compact horizontal stack with vertically stacked values and descriptions ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="hidden md:flex flex-wrap items-center justify-start gap-x-6 gap-y-4 mt-3 pt-3 border-t border-slate-100/80"
+        className="hidden md:flex flex-row items-center justify-start gap-x-6 sm:gap-x-7 lg:gap-x-8 mt-4 pt-3 border-t border-slate-100/80 w-full"
       >
         {/* Metric 1: Customers */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-            <Users className="w-3.5 h-3.5 text-[#103783]" />
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="w-5.5 h-5.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+            <Users className="w-3 h-3 text-[#103783]" />
           </div>
-          <div>
-            <p className="text-xs sm:text-sm font-extrabold text-[#0a1530] leading-none tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
+          <div className="flex flex-col items-start leading-none">
+            <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
               <MiniCountUp to={10000} suffix="+" formatComma={true} />
             </p>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Customers Trusted</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Customers Trusted</p>
           </div>
         </div>
 
         {/* Metric 2: Loans */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-            <Building2 className="w-3.5 h-3.5 text-[#103783]" />
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="w-5.5 h-5.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+            <Building2 className="w-3 h-3 text-[#103783]" />
           </div>
-          <div>
-            <p className="text-xs sm:text-sm font-extrabold text-[#0a1530] leading-none tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
+          <div className="flex flex-col items-start leading-none">
+            <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
               <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
             </p>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Loans Facilitated</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Loans Facilitated</p>
           </div>
         </div>
 
         {/* Metric 3: Rating */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="w-5.5 h-5.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
           </div>
-          <div>
-            <p className="text-xs sm:text-sm font-extrabold text-[#0a1530] leading-none tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
+          <div className="flex flex-col items-start leading-none">
+            <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
               4.8/5
             </p>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Customer Rating</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Customer Rating</p>
           </div>
         </div>
       </motion.div>

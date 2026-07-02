@@ -61,7 +61,7 @@ const Contact = () => {
                 <div className="flex flex-col gap-8 h-full">
                   {[
                     { icon: Phone, title: "Call Us", detail: "+91 92432 94291", sub: "Mon-Sat, 10AM - 7PM" },
-                    { icon: Mail, title: "Email Support", detail: "hello@gopryme.in", sub: "24/7 Priority Response" },
+                    { icon: Mail, title: "Email Support", detail: "contact@gopryme.in", sub: "24/7 Priority Response" },
                     { icon: MapPin, title: "Headquarters", detail: "Indore HQ", sub: "4th Floor, Above Mr. DIY Showroom,\nRanjeet Hanuman Main Road, Mhow Naka Square,\nIndore, Madhya Pradesh, 452009, India" }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-sm">

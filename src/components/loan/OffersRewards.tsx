@@ -11,10 +11,12 @@ import {
   ShieldCheck, 
   Clock, 
   ArrowRight, 
-  ArrowLeft 
+  ArrowLeft,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import loyaltyGiftImg from "@/assets/loyalty-gift.png";
 
 interface Offer {
   id: string;
@@ -25,10 +27,19 @@ interface Offer {
   validTill?: string;
 }
 
+const products = [
+  { id: "personal", label: "Personal Loan" },
+  { id: "business", label: "Business Loan" },
+  { id: "home", label: "Home Loan" },
+  { id: "lap", label: "Loan Against Property" },
+  { id: "auto", label: "Auto Loan" },
+];
+
 const OffersRewards = () => {
   // Form State
   const [loanAmount, setLoanAmount] = useState<number | "">("");
   const [loanProduct, setLoanProduct] = useState<string>("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [employmentType, setEmploymentType] = useState<string>("salaried");
   
   // Navigation Step State
@@ -148,203 +159,145 @@ const OffersRewards = () => {
   };
 
   return (
-    <div className="w-full bg-white border border-slate-200 dark:bg-[#080d1e] dark:border-[#103783]/20 rounded-[2.5rem] p-6 md:p-10 shadow-2xl relative overflow-hidden">
-      
-      {/* Background soft ambient glows */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#103783]/[0.02] rounded-full pointer-events-none" style={{ transform: "translate(30%, -30%)" }} />
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#103783]/[0.01] rounded-full pointer-events-none" style={{ transform: "translate(-30%, 30%)" }} />
+    <div className="w-full bg-transparent relative overflow-visible">
 
       <AnimatePresence mode="wait">
         {step === "form" ? (
           <motion.div
             key="calculator-form"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35 }}
           >
-            {/* ────────────── HEADER SECTION (ILLUSTRATED SPLIT) ────────────── */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mb-10">
-              <div className="md:col-span-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#103783]/10 border border-[#103783]/20 flex items-center justify-center">
-                    <Gift className="w-5 h-5 text-[#103783]" />
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">
-                    Pryme Loyalty Club
-                  </span>
+            {/* ────────────── HEADER SECTION ────────────── */}
+            <div className="text-center mb-6 pb-6 border-b border-slate-100 dark:border-slate-800/60">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-lg bg-[#103783]/10 border border-[#103783]/20 flex items-center justify-center">
+                  <Gift className="w-3.5 h-3.5 text-[#103783]" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-[#0a1530] dark:text-white tracking-tight leading-none mb-3" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-                  Rewards Calculator
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base max-w-xl font-medium leading-relaxed">
-                  Enter your loan details to see the exciting rewards and offers you can earn with top lenders.
-                </p>
+                <span className="text-[10px] font-extrabold text-[#103783] dark:text-[#3b82f6] uppercase tracking-widest leading-none">
+                  Pryme Loyalty Club
+                </span>
               </div>
-              <div className="md:col-span-4 flex justify-center md:justify-end relative">
-                <div className="relative w-44 h-44 xl:w-52 xl:h-52">
-                  {/* Minimal sparkles background blur */}
-                  <div className="absolute inset-0 bg-gradient-radial from-blue-500/5 to-transparent rounded-full blur-2xl animate-pulse" />
-                  <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full object-contain relative z-10 animate-float">
-                    <defs>
-                      <linearGradient id="boxBodyGrad" x1="60" y1="90" x2="140" y2="160" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#1e3a8a" />
-                        <stop offset="100%" stopColor="#103783" />
-                      </linearGradient>
-                      <linearGradient id="boxLidGrad" x1="56" y1="80" x2="144" y2="95" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#1d4ed8" />
-                      </linearGradient>
-                      <linearGradient id="ribbonGrad" x1="92" y1="67" x2="108" y2="160" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#fbbf24" />
-                        <stop offset="100%" stopColor="#d97706" />
-                      </linearGradient>
-                    </defs>
-
-                    {/* Ambient connection rays (dotted lines) */}
-                    <path d="M 85,95 Q 55,95 48,110" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3,3" strokeLinecap="round" fill="none" className="dark:stroke-slate-700" />
-                    <path d="M 115,95 Q 145,95 152,100" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3,3" strokeLinecap="round" fill="none" className="dark:stroke-slate-700" />
-                    <path d="M 110,80 Q 130,80 138,68" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3,3" strokeLinecap="round" fill="none" className="dark:stroke-slate-700" />
-                    <path d="M 90,80 Q 70,80 62,68" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3,3" strokeLinecap="round" fill="none" className="dark:stroke-slate-700" />
-
-                    {/* Ground Shadow */}
-                    <ellipse cx="100" cy="165" rx="36" ry="6" fill="#0f172a" opacity="0.1" />
-
-                    {/* Box Body */}
-                    <rect x="60" y="90" width="80" height="70" rx="10" fill="url(#boxBodyGrad)" stroke="#103783" strokeWidth="1.5" />
-                    
-                    {/* Vertical Ribbon (Body) */}
-                    <rect x="92" y="90" width="16" height="70" fill="url(#ribbonGrad)" />
-
-                    {/* Box Lid */}
-                    <rect x="54" y="78" width="92" height="15" rx="4" fill="url(#boxLidGrad)" stroke="#103783" strokeWidth="1.5" />
-                    
-                    {/* Vertical Ribbon (Lid) */}
-                    <rect x="92" y="78" width="16" height="15" fill="url(#ribbonGrad)" />
-
-                    {/* Ribbon loops (Intersecting circles) */}
-                    <circle cx="89" cy="65" r="12" fill="none" stroke="url(#ribbonGrad)" strokeWidth="2.5" />
-                    <circle cx="111" cy="65" r="12" fill="none" stroke="url(#ribbonGrad)" strokeWidth="2.5" />
-                    
-                    {/* Ribbon Tails */}
-                    <path d="M 94,76 L 84,88" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                    <path d="M 106,76 L 116,88" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                    
-                    {/* Center Knot */}
-                    <circle cx="100" cy="72" r="5" fill="url(#ribbonGrad)" stroke="#b45309" strokeWidth="0.5" />
-
-                    {/* Reward Badges */}
-                    <g className="hover:scale-110 transition-transform duration-300 origin-center">
-                      <circle cx="40" cy="120" r="12" fill="#fffbeb" stroke="#f59e0b" strokeWidth="1.5" />
-                      <text x="40" y="124" fill="#d97706" fontSize="11" fontWeight="bold" textAnchor="middle" fontFamily="system-ui, sans-serif">₹</text>
-                    </g>
-
-                    <g className="hover:scale-110 transition-transform duration-300 origin-center">
-                      <circle cx="160" cy="100" r="12" fill="#f0f9ff" stroke="#0284c7" strokeWidth="1.5" />
-                      <text x="160" y="104" fill="#0369a1" fontSize="11" fontWeight="bold" textAnchor="middle" fontFamily="system-ui, sans-serif">%</text>
-                    </g>
-
-                    <g className="hover:scale-110 transition-transform duration-300 origin-center">
-                      <circle cx="145" cy="60" r="10" fill="#fff7ed" stroke="#f97316" strokeWidth="1.5" />
-                      <path d="M 145,55 L 146.5,58.5 L 150,58.5 L 147.2,60.5 L 148.3,64 L 145,62 L 141.7,64 L 142.8,60.5 L 140,58.5 L 143.5,58.5 Z" fill="#ea580c" />
-                    </g>
-
-                    <g className="hover:scale-110 transition-transform duration-300 origin-center">
-                      <circle cx="55" cy="65" r="9" fill="#f0fdf4" stroke="#22c55e" strokeWidth="1.5" />
-                      <path d="M 55,61 Q 55,65 59,65 Q 55,65 55,69 Q 55,65 51,65 Q 55,65 55,61 Z" fill="#16a34a" />
-                    </g>
-
-                    {/* Minimal sparkles */}
-                    <path d="M 175,130 Q 175,135 180,135 Q 175,135 175,140 Q 175,135 170,135 Q 175,135 175,130 Z" fill="#cbd5e1" className="dark:fill-slate-700" />
-                    <path d="M 25,85 Q 25,90 30,90 Q 25,90 25,95 Q 25,90 20,90 Q 25,90 25,85 Z" fill="#cbd5e1" className="dark:fill-slate-700" />
-                  </svg>
-                </div>
-              </div>
+              <h2 className="text-xl md:text-2xl font-extrabold text-[#0a1530] dark:text-white tracking-tight leading-none mb-2" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
+                Rewards Calculator
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm max-w-xl mx-auto font-medium leading-relaxed">
+                Enter your loan details to see the exciting rewards and offers you can earn with top lenders.
+              </p>
             </div>
 
             {/* ────────────── FORM SECTION ────────────── */}
-            <div className="bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-[#103783]/10 rounded-3xl p-6 md:p-8 max-w-4xl mx-auto shadow-sm">
-              <h3 className="text-lg font-bold text-[#0a1530] dark:text-white mb-1" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-                Enter Loan Details
-              </h3>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-6">
-                Fill in the details below to calculate your rewards
-              </p>
-
-              <form onSubmit={handleCalculate} className="space-y-6">
-                {/* Input: Loan Amount */}
-                <div className="space-y-2">
-                  <label htmlFor="reward-loan-amount" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                    Loan Amount
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-base">
-                      ₹
+            <div className="max-w-2xl mx-auto">
+              <form onSubmit={handleCalculate} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Input: Loan Amount */}
+                  <div className="space-y-1.5">
+                    <label htmlFor="reward-loan-amount" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                      Loan Amount
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                        ₹
+                      </span>
+                      <input
+                        id="reward-loan-amount"
+                        type="text"
+                        required
+                        placeholder="Enter loan amount"
+                        value={formatInputCurrency(loanAmount)}
+                        onChange={handleAmountChange}
+                        className="w-full pl-7 pr-3 py-2 bg-white dark:bg-[#0c1829] border border-slate-200 focus:border-[#103783] dark:border-[#103783]/20 dark:focus:border-[#1e56c7] focus:ring-4 focus:ring-[#103783]/5 transition-all rounded-lg text-xs font-bold text-[#0a1530] dark:text-white placeholder:text-slate-400"
+                      />
+                    </div>
+                    <span className="text-[9px] font-semibold text-slate-400 block">
+                      Enter amount between ₹1,00,000 - ₹5,00,000,000
                     </span>
-                    <input
-                      id="reward-loan-amount"
-                      type="text"
-                      required
-                      placeholder="Enter loan amount"
-                      value={formatInputCurrency(loanAmount)}
-                      onChange={handleAmountChange}
-                      className="w-full pl-8 pr-4 py-3 bg-white dark:bg-[#0c1829] border border-slate-200 focus:border-[#103783] dark:border-[#103783]/20 dark:focus:border-[#1e56c7] focus:ring-4 focus:ring-[#103783]/5 transition-all rounded-xl text-sm font-bold text-[#0a1530] dark:text-white placeholder:text-slate-400"
-                    />
                   </div>
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    Enter amount between ₹1,00,000 - ₹5,00,000,000
-                  </span>
-                </div>
 
-                {/* Dropdown: Loan Product */}
-                <div className="space-y-2">
-                  <label htmlFor="reward-loan-product" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                    Loan Product
-                  </label>
-                  <select
-                    id="reward-loan-product"
-                    required
-                    value={loanProduct}
-                    onChange={(e) => setLoanProduct(e.target.value)}
-                    className="w-full px-4 py-3 bg-white dark:bg-[#0c1829] border border-slate-200 focus:border-[#103783] dark:border-[#103783]/20 dark:focus:border-[#1e56c7] focus:ring-4 focus:ring-[#103783]/5 transition-all rounded-xl text-sm font-bold text-[#0a1530] dark:text-white appearance-none cursor-pointer"
-                  >
-                    <option value="" disabled className="text-slate-400 font-medium">Select loan product</option>
-                    <option value="personal" className="font-semibold text-[#0a1530]">Personal Loan</option>
-                    <option value="business" className="font-semibold text-[#0a1530]">Business Loan</option>
-                    <option value="home" className="font-semibold text-[#0a1530]">Home Loan</option>
-                    <option value="lap" className="font-semibold text-[#0a1530]">Loan Against Property</option>
-                    <option value="auto" className="font-semibold text-[#0a1530]">Auto Loan</option>
-                  </select>
+                  {/* Dropdown: Loan Product */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                      Loan Product
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full flex items-center justify-between px-3 py-2 bg-white dark:bg-[#0c1829] border border-slate-200 dark:border-[#103783]/20 focus:outline-none focus:border-[#103783] dark:focus:border-[#1e56c7] focus:ring-4 focus:ring-[#103783]/5 transition-all rounded-lg text-xs font-bold text-[#0a1530] dark:text-white text-left cursor-pointer"
+                      >
+                        <span className={cn(!loanProduct && "text-slate-400 font-medium")}>
+                          {loanProduct 
+                            ? products.find(p => p.id === loanProduct)?.label 
+                            : "Select loan product"}
+                        </span>
+                        <ChevronDown className={cn(
+                          "w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0",
+                          isDropdownOpen && "transform rotate-180"
+                        )} />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      <AnimatePresence>
+                        {isDropdownOpen && (
+                          <>
+                            {/* Backdrop to close on click outside */}
+                            <div 
+                              className="fixed inset-0 z-40 bg-transparent" 
+                              onClick={() => setIsDropdownOpen(false)} 
+                            />
+                            <motion.div
+                              initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                              transition={{ duration: 0.15 }}
+                              className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-[#0c1829] border border-slate-200 dark:border-[#103783]/20 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+                            >
+                              {products.map((p) => (
+                                <button
+                                  key={p.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setLoanProduct(p.id);
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={cn(
+                                    "w-full text-left px-3 py-2 text-xs font-bold transition-all flex items-center justify-between hover:bg-[#103783]/5 dark:hover:bg-[#1e56c7]/5 hover:text-[#103783] dark:hover:text-white",
+                                    loanProduct === p.id 
+                                      ? "text-[#103783] dark:text-white bg-[#103783]/5 dark:bg-[#1e56c7]/5" 
+                                      : "text-slate-600 dark:text-slate-350"
+                                  )}
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Selection Cards: Employment Type */}
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                     Employment Type
                   </label>
-                  <span className="text-[10px] font-semibold text-slate-400 block -mt-1.5 mb-3">
-                    Select the type that best describes your employment
-                  </span>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-2">
                     {/* Option 1: Salaried */}
                     <div 
                       onClick={() => setEmploymentType("salaried")}
                       className={cn(
-                        "border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 relative overflow-hidden group",
+                        "border rounded-xl py-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-center select-none",
                         employmentType === "salaried"
-                          ? "border-[#103783] bg-[#103783]/5 dark:border-[#1e56c7] dark:bg-[#1e56c7]/5" 
-                          : "border-slate-200 bg-white hover:border-slate-300 dark:border-[#103783]/10 dark:bg-[#0c1829]"
+                          ? "border-[#103783] bg-[#103783]/5 text-[#103783] dark:border-[#1e56c7] dark:bg-[#1e56c7]/5 dark:text-white font-bold" 
+                          : "border-slate-200 bg-white hover:border-slate-350 text-slate-500 dark:border-[#103783]/10 dark:bg-[#0c1829]"
                       )}
                     >
-                      {/* Selection dot */}
-                      <div className="absolute top-3 left-3 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center">
-                        {employmentType === "salaried" && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#103783] dark:bg-[#1e56c7]" />
-                        )}
-                      </div>
-                      <Briefcase className={cn("w-7 h-7 mt-2 transition-transform duration-300 group-hover:scale-110", employmentType === "salaried" ? "text-[#103783] dark:text-[#1e56c7]" : "text-slate-400")} />
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#0a1530] dark:text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wider">
                         Salaried
                       </span>
                     </div>
@@ -353,20 +306,14 @@ const OffersRewards = () => {
                     <div 
                       onClick={() => setEmploymentType("non-professional")}
                       className={cn(
-                        "border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 relative overflow-hidden group",
+                        "border rounded-xl py-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-center select-none",
                         employmentType === "non-professional"
-                          ? "border-[#103783] bg-[#103783]/5 dark:border-[#1e56c7] dark:bg-[#1e56c7]/5" 
-                          : "border-slate-200 bg-white hover:border-slate-300 dark:border-[#103783]/10 dark:bg-[#0c1829]"
+                          ? "border-[#103783] bg-[#103783]/5 text-[#103783] dark:border-[#1e56c7] dark:bg-[#1e56c7]/5 dark:text-white font-bold" 
+                          : "border-slate-200 bg-white hover:border-slate-350 text-slate-500 dark:border-[#103783]/10 dark:bg-[#0c1829]"
                       )}
                     >
-                      <div className="absolute top-3 left-3 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center">
-                        {employmentType === "non-professional" && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#103783] dark:bg-[#1e56c7]" />
-                        )}
-                      </div>
-                      <User className={cn("w-7 h-7 mt-2 transition-transform duration-300 group-hover:scale-110", employmentType === "non-professional" ? "text-[#103783] dark:text-[#1e56c7]" : "text-slate-400")} />
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#0a1530] dark:text-white text-center leading-tight">
-                        Self Employed<br /><span className="text-[10px] lowercase font-semibold text-slate-400">Non Professional</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider">
+                        Self Employed
                       </span>
                     </div>
 
@@ -374,20 +321,14 @@ const OffersRewards = () => {
                     <div 
                       onClick={() => setEmploymentType("professional")}
                       className={cn(
-                        "border rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 relative overflow-hidden group",
+                        "border rounded-xl py-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-center select-none",
                         employmentType === "professional"
-                          ? "border-[#103783] bg-[#103783]/5 dark:border-[#1e56c7] dark:bg-[#1e56c7]/5" 
-                          : "border-slate-200 bg-white hover:border-slate-300 dark:border-[#103783]/10 dark:bg-[#0c1829]"
+                          ? "border-[#103783] bg-[#103783]/5 text-[#103783] dark:border-[#1e56c7] dark:bg-[#1e56c7]/5 dark:text-white font-bold" 
+                          : "border-slate-200 bg-white hover:border-slate-350 text-slate-500 dark:border-[#103783]/10 dark:bg-[#0c1829]"
                       )}
                     >
-                      <div className="absolute top-3 left-3 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center">
-                        {employmentType === "professional" && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#103783] dark:bg-[#1e56c7]" />
-                        )}
-                      </div>
-                      <UserCheck className={cn("w-7 h-7 mt-2 transition-transform duration-300 group-hover:scale-110", employmentType === "professional" ? "text-[#103783] dark:text-[#1e56c7]" : "text-slate-400")} />
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#0a1530] dark:text-white text-center leading-tight">
-                        Self Employed<br /><span className="text-[10px] lowercase font-semibold text-slate-400">Professional</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider">
+                        Professional
                       </span>
                     </div>
                   </div>
@@ -396,17 +337,17 @@ const OffersRewards = () => {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  className="w-full bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-[#103783]/20 hover:shadow-[#103783]/30 transition-all flex items-center justify-center gap-2 mt-4"
+                  className="w-full bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-[#103783]/10 hover:shadow-[#103783]/20 transition-all flex items-center justify-center gap-1.5 mt-2"
                 >
                   Calculate Rewards
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </form>
             </div>
 
             {/* Privacy note */}
-            <div className="flex items-center justify-center gap-2 mt-6 text-slate-400 text-xs font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <div className="flex items-center justify-center gap-1.5 mt-2 text-slate-400 text-[10px] font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
               <span>Your information is 100% secure and confidential</span>
             </div>
           </motion.div>
@@ -515,24 +456,9 @@ const OffersRewards = () => {
       </AnimatePresence>
 
       {/* ────────────── TRUST FOOTER SECTION ────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 pt-8 border-t border-slate-150 dark:border-[#103783]/20">
-        {/* Item 1 */}
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#103783]/5 dark:bg-[#103783]/10 flex items-center justify-center shrink-0 border border-[#103783]/10">
-            <ShieldCheck className="w-4.5 h-4.5 text-[#103783]" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-[#0a1530] dark:text-white uppercase tracking-wider mb-0.5">
-              100% Secure
-            </h4>
-            <p className="text-[10px] font-semibold text-slate-400">
-              Your information is safe and encrypted
-            </p>
-          </div>
-        </div>
-
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 md:gap-16 mt-2.5 pt-2.5 border-t border-slate-150 dark:border-[#103783]/20 w-full">
         {/* Item 2 */}
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 max-w-xs">
           <div className="w-9 h-9 rounded-full bg-[#103783]/5 dark:bg-[#103783]/10 flex items-center justify-center shrink-0 border border-[#103783]/10">
             <Percent className="w-4.5 h-4.5 text-[#103783]" />
           </div>
@@ -547,7 +473,7 @@ const OffersRewards = () => {
         </div>
 
         {/* Item 3 */}
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 max-w-xs">
           <div className="w-9 h-9 rounded-full bg-[#103783]/5 dark:bg-[#103783]/10 flex items-center justify-center shrink-0 border border-[#103783]/10">
             <Clock className="w-4.5 h-4.5 text-[#103783]" />
           </div>

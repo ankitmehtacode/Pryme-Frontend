@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { PageShell, Surface, Stack, Inline, ContentContainer, SplitLayout } from "@/components/layout";
+import { PageShell, Surface, Stack, Inline, Container, Section, SplitLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -548,8 +548,9 @@ const Dashboard: React.FC = () => {
       <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] selection:bg-primary/20">
         <Header />
 
-        <PageShell className="flex-1 pb-[var(--space-section)]">
-          <AnimatePresence mode="wait">
+        <PageShell className="flex-1">
+          <main className="flex-1 w-full pt-16 md:pt-20 flex flex-col">
+            <AnimatePresence mode="wait">
             {viewState === "FUNNEL" && (
               <motion.div 
                 key="funnel"
@@ -557,7 +558,11 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
               >
-                <Surface className="relative overflow-hidden mb-[var(--space-10)] p-[var(--space-8)] md:p-[var(--space-12)] border border-[hsl(var(--border))]/40 dark:border-[hsl(var(--border))]/10 bg-[hsl(var(--background))]/60 backdrop-blur-3xl">
+                <Section spacing="xl">
+                  <Container size="expanded">
+                <Surface className="relative overflow-hidden mb-[var(--space-10)] border border-[hsl(var(--border))]/40 dark:border-[hsl(var(--border))]/10 bg-[hsl(var(--background))]/60 backdrop-blur-3xl">
+                  <Section spacing="md">
+                    <Container size="full">
                   {/* Subtle Glowing Orbs */}
                   <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                   <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
@@ -605,11 +610,15 @@ const Dashboard: React.FC = () => {
                       <div className="absolute inset-0 w-full h-full opacity-30" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)' }}></div>
                     </motion.div>
                   </div>
+                    </Container>
+                  </Section>
                 </Surface>
 
                 <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-[var(--layout-panel-gap,var(--space-8))] items-start">
                   <SplitLayout.Media className="lg:col-span-4 sticky top-[var(--space-8)]">
-                    <Surface className="p-[var(--space-6)]">
+                    <Surface>
+                      <Section spacing="md">
+                        <Container size="full">
                       <h3 className="font-bold text-[hsl(var(--foreground))] mb-[var(--space-6)]">Pipeline Stages</h3>
                       <Stack gap="var(--space-6)">
                         {stages.map((s) => {
@@ -630,12 +639,16 @@ const Dashboard: React.FC = () => {
                           );
                         })}
                       </Stack>
+                        </Container>
+                      </Section>
                     </Surface>
                   </SplitLayout.Media>
 
                   <SplitLayout.Content className="lg:col-span-8">
                     <motion.div key={currentStage} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                      <Surface className="p-[var(--space-8)] relative overflow-hidden">
+                      <Surface className="relative overflow-hidden">
+                        <Section spacing="lg">
+                          <Container size="full">
                         
                         {currentStage === 1 && (
                           <Stack gap="var(--space-6)" className="relative z-10">
@@ -797,10 +810,14 @@ const Dashboard: React.FC = () => {
                             )}
                           </Button>
                         </div>
+                          </Container>
+                        </Section>
                       </Surface>
                     </motion.div>
                   </SplitLayout.Content>
                 </SplitLayout>
+                  </Container>
+                </Section>
               </motion.div>
             )}
           </AnimatePresence>
@@ -813,8 +830,9 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
               >
-                <div className="aurora-gradient pt-[var(--space-section)] pb-[var(--space-12)] border-b border-[hsl(var(--border))] mb-[var(--space-section)]">
-                  <ContentContainer width="max">
+                <Surface className="aurora-gradient border-b border-[hsl(var(--border))] mb-[var(--space-section)]">
+                  <Section spacing="lg">
+                    <Container size="expanded">
                     <Inline justify="space-between" align="end" className="flex-col md:flex-row gap-[var(--space-4)]">
                       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
                         <h1 className="text-2xl md:text-3xl font-bold text-[hsl(var(--foreground))] mb-[var(--space-2)] tracking-tight">Client Portfolio</h1>
@@ -833,18 +851,24 @@ const Dashboard: React.FC = () => {
                         </Link>
                       </Inline>
                     </Inline>
-                  </ContentContainer>
-                </div>
+                    </Container>
+                  </Section>
+                </Surface>
 
-                <ContentContainer width="max">
+                <Section spacing="none">
+                  <Container size="expanded">
                   {viewState === "EMPTY" ? (
-                    <Surface className="p-[var(--space-16)] text-center shadow-sm">
+                    <Surface className="text-center shadow-sm">
+                      <Section spacing="2xl">
+                        <Container size="full">
                       <div className="w-20 h-20 bg-[hsl(var(--muted))]/60 rounded-full flex items-center justify-center mx-auto mb-[var(--space-6)] border border-[hsl(var(--border))]/50">
                         <FileText className="w-8 h-8 text-[hsl(var(--muted-foreground))]" />
                       </div>
                       <h3 className="text-[length:var(--text-heading)] font-bold text-[hsl(var(--foreground))] mb-[var(--space-2)]">No Active Instruments</h3>
                       <p className="text-[hsl(var(--muted-foreground))] mb-[var(--space-8)] max-w-md mx-auto">Your portfolio is empty. Click below to initiate a new loan application and explore our banking partners.</p>
                       <Link to="/apply"><Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700 text-white">Initialize Application</Button></Link>
+                        </Container>
+                      </Section>
                     </Surface>
                   ) : (
                     <Stack gap="var(--space-6)">
@@ -927,10 +951,12 @@ const Dashboard: React.FC = () => {
                       })}
                     </Stack>
                   )}
-                </ContentContainer>
+                  </Container>
+                </Section>
               </motion.div>
             </AnimatePresence>
           )}
+          </main>
         </PageShell>
         <Footer />
       </div>

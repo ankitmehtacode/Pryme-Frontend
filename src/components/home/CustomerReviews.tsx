@@ -53,7 +53,7 @@ const ReviewCard = memo(({ review }: { review: typeof reviews[0] }) => {
         <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#103783]/40 to-transparent" />
 
         {/* Quote icon */}
-        <Quote className="w-5 h-5 text-[#103783]/40 -scale-x-100 shrink-0" />
+        <Quote className="w-5 h-5 text-[#9BAFD9]/60 -scale-x-100 shrink-0" />
         
         {/* Review text */}
         <p className="text-slate-300 text-sm leading-relaxed flex-1">
@@ -163,12 +163,12 @@ const CustomerReviews = () => {
       {/* 200 IQ Scrub Slider */}
       <div className="mt-14 w-full max-w-md mx-auto relative z-30 flex flex-col items-center gap-4">
         <p className="text-[9px] uppercase tracking-[0.2em] text-[#9BAFD9]/50 font-bold">Slide to explore reviews</p>
-        <div className="w-full relative flex items-center" ref={wrapperRef}>
+        <div className="w-full relative flex items-center h-5" ref={wrapperRef}>
           {/* Custom Range Track Background */}
-          <div className="absolute inset-0 h-1.5 bg-white/5 rounded-full pointer-events-none" />
+          <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-white/10 rounded-full pointer-events-none" />
           {/* Custom Range Fill */}
           <div 
-            className="absolute left-0 h-1.5 bg-gradient-to-r from-[#103783] to-[#9BAFD9] rounded-full pointer-events-none" 
+            className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-[#103783] to-[#9BAFD9] rounded-full pointer-events-none" 
             style={{ width: "var(--value, 0%)" }}
           />
           <input 
@@ -183,7 +183,7 @@ const CustomerReviews = () => {
             onTouchStart={() => isDragging.current = true}
             onTouchEnd={() => isDragging.current = false}
             onChange={handleDrag}
-            className="w-full absolute inset-0 appearance-none bg-transparent h-1.5 outline-none cursor-grab active:cursor-grabbing z-10
+            className="w-full absolute inset-y-0 left-0 appearance-none bg-transparent h-full outline-none cursor-grab active:cursor-grabbing z-10
               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
               [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white 
               [&::-webkit-slider-thumb]:shadow-[0_0_15px_rgba(155,175,217,0.8)] 
@@ -196,8 +196,8 @@ const CustomerReviews = () => {
       </div>
 
       {/* Edge fades — matched to exact bg color */}
-      <div className="absolute top-0 bottom-0 left-0 w-24 md:w-40 bg-gradient-to-r from-[#030303] to-transparent z-20 pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-24 md:w-40 bg-gradient-to-l from-[#030303] to-transparent z-20 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-24 md:w-40 bg-gradient-to-r from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-24 md:w-40 bg-gradient-to-l from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
     </div>
   );
 };

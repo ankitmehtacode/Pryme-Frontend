@@ -56,21 +56,21 @@ const ScrollToTop = memo(() => {
           className="fixed bottom-6 right-6 z-50 group outline-none"
           aria-label="Scroll to top"
         >
-          {/* Pill-shaped sleek button — CRED-inspired */}
+          {/* Pill-shaped sleek button — CRED-inspired elevated glassmorphism */}
           <div className="
-            flex items-center justify-center w-9 h-9 rounded-full
-            bg-foreground/[0.08] dark:bg-white/[0.08]
-            border border-foreground/[0.06] dark:border-white/[0.08]
-            shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.3)]
-            hover:bg-foreground/[0.12] dark:hover:bg-white/[0.12]
-            hover:border-primary/20
-            hover:shadow-[0_4px_30px_rgba(42,172,100,0.1)]
+            flex items-center justify-center w-11 h-11 rounded-full
+            bg-white dark:bg-[#0d1829]
+            border border-slate-200 dark:border-[#103783]/30
+            shadow-lg shadow-slate-200/60 dark:shadow-[#03070f]/80
+            hover:bg-slate-50 dark:hover:bg-[#103783]
+            hover:border-[#103783]/30 dark:hover:border-[#1e56c7]/50
+            hover:shadow-[0_8px_30px_rgba(16,55,131,0.12)] dark:hover:shadow-[0_8px_30px_rgba(30,86,199,0.35)]
             transition-all duration-300 ease-out
             cursor-pointer
           ">
             <ChevronUp 
-              className="w-4 h-4 text-foreground/50 dark:text-white/40 group-hover:text-primary transition-colors duration-300" 
-              strokeWidth={2.5} 
+              className="w-5 h-5 text-[#103783] dark:text-white/80 group-hover:text-[#1e56c7] dark:group-hover:text-white group-hover:scale-110 transition-all duration-300" 
+              strokeWidth={3} 
             />
           </div>
         </motion.button>

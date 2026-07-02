@@ -47,8 +47,8 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const res = await PrymeAPI.getProfile();
-      if (res && res.data) {
-        const metadata = res.data.metadata || {};
+      if (res) {
+        const metadata = res.metadata || {};
         const preferences = {
           appUpdates: true,
           newOffers: true,
@@ -56,7 +56,7 @@ const Profile = () => {
           ...(metadata.preferences || {})
         };
         setProfileData({
-          ...res.data,
+          ...res,
           metadata: {
             ...metadata,
             preferences

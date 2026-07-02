@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { Shield, Lock, CheckCircle, Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
 import prymeLogo from "@/assets/Pryme2.svg";
+import { Container } from "@/components/layout/Primitives";
 
 const CONTACT_PHONE = "+91 92432 94291";
 const CONTACT_PHONE_LINK = "tel:+919243294291";
-const CONTACT_EMAIL = "hello@gopryme.in";
+const CONTACT_EMAIL = "contact@gopryme.in";
 
 const COMPANY_ADDRESS_NODE = (
   <span className="block leading-relaxed">
@@ -42,6 +43,7 @@ const Footer = () => {
 
   const companyLinks = [
     { label: "About Us", href: "/about" },
+    { label: "Frequently Asked Questions", href: "/faq" },
     { label: "How It Works", href: "/#process" },
     { label: "Partner Banks", href: "/#partners" },
     { label: "Careers", href: "/careers" },
@@ -61,35 +63,14 @@ const Footer = () => {
     { label: "Compare Loans", href: "/services" },
   ];
 
-  const trustItems = [
-    { icon: Shield, label: "RBI Compliant" },
-    { icon: Lock, label: "ISO 27001 Certified" },
-    { icon: CheckCircle, label: "256-bit Encryption" },
-    { icon: CheckCircle, label: "GDPR Ready" },
-  ];
-
   return (
     <footer className="bg-[#060a18] text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
 
       {/* Brand gradient accent stripe */}
       <div className="h-[2px] bg-gradient-to-r from-transparent via-[#103783] to-transparent" />
 
-      {/* Trust Badges */}
-      <div className="border-b border-white/[0.06]">
-        <div className="container mx-auto px-4 py-5">
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {trustItems.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm">
-                <item.icon className="w-4 h-4 text-[#9BAFD9]" />
-                <span className="text-zinc-500 text-xs font-medium uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Grid */}
-      <div className="container mx-auto px-4 py-12 md:py-16">
+      <Container size="expanded" className="py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6">
 
           {/* Brand Column */}
@@ -206,11 +187,11 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-      </div>
+      </Container>
 
       {/* Legal Footer */}
       <div className="border-t border-white/[0.06]">
-        <div className="container mx-auto px-4 py-6">
+        <Container size="expanded" className="py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <p className="text-[11px] text-zinc-600">
@@ -241,7 +222,7 @@ const Footer = () => {
               on this website is for general informational purposes only and should not be considered as financial advice.
             </p>
           </div>
-        </div>
+        </Container>
       </div>
     </footer>
   );

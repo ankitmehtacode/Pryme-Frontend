@@ -22,9 +22,9 @@ const BOOT_TIMEOUT_MS = 4000;
 
 // Whitelist of public paths that should not be redirected on 401
 const PUBLIC_PATHS = [
-  "/", "/auth", "/apply", "/about", "/services", "/contact", 
+  "/", "/auth", "/apply", "/about", "/faq", "/services", "/contact", 
   "/blogs", "/offers", "/emi-calculator", "/prepayment-calculator", 
-  "/rewards-calculator"
+  "/rewards-calculator", "/apply-direct"
 ];
 
 interface Props {
@@ -49,7 +49,9 @@ export const AppBootstrapper = ({ children }: Props) => {
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
       const isPublicRoute = PUBLIC_PATHS.some(path => 
-        location.pathname === path || location.pathname.startsWith("/blogs/")
+        location.pathname === path || 
+        location.pathname.startsWith("/blogs/") ||
+        location.pathname.startsWith("/apply-direct/")
       );
       
       if (!isPublicRoute) {

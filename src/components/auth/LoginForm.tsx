@@ -85,12 +85,13 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-1">
         <Label className="text-[13px] font-semibold text-slate-700">Email</Label>
         <Input
           type="email"
           placeholder="you@company.com"
+          className="h-11 rounded-xl px-3.5 text-sm"
           {...form.register("email")}
         />
         {form.formState.errors.email && (
@@ -99,7 +100,12 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[13px] font-semibold text-slate-700">Password</Label>
+        <div className="flex justify-between items-center mb-0.5">
+          <Label className="text-[13px] font-semibold text-slate-700">Password</Label>
+          <button type="button" onClick={onForgotPassword} className="text-[12px] font-semibold text-[#103783] hover:underline transition-all duration-[150ms] ease-out">
+            Forgot password?
+          </button>
+        </div>
         <motion.div 
           className="relative"
           animate={isShaking ? { x: [-5, 5, -5, 5, -3, 3, 0], transition: { duration: 0.4 } } : {}}
@@ -107,7 +113,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
           <Input
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
-             className={cn(form.formState.errors.password ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : "")}
+            className={cn("h-11 rounded-xl px-3.5 text-sm", form.formState.errors.password ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : "")}
             {...form.register("password", {
               onChange: () => {
                 if (form.formState.errors.password) {
@@ -128,21 +134,18 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
               exit={{ opacity: 0, height: 0, y: -5 }}
               className="text-[10px] text-rose-500 mt-1.5 pl-1 font-bold flex items-center gap-1"
             >
-              <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               {form.formState.errors.password.message}
             </motion.div>
           )}
         </AnimatePresence>
-        <button type="button" onClick={onForgotPassword} className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[150ms] ease-out mt-2 text-left">
-          Forgot password?
-        </button>
       </div>
 
       <div 
         onClick={() => setRememberMe(!rememberMe)}
-        className="flex items-center gap-2 mt-5 sm:mt-6 group cursor-pointer select-none"
+        className="flex items-center gap-2 mt-3.5 group cursor-pointer select-none"
       >
           <div className={cn(
             "w-[14px] sm:w-[16px] h-[14px] sm:h-[16px] rounded-[4px] bg-white border flex items-center justify-center transition-colors",
@@ -158,8 +161,8 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
           </span>
       </div>
 
-      <div className="pt-4 sm:pt-6 flex flex-col items-start w-full">
-        <Button type="submit" disabled={isLoading} className="mb-6 w-full h-[56px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-[14px] transition-all duration-[160ms] ease-out text-[16px] flex items-center justify-center gap-2" size="sm">
+      <div className="pt-2 flex flex-col items-start w-full">
+        <Button type="submit" disabled={isLoading} className="mb-4 w-full h-[46px] bg-[#103783] hover:bg-[#1E4DAB] border border-transparent hover:border-white/10 text-white font-semibold rounded-xl transition-all duration-[160ms] ease-out text-sm flex items-center justify-center gap-2" size="sm">
           {isLoading ? <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" /> : (
             <>
               Sign in →

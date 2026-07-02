@@ -32,26 +32,26 @@ const Blogs = () => {
       <Header />
       
       <SmoothScroll>
-        <main className="flex-1 pt-24 md:pt-32">
+        <main className="flex-1 pt-16 md:pt-24">
           <section className="container mx-auto px-4 pb-24">
             <ScrollReveal direction="up">
-              <div className="max-w-4xl mx-auto text-center mb-16">
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
-                  <BookOpen className="w-4 h-4" />
+              <div className="max-w-4xl mx-auto text-center mb-8">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium uppercase tracking-widest mb-4 border border-primary/20">
+                  <BookOpen className="w-3.5 h-3.5" />
                   Pryme Insights
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4 tracking-tight">
                   Financial <span className="text-primary italic">Intelligence</span>
                 </h1>
                 
-                <div className="relative max-w-2xl mx-auto mt-12">
-                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <div className="relative max-w-md mx-auto mt-6">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <input
                     type="text"
                     placeholder="Search guides, tips, and news..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-14 pl-14 pr-6 rounded-2xl bg-white dark:bg-white/5 border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-lg text-foreground"
+                    className="w-full h-11 pl-11 pr-5 rounded-xl bg-white dark:bg-white/5 border border-border focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-md text-sm text-foreground"
                   />
                 </div>
               </div>
@@ -72,7 +72,7 @@ const Blogs = () => {
                 </div>
               </ScrollReveal>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
                 {filteredBlogs.map((blog, i) => (
                   <ScrollReveal key={i} direction="up" delay={(i % 3) * 0.1}>
                     <Link to={`/blogs/${blog.slug}`} className="group flex flex-col h-full rounded-[2rem] bg-card text-card-foreground border border-border overflow-hidden shadow-xl hover:-translate-y-2 transition-all duration-300">

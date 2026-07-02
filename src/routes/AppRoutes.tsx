@@ -14,8 +14,10 @@ const Contact = lazy(() => import("@/pages/Contact"));
 const Blogs = lazy(() => import("@/pages/Blogs"));
 const BlogDetail = lazy(() => import("@/pages/BlogDetail"));
 const Offers = lazy(() => import("@/pages/Offers"));
+const ApplyDirect = lazy(() => import("@/pages/ApplyDirect"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
+const Faq = lazy(() => import("@/pages/Faq"));
 
 // Tools
 const EMICalculatorPage = lazy(() => import("@/pages/tools/EMICalculatorPage"));
@@ -71,11 +73,14 @@ export const AppRoutes = () => {
         <Route path="/emi-calculator" element={<PageWrapper><EMICalculatorPage /></PageWrapper>} />
         <Route path="/prepayment-calculator" element={<PageWrapper><PrepaymentCalculatorPage /></PageWrapper>} />
         <Route path="/rewards-calculator" element={<PageWrapper><RewardsCalculatorPage /></PageWrapper>} />
+        <Route path="/faq" element={<PageWrapper><Faq /></PageWrapper>} />
 
         {/* ════════════════════════════════════════════════════════════
             APPLICATION LAYER (Native 1:1 Coordinates)
             ════════════════════════════════════════════════════════════ */}
         <Route path="/apply" element={<PageWrapper viewport="native"><Apply /></PageWrapper>} />
+        <Route path="/apply-direct" element={<PageWrapper viewport="native"><ApplyDirect /></PageWrapper>} />
+        <Route path="/apply-direct/:bankId" element={<PageWrapper viewport="native"><ApplyDirect /></PageWrapper>} />
         <Route path="/auth" element={<PageWrapper viewport="native"><Auth /></PageWrapper>} />
 
         <Route element={<ProtectedRoute />}>

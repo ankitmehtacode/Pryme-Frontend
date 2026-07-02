@@ -9,24 +9,30 @@ interface HeroArtworkProps {
 
 export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children }) => {
   return (
-    <div 
-      className="hidden lg:flex items-center justify-center relative h-full w-full order-2"
+    <div
+      className="hidden lg:flex items-center justify-center relative h-full w-full order-2 z-0"
       style={{
-        maxInlineSize: "clamp(620px, 58vw, 920px)",
-        overflow: "hidden",
-        isolation: "isolate",
+        maxInlineSize: "var(--landing-artwork-width, clamp(620px, 58vw, 920px))",
+        minBlockSize: "calc(var(--landing-hero-height, 430px) - 28px)",
+        overflow: "visible",
+        transform: "translate(-130px, -15px)",
       }}
     >
-      <HeroIllustration
-        src={currentOffer?.heroImageUrl || heroBankImg}
-        alt={currentOffer?.heroImageUrl ? `${currentOffer?.bank} hero illustration` : "Professional walking toward a bank building"}
-      />
+      <div className="absolute inset-0 pointer-events-none" style={{ transform: "translateX(-192px)", zIndex: -1 }}>
+        <HeroIllustration
+          src={currentOffer?.heroImageUrl || heroBankImg}
+          alt={currentOffer?.heroImageUrl ? `${currentOffer?.bank} hero illustration` : "Professional walking toward a bank building"}
+        />
+      </div>
       {children && (
-        <div 
+        <div
           className="absolute z-20"
           style={{
-            insetInlineEnd: "var(--offer-anchor-right, clamp(24px, 4%, 64px))",
-            insetBlockEnd: "var(--offer-anchor-bottom, clamp(32px, 8%, 96px))",
+            insetInlineStart: "calc(var(--offer-anchor-left, clamp(320px, 28vw, 420px)) + 125px)",
+            insetBlockEnd: "12px",
+            inlineSize: "var(--landing-offer-width, 360px)",
+            blockSize: "var(--landing-offer-height, 302px)",
+            overflow: "visible",
           }}
         >
           {children}

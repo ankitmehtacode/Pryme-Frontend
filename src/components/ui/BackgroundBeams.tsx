@@ -87,19 +87,6 @@ export const BackgroundBeams = memo(({ className }: { className?: string }) => {
           style={{ animation: "beam3 10s linear infinite 1s", willChange: "transform" }}
         />
       </div>
-
-      {/* Ambient orb — Layer 4 of 4 (budget cap).
-          PERF: opacity-only animation. transform-gpu is applied once and cached
-          by the GPU as a texture. Opacity changes on a cached texture = free. */}
-      <div
-        className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-primary/10 transform-gpu rounded-full transform-gpu"
-        style={{
-          animation: "orbPulse 8s ease-in-out infinite",
-          willChange: "opacity",
-          // Fixed position via transform — no top/left animation
-          transform: "translate(-50%, -50%)",
-        }}
-      />
     </div>
   );
 });

@@ -9,7 +9,7 @@ export function AuthHeroArtwork() {
   return (
     <>
       <div
-        className="absolute top-[56px] left-[56px] z-10 cursor-pointer pointer-events-auto"
+        className="absolute top-8 left-8 z-10 cursor-pointer pointer-events-auto"
         onClick={() => navigate("/")}
       >
         <img
@@ -19,11 +19,11 @@ export function AuthHeroArtwork() {
         />
       </div>
 
-      <div className="absolute inset-0 h-full w-full">
+      <div className="absolute inset-0 h-full w-full bg-slate-50">
         <img
           src={authHeroImg}
           alt=""
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-center opacity-70"
           aria-hidden="true"
           loading="eager"
           decoding="async"

@@ -7,12 +7,23 @@ interface SectionBackgroundProps {
 export const SectionBackground: React.FC<SectionBackgroundProps> = ({ variant = "default" }) => {
   if (variant === "hero") {
     return (
-      <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+      <div 
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        style={{
+          maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)"
+        }}
+      >
         <div className="absolute inset-0 bg-gradient-to-b from-[#f0f4ff] via-white to-[#fafafa]" />
-        
-        {/* ────────────── SUBTLE BACKGROUND DECORATION ────────────── */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#103783]/[0.03] rounded-full pointer-events-none" style={{ transform: 'translate(30%, -30%)' }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#103783]/[0.02] rounded-full pointer-events-none" style={{ transform: 'translate(-30%, 30%)' }} />
+
+        {/* 🧠 Premium Dynamic Right-Side Glowing Orbs (Intensified Right Side) */}
+        <div className="absolute right-0 inset-y-0 w-[50%] pointer-events-none z-0 opacity-80 dark:opacity-60">
+          {/* Neon Purple/Indigo Orb */}
+          <div className="absolute -right-[10%] top-[10%] w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent blur-[120px] mix-blend-multiply dark:mix-blend-screen" />
+          {/* Neon Blue Orb */}
+          <div className="absolute right-[15%] bottom-[10%] w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] rounded-full bg-gradient-to-tr from-blue-500/15 via-cyan-500/10 to-transparent blur-[100px] mix-blend-multiply dark:mix-blend-screen" />
+        </div>
+
 
         {/* ────────────── TECH GRID PATTERN ────────────── */}
         <div 

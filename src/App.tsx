@@ -10,7 +10,7 @@ const App = () => (
     <AppErrorBoundary>
       <SplashOverlay />
 
-      <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-x-hidden flex flex-col w-full relative">
+      <div className="min-h-screen bg-background text-foreground transition-colors duration-300 flex flex-col w-full relative">
         <Suspense fallback={<PageTransitionLoader />}>
           <AppRoutes />
         </Suspense>

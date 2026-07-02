@@ -136,40 +136,40 @@ export function AuthForms() {
   };
 
   return (
-    <div className="w-full max-w-[420px] z-10 flex flex-col items-stretch">
+    <div className="w-full max-w-[380px] z-10 flex flex-col items-stretch">
       {/* Mobile Header (Hidden on LG) */}
-      <div className="lg:hidden flex justify-start cursor-pointer mb-8 sm:mb-10" onClick={() => navigate("/")}>
-        <img src={prymeLogo} alt="Pryme Logo" className="h-[28px] sm:h-[32px] auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
+      <div className="lg:hidden flex justify-start cursor-pointer mb-6" onClick={() => navigate("/")}>
+        <img src={prymeLogo} alt="Pryme Logo" className="h-[26px] auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
       </div>
 
       <AnimatePresence mode="wait">
         {view === "forgot-password" ? (
           <motion.div key="fp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-6 transition-all duration-[160ms] ease-out">
-              <ArrowLeft className="w-4 h-4" /> Back to sign in
+            <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-900 mb-5 transition-all duration-[160ms] ease-out">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to sign in
             </button>
-            <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-3 tracking-tight">Reset password</h2>
-            <p className="text-slate-500 mb-8 text-[16px] font-normal">Enter your email and we'll send a secure reset link.</p>
+            <h2 className="text-2xl sm:text-[28px] font-extrabold leading-[1.1] text-[#0a1530] mb-1.5 tracking-tight">Reset password</h2>
+            <p className="text-slate-500 mb-6 text-sm font-normal">Enter your email and we'll send a secure reset link.</p>
 
             <ForgotPasswordForm onSuccess={() => setView("login")} />
           </motion.div>
         ) : (
           <motion.div key="auth" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <h2 className="text-[32px] sm:text-[40px] font-bold leading-[1.05] text-[#0a1530] mb-3 tracking-tight">
+            <h2 className="text-2xl sm:text-[28px] font-extrabold leading-[1.1] text-[#0a1530] mb-1.5 tracking-tight">
               {view === "login" ? "Welcome back" : "Create your account"}
             </h2>
-            <p className="text-[16px] font-normal text-slate-500 mb-8">
+            <p className="text-sm font-normal text-slate-500 mb-6">
               {view === "login" ? "Continue to Pryme." : "Join Pryme today."}
             </p>
 
             {view === "login" ? (
               <LoginForm onForgotPassword={() => setView("forgot-password")} from={from}>
-                <div className="relative mt-[48px] mb-[48px]">
+                <div className="relative mt-6 mb-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200"></div>
                   </div>
-                  <div className="relative flex justify-center text-[12px]">
-                    <span className="bg-white px-4 text-slate-500 font-medium">or</span>
+                  <div className="relative flex justify-center text-[10px]">
+                    <span className="bg-white dark:bg-[#0d1527] px-3 text-slate-400 font-bold uppercase tracking-wider">or</span>
                   </div>
                 </div>
 
@@ -180,9 +180,9 @@ export function AuthForms() {
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={isGoogleLoading}
-                    className="w-full h-[56px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-[14px] text-[16px] font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
+                    className="w-full h-11 flex items-center justify-center gap-2.5 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl text-sm font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
                   >
-                    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
+                    <svg className="w-[16px] h-[16px]" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -192,11 +192,11 @@ export function AuthForms() {
                   </button>
                 )}
 
-                <div className="mt-8 text-center">
-                  <span className="text-[14px] text-slate-500">Don't have an account? </span>
+                <div className="mt-5 text-center">
+                  <span className="text-[13px] text-slate-500">Don't have an account? </span>
                   <button
                     onClick={() => setView("signup")}
-                    className="text-[14px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
+                    className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
                   >
                     Create account &rarr;
                   </button>
@@ -204,12 +204,12 @@ export function AuthForms() {
               </LoginForm>
             ) : (
               <SignupForm from={from}>
-                <div className="relative mt-[48px] mb-[48px]">
+                <div className="relative mt-6 mb-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200"></div>
                   </div>
-                  <div className="relative flex justify-center text-[12px]">
-                    <span className="bg-white px-4 text-slate-500 font-medium">or</span>
+                  <div className="relative flex justify-center text-[10px]">
+                    <span className="bg-white dark:bg-[#0d1527] px-3 text-slate-400 font-bold uppercase tracking-wider">or</span>
                   </div>
                 </div>
 
@@ -220,9 +220,9 @@ export function AuthForms() {
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={isGoogleLoading}
-                    className="w-full h-[56px] flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 rounded-[14px] text-[16px] font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
+                    className="w-full h-11 flex items-center justify-center gap-2.5 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl text-sm font-semibold text-slate-700 transition-all duration-[160ms] ease-out"
                   >
-                    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
+                    <svg className="w-[16px] h-[16px]" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -232,11 +232,11 @@ export function AuthForms() {
                   </button>
                 )}
 
-                <div className="mt-8 text-center">
-                  <span className="text-[14px] text-slate-500">Already have an account? </span>
+                <div className="mt-5 text-center">
+                  <span className="text-[13px] text-slate-500">Already have an account? </span>
                   <button
                     onClick={() => setView("login")}
-                    className="text-[14px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
+                    className="text-[13px] font-semibold text-[#103783] hover:underline transition-all duration-[160ms] ease-out"
                   >
                     Sign in &rarr;
                   </button>
@@ -251,7 +251,7 @@ export function AuthForms() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="mt-12 flex items-center justify-center gap-4 w-full text-slate-400"
+        className="mt-8 flex items-center justify-center gap-4 w-full text-slate-400"
       >
         <div className="flex items-center gap-2">
           <Shield className="w-[18px] h-[18px] text-slate-400" strokeWidth={1.5} />

@@ -9,8 +9,6 @@ export function PageShell({ children, className = "", style, ...props }: PageShe
     <div
       className={`w-full ${className}`}
       style={{
-        paddingInline: "var(--space-md)",
-        overflowX: "hidden", // Prevent horizontal scroll on mobile
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",

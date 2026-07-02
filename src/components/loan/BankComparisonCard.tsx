@@ -1,7 +1,22 @@
-import { useState } from "react";
+import { useState, memo } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const parseExpenseValue = (val: any): string | null => {
+  if (val == null || val === "" || val === "0" || val === 0) return null;
+  if (typeof val === "number") {
+    return `₹${Math.round(val).toLocaleString("en-IN")}`;
+  }
+  const cleanStr = val.toString().trim();
+  const num = parseFloat(cleanStr.replace(/[^0-9.]/g, ""));
+  if (!isNaN(num) && num > 0) {
+    if (cleanStr.includes("%")) return cleanStr;
+    return `₹${Math.round(num).toLocaleString("en-IN")}`;
+  }
+  return cleanStr;
+};
 
 export interface BankOfferDTO {
   id: string;
@@ -16,6 +31,7 @@ export interface BankOfferDTO {
   approvalOdds: number;
   processingTime: string;
   requiredDocs: string[];
+  originalEngineResult?: any;
 }
 
 interface BankComparisonCardProps {
@@ -27,13 +43,13 @@ interface BankComparisonCardProps {
   heroBankName: string;
   principalAmount: number;
   isExpanded: boolean;
-  onToggleExpand: () => void;
+  onToggleExpand: (id: string) => void;
   onApply: (providerId: string) => Promise<void>;
   isGlobalLocking: boolean;
   isRecommended?: boolean;
 }
 
-export function BankComparisonCard({
+export const BankComparisonCard = memo(function BankComparisonCard({
   offer,
   emi,
   totalRepayment,
@@ -47,6 +63,7 @@ export function BankComparisonCard({
   isGlobalLocking,
   isRecommended = false,
 }: BankComparisonCardProps) {
+  const navigate = useNavigate();
   const [localStatus, setLocalStatus] = useState<"idle" | "processing" | "resolved">("idle");
   const [logoError, setLogoError] = useState(false);
 
@@ -68,18 +85,17 @@ export function BankComparisonCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6, scale: 1.01, transition: { duration: 0.3, ease: "easeOut" } }}
-      className="group relative antialiased z-10 hover:z-20"
+      className="group relative antialiased z-10 hover:z-20 transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] will-change-transform"
     >
       {/* ── Glassmorphic Card Shell ──────────────────────────── */}
       <div
         className={`
           relative rounded-[2rem] overflow-hidden
-          bg-white/90 dark:bg-zinc-900/60 backdrop-blur-2xl
+          bg-white dark:bg-[#0c1322]/95
           border transition-all duration-500 will-change-transform
           ${isExpanded
-            ? 'border-white/60 dark:border-white/[0.15] shadow-[0_16px_48px_rgba(0,0,0,0.1)]'
-            : 'border-white/40 dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.06)] group-hover:shadow-[0_24px_64px_rgba(0,0,0,0.12)] group-hover:border-white/80 dark:group-hover:border-white/[0.22]'
+            ? 'border-slate-300 dark:border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.1)]'
+            : 'border-slate-200/80 dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.06)] group-hover:shadow-[0_24px_64px_rgba(0,0,0,0.12)] group-hover:border-slate-300 dark:group-hover:border-white/[0.22]'
           }
         `}
       >
@@ -99,7 +115,7 @@ export function BankComparisonCard({
 
         <div className="pl-6 pr-5 py-6 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Desktop Grid ───────────────────────────── */}
-          <div className="grid grid-cols-[1fr] xl:grid-cols-[170px_125px_135px_1fr_auto] 2xl:grid-cols-[200px_145px_165px_1fr_auto] items-center gap-4 xl:gap-3 2xl:gap-4">
+          <div className="grid grid-cols-[1fr] xl:grid-cols-[220px_auto_1fr_auto] 2xl:grid-cols-[245px_auto_1fr_auto] items-center gap-4 xl:gap-5 2xl:gap-6">
 
             {/* ── Bank Identity ────────────────────────────── */}
             <div className="flex items-center gap-4">
@@ -123,52 +139,53 @@ export function BankComparisonCard({
               </div>
               <div className="min-w-0 flex flex-col justify-center">
                 {isRecommended && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-1.5 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
-                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
+                  <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1.5 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
                   </span>
                 )}
                 <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">{offer.bankName}</h3>
-                <span className="text-[10px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
-                  <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 stroke-[2.5]" /> {offer.approvalOdds}% approval
-                </span>
               </div>
             </div>
 
-            {/* ── EMI ──────────────────────────────────────── */}
-            <div className="hidden xl:block">
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">EMI</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-foreground tabular-nums leading-none tracking-tight">
-                <span className="text-base sm:text-lg text-muted-foreground/50 mr-0.5">₹</span>{emi.toLocaleString("en-IN")}
-              </p>
-            </div>
-
-            {/* ── Comparison Diff ──────────────────────────── */}
-            <div className="hidden xl:flex flex-col justify-center min-h-[44px]">
-              {emiDiffFromHero !== 0 ? (
-                <>
-                  <p
-                    className="text-xs sm:text-sm font-extrabold tabular-nums whitespace-nowrap tracking-tight"
-                    style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}
-                  >
-                    {emiDiffFromHero > 0
-                      ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
-                      : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`}
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground/60 font-semibold tabular-nums whitespace-nowrap mt-0.5">
-                    {totalDiffFromHero > 0
-                      ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
-                      : totalDiffFromHero < 0
-                        ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
-                        : "Same total"}
-                  </p>
-                </>
-              ) : (
-                <div className="flex items-center">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-200/50 dark:border-amber-500/20">
-                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Best Match
-                  </span>
-                </div>
-              )}
+            {/* ── EMI & Comparison Diff (Grouped for Perfect Alignment) ── */}
+            <div className="hidden xl:flex items-end gap-3.5 min-h-[44px]">
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">EMI</p>
+                <p className="text-2xl sm:text-[26px] font-extrabold text-foreground tabular-nums leading-none tracking-tight">
+                  <span className="text-sm sm:text-base text-muted-foreground/50 mr-0.5">₹</span>{emi.toLocaleString("en-IN")}
+                </p>
+              </div>
+              
+              <div className="pb-0.5 flex flex-col justify-end">
+                {!isRecommended ? (
+                  <>
+                    <p
+                      className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none"
+                      style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}
+                    >
+                      {emiDiffFromHero > 0
+                        ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
+                        : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/50 font-semibold tabular-nums whitespace-nowrap leading-none mt-1">
+                      {totalDiffFromHero > 0
+                        ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
+                        : totalDiffFromHero < 0
+                          ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
+                          : "Same total"}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[11px] sm:text-xs font-bold whitespace-nowrap tracking-tight leading-none text-emerald-600 dark:text-emerald-400">
+                      Lowest EMI
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
+                      Lowest total cost
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* ── Metrics Chips ────────────────────────────── */}
@@ -176,11 +193,10 @@ export function BankComparisonCard({
               {[
                 { label: "Interest", value: `${offer.interestRate}%` },
                 { label: "Tenure", value: `${offer.maxTenure} yrs` },
-                { label: "Processing Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
               ].map((m, i) => (
                 <div
                   key={i}
-                  className="px-2.5 py-2 2xl:px-3.5 2xl:py-2.5 rounded-[1rem] bg-slate-50/80 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-md shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
+                  className="px-2.5 py-2 2xl:px-3.5 2xl:py-2.5 rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
                 >
                   <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5">{m.label}</p>
                   <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight">{m.value}</p>
@@ -189,8 +205,8 @@ export function BankComparisonCard({
             </div>
 
             {/* ── CTA ──────────────────────────────────────── */}
-            <div className="flex items-center gap-3 justify-end w-full xl:w-auto mt-5 xl:mt-0 xl:col-start-5">
-              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[150px]">
+            <div className="flex items-center gap-3 justify-end w-full xl:w-auto mt-5 xl:mt-0 xl:col-start-4">
+              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[175px]">
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
@@ -198,33 +214,40 @@ export function BankComparisonCard({
                   style={{
                     background: localStatus === "resolved"
                       ? '#10b981'
-                      : brand,
-                    color: 'white',
+                      : isRecommended
+                        ? '#eab308'
+                        : '#0f172a',
+                    color: localStatus === "resolved"
+                      ? 'white'
+                      : isRecommended
+                        ? '#0f172a'
+                        : 'white',
                   }}
                 >
                   <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                   {localStatus === "resolved" ? (
-                    <span className="relative z-10 flex items-center justify-center">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
+                    <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
                   ) : isLocking ? (
                     <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
                   ) : (
-                    <span className="relative z-10 flex items-center justify-center w-full">
+                    <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
                       Apply with Pryme 
                       <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
                     </span>
                   )}
                 </Button>
                 <button
-                  className="rounded-xl h-11 xl:h-9 px-3 sm:px-4 text-[11px] sm:text-xs font-bold transition-all border backdrop-blur-md bg-white/60 dark:bg-white/[0.04] border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-foreground hover:border-slate-300 dark:hover:border-white/[0.2] flex items-center justify-center gap-1.5 flex-1 xl:flex-none shadow-sm"
+                  onClick={() => navigate(`/apply-direct/${offer.id}`)}
+                  className="rounded-xl h-11 xl:h-9 px-3 sm:px-4 text-[11px] sm:text-xs font-bold transition-all border bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-foreground hover:border-slate-300 dark:hover:border-white/[0.2] flex items-center justify-center gap-1.5 flex-1 xl:flex-none shadow-sm"
                   title={`Apply directly on ${offer.bankName} website`}
                 >
                   Apply Directly <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
               <button
-                onClick={onToggleExpand}
+                onClick={() => onToggleExpand(offer.id)}
                 className={`
-                  p-3 xl:p-2.5 rounded-xl transition-all duration-300 border backdrop-blur-md shrink-0 shadow-sm
+                  p-3 xl:p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
                   ${isExpanded
                     ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
                     : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/40'
@@ -244,7 +267,6 @@ export function BankComparisonCard({
               { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
               { label: "Interest", value: `${offer.interestRate}%` },
               { label: "Tenure", value: `${offer.maxTenure} yrs` },
-              { label: "Processing Fee", value: offer.processingFee >= 100 ? `₹${Math.round(offer.processingFee).toLocaleString("en-IN")}` : `${offer.processingFee}%` },
             ].map((m, i) => (
               <div
                 key={i}
@@ -287,48 +309,134 @@ export function BankComparisonCard({
                 className="border-t mx-5 md:mx-7"
                 style={{ borderColor: `${brand}15` }}
               />
-              <div className="p-5 md:px-7 md:py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Cost breakdown */}
-                <div className="bg-white/40 dark:bg-white/[0.02] backdrop-blur-md rounded-2xl p-4 border border-white/30 dark:border-white/[0.05]">
-                  <h4 className="text-xs font-bold text-foreground mb-3.5 flex items-center gap-1.5">
-                    <Calculator className="w-3.5 h-3.5" style={{ color: brand }} /> Cost Breakdown
-                  </h4>
-                  <div className="space-y-2.5">
-                    {[
-                      { l: "Principal", v: principalAmount },
-                      { l: "Total Interest", v: totalRepayment - principalAmount },
-                      ...(offer.processingFee >= 100
-                        ? [
-                            { l: "Processing Fee (Base)", v: Math.round(offer.processingFee / 1.18) },
-                            { l: "GST on PF (18%)", v: offer.processingFee - Math.round(offer.processingFee / 1.18) }
-                          ]
-                        : [
-                            { l: `Processing (${offer.processingFee}%)`, v: Math.round(principalAmount * offer.processingFee / 100) },
-                            { l: "GST on PF", v: Math.round(principalAmount * offer.processingFee / 100 * 0.18) }
-                          ]
-                      )
-                    ].map((r, i) => (
-                      <div key={i} className="flex justify-between text-[11px] py-1.5 border-b border-dashed border-slate-100/60 dark:border-white/[0.04] last:border-b-0">
-                        <span className="text-muted-foreground font-medium">{r.l}</span>
-                        <span className="font-bold text-foreground tabular-nums">₹{r.v.toLocaleString("en-IN")}</span>
+              <div className="p-5 md:px-7 md:py-6 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                {(() => {
+                  const er = offer.originalEngineResult;
+                  const productCode = (er?.productCode || offer.id || "").toUpperCase();
+                  const isLap = productCode.includes("LAP");
+
+                  // Parse a raw fee value into a displayable ₹ amount number (for totaling)
+                  const toNumeric = (val: any, fallbackVal: string): number => {
+                    let checkVal = val;
+                    if (checkVal == null || checkVal === "") {
+                      checkVal = fallbackVal;
+                    }
+                    if (checkVal === "Nil" || checkVal === "0") return 0;
+                    if (typeof checkVal === "number") return checkVal;
+                    const s = String(checkVal).replace(/[₹,\s]/g, "");
+                    if (s.includes("%")) {
+                      // Percentage based (e.g. stamp duty 0.25%) - compute percentage of principal
+                      const pct = parseFloat(s.replace("%", ""));
+                      return isNaN(pct) ? 0 : Math.round(principalAmount * pct / 100);
+                    }
+                    const n = parseFloat(s);
+                    return isNaN(n) ? 0 : n;
+                  };
+
+                  // Format a value for display with fallback
+                  const fmt = (val: any, fallbackVal: string): string => {
+                    const checkVal = (val != null && val !== "") ? val : fallbackVal;
+                    if (checkVal === 0 || checkVal === "0" || checkVal === 0.0) return "Nil";
+                    if (typeof checkVal === "number") return `₹${Math.round(checkVal).toLocaleString("en-IN")}`;
+                    const s = String(checkVal).trim();
+                    if (s === "0") return "Nil";
+                    if (s.includes("%")) {
+                      const pct = parseFloat(s.replace(/[^\d.]/g, ""));
+                      if (!isNaN(pct)) {
+                        return `₹${Math.round(principalAmount * pct / 100).toLocaleString("en-IN")}`;
+                      }
+                    }
+                    if (s.startsWith("₹") || s.includes("-")) return s;
+                    const n = parseFloat(s.replace(/[₹,\s]/g, ""));
+                    if (!isNaN(n)) return `₹${Math.round(n).toLocaleString("en-IN")}`;
+                    return s;
+                  };
+
+                  // Fallbacks matching database seed patterns
+                  const stampDutyFallback = isLap ? "0.50%" : "0.25%";
+                  const legalTechFallback = isLap ? "₹2,500" : "Nil";
+                  const loginFeeFallback = "₹1,000";
+
+                  // Processing fee in ₹
+                  const pfAmount = offer.processingFee >= 100
+                    ? Math.round(offer.processingFee)
+                    : Math.round(principalAmount * offer.processingFee / 100);
+
+                  const loginFeeNum = toNumeric(er?.loginFee, loginFeeFallback);
+                  const stampDutyNum = toNumeric(er?.stampDuty, stampDutyFallback);
+                  const legalTechNum = toNumeric(er?.legalTechnicalCharges, legalTechFallback);
+
+                  const totalUpfront = pfAmount + loginFeeNum + stampDutyNum + legalTechNum;
+
+                  const coreRows = [
+                    { label: "Principal Amount", value: `₹${principalAmount.toLocaleString("en-IN")}` },
+                    { label: "Interest Rate", value: `${offer.interestRate}% p.a.` },
+                    { label: "Loan Tenure", value: `${offer.maxTenure} Years` },
+                    { label: "Estimated Monthly EMI", value: `₹${emi.toLocaleString("en-IN")}` },
+                    { label: "Total Interest Payable", value: `₹${(totalRepayment - principalAmount).toLocaleString("en-IN")}` },
+                    { label: "Total Cost of Loan", value: `₹${totalRepayment.toLocaleString("en-IN")}` },
+                  ];
+
+                  const feeRows = [
+                    { label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                    { label: "Login Fees", value: fmt(er?.loginFee, loginFeeFallback) },
+                    { label: "Stamp Duty", value: fmt(er?.stampDuty, stampDutyFallback) },
+                    { label: "Legal & Technical Fees", value: fmt(er?.legalTechnicalCharges, legalTechFallback) },
+                  ];
+
+                  return (
+                    <>
+                      {/* Column 1: Core Loan Costs */}
+                      <div className="bg-white/40 dark:bg-white/[0.02] backdrop-blur-md rounded-2xl p-5 border border-white/30 dark:border-white/[0.05] flex flex-col justify-between h-full">
+                        <div>
+                          <h4 className="text-xs font-bold text-foreground mb-3.5 flex items-center gap-1.5">
+                            <Calculator className="w-3.5 h-3.5" style={{ color: brand }} /> Loan Cost Breakdown
+                          </h4>
+                          <div className="space-y-0">
+                            {coreRows.map((r, i) => (
+                              <div key={i} className="flex justify-between text-[11px] py-2 border-b border-dashed border-slate-100/60 dark:border-white/[0.04] last:border-b-0">
+                                <span className="text-muted-foreground font-medium">{r.label}</span>
+                                <span className="font-bold text-foreground tabular-nums">{r.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Required docs */}
-                <div className="bg-white/40 dark:bg-white/[0.02] backdrop-blur-md rounded-2xl p-4 border border-white/30 dark:border-white/[0.05]">
-                  <h4 className="text-xs font-bold text-foreground mb-3.5 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" style={{ color: brand }} /> Documents Required
-                  </h4>
-                  <div className="space-y-2">
-                    {offer.requiredDocs.map((doc, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[11px]">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span className="text-foreground/80 font-medium">{doc}</span>
+
+                      {/* Column 2: Upfront Fees & Charges */}
+                      <div className="bg-white/40 dark:bg-white/[0.02] backdrop-blur-md rounded-2xl p-5 border border-white/30 dark:border-white/[0.05] flex flex-col justify-between h-full">
+                        <div>
+                          <h4 className="text-xs font-bold text-foreground mb-3.5 flex items-center gap-1.5">
+                            <Calculator className="w-3.5 h-3.5" style={{ color: brand }} /> Upfront Fees & Charges
+                          </h4>
+                          <div className="space-y-0">
+                            {feeRows.map((r, i) => (
+                              <div key={i} className="flex justify-between text-[11px] py-2 border-b border-dashed border-slate-100/60 dark:border-white/[0.04]">
+                                <span className="text-muted-foreground font-medium">{r.label}</span>
+                                <span className="font-bold text-foreground tabular-nums">{r.value}</span>
+                              </div>
+                            ))}
+                            {/* Empty spacer row to align vertically with left column's 6 rows */}
+                            <div className="flex justify-between text-[11px] py-2 border-b border-dashed border-transparent invisible">
+                              <span>Spacer</span>
+                              <span>Spacer</span>
+                            </div>
+                            {/* Total Upfront Cost */}
+                            <div className="flex justify-between text-xs py-2.5 mt-0.5">
+                              <span className="font-extrabold text-foreground">Total Upfront Cost</span>
+                              <span className="font-extrabold tabular-nums" style={{ color: brand }}>
+                                {totalUpfront > 0 ? `₹${totalUpfront.toLocaleString("en-IN")}` : "Nil"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </>
+                  );
+                })()}
+
+
+
               </div>
             </motion.div>
           )}
@@ -336,4 +444,4 @@ export function BankComparisonCard({
       </div>
     </motion.div>
   );
-}
+});

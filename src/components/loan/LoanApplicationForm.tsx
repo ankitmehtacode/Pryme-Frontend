@@ -996,14 +996,14 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
 
         {/* Trust Card Footer */}
-        <div className="-mx-5 -mb-5 md:-mx-8 md:-mb-8 mt-10 bg-slate-50/80 dark:bg-slate-900/40 border-t border-slate-150 dark:border-slate-800/60 py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
-            <LockKeyhole className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-            <span>Bank-Grade 256-Bit SSL Secured</span>
-          </div>
-          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-500/10 dark:bg-emerald-500/[0.03] px-3.5 py-1.5 rounded-full border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-500/15">
+        <div className="-mx-5 -mb-5 md:-mx-8 md:-mb-8 mt-10 bg-gradient-to-b from-slate-50/60 to-slate-100/80 dark:from-slate-900/30 dark:to-slate-900/50 border-t border-slate-200/80 dark:border-slate-800/60 py-5 px-6 flex flex-col items-center gap-3">
+          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-500/10 dark:bg-emerald-500/[0.03] px-4 py-2 rounded-full border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm text-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>Checking eligibility will <span className="underline decoration-2 decoration-emerald-500/50 text-emerald-950 dark:text-emerald-100 font-extrabold px-0.5">not</span> affect your credit score</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60 text-center leading-relaxed">
+            <LockKeyhole className="w-3 h-3 shrink-0" />
+            <span>Your information is protected using modern security practices. We never sell your personal data or share it without your permission.</span>
           </div>
         </div>
       </motion.div>

@@ -262,13 +262,18 @@ const PrepaymentCalculatorPage = () => {
                     <div className="space-y-3 md:space-y-4 relative z-10">
                       {/* Loan Amount */}
                       <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
-                        <div className="flex justify-between items-center mb-3 md:mb-4">
+                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Loan Amount
+                            Loan Amount (₹)
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm leading-none">
-                            {formatCurrency(loanAmount)}
-                          </span>
+                          <input
+                            type="number"
+                            value={loanAmount}
+                            onChange={(e) => setLoanAmount(Number(e.target.value))}
+                            className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            min={100000}
+                            max={10000000}
+                          />
                         </div>
                         <Slider
                           value={[loanAmount]}
@@ -290,16 +295,19 @@ const PrepaymentCalculatorPage = () => {
 
                       {/* Interest Rate */}
                       <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
-                        <div className="flex justify-between items-center mb-3 md:mb-4">
+                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Interest Rate
+                            Interest Rate (% p.a.)
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-center leading-none">
-                            {interestRate}%{" "}
-                            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest ml-1">
-                              p.a.
-                            </span>
-                          </span>
+                          <input
+                            type="number"
+                            value={interestRate}
+                            onChange={(e) => setInterestRate(Number(e.target.value))}
+                            className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            min={6}
+                            max={24}
+                            step={0.1}
+                          />
                         </div>
                         <Slider
                           value={[interestRate]}
@@ -321,16 +329,23 @@ const PrepaymentCalculatorPage = () => {
 
                       {/* Tenure */}
                       <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
-                        <div className="flex justify-between items-center mb-3 md:mb-4">
+                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Loan Tenure
+                            Loan Tenure (Months)
                           </span>
-                          <span className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm flex items-baseline gap-1 leading-none">
-                            {tenureMonths} Mo{" "}
-                            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={tenureMonths}
+                              onChange={(e) => setTenureMonths(Number(e.target.value))}
+                              className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              min={12}
+                              max={360}
+                            />
+                            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
                               ({(tenureMonths / 12).toFixed(1)} Yrs)
                             </span>
-                          </span>
+                          </div>
                         </div>
                         <Slider
                           value={[tenureMonths]}
@@ -354,13 +369,18 @@ const PrepaymentCalculatorPage = () => {
                         <>
                           {/* Prepayment Amount */}
                           <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
-                            <div className="flex justify-between items-center mb-3 md:mb-4">
+                            <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                Prepayment Amount
+                                Prepayment Amount (₹)
                               </span>
-                              <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
-                                {formatCurrency(prepaymentAmount)}
-                              </span>
+                              <input
+                                type="number"
+                                value={prepaymentAmount}
+                                onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                min={10000}
+                                max={Math.min(loanAmount, 5000000)}
+                              />
                             </div>
                             <Slider
                               value={[prepaymentAmount]}
@@ -382,13 +402,18 @@ const PrepaymentCalculatorPage = () => {
 
                           {/* Prepayment Month */}
                           <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
-                            <div className="flex justify-between items-center mb-3 md:mb-4">
+                            <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                                 Prepay After Month
                               </span>
-                              <span className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm leading-none">
-                                Month {prepaymentMonth}
-                              </span>
+                              <input
+                                type="number"
+                                value={prepaymentMonth}
+                                onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
+                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                min={1}
+                                max={Math.max(1, tenureMonths - 1)}
+                              />
                             </div>
                             <Slider
                               value={[prepaymentMonth]}

@@ -10,9 +10,9 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      className="w-full max-w-[1600px] z-10"
+      className="w-full max-w-[1000px] z-10 px-4"
     >
-      <Surface className="min-h-[600px] lg:h-[clamp(600px,85vh,1000px)] border border-slate-900/5">
+      <Surface className="min-h-[580px] lg:h-[clamp(580px,72vh,680px)] border border-slate-900/5 shadow-2xl">
         <SplitLayout>
           {children}
         </SplitLayout>
@@ -24,7 +24,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 AuthLayout.Media = SplitLayout.Media;
 AuthLayout.Content = function AuthLayoutContent({ children, className }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <SplitLayout.Content className={cn("items-center justify-center p-6 sm:p-12 lg:p-[clamp(32px,5vw,96px)] overflow-y-auto", className)}>
+    <SplitLayout.Content className={cn("items-center justify-center p-6 sm:p-8 lg:p-10 overflow-y-auto", className)}>
       {children}
     </SplitLayout.Content>
   );

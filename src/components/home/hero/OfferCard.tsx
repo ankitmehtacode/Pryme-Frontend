@@ -32,17 +32,18 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
   if (offer.bannerImageUrl) {
     return (
       <div
-        className="relative h-full max-h-[340px] rounded-3xl overflow-hidden group cursor-default transition-all duration-500 hover:shadow-[0_24px_60px_rgba(0,0,0,0.12)] hover:-translate-y-1"
+        className="relative h-full rounded-3xl overflow-hidden group cursor-default transition-all duration-500 hover:shadow-[0_32px_70px_rgba(0,0,0,0.15)] hover:-translate-y-4 hover:scale-[1.05] isolation-isolate"
         style={{
           boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${offer.accentColor}15`,
-          backgroundColor: offer.accentColor ? `${offer.accentColor}08` : '#f8fafc'
+          backgroundColor: offer.accentColor ? `${offer.accentColor}08` : '#f8fafc',
+          WebkitMaskImage: "-webkit-radial-gradient(white, black)"
         }}
       >
         {/* Full-bleed image */}
         <img
           src={offer.bannerImageUrl}
           alt={`${offer.bank} — ${offer.title}`}
-          className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           loading="eager"
         />
 
@@ -56,13 +57,13 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
         </span>
 
         {/* Floating CTA button overlay — bottom right */}
-        <div className="absolute bottom-4 right-4 z-10 flex items-center">
+        <div className="absolute bottom-5 right-5 z-10 flex items-center">
           {targetUrl.startsWith("http://") || targetUrl.startsWith("https://") ? (
             <a 
               href={targetUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 bg-[#103783] text-white px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-lg hover:scale-[1.05] active:scale-[0.95] transition-all hover:bg-[#0c2a66]"
+              className="inline-flex items-center gap-1 bg-[#103783] text-white px-3 py-1.5 rounded-full text-[8.5px] font-extrabold uppercase tracking-wider shadow-lg hover:scale-[1.05] active:scale-[0.95] transition-all hover:bg-[#0c2a66]"
               style={{
                 backgroundColor: offer.accentColor || "#103783",
                 boxShadow: offer.accentColor ? `0 4px 12px ${offer.accentColor}40` : undefined
@@ -70,12 +71,12 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
               onClick={(e) => e.stopPropagation()}
             >
               {offer.cta || "View Details"}
-              <ArrowRight className="w-3 h-3 ml-0.5" />
+              <ArrowRight className="w-2.5 h-2.5 ml-0.5" />
             </a>
           ) : (
             <Link 
               to={targetUrl}
-              className="inline-flex items-center gap-1 bg-[#103783] text-white px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-lg hover:scale-[1.05] active:scale-[0.95] transition-all hover:bg-[#0c2a66]"
+              className="inline-flex items-center gap-1 bg-[#103783] text-white px-3 py-1.5 rounded-full text-[8.5px] font-extrabold uppercase tracking-wider shadow-lg hover:scale-[1.05] active:scale-[0.95] transition-all hover:bg-[#0c2a66]"
               style={{
                 backgroundColor: offer.accentColor || "#103783",
                 boxShadow: offer.accentColor ? `0 4px 12px ${offer.accentColor}40` : undefined
@@ -83,7 +84,7 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
               onClick={(e) => e.stopPropagation()}
             >
               {offer.cta || "View Details"}
-              <ArrowRight className="w-3 h-3 ml-0.5" />
+              <ArrowRight className="w-2.5 h-2.5 ml-0.5" />
             </Link>
           )}
         </div>
@@ -97,9 +98,10 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
   // ─── TEXT MODE: Glassmorphic card fallback (existing layout) ──────────────
   return (
     <div 
-      className="relative h-full bg-white/40 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-[0_24px_50px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 flex flex-col justify-between p-5 sm:p-6 group"
+      className="relative h-full bg-white/40 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-[0_24px_50px_rgba(0,0,0,0.08)] hover:-translate-y-2 hover:scale-[1.03] flex flex-col justify-between p-4 md:p-5 lg:p-6 group isolation-isolate"
       style={{
-        boxShadow: `0 8px 32px 0 rgba(16,55,131,0.04), inset 0 1px 1px 0 rgba(255,255,255,0.8), 0 20px 40px -10px ${offer.accentColor}12`
+        boxShadow: `0 8px 32px 0 rgba(16,55,131,0.04), inset 0 1px 1px 0 rgba(255,255,255,0.8), 0 20px 40px -10px ${offer.accentColor}12`,
+        WebkitMaskImage: "-webkit-radial-gradient(white, black)"
       }}
     >
       {/* 200-IQ Techy Shimmer Reflection Sweep */}
@@ -109,48 +111,48 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
         {/* Top Header Row with Bank Logo & FOMO Badge */}
         <motion.div 
           variants={childVariants}
-          className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100/50 shrink-0"
+          className="flex items-center justify-between gap-2.5 mb-2.5 pb-2.5 border-b border-slate-100/30 shrink-0"
         >
           {/* Enlarged Bank Logo (Responsive and Landscape-Friendly) */}
-          <div className="h-8 w-24 bg-white/70 backdrop-blur-sm border border-white shadow-sm p-1 rounded-xl flex items-center justify-center overflow-hidden">
+          <div className="h-7 md:h-8 lg:h-9 w-20 md:w-24 lg:w-28 bg-white/80 backdrop-blur-sm border border-white shadow-sm p-1 rounded-lg md:rounded-xl flex items-center justify-center overflow-hidden">
             {offer.logo ? (
-              <img src={offer.logo} alt={offer.bank} className="h-full w-auto object-contain object-left max-w-[80px]" />
+              <img src={offer.logo} alt={offer.bank} className="h-full w-auto object-contain object-left max-w-[65px] md:max-w-[85px] lg:max-w-[100px]" />
             ) : (
               <div className="flex items-center gap-1">
-                <Building2 className="w-4 h-4 text-slate-400" />
-                <span className="text-[10px] font-bold text-slate-700 tracking-tight">{offer.bank}</span>
+                <Building2 className="w-3 md:w-4 h-3 md:h-4 text-slate-400" />
+                <span className="text-[9px] md:text-[11px] font-bold text-slate-700 tracking-tight">{offer.bank}</span>
               </div>
             )}
           </div>
 
           {/* Pulse FOMO Tag */}
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border ${fomoBadge.color}`}>
+          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] md:text-[8px] font-extrabold uppercase tracking-wider border ${fomoBadge.color}`}>
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shrink-0" />
             {fomoBadge.text}
           </span>
         </motion.div>
 
         {/* Middle Content Group (grows to fill available space) */}
-        <div className="flex-1 flex flex-col justify-center my-auto py-2">
+        <div className="flex-1 flex flex-col justify-center my-auto py-2 md:py-3">
           {/* Headline + Amount */}
-          <motion.div variants={childVariants} className="mb-3">
-            <h3 className="text-sm font-bold text-[#0a1530]/80 leading-snug mb-1" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
+          <motion.div variants={childVariants} className="mb-2">
+            <h3 className="text-sm md:text-[15px] font-bold text-[#0a1530]/90 leading-snug mb-1" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
               {offer.headline}
             </h3>
-            <p className="text-xl font-extrabold tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif', color: offer.accentColor }}>
+            <p className="text-lg md:text-xl lg:text-2xl font-extrabold tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif', color: offer.accentColor }}>
               {offer.amount}
             </p>
           </motion.div>
 
           {/* Highlights */}
           {offer.highlights && offer.highlights.filter(Boolean).length > 0 && (
-            <motion.div variants={childVariants} className="space-y-2">
+            <motion.div variants={childVariants} className="space-y-1.5 md:space-y-2">
               {offer.highlights.filter(Boolean).map((h, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
                   </div>
-                  <span className="text-xs text-slate-600 font-semibold leading-tight">{h}</span>
+                  <span className="text-[10.5px] md:text-xs lg:text-[13px] font-semibold leading-tight text-slate-600">{h}</span>
                 </div>
               ))}
             </motion.div>
@@ -164,7 +166,7 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
               href={targetUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-2.5 px-4 text-xs font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] text-center"
+              className="block w-full py-2 px-3 text-[10px] font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] text-center"
               style={{ 
                 backgroundColor: offer.accentColor,
                 boxShadow: `0 8px 16px -4px ${offer.accentColor}40`
@@ -175,7 +177,7 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
           ) : (
             <Link 
               to={targetUrl}
-              className="block w-full py-2.5 px-4 text-xs font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] text-center"
+              className="block w-full py-2 px-3 text-[10px] font-bold text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] text-center"
               style={{ 
                 backgroundColor: offer.accentColor,
                 boxShadow: `0 8px 16px -4px ${offer.accentColor}40`

@@ -1,7 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line storybook/no-renderer-packages
 import type { Meta, StoryObj } from '@storybook/react';
-import { PageShell, Surface, Stack, Inline, ContentContainer, SplitLayout, MediaPanel } from '../index';
+import { PageShell, Surface, Stack, Inline, Container, SplitLayout, MediaPanel } from '../index';
 
 const meta: Meta = {
   title: 'Foundation/Layout Primitives',
@@ -64,13 +64,13 @@ export const InlineStory: StoryObj = {
   ),
 };
 
-export const ContentContainerStory: StoryObj = {
-  name: 'ContentContainer',
+export const ContainerStory: StoryObj = {
+  name: 'Container',
   render: () => (
-    <div className="p-8 bg-slate-100 min-h-screen">
-      <ContentContainer width="readable" className="bg-white border border-dashed border-slate-300 p-8 text-center text-slate-500 font-mono">
-        ContentContainer (readable width)
-      </ContentContainer>
+    <div className="bg-slate-100 p-8 h-full">
+      <Container size="readable" className="bg-white border border-dashed border-slate-300 p-8 text-center text-slate-500 font-mono">
+        Container (readable size)
+      </Container>
     </div>
   ),
 };

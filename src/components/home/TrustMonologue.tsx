@@ -101,68 +101,47 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <div className="w-full relative overflow-hidden">
-      {/* Background Trust Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=800&fit=crop&auto=format&q=80" 
-          alt="" 
-          className="w-full h-full object-cover opacity-[0.03] dark:opacity-[0.05]" 
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 via-white/80 to-slate-50/50 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-900" />
-      </div>
-      
-      {/* Ambient Glow — CSS animation only, no Framer Motion re-renders */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#103783]/10 md:bg-[#103783]/20 transform-gpu rounded-full pointer-events-none"
-      />
-
-      <div className="w-full relative z-10">
-        <div className="w-full">
-          {/* Trust Quote */}
-          <motion.div
-            initial={headlineInitial}
-            whileInView={headlineInView}
-            viewport={headlineViewport}
-            transition={headlineTransition}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50 text-[#103783] dark:text-blue-400 text-xs font-semibold uppercase tracking-widest mb-6">
-              <Shield className="w-4 h-4" />
-              Your Privacy Protected
-            </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-[#0a1530] dark:text-white tracking-tight mb-8">
-              Why Trust Us?
-            </h2>
-            <motion.div
-              initial={quoteInitial}
-              whileInView={quoteInView}
-              viewport={viewportOnce}
-              transition={quoteTransition}
-              className="max-w-3xl mx-auto bg-gradient-to-b from-slate-200/80 dark:from-white/10 to-transparent p-[1.5px] rounded-[2.5rem]"
-            >
-              <div className="bg-white dark:bg-[#050505] rounded-[2.4rem] p-8 md:p-12 shadow-xl dark:shadow-2xl">
-                <p className="text-lg md:text-2xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                  "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching, and permanently deleted from the Database after your session. We do not sell, or share your personal information."
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Security Features Grid */}
-          <TooltipProvider>
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
-            >
-              {securityFeatures.map((feature, idx) => (
-                <TiltCard key={feature.title} feature={feature} index={idx} />
-              ))}
-            </div>
-          </TooltipProvider>
+    <div className="w-full">
+      {/* Trust Quote */}
+      <motion.div
+        initial={headlineInitial}
+        whileInView={headlineInView}
+        viewport={headlineViewport}
+        transition={headlineTransition}
+        className="text-center mb-16"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50 text-[#103783] dark:text-blue-400 text-xs font-semibold uppercase tracking-widest mb-6">
+          <Shield className="w-4 h-4" />
+          Your Privacy Protected
         </div>
-      </div>
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-[#0a1530] dark:text-white tracking-tight mb-8">
+          Why Trust Us?
+        </h2>
+        <motion.div
+          initial={quoteInitial}
+          whileInView={quoteInView}
+          viewport={viewportOnce}
+          transition={quoteTransition}
+          className="max-w-3xl mx-auto bg-gradient-to-b from-slate-200/80 dark:from-white/10 to-transparent p-[1.5px] rounded-[2.5rem]"
+        >
+          <div className="bg-white dark:bg-[#050505] rounded-[2.4rem] p-8 md:p-12 shadow-xl dark:shadow-2xl">
+            <p className="text-lg md:text-2xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+              "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching, and permanently deleted from the Database after your session. We do not sell, or share your personal information."
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Security Features Grid */}
+      <TooltipProvider>
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        >
+          {securityFeatures.map((feature, idx) => (
+            <TiltCard key={feature.title} feature={feature} index={idx} />
+          ))}
+        </div>
+      </TooltipProvider>
     </div>
   );
 }

@@ -4,7 +4,6 @@ import React from "react";
 // PRYME ENTERPRISE LAYOUT PRIMITIVES (v1.0)
 // Documented in docs/LAYOUT_MANIFEST.md
 // ============================================================================
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. SURFACE
 // Responsibilities: Background color, theme, environment context, decorative layers.
@@ -29,6 +28,7 @@ export const Surface = React.forwardRef<HTMLDivElement, SurfaceProps>(
         ref={ref}
         className={`pryme-surface relative w-full ${bgClass} ${className}`.trim()}
         style={{ ...style }}
+        data-surface="true"
         {...props}
       >
         {children}
@@ -61,6 +61,7 @@ export const Section = React.forwardRef<HTMLElement, SectionProps>(
           ...(bleed ? { overflow: "hidden", isolation: "isolate", position: "relative" } : {}),
           ...style,
         } as React.CSSProperties}
+        data-section="true"
         {...props}
       >
         {children}
@@ -91,8 +92,10 @@ export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
           maxInlineSize: "var(--container-size)",
           marginInline: "auto",
           width: "100%",
+          paddingInline: "var(--space-md)",
           ...style,
         } as React.CSSProperties}
+        data-container="true"
         {...props}
       >
         {children}

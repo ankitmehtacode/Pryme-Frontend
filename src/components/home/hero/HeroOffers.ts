@@ -8,6 +8,8 @@ import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg
 import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
 import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
 import hdfcLogo from "@/assets/hdfc.svg";
+import idfcLogo from "@/assets/idfc.svg";
+import jioLogo from "@/assets/jio.svg";
 
 import axisBanner from "@/assets/axis_festive_banner.png";
 import hdfcBanner from "@/assets/hdfc_preferred_banner.png";
@@ -22,6 +24,8 @@ export const LOGO_MAP: Record<string, string> = {
   yes: yesLogo,
   tata: tataLogo,
   hdfc: hdfcLogo,
+  idfc: idfcLogo,
+  jio: jioLogo,
 };
 
 export const initialOffers = [

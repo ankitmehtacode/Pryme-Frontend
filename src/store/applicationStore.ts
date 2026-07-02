@@ -56,11 +56,11 @@ const createFreshState = (): ApplicationState => ({
   financialDetails: { path: null, data: {} } as FinancialDetails,
 
   loanRequirements: {
-    loanType: 'PERSONAL_LOAN',
-    loanAmount: 500000,
-    tenureYears: 5,
+    loanType: '',
+    loanAmount: 0,
+    tenureYears: 0,
     purpose: '',
-    cibilScore: 750,
+    cibilScore: 0,
   },
 
   financialFootprint: {
@@ -159,7 +159,7 @@ const defaultBusiness: BusinessDetails = {
 // Bump this when the ApplicationState shape changes. Zustand's persist
 // middleware uses this to decide whether to hydrate or purge stale data.
 
-const STORE_VERSION = 4;
+const STORE_VERSION = 5;
 
 // ─── THE STORE ──────────────────────────────────────────────────────────────
 

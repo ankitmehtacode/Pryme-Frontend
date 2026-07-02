@@ -30,6 +30,10 @@ import bandhanLogo from "@/assets/bandhan-bank.svg";
 import abflLogo from "@/assets/abfl.svg";
 import scLogo from "@/assets/sc.svg";
 import indusindLogo from "@/assets/indusind.svg";
+import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
+import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
+import idfcLogo from "@/assets/idfc.svg";
+import jioLogo from "@/assets/jio.svg";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -48,6 +52,8 @@ interface BankOffer {
   approvalOdds: number;
   processingTime: string;
   requiredDocs: string[];
+  bankKey: string;
+  originalEngineResult?: any;
 }
 
 interface LeadDataPayload {
@@ -169,27 +175,31 @@ export default function Offers() {
     // Filter only eligible offers returned by Matrix Engine (Java)
     const eligibleResults = leadData.engineResults.filter((r: any) => r && (r.eligible === true || r.isEligible === true));
 
-    return eligibleResults.map((er: any, index: number) => {
+    const mappedOffers = eligibleResults.map((er: any, index: number) => {
       // Map Matrix response onto our UI BankOffer structure
       // Resolve the correct bank theme and logo based on the bank's name
       const resolveBankTheme = (bankName: string, productCode: string, lenderName?: string) => {
         const name = `${lenderName || ""} ${bankName || ""} ${productCode || ""}`.toUpperCase();
 
-        if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo };
-        if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo };
-        if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo };
-        if (name.includes("KOTAK")) return { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo };
-        if (name.includes("SBI") || name.includes("STATE BANK")) return { c: "bg-[#0f3b8c]", x: "#0f3b8c", img: sbiLogo };
-        if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo };
-        if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo };
-        if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo };
-        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: bajajLogo };
-        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: ltLogo };
-        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: bandhanLogo };
-        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: abflLogo };
-        if (name.includes("RBL")) return { c: "bg-[#0A387E]", x: "#0A387E", img: rblLogo };
-        if (name.includes("SC") || name.includes("STANDARD")) return { c: "bg-[#00a546]", x: "#00a546", img: scLogo };
-        if (name.includes("INDUSIND")) return { c: "bg-[#8a1921]", x: "#8a1921", img: indusindLogo };
+        if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo + "?v=4", bankKey: "HDFC" };
+        if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo + "?v=4", bankKey: "ICICI" };
+        if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo + "?v=4", bankKey: "AXIS" };
+        if (name.includes("KOTAK")) return { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo + "?v=4", bankKey: "KOTAK" };
+        if (name.includes("SBI") || name.includes("STATE BANK")) return { c: "bg-[#0f3b8c]", x: "#0f3b8c", img: sbiLogo + "?v=4", bankKey: "SBI" };
+        if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo + "?v=4", bankKey: "BOB" };
+        if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo + "?v=4", bankKey: "PNB" };
+        if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo + "?v=4", bankKey: "YES" };
+        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: bajajLogo + "?v=4", bankKey: "BAJAJ" };
+        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: ltLogo + "?v=4", bankKey: "LNT" };
+        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: bandhanLogo + "?v=4", bankKey: "BANDHAN" };
+        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: abflLogo + "?v=4", bankKey: "ABFL" };
+        if (name.includes("RBL")) return { c: "bg-[#0A387E]", x: "#0A387E", img: rblLogo + "?v=4", bankKey: "RBL" };
+        if (name.includes("SC") || name.includes("STANDARD")) return { c: "bg-[#00a546]", x: "#00a546", img: scLogo + "?v=4", bankKey: "SC" };
+        if (name.includes("INDUSIND")) return { c: "bg-[#8a1921]", x: "#8a1921", img: indusindLogo + "?v=4", bankKey: "INDUSIND" };
+        if (name.includes("JIO")) return { c: "bg-[#0a2240]", x: "#0a2240", img: jioLogo + "?v=4", bankKey: "JIO" };
+        if (name.includes("IDFC")) return { c: "bg-[#9d1d27]", x: "#9d1d27", img: idfcLogo + "?v=4", bankKey: "IDFC" };
+        if (name.includes("IDBI")) return { c: "bg-[#00703c]", x: "#00703c", img: idbiLogo + "?v=4", bankKey: "IDBI" };
+        if (name.includes("TATA")) return { c: "bg-[#005a9c]", x: "#005a9c", img: tataLogo + "?v=4", bankKey: "TATA" };
 
         // Generic fallback colors using a stable hash so it doesn't change on re-render
         const fallbacks = [
@@ -197,7 +207,8 @@ export default function Offers() {
           { c: "bg-[#0f172a]", x: "#0f172a", img: undefined }, // Slate darker
           { c: "bg-[#334155]", x: "#334155", img: undefined }  // Slate lighter
         ];
-        return fallbacks[name.length % fallbacks.length];
+        const fb = fallbacks[name.length % fallbacks.length];
+        return { ...fb, bankKey: `GENERIC-${name}` };
       };
 
       const theme = resolveBankTheme(er?.productName || er?.lenderName, er?.productCode, er?.lenderName);
@@ -219,15 +230,37 @@ export default function Offers() {
         approvalOdds: 98,
         processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
-        originalEngineResult: er
+        originalEngineResult: er,
+        bankKey: theme.bankKey
       };
-    }).sort((a, b) => {
-      // Primary Sort: Lowest Interest Rate
+    });
+
+    // Sort mapped offers: lowest interest rate first, then lowest processing fee
+    const sortedOffers = mappedOffers.sort((a, b) => {
       if (a.interestRate !== b.interestRate) {
         return a.interestRate - b.interestRate;
       }
-      // Secondary Sort: Lowest Processing Fee
       return a.processingFee - b.processingFee;
+    });
+
+    // Deduplicate: Keep only the single best offer for each unique bankKey
+    const seenBanks = new Set<string>();
+    const uniqueOffers: BankOffer[] = [];
+
+    for (const offer of sortedOffers) {
+      if (!seenBanks.has(offer.bankKey)) {
+        seenBanks.add(offer.bankKey);
+        uniqueOffers.push(offer);
+      }
+    }
+
+    // Assign final approval odds based on overall rank
+    return uniqueOffers.map((offer, idx) => {
+      const nameHash = offer.bankName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return {
+        ...offer,
+        approvalOdds: idx === 0 ? 98 : 85 + (nameHash % 13)
+      };
     });
   }, [leadData]);
 
@@ -280,7 +313,7 @@ export default function Offers() {
   // SCENARIO B: EXCEPTION ZERO-STATE (No Offers Matched Engine Profile)
   // ═══════════════════════════════════════════════════════════════════════
   // ── Handlers (must be declared before any early returns to avoid conditional hook-like patterns) ──
-  const handleUnlock = async (offer: BankOffer) => {
+  const handleUnlock = useCallback(async (offer: BankOffer) => {
     if (!leadData) return;
     setIsLocking(offer.id);
     try {
@@ -305,7 +338,18 @@ export default function Offers() {
       setIsLocking(null);
       throw new Error("API Gateway routing failed"); // Throw so the error boundary can catch it
     }
-  };
+  }, [leadData, isAuthenticated, navigate]);
+
+  const handleToggleExpand = useCallback((id: string) => {
+    setExpandedCard(prev => prev === id ? null : id);
+  }, []);
+
+  const handleApply = useCallback(async (providerId: string) => {
+    const offer = dynamicOffers.find(o => o.id === providerId);
+    if (offer) {
+      await handleUnlock(offer);
+    }
+  }, [dynamicOffers, handleUnlock]);
 
   // ═══════════════════════════════════════════════════════════════════════
   // SCENARIO A: PUBLIC PAGE (no lead data — direct URL navigation)
@@ -458,7 +502,7 @@ export default function Offers() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-8 bg-white/60 dark:bg-white/[0.04] backdrop-blur-sm border border-white/40 dark:border-white/[0.08] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
+            className="mb-8 bg-slate-50/90 dark:bg-[#0c1322]/90 border border-slate-200 dark:border-white/[0.06] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
           >
             <div className="flex items-center gap-6 md:gap-8">
               {[
@@ -533,10 +577,10 @@ export default function Offers() {
                         heroBankName={heroOffer.bankName}
                         principalAmount={leadData.loanAmount}
                         isExpanded={isExpanded}
-                        onToggleExpand={() => setExpandedCard(isExpanded ? null : offer.id)}
-                        onApply={async (providerId) => await handleUnlock(dynamicOffers.find(o => o.id === providerId)!)}
+                        onToggleExpand={handleToggleExpand}
+                        onApply={handleApply}
                         isGlobalLocking={isLocking !== null}
-                        isRecommended={idx === 0}
+                        isRecommended={offer.interestRate === heroOffer.interestRate && offer.processingFee === heroOffer.processingFee}
                       />
                     );
                   })}
@@ -567,7 +611,7 @@ export default function Offers() {
       </main>
 
       {/* ── Mobile Sticky CTA (thumb zone) ──────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-card/95 dark:bg-[#0d1829]/95 backdrop-blur-sm border-t border-border dark:border-white/[0.06] px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-white/95 dark:bg-[#0c1322]/98 border-t border-slate-200 dark:border-white/[0.06] px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-foreground truncate">{heroOffer.bankName}</p>
