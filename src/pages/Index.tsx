@@ -146,11 +146,11 @@ const Index = () => {
 
           <Header />
 
-          <main className="flex-1 w-full pt-16 md:pt-20">
+          <main className="flex-1 w-full pt-14 md:pt-16">
 
             {/* 1. TOP OF FUNNEL (Hero, Products, Partners) */}
             <Surface variant="default">
-              <div className="flex flex-col justify-start w-full relative gap-2 md:gap-3 pb-1">
+              <div className="flex flex-col justify-start w-full relative gap-1.5 md:gap-2 pb-0.5">
                 <SectionBackground variant="hero" />
 
                 {/* 🧠 1. HERO SECTION: The Billboard */}
@@ -170,7 +170,7 @@ const Index = () => {
                 </ScrollReveal>
 
                 {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
-                <Section spacing="xs" className="relative z-20 pt-0 pb-2 md:pb-3 w-full">
+                <Section spacing="xs" className="relative z-20 pt-0 pb-1 md:pb-1.5 w-full">
                   <Container size="expanded">
                     <PartnerBankMarquee />
                   </Container>

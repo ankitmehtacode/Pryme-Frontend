@@ -13,7 +13,7 @@ const HeroSection = memo(() => {
   return (
     <div
       ref={heroRef as any}
-      className="w-full relative z-10 h-full flex flex-col justify-start pt-2 lg:pt-4"
+      className="w-full relative z-10 h-full flex flex-col justify-start pt-1 lg:pt-2"
       style={{ minBlockSize: "var(--landing-hero-height, clamp(392px, 43vh, 490px))" }}
     >
       {/* ════════════════════════════════════════════════════════════

@@ -61,8 +61,8 @@ const PartnerBankMarquee = memo(() => {
       <div className="relative flex w-full overflow-hidden py-0">
 
         {/* Wide luminous edge fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-r from-white via-white/80 dark:from-[#050505] dark:via-[#050505]/80 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-52 bg-gradient-to-l from-white via-white/80 dark:from-[#050505] dark:via-[#050505]/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-52 bg-gradient-to-r from-white via-white/80 dark:from-[#050505] dark:via-[#050505]/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-52 bg-gradient-to-l from-white via-white/80 dark:from-[#050505] dark:via-[#050505]/80 to-transparent z-10 pointer-events-none" />
 
 
         {/* Marquee Track */}

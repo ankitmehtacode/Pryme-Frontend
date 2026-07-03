@@ -9,7 +9,7 @@ export const HeroActions = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.45 }}
-      className="flex flex-row flex-nowrap items-center gap-x-2 sm:gap-x-3 mb-0 w-full"
+      className="flex flex-row flex-wrap items-center gap-2 sm:gap-x-3 mb-0 w-full"
     >
       <Link
         to="/apply"

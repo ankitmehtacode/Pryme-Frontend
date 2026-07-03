@@ -482,6 +482,12 @@
   .pryme-columns > *, .pryme-autogrid > * {
     min-width: 0; /* Intrinsic blowout protection */
   }
+
+  @media (max-width: 1023px) {
+    .pryme-columns {
+      grid-template-columns: 1fr !important;
+    }
+  }
 }
 
 @layer utilities {

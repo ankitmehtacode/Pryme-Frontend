@@ -45,7 +45,7 @@ const allReviews = [...reviews, ...reviews];
 
 const ReviewCard = memo(({ review }: { review: typeof reviews[0] }) => {
   return (
-    <div className="w-[320px] md:w-[380px] flex-shrink-0 relative group">
+    <div className="w-[280px] xs:w-[320px] md:w-[380px] flex-shrink-0 relative group">
       {/* Card */}
       <div className="h-full bg-white/[0.03] border border-white/[0.06] p-6 rounded-2xl flex flex-col gap-4 transition-all duration-500 hover:border-[#103783]/30 hover:bg-white/[0.05]">
         
@@ -196,8 +196,8 @@ const CustomerReviews = () => {
       </div>
 
       {/* Edge fades — matched to exact bg color */}
-      <div className="absolute top-0 bottom-0 left-0 w-24 md:w-40 bg-gradient-to-r from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-24 md:w-40 bg-gradient-to-l from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-0 w-12 md:w-40 bg-gradient-to-r from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-12 md:w-40 bg-gradient-to-l from-slate-900 dark:from-[#030303] to-transparent z-20 pointer-events-none" />
     </div>
   );
 };
