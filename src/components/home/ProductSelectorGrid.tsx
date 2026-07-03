@@ -117,15 +117,15 @@ const ProductSelectorGrid = memo(() => {
       <BackgroundBeams />
 
       {/* Typography Section */}
-      <div className="w-full text-center pt-0 relative z-10">
+      <div className="w-full text-center pt-0 relative z-10 mb-2">
         <motion.div
           initial={headingInitial}
           whileInView={headingWhileInView}
           viewport={viewportHeading}
           transition={headingTransition}
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-3 border border-primary/20">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-widest border border-primary/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             Explore More Products
           </span>
         </motion.div>

@@ -674,3 +674,22 @@ button[role="combobox"] .select-item-icon {
     animation: none !important;
   }
 }
+
+/* Hide elements above the fold on short desktop displays (e.g. 13-inch laptops) */
+@media (min-width: 768px) and (max-height: 940px) {
+  .short-viewport-hidden {
+    display: none !important;
+  }
+}
+
+/* Hide second copy of marquee on mobile and on tall desktops, showing it only on short desktops below the fold */
+@media (max-width: 767px) {
+  .short-viewport-only {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (min-height: 941px) {
+  .short-viewport-only {
+    display: none !important;
+  }
+}
