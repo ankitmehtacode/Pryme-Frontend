@@ -137,8 +137,8 @@ export function AuthForms() {
 
   return (
     <div className="w-full max-w-[380px] z-10 flex flex-col items-stretch">
-      {/* Mobile Header (Hidden on LG) */}
-      <div className="lg:hidden flex justify-start cursor-pointer mb-6" onClick={() => navigate("/")}>
+      {/* Mobile Header (Hidden as we place logo top-left globally) */}
+      <div className="hidden justify-start cursor-pointer mb-6" onClick={() => navigate("/")}>
         <img src={prymeLogo} alt="Pryme Logo" className="h-[26px] auto" style={{ filter: 'brightness(0) saturate(100%) invert(18%) sepia(85%) saturate(2250%) hue-rotate(211deg) brightness(98%) contrast(92%)' }} />
       </div>
 

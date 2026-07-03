@@ -77,7 +77,7 @@ const PartnerBankMarquee = memo(() => {
                 <div className="absolute inset-0 -inset-x-2 -inset-y-1 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.04] transition-[background-color] duration-300 pointer-events-none" />
 
                 {/* Bounding box for uniform rendering */}
-                <div className="w-[130px] h-[32px] sm:w-[170px] sm:h-[42px] flex items-center justify-center relative">
+                <div className="w-[130px] h-[32px] sm:w-[170px] sm:h-[34px] flex items-center justify-center relative">
                   <img
                     src={bank.logo}
                     alt={bank.name}
@@ -95,7 +95,7 @@ const PartnerBankMarquee = memo(() => {
                 className="mx-6 sm:mx-8 flex-shrink-0 flex items-center justify-center group/item cursor-pointer relative py-2"
               >
                 {/* Bounding box for uniform rendering */}
-                <div className="w-[130px] h-[32px] sm:w-[170px] sm:h-[42px] flex items-center justify-center relative">
+                <div className="w-[130px] h-[32px] sm:w-[170px] sm:h-[34px] flex items-center justify-center relative">
                   <img
                     src={bank.logo}
                     alt=""

@@ -9,23 +9,16 @@ import {
 } from "@/components/ui/tooltip";
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 15, scale: 0.98 },
   show: (index: number) => ({
     opacity: 1, 
     y: 0, 
     scale: 1,
-    transition: { duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.4, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }
   })
 };
 const viewportOnce = { once: true };
 
-/**
- * CSS-only 3D tilt card — replaces per-pixel useSpring + useTransform
- * that was causing 4 React re-renders per mouse-move event per card.
- * 
- * Uses CSS perspective + :hover pseudo-class for the tilt effect.
- * The hover transform runs entirely on the compositor thread.
- */
 const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
   return (
     <Tooltip>
@@ -36,21 +29,20 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
           whileInView="show"
           viewport={viewportOnce}
           variants={cardVariants}
-          className="relative group bg-white/5 dark:bg-slate-900/50 rounded-2xl border border-slate-200/20 dark:border-[#103783]/20 p-6 transition-all duration-500 cursor-help text-center z-10
-            hover:border-[#103783]/30 hover:bg-white/10 hover:shadow-[0_20px_60px_-15px_rgba(16,55,131,0.2)]"
+          className="relative group bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200/40 dark:border-white/5 p-5 transition-all duration-300 cursor-help text-left z-10
+            hover:border-[#103783]/20 dark:hover:border-blue-500/20 hover:bg-white/60 dark:hover:bg-slate-900/60 hover:shadow-[0_12px_30px_-10px_rgba(16,55,131,0.12)]"
         >
-          {/* Card glow on hover — CSS only */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/0 via-transparent to-[#103783]/0 group-hover:from-[#103783]/20 group-hover:to-[#103783]/5 rounded-2xl transition-all duration-500 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#103783]/0 via-transparent to-[#103783]/0 group-hover:from-[#103783]/5 group-hover:to-[#103783]/2 rounded-2xl transition-all duration-300 pointer-events-none" />
           
           <div
-            className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-5 group-hover:bg-[#103783]/10 transition-colors duration-300 shadow-inner overflow-hidden relative"
+            className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800/60 flex items-center justify-center mb-3 group-hover:bg-[#103783]/10 transition-colors duration-300 border border-slate-200/10 dark:border-white/5 relative"
           >
-            <feature.icon className="w-8 h-8 text-[#103783] relative z-10" strokeWidth={2} />
+            <feature.icon className="w-5 h-5 text-[#103783] dark:text-blue-400 relative z-10" strokeWidth={2.2} />
           </div>
           
           <div>
-            <h3 className="font-semibold text-[#0a1530] dark:text-white mb-2 text-base">{feature.title}</h3>
-            <p className="text-sm text-slate-400 leading-relaxed font-medium">
+            <h3 className="font-bold text-[#0a1530] dark:text-white mb-1 text-sm tracking-tight">{feature.title}</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
               {feature.description}
             </p>
           </div>
@@ -62,15 +54,6 @@ const TiltCard = ({ feature, index }: { feature: any; index: number }) => {
     </Tooltip>
   );
 };
-
-const headlineInitial = { opacity: 0, y: 20 };
-const headlineInView = { opacity: 1, y: 0 };
-const headlineViewport = { once: true, margin: "-100px" };
-const headlineTransition = { duration: 0.7 };
-
-const quoteInitial = { opacity: 0, scale: 0.96 };
-const quoteInView = { opacity: 1, scale: 1 };
-const quoteTransition = { duration: 0.6, delay: 0.2 };
 
 export default function TrustMonologue() {
   const securityFeatures = [
@@ -101,47 +84,33 @@ export default function TrustMonologue() {
   ];
 
   return (
-    <div className="w-full">
-      {/* Trust Quote */}
-      <motion.div
-        initial={headlineInitial}
-        whileInView={headlineInView}
-        viewport={headlineViewport}
-        transition={headlineTransition}
-        className="text-center mb-16"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50 text-[#103783] dark:text-blue-400 text-xs font-semibold uppercase tracking-widest mb-6">
-          <Shield className="w-4 h-4" />
-          Your Privacy Protected
-        </div>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-[#0a1530] dark:text-white tracking-tight mb-8">
-          Why Trust Us?
-        </h2>
-        <motion.div
-          initial={quoteInitial}
-          whileInView={quoteInView}
-          viewport={viewportOnce}
-          transition={quoteTransition}
-          className="max-w-3xl mx-auto bg-gradient-to-b from-slate-200/80 dark:from-white/10 to-transparent p-[1.5px] rounded-[2.5rem]"
-        >
-          <div className="bg-white dark:bg-[#050505] rounded-[2.4rem] p-8 md:p-12 shadow-xl dark:shadow-2xl">
-            <p className="text-lg md:text-2xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-              "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching, and permanently deleted from the Database after your session. We do not sell, or share your personal information."
-            </p>
+    <div className="w-full max-w-6xl mx-auto py-4 md:py-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* Left Column (copy) */}
+        <div className="lg:col-span-5 flex flex-col items-start text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/30 dark:border-slate-700/30 text-[#103783] dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
+            <Shield className="w-3.5 h-3.5" />
+            Your Privacy Protected
           </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Security Features Grid */}
-      <TooltipProvider>
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
-        >
-          {securityFeatures.map((feature, idx) => (
-            <TiltCard key={feature.title} feature={feature} index={idx} />
-          ))}
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#0a1530] dark:text-white tracking-tight mb-4">
+            Why Trust Us?
+          </h2>
+          <div className="border-l-2 border-primary/30 pl-4 py-1.5 text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed font-medium">
+            "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching, and permanently deleted from the database after your session. We do not sell or share your personal information."
+          </div>
         </div>
-      </TooltipProvider>
+
+        {/* Right Column (2x2 grid of cards) */}
+        <div className="lg:col-span-7 w-full">
+          <TooltipProvider>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {securityFeatures.map((feature, idx) => (
+                <TiltCard key={feature.title} feature={feature} index={idx} />
+              ))}
+            </div>
+          </TooltipProvider>
+        </div>
+      </div>
     </div>
   );
 }

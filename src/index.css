@@ -278,7 +278,7 @@
 
   @media (min-width: 768px) {
     :root {
-      --landing-hero-height: clamp(300px, 22vw, 340px);
+      --landing-hero-height: clamp(240px, 18vw, 280px);
       --landing-hero-grid: minmax(430px, 460px) minmax(0, 1fr);
       --landing-hero-gap: clamp(12px, 1.5vw, 24px);
       --landing-copy-width: clamp(430px, 32vw, 460px);
@@ -287,7 +287,7 @@
       --landing-offer-height: clamp(240px, 23vw, 280px);
       --landing-offer-right: clamp(4px, 1vw, 16px);
       --landing-offer-bottom: clamp(12px, 3vw, 36px);
-      --landing-product-card-width: clamp(150px, 14vw, 200px);
+      --landing-product-card-width: clamp(130px, 11vw, 160px);
       --landing-product-card-height: calc(var(--landing-product-card-width) * 0.75);
       --landing-hero-section-end: 0;
       --hero-grid: var(--landing-hero-grid);
@@ -298,10 +298,10 @@
 
   @media (min-width: 1024px) and (max-width: 1399px) {
     :root {
-      --landing-hero-height: clamp(280px, 20vw, 320px);
+      --landing-hero-height: clamp(240px, 16vw, 270px);
       --landing-hero-grid: minmax(430px, 470px) minmax(0, 1fr);
       --landing-artwork-width: clamp(700px, 58vw, 850px);
-      --landing-offer-width: clamp(340px, 26vw, 380px);
+      --landing-offer-width: clamp(300px, 22vw, 330px);
       --landing-offer-height: calc((var(--landing-offer-width) / 1.586) + 75px);
       --landing-offer-right: clamp(12px, 2vw, 36px);
       --landing-offer-bottom: clamp(16px, 2.5vw, 40px);
@@ -310,11 +310,11 @@
 
   @media (min-width: 1400px) {
     :root {
-      --landing-hero-height: clamp(320px, 18vw, 360px);
+      --landing-hero-height: clamp(260px, 15vw, 300px);
       --landing-hero-grid: minmax(460px, 500px) minmax(0, 1fr);
       --landing-copy-width: clamp(460px, 32vw, 500px);
       --landing-artwork-width: clamp(800px, 52vw, 1050px);
-      --landing-offer-width: clamp(380px, 24vw, 420px);
+      --landing-offer-width: clamp(330px, 20vw, 370px);
       --landing-offer-height: calc((var(--landing-offer-width) / 1.586) + 75px);
       --landing-offer-right: clamp(24px, 4vw, 64px);
       --landing-offer-bottom: clamp(24px, 4vw, 64px);

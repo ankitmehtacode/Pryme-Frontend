@@ -109,7 +109,7 @@ const CibilTips = () => {
   const isBulbActive = expandedIndex !== null;
 
   return (
-    <div className="bg-card dark:bg-[#080d1e] text-card-foreground border border-border dark:border-white/10 rounded-[2rem] p-5 md:p-7 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all">
+    <div className="bg-card dark:bg-[#080d1e] text-card-foreground border border-border dark:border-white/10 rounded-[2rem] p-4 md:p-5 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all w-full h-full flex flex-col">
       {/* Ambient glow — intensifies when a tip is expanded */}
       <motion.div
         animate={{
@@ -120,7 +120,7 @@ const CibilTips = () => {
       />
 
       {/* Header with Glowing Lightbulb */}
-      <div className="flex items-center gap-3.5 mb-5 relative z-10">
+      <div className="flex items-center gap-3.5 mb-3.5 relative z-10">
         <motion.div
           animate={{
             boxShadow: isBulbActive
@@ -157,7 +157,7 @@ const CibilTips = () => {
       </div>
 
       {/* Filter Pills */}
-      <div className="flex flex-wrap gap-2 mb-5 relative z-10">
+      <div className="flex flex-wrap gap-2 mb-3.5 relative z-10">
         {[
           { key: "all", label: "All Tips" },
           { key: "advanced", label: "Pro Moves" },
@@ -180,7 +180,7 @@ const CibilTips = () => {
       </div>
 
       {/* Tips Accordion - Constrained Height with Custom Scrollbar */}
-      <div className="space-y-3 relative z-10 max-h-[60vh] overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
+      <div className="space-y-2 relative z-10 flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
         <AnimatePresence mode="popLayout">
           {(showAll ? filteredTips : filteredTips.slice(0, 3)).map((tip, index) => {
             const isExpanded = expandedIndex === index;
@@ -210,7 +210,7 @@ const CibilTips = () => {
                   onKeyDown={(e) => e.key === "Enter" && toggleTip(index)}
                 >
                   {/* Header Row */}
-                  <div className="flex items-center gap-3.5 p-4">
+                  <div className="flex items-center gap-3.5 py-3 px-3.5">
                     {/* Per-tip mini lightbulb that glows when active */}
                     <motion.div
                       animate={{
@@ -234,7 +234,7 @@ const CibilTips = () => {
                           {categoryLabels[tip.category]}
                         </span>
                       </div>
-                      <h4 className="text-sm font-bold text-foreground leading-tight truncate pr-6">{tip.title}</h4>
+                      <h4 className="text-sm font-bold text-foreground leading-tight break-words pr-2">{tip.title}</h4>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className={cn("text-[9px] font-bold px-2 py-1 rounded-md border hidden sm:inline-block", colors)}>
@@ -296,7 +296,7 @@ const CibilTips = () => {
 
       {/* See All / Show Less button */}
       {filteredTips.length > 3 && (
-        <div className="flex justify-center mt-4 mb-2 relative z-10">
+        <div className="flex justify-center mt-3 mb-1 relative z-10">
           <button
             onClick={() => setShowAll(!showAll)}
             className="w-full sm:w-auto bg-primary/10 dark:bg-[#103783]/20 border border-primary/20 dark:border-[#103783]/40 hover:bg-primary/20 dark:hover:bg-[#103783]/30 text-primary dark:text-[#3876f2] font-bold text-[10px] md:text-xs px-6 py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
@@ -308,7 +308,7 @@ const CibilTips = () => {
       )}
 
       {/* Footer note */}
-      <div className="mt-5 pt-4 border-t border-border dark:border-white/5 relative z-10">
+      <div className="mt-3 pt-3 border-t border-border dark:border-white/5 relative z-10">
         <div className="flex items-start gap-2">
           <ShieldCheck className="w-4 h-4 text-primary dark:text-[#103783] shrink-0 mt-0.5" />
           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider leading-relaxed">
