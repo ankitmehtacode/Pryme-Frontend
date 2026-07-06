@@ -27,7 +27,7 @@ const Auth = () => {
               backfaceVisibility: "hidden",
             }}
             loading="eager"
-            // @ts-ignore
+            // @ts-expect-error - fetchPriority missing from React.ImgHTMLAttributes
             fetchPriority="high"
             decoding="async"
             draggable={false}
