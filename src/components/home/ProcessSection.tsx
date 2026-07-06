@@ -109,14 +109,14 @@ const ProcessSection = () => {
               {/* Scroll-linked animated fill — Framer Motion scaleY */}
               <motion.div 
                 className="absolute inset-0 origin-top"
-                style={{ scaleY }}
+                style={{ scaleY, willChange: "transform" }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-[#103783] via-[#4a6db5] to-[#9BAFD9]" />
                 {/* Glowing comet head */}
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[5px] h-3 bg-[#9BAFD9] rounded-full shadow-[0_0_8px_2px_rgba(155,175,217,0.6)]" />
               </motion.div>
             </div>
-
+ 
             {/* Steps Container */}
             <div className="relative z-10 flex flex-col space-y-8 md:space-y-12">
               {steps.map((step, idx) => (
@@ -139,8 +139,8 @@ const ProcessSection = () => {
                   {/* Card content */}
                   <div className={cn(
                     "w-full p-6 md:p-8 rounded-2xl border transition-all duration-400",
-                    "bg-[#030303]/80 backdrop-blur-sm border-white/[0.06]",
-                    "hover:bg-white/[0.04] hover:border-[#103783]/25 shadow-sm"
+                    "bg-[#0d1222] border-white/[0.06]",
+                    "hover:bg-[#121930] hover:border-[#103783]/25 shadow-sm"
                   )}>
                     <div className="flex items-start gap-5">
                       <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#103783] to-[#9BAFD9] tabular-nums shrink-0 leading-none pt-0.5">

@@ -40,9 +40,9 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
   const cibilUi = useMemo(() => {
     if (cibilScore === -1) return { color: "text-slate-500", bg: "bg-slate-500/10", border: "border-slate-500/20", label: "No History" };
     if (cibilScore >= 750) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Excellent" };
-    if (cibilScore >= 650) return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Good" };
-    if (cibilScore >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Fair" };
-    return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Poor" };
+    if (cibilScore >= 650) return { color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20", label: "Good/Fair" };
+    if (cibilScore >= 550) return { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Poor" };
+    return { color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20", label: "Very Poor" };
   }, [cibilScore]);
 
   const selectedProduct = useMemo(() => {
@@ -188,6 +188,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
                     value={cibilInputVal}
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => setCibilInputVal(e.target.value)}
+                    onWheel={(e) => e.currentTarget.blur()}
                     onBlur={() => {
                       const parsed = parseInt(cibilInputVal, 10);
                       let val;

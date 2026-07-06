@@ -6,6 +6,7 @@ import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
+import applyCustomBg from "@/assets/images/apply-bg-custom.png";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";
@@ -389,7 +390,25 @@ const Apply = () => {
       />
 
       {/* 🧠 UI FIX: Changed hardcoded black `#080d1e` to semantic adaptive `bg-slate-50 dark:bg-[#080d1e]` */}
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary relative overflow-hidden transition-colors duration-300">
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e] selection:bg-primary/20 selection:text-primary relative overflow-x-hidden transition-colors duration-300">
+
+        {/* Custom High-Fidelity Cover Background */}
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <img
+            src={applyCustomBg}
+            alt=""
+            className="w-full h-full object-cover object-center"
+            style={{
+              imageRendering: "auto",
+              backfaceVisibility: "hidden",
+            }}
+            loading="eager"
+            // @ts-ignore
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+          />
+        </div>
 
         <Header />
 

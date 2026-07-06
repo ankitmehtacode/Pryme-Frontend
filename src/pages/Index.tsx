@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, lazy, Suspense } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Helmet } from "react-helmet-async";
 import { Building2 } from "lucide-react";
@@ -48,22 +48,21 @@ import HeroSection from "@/components/home/HeroSection";
 import ProductSelectorGrid from "@/components/home/ProductSelectorGrid";
 import PartnerBankMarquee from "@/components/home/PartnerBankMarquee";
 
-// Below-the-fold components (lazy-loaded — won't block initial paint)
-const ProcessSection = lazy(() => import("@/components/home/ProcessSection"));
-const TrustMonologue = lazy(() => import("@/components/home/TrustMonologue"));
-
-const CustomerReviews = lazy(() => import("@/components/home/CustomerReviews"));
+// Below-the-fold components
+import ProcessSection from "@/components/home/ProcessSection";
+import TrustMonologue from "@/components/home/TrustMonologue";
+import CustomerReviews from "@/components/home/CustomerReviews";
 
 import { BookOpen, ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { blogs } from "@/data/blogs";
 
-// Loan Utility Components (below-the-fold — lazy-loaded)
-const EMICalculator = lazy(() => import("@/components/loan/EMICalculator"));
-const PrepaymentCalculator = lazy(() => import("@/components/loan/PrepaymentCalculator"));
-const OffersRewards = lazy(() => import("@/components/loan/OffersRewards"));
-const CibilTips = lazy(() => import("@/components/loan/CibilTips"));
+// Loan Utility Components
+import EMICalculator from "@/components/loan/EMICalculator";
+import PrepaymentCalculator from "@/components/loan/PrepaymentCalculator";
+import OffersRewards from "@/components/loan/OffersRewards";
+import CibilTips from "@/components/loan/CibilTips";
 
 // 🧠 1. NATIVE ERROR BOUNDARY: Localized crash protection. 
 class LocalErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any, errorInfo: any }> {
@@ -98,6 +97,20 @@ class LocalErrorBoundary extends React.Component<{ children: React.ReactNode }, 
 const Index = () => {
   const calculatorRef = useRef<HTMLDivElement>(null);
   const [calculatorHeight, setCalculatorHeight] = useState<number | undefined>(undefined);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        const timer = setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [location.hash, location.pathname]);
 
   useEffect(() => {
     if (!calculatorRef.current) return;
@@ -170,7 +183,7 @@ const Index = () => {
                 </ScrollReveal>
 
                 {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
-                <Section spacing="xs" className="relative z-20 pt-0 pb-1 md:pb-1.5 w-full">
+                <Section id="partners" spacing="xs" className="relative z-20 pt-10 pb-12 md:pt-16 md:pb-20 w-full">
                   <Container size="expanded">
                     <PartnerBankMarquee />
                   </Container>
@@ -179,7 +192,6 @@ const Index = () => {
             </Surface>
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
-            <Suspense fallback={<div className="min-h-[200px]" />}>
               <Surface variant="muted">
                 <Section spacing="md" className="relative z-10" style={{ paddingBlockStart: "clamp(24px, 3.5vw, 48px)", paddingBlockEnd: "clamp(20px, 2.5vw, 36px)" }}>
                   {/* Gradient section divider */}
@@ -251,12 +263,10 @@ const Index = () => {
                   </ScrollReveal>
                 </Section>
               </Surface>
-            </Suspense>
 
             {/* 5. BOTTOM OF FUNNEL: Closing the deal (Process & Trust) */}
-            <Suspense fallback={<div className="min-h-[200px]" />}>
               <Surface variant="inverse">
-                <Section spacing="lg" style={{ paddingBlockStart: "clamp(24px, 3vw, 48px)", paddingBlockEnd: "clamp(20px, 2.5vw, 36px)" }}>
+                <Section id="process" spacing="lg" style={{ paddingBlockStart: "clamp(24px, 3vw, 48px)", paddingBlockEnd: "clamp(20px, 2.5vw, 36px)" }}>
                   <Container size="expanded"><ProcessSection /></Container>
                 </Section>
               </Surface>
@@ -289,7 +299,6 @@ const Index = () => {
                   <Container size="expanded"><CustomerReviews /></Container>
                 </Section>
               </Surface>
-            </Suspense>
 
             {/* 🧠 6. BLOG PREVIEW & FAQ */}
             <Surface variant="default">

@@ -11,6 +11,7 @@ import product2 from "@/assets/products/product-2.jpg"; // Wallet -> Personal
 import product3 from "@/assets/products/product-3.jpg"; // House -> Home
 import product4 from "@/assets/products/product-4.jpg"; // Briefcase -> Business
 import product5 from "@/assets/products/product-5.png"; // Building/House -> LAP
+import product6 from "@/assets/products/product-6.jpg"; // Balance Transfer
 
 export const BANK_OFFERS = [
   "Lowest Interest Rates Starting at 10.15% at Kotak Bank",
@@ -81,6 +82,18 @@ export const products = [
     overlay: "transparent",
     borderColor: "rgba(255,255,255,0.05)",
   },
+  {
+    id: "transfer",
+    label: "BALANCE TRANSFER & TOP UP",
+    image: product6,
+    tag: "SAVE INTEREST",
+    href: "/apply?type=transfer",
+    accent: "142, 70%, 45%",
+    bg: "transparent",
+    imgClass: "",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
+  },
 ];
 
 const spring = { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.7 };
@@ -117,7 +130,7 @@ const ProductSelectorGrid = memo(() => {
       <BackgroundBeams />
 
       {/* Typography Section */}
-      <div className="w-full text-center pt-0 relative z-10 mb-2">
+      <div className="w-full text-center pt-0 relative z-10 mb-8 md:mb-10 -mt-3 md:-mt-4">
         <motion.div
           initial={headingInitial}
           whileInView={headingWhileInView}
@@ -140,7 +153,7 @@ const ProductSelectorGrid = memo(() => {
           viewport={viewportOnce}
           className="w-full"
         >
-          <AutoGrid minItemWidth="clamp(142px, 13vw, 210px)" gap="md" className="pt-1 relative z-10 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8 w-full justify-items-center relative z-10 pt-1">
           {products.map((product) => (
             <motion.div 
               key={product.id} 
@@ -155,7 +168,7 @@ const ProductSelectorGrid = memo(() => {
                     GPU with zero main-thread involvement. */}
                 <motion.div
                   variants={imageVariants}
-                  className="relative w-[140px] h-[105px] sm:w-[160px] sm:h-[120px] md:w-[180px] md:h-[135px] lg:w-[var(--landing-product-card-width,200px)] lg:h-[var(--landing-product-card-height,150px)] aspect-[4/3] shrink-0 rounded-2xl md:rounded-[1.5rem]
+                  className="relative w-[120px] h-[90px] sm:w-[140px] sm:h-[105px] md:w-[160px] md:h-[120px] lg:w-[var(--landing-product-card-width,180px)] lg:h-[var(--landing-product-card-height,135px)] aspect-[4/3] shrink-0 rounded-2xl md:rounded-[1.5rem]
                     transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1.5 active:scale-95"
                   style={{ willChange: "transform" }}
                 >
@@ -211,7 +224,7 @@ const ProductSelectorGrid = memo(() => {
               </Link>
             </motion.div>
           ))}
-          </AutoGrid>
+          </div>
         </motion.div>
       </div>
 

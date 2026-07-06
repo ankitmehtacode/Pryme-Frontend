@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
 import prymeLogo from "@/assets/Pryme2.svg";
 import { Container } from "@/components/layout/Primitives";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const CONTACT_PHONE = "+91 92432 94291";
 const CONTACT_PHONE_LINK = "tel:+919243294291";
@@ -52,19 +53,19 @@ const Footer = () => {
   const legalLinks = [
     { label: "Privacy Policy", href: "/services" },
     { label: "Terms of Service", href: "/services" },
-    { label: "Grievance Redressal", href: "/services" },
-    { label: "RBI Guidelines", href: "/services" },
+    { label: "Grievance Redressal", href: "/grievance-redressal" },
+    { label: "RBI Kehta Hai", href: "https://rbikehtahai.rbi.org.in", isExternal: true },
   ];
 
   const toolLinks = [
-    { label: "EMI Calculator", href: "/emi-calculator" },
     { label: "Eligibility Checker", href: "/apply" },
-    { label: "Document Checklist", href: "/document-check" },
-    { label: "Compare Loans", href: "/services" },
+    { label: "EMI Calculator", href: "/emi-calculator" },
+    { label: "Prepayment Calculator", href: "/prepayment-calculator" },
+    { label: "Rewards Calculator", href: "/rewards-calculator" },
   ];
 
   return (
-    <footer className="bg-[#060a18] text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
+    <footer className="relative z-10 bg-[#060a18] text-zinc-200 dark:bg-background dark:border-t border-border overflow-x-hidden">
 
       {/* Brand gradient accent stripe */}
       <div className="h-[2px] bg-gradient-to-r from-transparent via-[#103783] to-transparent" />
@@ -197,17 +198,56 @@ const Footer = () => {
               <p className="text-[11px] text-zinc-600">
                 © {currentYear} GOPRYME FINTECH Pvt. Ltd. All rights reserved. CIN: U70200MP2026PTC081776
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 {legalLinks.map((link) => (
-                  <Link
-                    key={link.label}
-                    to={link.href}
-                    onClick={() => handleLinkClick(link.href)}
-                    className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
+                  link.isExternal ? (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.label}
+                      to={link.href}
+                      onClick={() => handleLinkClick(link.href)}
+                      className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )
                 ))}
+                <Dialog>
+                  <DialogTrigger className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors">
+                    RBI Guidelines
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>RBI Guidelines & Resources</DialogTitle>
+                      <DialogDescription>
+                        Important links and resources provided by the Reserve Bank of India.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-3 mt-2">
+                      <a href="https://www.rbi.org.in/" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-700 dark:text-zinc-300 hover:text-[#103783] dark:hover:text-[#9BAFD9] transition-colors">
+                        Reserve Bank of India (Official Website)
+                      </a>
+                      <a href="https://cms.rbi.org.in" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-700 dark:text-zinc-300 hover:text-[#103783] dark:hover:text-[#9BAFD9] transition-colors">
+                        Complaint Management System (CMS)
+                      </a>
+                      <a href="https://www.rbi.org.in/commonperson/english/scripts/FAQs.aspx?Id=3413" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-700 dark:text-zinc-300 hover:text-[#103783] dark:hover:text-[#9BAFD9] transition-colors">
+                        FAQs on Digital Lending
+                      </a>
+                      <a href="https://www.rbi.org.in/commonperson/english/scripts/FAQs.aspx?Id=3407" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-700 dark:text-zinc-300 hover:text-[#103783] dark:hover:text-[#9BAFD9] transition-colors">
+                        FAQs on NBFCs
+                      </a>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

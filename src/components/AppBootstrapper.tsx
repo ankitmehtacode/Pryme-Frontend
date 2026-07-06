@@ -24,7 +24,7 @@ const BOOT_TIMEOUT_MS = 4000;
 const PUBLIC_PATHS = [
   "/", "/auth", "/apply", "/about", "/faq", "/services", "/contact", 
   "/blogs", "/offers", "/emi-calculator", "/prepayment-calculator", 
-  "/rewards-calculator", "/apply-direct"
+  "/rewards-calculator", "/apply-direct", "/careers", "/grievance-redressal"
 ];
 
 interface Props {

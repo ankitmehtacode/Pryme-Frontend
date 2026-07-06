@@ -20,13 +20,12 @@ export const HeroContent = () => {
         {[
           { text: "RBI COMPLIANT", icon: Shield },
           { text: "ISO 27001 CERTIFIED", icon: Lock },
-          { text: "256-BIT ENCRYPTION", icon: ShieldCheck },
-          { text: "GDPR READY", icon: CheckCircle2 }
+          { text: "256-BIT ENCRYPTION", icon: ShieldCheck }
         ].map((badge, i) => (
           <span key={i} className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-wider text-[#103783]/70">
             <badge.icon className="w-2.5 h-2.5 text-[#103783]/60" />
             {badge.text}
-            {i < 3 && <span className="text-slate-300/60 ml-0.5">•</span>}
+            {i < 2 && <span className="text-slate-300/60 ml-0.5">•</span>}
           </span>
         ))}
       </motion.div>
@@ -36,31 +35,23 @@ export const HeroContent = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="text-[clamp(2.5rem,4vw,3.5rem)] md:text-[clamp(2.15rem,2.5vw,2.5rem)] lg:text-[clamp(2.25rem,2.5vw,2.55rem)] font-extrabold text-[#0a1530] tracking-tight leading-[1.02] mb-1 md:mb-1.5"
+        className="text-[clamp(2.15rem,7.5vw,2.5rem)] md:text-[clamp(2.15rem,2.5vw,2.5rem)] lg:text-[clamp(2.25rem,2.5vw,2.55rem)] font-extrabold text-[#0a1530] tracking-tight leading-[1.05] mb-2 md:mb-1.5"
         style={{ 
           fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif',
           maxInlineSize: "40ch"
         }}
       >
-        {/* Mobile: 2-line layout */}
-        <span className="md:hidden">
-          FIND THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
-          BEFORE YOU APPLY.
-        </span>
-        {/* Desktop: original 3-line layout */}
-        <span className="hidden md:inline">
-          FIND THE<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
-          BEFORE YOU APPLY.
-        </span>
+        FIND THE<br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#103783] to-[#1e56c7]">RIGHT BANK</span><br />
+        BEFORE YOU APPLY.
       </motion.h1>
-
+ 
       {/* Subheadline — Gilroy font */}
       <motion.p
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="text-[clamp(1.125rem,2vw,1.35rem)] md:text-[clamp(0.85rem,0.95vw,0.95rem)] text-[#3b4764] leading-relaxed md:leading-[1.28] mb-3 md:mb-2.5 font-medium"
+        className="text-[clamp(0.95rem,1.8vw,1.15rem)] md:text-[clamp(0.85rem,0.95vw,0.95rem)] text-[#3b4764] leading-relaxed md:leading-[1.28] mb-3 md:mb-2.5 font-medium"
         style={{ 
           fontFamily: '"Gilroy", "Inter", system-ui, sans-serif',
           maxInlineSize: "43ch"
@@ -78,21 +69,19 @@ export const HeroContent = () => {
       {/* ─── MOBILE: Inline Loan Products Grid (conversion-first) ─── */}
       <div className="md:hidden mt-3">
         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Explore Loan Products</p>
-        <div className="grid grid-cols-2 gap-1.5">
-          {loanProducts.map((product, idx) => (
+        <div className="grid grid-cols-2 gap-2">
+          {loanProducts.map((product) => (
             <Link
               key={product.id}
               to={product.href}
-              className={`flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-slate-100 rounded-lg px-2.5 py-2 hover:border-[#103783]/20 hover:bg-white transition-all active:scale-[0.97] ${
-                idx === loanProducts.length - 1 ? 'col-span-2' : ''
-              }`}
+              className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-slate-100 rounded-xl px-3 py-2.5 hover:border-[#103783]/20 hover:bg-white transition-all active:scale-[0.97] shadow-sm"
             >
-              <div className="w-9 h-9 rounded-md overflow-hidden shrink-0 bg-slate-50">
+              <div className="w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-50 border border-slate-100">
                 <img src={product.image} alt={product.label} className="w-full h-full object-cover" loading="eager" />
               </div>
-              <div className="min-w-0">
-                <span className="text-[9px] font-extrabold text-[#0a1530] uppercase tracking-wide leading-tight block truncate">{product.label}</span>
-                <span className="text-[7px] font-bold text-[#103783]/60 uppercase tracking-wider">{product.tag}</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] font-extrabold text-[#0a1530] uppercase tracking-wide leading-snug block line-clamp-2 mb-0.5">{product.label}</span>
+                <span className="text-[8px] font-bold text-[#103783]/60 uppercase tracking-wider block">{product.tag}</span>
               </div>
             </Link>
           ))}

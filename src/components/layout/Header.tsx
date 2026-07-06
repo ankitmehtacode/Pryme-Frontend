@@ -55,6 +55,8 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/faq", label: "FAQ" },
   { href: "/blogs", label: "Insights" },
+  { href: "/careers", label: "Careers" },
+  { href: "/rewards-calculator", label: "Rewards and Offers" },
 ];
 
 // --- Mobile Menu Component ---

@@ -14,7 +14,7 @@ interface PrepaymentCalculatorProps {
   className?: string;
 }
 
-const PrepaymentCalculator = ({ 
+const PrepaymentCalculator = ({
   showTerminology = true,
   className = ""
 }: PrepaymentCalculatorProps) => {
@@ -53,7 +53,7 @@ const PrepaymentCalculator = ({
       if (balance <= 0) break;
 
       const interestForMonth = balance * monthlyRate;
-      
+
       // Calculate current EMI for this month (incorporating annual 5% step-up if active)
       const isStepUp = strategy === "step-up" || strategy === "combo";
       const yearIndex = Math.floor((m - 1) / 12);
@@ -103,8 +103,8 @@ const PrepaymentCalculator = ({
     };
   }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth, strategy]);
 
-  const savingsPercentage = calculations.interestOriginal > 0 
-    ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1) 
+  const savingsPercentage = calculations.interestOriginal > 0
+    ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1)
     : "0";
 
   const prepaymentTerminology = [
@@ -150,11 +150,10 @@ const PrepaymentCalculator = ({
             <button
               key={tab.id}
               onClick={() => setStrategy(tab.id as any)}
-              className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${
-                strategy === tab.id
+              className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${strategy === tab.id
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-emerald-500 dark:text-[#080d1e]"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -163,10 +162,10 @@ const PrepaymentCalculator = ({
 
         {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 relative z-10 w-full items-stretch">
-          
+
           {/* Left Col: 5 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
           <div className="lg:grid lg:grid-rows-5 lg:gap-3 flex flex-col space-y-3 lg:space-y-0 w-full min-w-0">
-            
+
             {/* Loan Amount */}
             <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-3 rounded-xl border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
@@ -175,6 +174,7 @@ const PrepaymentCalculator = ({
                   type="number"
                   value={loanAmount}
                   onChange={(e) => setLoanAmount(Number(e.target.value))}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   min={100000}
                   max={10000000}
@@ -191,6 +191,7 @@ const PrepaymentCalculator = ({
                   type="number"
                   value={interestRate}
                   onChange={(e) => setInterestRate(Number(e.target.value))}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-20 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   min={6}
                   max={24}
@@ -209,11 +210,12 @@ const PrepaymentCalculator = ({
                     type="number"
                     value={tenureMonths}
                     onChange={(e) => setTenureMonths(Number(e.target.value))}
+                    onWheel={(e) => e.currentTarget.blur()}
                     className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-20 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     min={12}
                     max={360}
                   />
-                  <span className="text-[8px] text-muted-foreground whitespace-nowrap">({(tenureMonths/12).toFixed(1)} Yrs)</span>
+                  <span className="text-[8px] text-muted-foreground whitespace-nowrap">({(tenureMonths / 12).toFixed(1)} Yrs)</span>
                 </div>
               </div>
               <Slider max={360} min={12} step={12} value={[tenureMonths]} onValueChange={(val) => setTenureMonths(val[0])} className="w-full cursor-pointer py-0.5" />
@@ -229,6 +231,7 @@ const PrepaymentCalculator = ({
                       type="number"
                       value={prepaymentAmount}
                       onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                      onWheel={(e) => e.currentTarget.blur()}
                       className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       min={10000}
                       max={Math.min(loanAmount, 5000000)}
@@ -245,6 +248,7 @@ const PrepaymentCalculator = ({
                       type="number"
                       value={prepaymentMonth}
                       onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
+                      onWheel={(e) => e.currentTarget.blur()}
                       className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-20 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       min={1}
                       max={Math.max(1, tenureMonths - 1)}
@@ -257,7 +261,7 @@ const PrepaymentCalculator = ({
               /* Strategy Specific Info Card spanning 2 rows on desktop to align with bottom rows of output */
               <div className="lg:row-span-2 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-4 rounded-xl border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden h-full select-none">
                 <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-                
+
                 {strategy === "13th-emi" && (
                   <div className="flex gap-3 items-start relative z-10">
                     <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
@@ -334,15 +338,22 @@ const PrepaymentCalculator = ({
 
           {/* Right Col: Savings Hero & Output Matrix */}
           <div className="flex flex-col lg:grid lg:grid-rows-5 gap-3 w-full min-w-0 h-full mt-2 lg:mt-0">
-            
+
             {/* Savings Hero */}
             <div className="flex flex-col items-center justify-center p-4 lg:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 shadow-inner relative overflow-hidden flex-1 lg:row-span-3">
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b9811a_1px,transparent_1px),linear-gradient(to_bottom,#10b9811a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
-              
+
               <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5 relative z-10">
                 <TrendingDown className="w-3.5 h-3.5" /> Interest Saved
               </span>
-              <span className="text-xl lg:text-2xl xl:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none drop-shadow-sm mb-2 truncate max-w-full relative z-10">
+              <span className={cn(
+                "font-extrabold text-emerald-600 dark:text-emerald-400 leading-none drop-shadow-sm mb-2 truncate max-w-full relative z-10",
+                formatCurrency(calculations.interestSaved).length > 14
+                  ? "text-base lg:text-lg xl:text-xl"
+                  : formatCurrency(calculations.interestSaved).length > 10
+                    ? "text-lg lg:text-xl xl:text-2xl"
+                    : "text-xl lg:text-2xl xl:text-3xl"
+              )}>
                 {formatCurrency(calculations.interestSaved)}
               </span>
               <span className="text-[9px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-sm border border-emerald-500/20 relative z-10">
@@ -351,31 +362,41 @@ const PrepaymentCalculator = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3 shrink-0 lg:row-span-1">
-               {/* Tenure Saved */}
-               <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
-                 <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Tenure Trimmed</span>
-                 <span className="text-xl font-bold text-foreground leading-none">{calculations.tenureSaved} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
-               </div>
-               
-               {/* New Tenure */}
-               <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
-                 <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">New Total Tenure</span>
-                 <span className="text-xl font-bold text-foreground leading-none">{calculations.monthsWithPrepayment} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
-               </div>
+              {/* Tenure Saved */}
+              <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
+                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Tenure Trimmed</span>
+                <span className="text-xl font-bold text-foreground leading-none">{calculations.tenureSaved} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
+              </div>
+
+              {/* New Tenure */}
+              <div className="flex flex-col items-center justify-center p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm">
+                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">New Total Tenure</span>
+                <span className="text-xl font-bold text-foreground leading-none">{calculations.monthsWithPrepayment} <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Mo</span></span>
+              </div>
             </div>
 
             {/* Comparison Matrix */}
             <div className="grid grid-cols-2 gap-3 shrink-0 lg:row-span-1">
               <div className="p-3 bg-red-50/30 dark:bg-red-500/5 rounded-xl border border-red-200/50 dark:border-red-500/10 flex flex-col justify-center items-center text-center">
                 <p className="text-[8px] font-bold uppercase tracking-wider text-red-500/70 mb-1">Base Interest</p>
-                <p className="text-sm font-bold text-foreground leading-none truncate w-full">{formatCurrency(calculations.interestOriginal)}</p>
+                <p className={cn(
+                  "font-bold text-foreground leading-none truncate w-full",
+                  formatCurrency(calculations.interestOriginal).length > 12
+                    ? "text-[10px] sm:text-xs"
+                    : "text-xs sm:text-sm"
+                )}>{formatCurrency(calculations.interestOriginal)}</p>
               </div>
               <div className="p-3 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl border border-emerald-200/50 dark:border-emerald-500/10 flex flex-col justify-center items-center text-center">
                 <p className="text-[8px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70 mb-1">New Interest</p>
-                <p className="text-sm font-bold text-foreground leading-none truncate w-full">{formatCurrency(calculations.interestWithPrepayment)}</p>
+                <p className={cn(
+                  "font-bold text-foreground leading-none truncate w-full",
+                  formatCurrency(calculations.interestWithPrepayment).length > 12
+                    ? "text-[10px] sm:text-xs"
+                    : "text-xs sm:text-sm"
+                )}>{formatCurrency(calculations.interestWithPrepayment)}</p>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>

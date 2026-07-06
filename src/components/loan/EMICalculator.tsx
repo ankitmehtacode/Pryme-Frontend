@@ -59,12 +59,11 @@ const EMICalculator = ({
     }).format(value);
   };
 
-  const formatShortCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(value);
+  // Dynamic font size: full numbers, auto-shrink to fit
+  const dynSize = (text: string, maxPx: number, baseLenThreshold = 10) => {
+    const len = text.length;
+    if (len <= baseLenThreshold) return maxPx;
+    return Math.max(10, Math.round(maxPx - (len - baseLenThreshold) * 1.4));
   };
 
   const terminology = [
@@ -107,6 +106,7 @@ const EMICalculator = ({
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-primary"
                   max={500000000}
                   min={100000}
@@ -127,6 +127,7 @@ const EMICalculator = ({
                   type="number"
                   value={rate}
                   onChange={(e) => setRate(Number(e.target.value))}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-primary"
                   max={36}
                   min={1}
@@ -149,6 +150,7 @@ const EMICalculator = ({
                     type="number"
                     value={months}
                     onChange={(e) => setMonths(Number(e.target.value))}
+                    onWheel={(e) => e.currentTarget.blur()}
                     className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-primary"
                     max={360}
                     min={6}
@@ -185,7 +187,7 @@ const EMICalculator = ({
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider md:tracking-widest text-[#103783] mb-0.5 md:mb-1 whitespace-nowrap">Monthly EMI</span>
-                  <span className="text-lg md:text-xl font-extrabold text-foreground whitespace-nowrap">{formatShortCurrency(emi)}</span>
+                  <span className="font-extrabold text-foreground whitespace-nowrap" style={{ fontSize: `${dynSize(formatCurrency(emi), 20, 8)}px` }}>{formatCurrency(emi)}</span>
                 </div>
               </div>
 
@@ -198,13 +200,13 @@ const EMICalculator = ({
                     </div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/70">Total Payable</span>
                   </div>
-                  <p className="text-2xl md:text-3xl font-extrabold text-foreground leading-none">{formatCurrency(totalPayment)}</p>
+                  <p className="font-extrabold text-foreground leading-tight" style={{ fontSize: `${dynSize(formatCurrency(totalPayment), 28)}px` }}>{formatCurrency(totalPayment)}</p>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-[#103783]/10 dark:border-[#103783]/15 flex items-center">
                   <div className="flex-1 flex items-center justify-between min-w-0 gap-2">
                     <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground truncate">Per Day Equivalent</p>
-                    <p className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">{formatShortCurrency(Math.round(emi / 30))}</p>
+                    <p className="font-bold text-foreground whitespace-nowrap shrink-0" style={{ fontSize: `${dynSize(formatCurrency(Math.round(emi / 30)), 14, 8)}px` }}>{formatCurrency(Math.round(emi / 30))}</p>
                   </div>
                 </div>
               </div>
@@ -217,18 +219,7 @@ const EMICalculator = ({
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Principal</p>
                   <div className="w-2.5 h-2.5 rounded-full bg-[#103783] shadow-[0_0_6px_rgba(16,55,131,0.3)] shrink-0" />
                 </div>
-                <div className="relative mb-2 w-full">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-bold text-foreground">₹</span>
-                  <input
-                    type="text"
-                    value={amount === 0 ? "" : amount.toLocaleString("en-IN")}
-                    onChange={(e) => {
-                      const cleanVal = e.target.value.replace(/[^0-9]/g, "");
-                      setAmount(Number(cleanVal));
-                    }}
-                    className="w-full pl-3 pr-0 py-1 text-xs sm:text-sm md:text-base font-extrabold text-foreground bg-transparent border-b border-dashed border-slate-350 focus:border-[#103783] focus:outline-none"
-                  />
-                </div>
+                <p className="font-extrabold text-foreground leading-tight mb-2" style={{ fontSize: `${dynSize(formatCurrency(amount), 14, 8)}px` }}>{formatCurrency(amount)}</p>
                 <span className="inline-block text-[10px] font-bold text-[#103783] bg-[#103783]/10 px-2.5 py-1 rounded leading-none">{principalPercentage.toFixed(0)}%</span>
               </div>
 
@@ -237,7 +228,7 @@ const EMICalculator = ({
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none">Interest</p>
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.3)] shrink-0" />
                 </div>
-                <p className="text-xs sm:text-sm md:text-base font-extrabold text-foreground leading-none whitespace-nowrap overflow-hidden text-ellipsis mb-3">{formatCurrency(totalInterest)}</p>
+                <p className="font-extrabold text-foreground leading-tight mb-3" style={{ fontSize: `${dynSize(formatCurrency(totalInterest), 14, 8)}px` }}>{formatCurrency(totalInterest)}</p>
                 <span className="inline-block text-[10px] font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded leading-none">{interestPercentage.toFixed(0)}%</span>
               </div>
             </div>
