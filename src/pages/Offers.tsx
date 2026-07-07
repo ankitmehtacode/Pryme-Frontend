@@ -181,25 +181,25 @@ export default function Offers() {
       const resolveBankTheme = (bankName: string, productCode: string, lenderName?: string) => {
         const name = `${lenderName || ""} ${bankName || ""} ${productCode || ""}`.toUpperCase();
 
-        if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo + "?v=4", bankKey: "HDFC" };
-        if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo + "?v=4", bankKey: "ICICI" };
-        if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo + "?v=4", bankKey: "AXIS" };
-        if (name.includes("KOTAK")) return { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo + "?v=4", bankKey: "KOTAK" };
-        if (name.includes("SBI") || name.includes("STATE BANK")) return { c: "bg-[#0f3b8c]", x: "#0f3b8c", img: sbiLogo + "?v=4", bankKey: "SBI" };
-        if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo + "?v=4", bankKey: "BOB" };
-        if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo + "?v=4", bankKey: "PNB" };
-        if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo + "?v=4", bankKey: "YES" };
-        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: bajajLogo + "?v=4", bankKey: "BAJAJ" };
-        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: ltLogo + "?v=4", bankKey: "LNT" };
-        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: bandhanLogo + "?v=4", bankKey: "BANDHAN" };
-        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: abflLogo + "?v=4", bankKey: "ABFL" };
-        if (name.includes("RBL")) return { c: "bg-[#0A387E]", x: "#0A387E", img: rblLogo + "?v=4", bankKey: "RBL" };
-        if (name.includes("SC") || name.includes("STANDARD")) return { c: "bg-[#00a546]", x: "#00a546", img: scLogo + "?v=4", bankKey: "SC" };
-        if (name.includes("INDUSIND")) return { c: "bg-[#8a1921]", x: "#8a1921", img: indusindLogo + "?v=4", bankKey: "INDUSIND" };
-        if (name.includes("JIO")) return { c: "bg-[#0a2240]", x: "#0a2240", img: jioLogo + "?v=4", bankKey: "JIO" };
-        if (name.includes("IDFC")) return { c: "bg-[#9d1d27]", x: "#9d1d27", img: idfcLogo + "?v=4", bankKey: "IDFC" };
-        if (name.includes("IDBI")) return { c: "bg-[#00703c]", x: "#00703c", img: idbiLogo + "?v=4", bankKey: "IDBI" };
-        if (name.includes("TATA")) return { c: "bg-[#005a9c]", x: "#005a9c", img: tataLogo + "?v=4", bankKey: "TATA" };
+        if (name.includes("HDFC")) return { c: "bg-[#004c8f]", x: "#004c8f", img: hdfcLogo, bankKey: "HDFC" };
+        if (name.includes("ICICI")) return { c: "bg-[#f58220]", x: "#f58220", img: iciciLogo, bankKey: "ICICI" };
+        if (name.includes("AXIS")) return { c: "bg-[#97144d]", x: "#97144d", img: axisLogo, bankKey: "AXIS" };
+        if (name.includes("KOTAK")) return { c: "bg-[#ed1c24]", x: "#ed1c24", img: kotakLogo, bankKey: "KOTAK" };
+        if (name.includes("SBI") || name.includes("STATE BANK")) return { c: "bg-[#0f3b8c]", x: "#0f3b8c", img: sbiLogo, bankKey: "SBI" };
+        if (name.includes("BOB") || name.includes("BARODA")) return { c: "bg-[#f15a22]", x: "#f15a22", img: bobLogo, bankKey: "BOB" };
+        if (name.includes("PNB") || name.includes("PUNJAB")) return { c: "bg-[#a32020]", x: "#a32020", img: pnbLogo, bankKey: "PNB" };
+        if (name.includes("YES")) return { c: "bg-[#005197]", x: "#005197", img: yesLogo, bankKey: "YES" };
+        if (name.includes("BAJAJ")) return { c: "bg-[#005cb9]", x: "#005cb9", img: bajajLogo, bankKey: "BAJAJ" };
+        if (name.includes("LNT") || name.includes("L&T")) return { c: "bg-[#ffcc00]", x: "#ffcc00", img: ltLogo, bankKey: "LNT" };
+        if (name.includes("BANDHAN")) return { c: "bg-[#005087]", x: "#005087", img: bandhanLogo, bankKey: "BANDHAN" };
+        if (name.includes("ABFL") || name.includes("ADITYA")) return { c: "bg-[#c62828]", x: "#c62828", img: abflLogo, bankKey: "ABFL" };
+        if (name.includes("RBL")) return { c: "bg-[#0A387E]", x: "#0A387E", img: rblLogo, bankKey: "RBL" };
+        if (name.includes("SC") || name.includes("STANDARD")) return { c: "bg-[#00a546]", x: "#00a546", img: scLogo, bankKey: "SC" };
+        if (name.includes("INDUSIND")) return { c: "bg-[#8a1921]", x: "#8a1921", img: indusindLogo, bankKey: "INDUSIND" };
+        if (name.includes("JIO")) return { c: "bg-[#0a2240]", x: "#0a2240", img: jioLogo, bankKey: "JIO" };
+        if (name.includes("IDFC")) return { c: "bg-[#9d1d27]", x: "#9d1d27", img: idfcLogo, bankKey: "IDFC" };
+        if (name.includes("IDBI")) return { c: "bg-[#00703c]", x: "#00703c", img: idbiLogo, bankKey: "IDBI" };
+        if (name.includes("TATA")) return { c: "bg-[#005a9c]", x: "#005a9c", img: tataLogo, bankKey: "TATA" };
 
         // Generic fallback colors using a stable hash so it doesn't change on re-render
         const fallbacks = [

@@ -45,6 +45,7 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
           alt={`${offer.bank} — ${offer.title}`}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           loading="eager"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
 
         {/* Subtle gradient overlay at bottom for contrast */}
