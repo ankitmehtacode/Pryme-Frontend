@@ -84,7 +84,7 @@ export const products = [
   },
   {
     id: "transfer",
-    label: "BALANCE TRANSFER & TOP UP",
+    label: "BALANCE TRANSFER | TOP UP",
     image: product6,
     tag: "SAVE INTEREST",
     href: "/apply?type=transfer",
@@ -125,7 +125,7 @@ const viewportHeading = { once: true };
 const ProductSelectorGrid = memo(() => {
   return (
     <div className="w-full relative z-30 flex flex-col items-center justify-center bg-transparent pb-0 pt-0 overflow-x-clip">
-      
+
       {/* 🧠 4K React Bits Style Beams Background */}
       <BackgroundBeams />
 
@@ -146,7 +146,7 @@ const ProductSelectorGrid = memo(() => {
 
       <div className="w-full relative z-20 mt-1">
 
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
@@ -154,76 +154,76 @@ const ProductSelectorGrid = memo(() => {
           className="w-full"
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8 w-full justify-items-center relative z-10 pt-1">
-          {products.map((product) => (
-            <motion.div 
-              key={product.id} 
-              variants={itemVariants}
-            >
-              <Link 
-                to={product.href}
-                className="relative flex flex-col items-center cursor-pointer group outline-none"
+            {products.map((product) => (
+              <motion.div
+                key={product.id}
+                variants={itemVariants}
               >
-                {/* PERF: will-change:transform on this wrapper tells the compositor to
+                <Link
+                  to={product.href}
+                  className="relative flex flex-col items-center cursor-pointer group outline-none"
+                >
+                  {/* PERF: will-change:transform on this wrapper tells the compositor to
                     pre-promote this element. hover:scale-105 then runs entirely on the
                     GPU with zero main-thread involvement. */}
-                <motion.div
-                  variants={imageVariants}
-                  className="relative w-[120px] h-[90px] sm:w-[140px] sm:h-[105px] md:w-[160px] md:h-[120px] lg:w-[var(--landing-product-card-width,180px)] lg:h-[var(--landing-product-card-height,135px)] aspect-[4/3] shrink-0 rounded-2xl md:rounded-[1.5rem]
+                  <motion.div
+                    variants={imageVariants}
+                    className="relative w-[130px] h-[97px] sm:w-[160px] sm:h-[120px] md:w-[180px] md:h-[135px] lg:w-[var(--landing-product-card-width,200px)] lg:h-[var(--landing-product-card-height,150px)] aspect-[4/3] shrink-0 rounded-2xl md:rounded-[1.5rem]
                     transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1.5 active:scale-95"
-                  style={{ willChange: "transform" }}
-                >
-                  
-                  {/* PERF: Replaced box-shadow hover transition with a static shadow.
+                    style={{ willChange: "transform" }}
+                  >
+
+                    {/* PERF: Replaced box-shadow hover transition with a static shadow.
                       box-shadow transitions are paint-bound (not compositor-accelerated)
                       and cause a full repaint on every frame during hover on 6 cards.
                       The card already has hover:scale-105 which reads as "bigger+elevated"
                       — the shadow delta was imperceptible at this small card size. */}
-                  <div
-                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden"
-                    style={{
-                      backgroundColor: product.bg,
-                      border: `1px solid ${product.borderColor}`,
-                    }}
-                  >
-                    {/* Per-card overlay gradient */}
                     <div
-                      className="absolute inset-0 z-10 pointer-events-none"
-                      style={{ background: product.overlay }}
-                    />
-                    <img
-                      src={product.image}
-                      alt={product.label}
-                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass}`}
-                      loading="lazy"
-                      draggable={false}
-                    />
-                  </div>
-
-                  {/* Ribbon Tag */}
-                  {product.tag && (
-                    <div 
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 group-hover:-translate-y-1 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300"
+                      className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] overflow-hidden"
+                      style={{
+                        backgroundColor: product.bg,
+                        border: `1px solid ${product.borderColor}`,
+                      }}
                     >
-                      {product.tag}
+                      {/* Per-card overlay gradient */}
+                      <div
+                        className="absolute inset-0 z-10 pointer-events-none"
+                        style={{ background: product.overlay }}
+                      />
+                      <img
+                        src={product.image}
+                        alt={product.label}
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass}`}
+                        loading="lazy"
+                        draggable={false}
+                      />
                     </div>
-                  )}
 
-                  {/* Glowing Ring — opacity-only transition, compositor-safe */}
-                  <div 
-                    className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{
-                      border: `2px solid hsla(${product.accent}, 0.8)`,
-                      boxShadow: `inset 0 0 20px hsla(${product.accent}, 0.4)`
-                    }}
-                  />
-                </motion.div>
+                    {/* Ribbon Tag */}
+                    {product.tag && (
+                      <div
+                        className="absolute -top-3 left-1/2 -translate-x-1/2 group-hover:-translate-y-1 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300"
+                      >
+                        {product.tag}
+                      </div>
+                    )}
 
-                <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-bold text-foreground/90 group-hover:text-primary transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10 drop-shadow-sm">
-                  {product.label}
-                </span>
-              </Link>
-            </motion.div>
-          ))}
+                    {/* Glowing Ring — opacity-only transition, compositor-safe */}
+                    <div
+                      className="absolute inset-0 rounded-2xl md:rounded-[1.5rem] z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        border: `2px solid hsla(${product.accent}, 0.8)`,
+                        boxShadow: `inset 0 0 20px hsla(${product.accent}, 0.4)`
+                      }}
+                    />
+                  </motion.div>
+
+                  <span className="mt-4 text-center text-[9px] sm:text-[10px] md:text-[11px] font-bold text-foreground/90 group-hover:text-primary transition-colors duration-300 leading-tight uppercase tracking-widest relative z-10 drop-shadow-sm">
+                    {product.label}
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>

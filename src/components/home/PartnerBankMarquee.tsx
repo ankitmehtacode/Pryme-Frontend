@@ -45,7 +45,7 @@ const PartnerBankMarquee = memo(() => {
     <div className="w-full overflow-hidden relative">
 
       {/* Section Header */}
-      <div className="w-full mb-8 text-center flex flex-col items-center justify-center gap-3">
+      <div className="w-full mb-8 md:mb-10 text-center flex flex-col items-center justify-center gap-3">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-semibold uppercase tracking-widest border border-primary/20">
           <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary animate-pulse" />
           Lending Partners
@@ -67,11 +67,11 @@ const PartnerBankMarquee = memo(() => {
 
         {/* Marquee Track */}
         <div className="flex w-full group overflow-hidden">
-          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-1">
+          <div className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-start group-hover:[animation-play-state:paused] py-1">
             {banks.map((bank, index) => (
               <div
                 key={`track1-${index}`}
-                className="mx-6 sm:mx-8 flex-shrink-0 flex items-center justify-center group/item cursor-pointer relative py-2"
+                className="mx-2 sm:mx-4 flex-shrink-0 flex items-center justify-center group/item cursor-pointer relative py-2"
               >
                 {/* PERF: transition-[background-color] only, not transition-all */}
                 <div className="absolute inset-0 -inset-x-2 -inset-y-1 rounded-full bg-primary/0 group-hover/item:bg-primary/[0.04] transition-[background-color] duration-300 pointer-events-none" />
@@ -88,11 +88,11 @@ const PartnerBankMarquee = memo(() => {
             ))}
           </div>
           {/* PERF: aria-hidden duplicate track — blur-2xl removed. */}
-          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-around px-4 group-hover:[animation-play-state:paused] py-1">
+          <div aria-hidden="true" className="flex shrink-0 animate-marquee whitespace-nowrap items-center min-w-full justify-start group-hover:[animation-play-state:paused] py-1">
             {banks.map((bank, index) => (
               <div
                 key={`track2-${index}`}
-                className="mx-6 sm:mx-8 flex-shrink-0 flex items-center justify-center group/item cursor-pointer relative py-2"
+                className="mx-2 sm:mx-4 flex-shrink-0 flex items-center justify-center group/item cursor-pointer relative py-2"
               >
                 {/* Bounding box for uniform rendering */}
                 <div className="w-[130px] h-[32px] sm:w-[170px] sm:h-[34px] flex items-center justify-center relative">

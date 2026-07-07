@@ -271,27 +271,6 @@ export const MarketingTab: React.FC = () => {
                 )}
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-slate-400 block mb-1">Hero Illustration URL (Optional)</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
-                    <input 
-                      type="url" 
-                      value={formData.heroImageUrl} 
-                      onChange={e => setFormData({ ...formData, heroImageUrl: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
-                      placeholder="https://cdn.example.com/hero-illustration.png"
-                    />
-                  </div>
-                </div>
-                <p className="text-[10px] text-slate-500 mt-1">Recommended: 640×800px (.png/.webp) — Overrides the center bank illustration.</p>
-                {formData.heroImageUrl && (
-                  <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
-                    <img src={formData.heroImageUrl} alt="Hero preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  </div>
-                )}
-              </div>
 
               <div>
                 <label className="text-xs font-semibold text-slate-400 block mb-1">Redirect / Target Link URL</label>
@@ -399,13 +378,12 @@ export const MarketingTab: React.FC = () => {
               </span>
               
               <img
-                src={formData.heroImageUrl || heroBankImg}
+                src={heroBankImg}
                 alt="Hero Illustration preview"
                 className="w-full h-full object-contain filter drop-shadow(0 12px 40px rgba(16,55,131,0.05)) transform scale-[1.33] translate-x-[18px] -translate-y-[22px]"
-                onError={(e) => { (e.target as HTMLImageElement).src = heroBankImg; }}
               />
               <span className="absolute bottom-3 left-3 text-[7px] text-slate-500 font-bold uppercase tracking-widest z-10 bg-white/70 px-2 py-0.5 rounded-full border border-[#103783]/5 shadow-sm">
-                {formData.heroImageUrl ? "Custom Illustration" : "Default Bank Building"}
+                Fixed Hero Illustration
               </span>
             </div>
 

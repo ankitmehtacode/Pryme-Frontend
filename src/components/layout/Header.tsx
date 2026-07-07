@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo, useLayoutEffect, useMemo } from "rea
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Menu, X, Phone, User, LogOut, Settings, ChevronDown,
-  Calculator, Home, Briefcase, Building2, Wallet, Gift, Bell, TrendingDown, Car, CheckCircle
+  Calculator, Home, Briefcase, Building2, Wallet, Gift, Bell, TrendingDown, Car, CheckCircle, RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ const productLinks = [
   { href: "/apply?type=vehicle", label: "Vehicle Loans", icon: Car, description: "Drive your dream today" },
   { href: "/apply?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs" },
   { href: "/apply?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth" },
+  { href: "/apply?type=transfer", label: "BT|Top Up", icon: RefreshCw, description: "Balance transfer & top up" },
 ];
 
 const toolLinks = [
@@ -55,7 +56,6 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/faq", label: "FAQ" },
   { href: "/blogs", label: "Insights" },
-  { href: "/careers", label: "Careers" },
   { href: "/rewards-calculator", label: "Rewards and Offers" },
 ];
 

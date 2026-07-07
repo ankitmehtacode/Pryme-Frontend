@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Settings, Search, CreditCard, Zap, Trash2 } from "lucide-react";
+import { Plus, Settings, Search, CreditCard, Zap, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import OffersTab from "./OffersTab";
 import { ConfirmAction } from "@/components/ui/confirm-action";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 /* ══════════════════════════════════════════════════════════════════════
    UNIFIED POLICY MATRIX TAB
@@ -149,10 +151,59 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   <SelectItem value="inactive" className="text-xs text-slate-400">Inactive</SelectItem>
                 </SelectContent>
               </Select>
+              <Button
+                onClick={() => {
+                  if (eligibilityRules.length === 0) {
+                    toast.error("No data to export.");
+                    return;
+                  }
+                  
+                  // Extract all unique headers across all rules
+                  const allKeys = new Set<string>();
+                  eligibilityRules.forEach(rule => {
+                    Object.keys(rule).forEach(key => allKeys.add(key));
+                  });
+                  
+                  // Array of headers
+                  const headers = Array.from(allKeys);
+                  
+                  // Build JSON array for Excel
+                  const dataToExport = eligibilityRules.map(rule => {
+                    const row: Record<string, any> = {};
+                    headers.forEach(header => {
+                      let value = rule[header];
+                      
+                      // Handle null, undefined, objects (like JSON arrays/objects)
+                      if (value === null || value === undefined) {
+                        row[header] = "";
+                      } else if (typeof value === 'object') {
+                        row[header] = JSON.stringify(value);
+                      } else {
+                        row[header] = value;
+                      }
+                    });
+                    return row;
+                  });
+                  
+                  // Create workbook and worksheet
+                  const worksheet = XLSX.utils.json_to_sheet(dataToExport, { header: headers });
+                  const workbook = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(workbook, worksheet, "Policy Matrix");
+                  
+                  // Download Excel file
+                  XLSX.writeFile(workbook, `policy_matrix_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+                  
+                  toast.success(`Exported ${eligibilityRules.length} rules to Excel.`);
+                }}
+                variant="outline"
+                className="border-white/10 text-slate-300 hover:bg-white/5 hover:text-white shadow-none whitespace-nowrap h-9"
+              >
+                <Download className="w-4 h-4 mr-2" /> Download Matrix
+              </Button>
               {(isSuperAdmin || authUser?.role === "ADMIN") && (
                 <Button
                   onClick={() => { setEditingEligibilityRule(null); setIsEligibilityModalOpen(true); }}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-none whitespace-nowrap"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-none whitespace-nowrap h-9"
                 >
                   <Plus className="w-4 h-4 mr-2" /> Add Rule
                 </Button>

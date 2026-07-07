@@ -211,7 +211,7 @@ export default function Offers() {
         return { ...fb, bankKey: `GENERIC-${name}` };
       };
 
-      const theme = resolveBankTheme(er?.productName || er?.lenderName, er?.productCode, er?.lenderName);
+      const theme = resolveBankTheme(er?.lenderName || er?.productName, er?.productCode, er?.lenderName);
 
       // Map dynamic backend fields without hardcoded fallbacks
       const roiPercent = er?.roi != null ? (er.roi < 1 ? er.roi * 100 : er.roi) : 0;
@@ -219,7 +219,7 @@ export default function Offers() {
 
       return {
         id: er?.productCode || er?.lenderId || Math.random().toString(),
-        bankName: er?.productName || er?.lenderName || "Partner Bank",
+        bankName: er?.lenderName || er?.productName || "Partner Bank",
         logoColor: theme.c,
         brandHex: theme.x,
         logoUrl: theme.img,
@@ -452,7 +452,7 @@ export default function Offers() {
 
           <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
             <div className="font-semibold text-foreground flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-primary" /> Suggestions to improve eligibility:
+              <AlertCircle className="w-4 h-4 text-destructive" /> {rawViolations.length > 1 ? "Reasons of rejection:" : "Reason of rejection:"}
             </div>
             <ul className="list-disc pl-5 space-y-2 text-secondary-foreground/80">
               {rawViolations.length > 0 ? (
@@ -465,8 +465,8 @@ export default function Offers() {
             </ul>
           </div>
 
-          <Button onClick={() => navigate("/")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
-            Review Application
+          <Button onClick={() => navigate("/apply-direct")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
+            Request a Call back
           </Button>
         </div>
       </div>

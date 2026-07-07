@@ -18,7 +18,6 @@ export function validateStage1(store: StoreSnapshot): ValidationErrors {
   const errors: ValidationErrors = {};
   if (!k.fullName || k.fullName.trim().length < 3) errors.fullName = "Name must be at least 3 characters";
   if (!k.mobileNumber || !/^[6-9]\d{9}$/.test(k.mobileNumber)) errors.mobileNumber = "Enter a valid 10-digit mobile number";
-  if (!k.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(k.email)) errors.email = "Enter a valid email address";
   if (!k.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
   if (!k.state) errors.state = "Select your state";
   if (!k.city) errors.city = "Select your city";

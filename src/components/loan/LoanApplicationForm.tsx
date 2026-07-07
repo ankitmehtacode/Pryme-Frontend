@@ -470,11 +470,16 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     isStageAccessible: useApplicationStore((s) => s.isStageAccessible),
   };
 
-  // ── Sync URL query parameter to store ─────────────────────────────────────
+  // ── Sync URL query parameters to store ────────────────────────────────────
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const typeParam = params.get("type");
+    const amountParam = params.get("amount");
+    const employmentParam = params.get("employment");
     
+    const currentState = useApplicationStore.getState();
+    const reqUpdates: Partial<typeof currentState.loanRequirements> = {};
+
     if (typeParam) {
       const typeMap: Record<string, typeof store.loanRequirements.loanType> = {
         personal: "PERSONAL_LOAN",
@@ -483,14 +488,38 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         lap: "LAP",
         auto: "AUTO_LOAN",
         vehicle: "AUTO_LOAN",
+        transfer: "BT_TOP_UP",
+        bt_top_up: "BT_TOP_UP",
       };
       
       const resolvedType = typeMap[typeParam.toLowerCase()];
-      
-      // We read the current state directly to avoid reactivity loops on `store` object
-      const currentState = useApplicationStore.getState();
       if (resolvedType && currentState.loanRequirements.loanType !== resolvedType) {
-        currentState.updateLoanRequirements({ loanType: resolvedType });
+        reqUpdates.loanType = resolvedType;
+      }
+    }
+
+    if (amountParam) {
+      const parsedAmount = parseInt(amountParam, 10);
+      if (!isNaN(parsedAmount) && currentState.loanRequirements.loanAmount !== parsedAmount) {
+        reqUpdates.loanAmount = parsedAmount;
+      }
+    }
+
+    if (Object.keys(reqUpdates).length > 0) {
+      currentState.updateLoanRequirements(reqUpdates);
+    }
+
+    if (employmentParam) {
+      const empMap: Record<string, any> = {
+        salaried: "SALARIED",
+        professional: "PROFESSIONAL",
+        "non-professional": "SELF_EMPLOYED",
+        selfemployed: "SELF_EMPLOYED",
+        self_employed: "SELF_EMPLOYED",
+      };
+      const resolvedEmp = empMap[employmentParam.toLowerCase()];
+      if (resolvedEmp && currentState.basicKYC.employmentType !== resolvedEmp) {
+        currentState.updateBasicKYC({ employmentType: resolvedEmp });
       }
     }
   }, [location.search]);
@@ -500,6 +529,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   const setErrors = store.setValidationErrors;
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [consent1, setConsent1] = useState(false);
+  const [consent2, setConsent2] = useState(false);
 
   const formEndRef = useRef<HTMLDivElement>(null);
   const [isBottomVisible, setIsBottomVisible] = useState(false);
@@ -838,6 +869,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   // ── Style tokens ──────────────────────────────────────────────────────────
 
   const cardCn = "bg-card dark:bg-[#080d1e] border border-border dark:border-white/[0.06] rounded-[1.75rem] p-5 md:p-6 relative overflow-hidden transition-colors duration-300 hover:border-primary/10 dark:hover:border-white/[0.08]";
+  const stepCn = "relative overflow-hidden transition-all duration-300";
 
   // ═════════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -912,17 +944,19 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
         {/* ── Step Content ─────────────────────────────────────────────────── */}
         
-        <div className="space-y-5 md:space-y-6">
+        <div className="space-y-8 divide-y divide-slate-100 dark:divide-white/[0.04]">
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* DYNAMIC RENDERER: MODULAR STEPS                                 */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           {[
-            { id: 'loan-details', Component: LoanDetailsStep, props: { cardCn } },
-            { id: 'identity', Component: IdentityStep, props: { cardCn } },
-            { id: 'employment', Component: EmploymentStep, props: { cardCn } },
-            { id: 'co-applicant', Component: CoApplicantStep, props: { cardCn } },
-          ].map(({ id, Component, props }) => (
-            <Component key={id} {...(props as any)} />
+            { id: 'loan-details', Component: LoanDetailsStep, props: { cardCn: stepCn } },
+            { id: 'identity', Component: IdentityStep, props: { cardCn: stepCn } },
+            { id: 'employment', Component: EmploymentStep, props: { cardCn: stepCn } },
+            { id: 'co-applicant', Component: CoApplicantStep, props: { cardCn: stepCn } },
+          ].map(({ id, Component, props }, index) => (
+            <div key={id} className={index > 0 ? "pt-8" : ""}>
+              <Component {...(props as any)} />
+            </div>
           ))}
         </div>
 
@@ -960,11 +994,68 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
            return null;
         })()}
 
+        {/* Consent Checkboxes */}
+        <div className={cn(cardCn, "mt-8 space-y-5 text-left border-dashed border-primary/20 dark:border-white/10")}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-2xl rounded-full pointer-events-none" />
+          <h4 className="text-sm font-semibold text-foreground/90 flex items-center gap-2 mb-1 relative z-10">
+            <ShieldCheck className="w-4 h-4 text-primary" /> Declarations & Consent
+          </h4>
+          <div className="space-y-4 relative z-10">
+            <label className="flex items-start gap-3.5 cursor-pointer group">
+              <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={consent1}
+                  onChange={() => setConsent1(!consent1)}
+                  className="sr-only"
+                />
+                <div className={cn(
+                  "w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 shadow-sm",
+                  consent1
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "bg-background border-border group-hover:border-primary/50"
+                )}>
+                  {consent1 && <Check className="w-3.5 h-3.5 stroke-[3px]" />}
+                </div>
+              </div>
+              <span className="text-xs md:text-sm text-muted-foreground group-hover:text-foreground/80 select-none leading-relaxed transition-colors">
+                I confirm that the information I have provided is accurate to the best of my knowledge.
+              </span>
+            </label>
+
+            <label className="flex items-start gap-3.5 cursor-pointer group">
+              <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={consent2}
+                  onChange={() => setConsent2(!consent2)}
+                  className="sr-only"
+                />
+                <div className={cn(
+                  "w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 shadow-sm",
+                  consent2
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "bg-background border-border group-hover:border-primary/50"
+                )}>
+                  {consent2 && <Check className="w-3.5 h-3.5 stroke-[3px]" />}
+                </div>
+              </div>
+              <span className="text-xs md:text-sm text-muted-foreground group-hover:text-foreground/80 select-none leading-relaxed transition-colors">
+                I confirm that I have read and understood the{" "}
+                <a href="/faq" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Terms & Conditions</a>{" "}
+                and{" "}
+                <a href="/faq" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Privacy Policy</a>,{" "}
+                and I voluntarily provide my consent to proceed.
+              </span>
+            </label>
+          </div>
+        </div>
+
         <div className="mt-8 relative z-50 flex justify-center">
           <Button 
              type="submit"
              disabled={
-               isSubmitting || isAnalyzing ||
+               isSubmitting || isAnalyzing || !consent1 || !consent2 ||
                (() => {
                  const empType = store.basicKYC?.employmentType;
                  const fin = store.financialDetails || {};
@@ -979,7 +1070,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
                  return false;
                })()
              }
-             className="w-full max-w-xs mx-auto h-12 text-sm md:text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all flex items-center justify-center"
+             className="w-full max-w-xs mx-auto h-12 text-sm md:text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
              onClick={(e) => { e.preventDefault(); handleFormSubmit(); }}
           >
              {isSubmitting || isAnalyzing ? (

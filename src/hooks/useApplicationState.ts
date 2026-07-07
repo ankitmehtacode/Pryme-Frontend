@@ -313,6 +313,8 @@ export function useApplicationState(initialLoanType?: string): UseApplicationRet
           home: 'HOME_LOAN',
           business: 'BUSINESS_LOAN',
           lap: 'LAP',
+          transfer: 'BT_TOP_UP',
+          bt_top_up: 'BT_TOP_UP',
         };
         fresh.loanRequirements.loanType = typeMap[initType.toLowerCase()] || 'PERSONAL_LOAN';
       }

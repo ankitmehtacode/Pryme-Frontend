@@ -179,9 +179,9 @@ const Apply = () => {
                 interestExpense: null,
             };
         } else if (data.financialPath === "PROFESSIONAL") {
-            // Professional (CA/CS/Doctor): SENP program
+            // Professional (CA/CS/Doctor): SEP program
             incomeInput = {
-                programName: "SENP",
+                programName: "SEP",
                 grossReceipts: data.annualGrossReceipts || (data.monthlyIncome * 12),
                 profession: data.professionalSubType || "CA",
             };

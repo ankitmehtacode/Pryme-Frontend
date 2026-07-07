@@ -68,10 +68,8 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
   const setErrors = store.setValidationErrors || (() => {});
   
   return (
-    <div className={cardCn}>
-      {/* Employment Category Selector */}
-      <div id="section-employment" className={cn(cardCn, 'transition-all duration-500')}>
-        <div className="flex items-center gap-3 mb-6 relative z-10">
+    <div id="section-employment" className={cn(cardCn, 'transition-all duration-500')}>
+      <div className="flex items-center gap-3 mb-6 relative z-10">
           <div className="w-10 h-10 rounded-xl bg-secondary dark:bg-[#0d1829] border border-border dark:border-white/[0.06] flex items-center justify-center">
             <Briefcase className="w-5 h-5 text-primary dark:text-[#103783]" />
           </div>
@@ -758,6 +756,5 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
           </AnimatePresence>
         </div>
       </div>
-    </div>
   );
 };

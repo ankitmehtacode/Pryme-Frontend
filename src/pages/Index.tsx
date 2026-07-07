@@ -183,7 +183,7 @@ const Index = () => {
                 </ScrollReveal>
 
                 {/* 🧠 3. STATIC PARTNERSHIP BAR — visible on all breakpoints */}
-                <Section id="partners" spacing="xs" className="relative z-20 pt-10 pb-12 md:pt-16 md:pb-20 w-full">
+                <Section id="partners" spacing="xs" className="relative z-20 pt-8 pb-0 md:pt-10 md:pb-0 lg:pt-10 lg:pb-0 w-full">
                   <Container size="expanded">
                     <PartnerBankMarquee />
                   </Container>
@@ -193,7 +193,7 @@ const Index = () => {
 
             {/* 🧠 4. PAISABAZAAR TERMINAL: EMI & Eligibility Split */}
               <Surface variant="muted">
-                <Section spacing="md" className="relative z-10" style={{ paddingBlockStart: "clamp(24px, 3.5vw, 48px)", paddingBlockEnd: "clamp(20px, 2.5vw, 36px)" }}>
+                <Section spacing="md" className="relative z-10" style={{ paddingBlockStart: "clamp(12px, 2vw, 24px)", paddingBlockEnd: "clamp(20px, 2.5vw, 36px)" }}>
                   {/* Gradient section divider */}
                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/30 dark:via-white/10 to-transparent" />
 
@@ -208,53 +208,48 @@ const Index = () => {
                         <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground mb-2 md:mb-3 tracking-tighter">
                           Calculate & Evaluate
                         </h2>
-                        <p className="text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal">
-                          Run the math before you apply. Check your EMIs and assess your approval probability instantly.
-                        </p>
                       </div>
 
                       {/* Full Width Stack: EMI & Prepayment (Side-by-Side) -> Rewards */}
                       <div className="flex flex-col gap-2 md:gap-3 lg:gap-4 items-start w-full">
 
                         {/* Grid layout for Calculators side by side on large screens */}
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-stretch">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-start">
                           {/* EMI Calculator */}
-                          <div className="w-full h-full flex">
-                            <EMICalculator loanAmount={500000} showTerminology={true} className="h-full" />
+                          <div className="w-full flex">
+                            <EMICalculator loanAmount={500000} showTerminology={true} />
                           </div>
 
                           {/* Prepayment Calculator */}
-                          <div className="w-full h-full flex">
-                            <PrepaymentCalculator className="h-full" />
+                          <div className="w-full flex">
+                            <PrepaymentCalculator />
                           </div>
                         </div>
 
                         {/* Grid layout for Reward Calculator & Cibil Tips side by side */}
                         <div className="grid grid-cols-1 xl:grid-cols-10 gap-6 w-full items-start mt-4">
                           {/* Rewards Calculator (70%) */}
-                          <div
-                            ref={calculatorRef}
-                            className="xl:col-span-7 w-full relative rounded-[2rem] border border-slate-200/80 dark:border-[#103783]/20 overflow-hidden shadow-xl py-8 md:py-10 px-6 md:px-12 bg-[#edf4ff] dark:bg-[#0b1021]"
-                          >
-                            {/* Background Image Layer with 75% opacity */}
+                          <div className="xl:col-span-7 w-full" ref={calculatorRef}>
                             <div
-                              className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none opacity-75"
-                              style={{
-                                backgroundImage: `url(${rewardsBgImg})`,
-                                backgroundSize: "cover"
-                              }}
-                            />
-                            <div className="max-w-3xl mx-auto relative z-10">
-                              <OffersRewards />
+                              className="w-full relative rounded-[2rem] border border-slate-200/80 dark:border-[#103783]/20 overflow-hidden shadow-xl py-8 md:py-10 px-6 md:px-12 bg-[#edf4ff] dark:bg-[#0b1021]"
+                            >
+                              {/* Background Image Layer with 75% opacity */}
+                              <div
+                                className="absolute inset-0 bg-center bg-no-repeat bg-cover pointer-events-none opacity-75"
+                                style={{
+                                  backgroundImage: `url(${rewardsBgImg})`,
+                                  backgroundSize: "cover"
+                                }}
+                              />
+                              <div className="max-w-3xl mx-auto relative z-10 w-full">
+                                <OffersRewards />
+                              </div>
                             </div>
                           </div>
 
                           {/* CIBIL Score Improvement Tips (30%) */}
-                          <div
-                            className="xl:col-span-3 w-full flex"
-                            style={calculatorHeight ? { minHeight: `${calculatorHeight}px` } : undefined}
-                          >
-                            <CibilTips />
+                          <div className="xl:col-span-3 w-full">
+                            <CibilTips calculatorHeight={calculatorHeight} />
                           </div>
                         </div>
 

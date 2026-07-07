@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2, Wallet, Briefcase, Car } from "lucide-react";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2, Wallet, Briefcase, Car, RefreshCw } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -14,6 +14,7 @@ const PRODUCT_OPTIONS = [
   { value: "HOME_LOAN", label: "Home Loan", icon: Home },
   { value: "LAP", label: "Loan Against Property", icon: Building2 },
   { value: "AUTO_LOAN", label: "Auto Loan", icon: Car },
+  { value: "BT_TOP_UP", label: "BT|Top Up", icon: RefreshCw },
 ];
 
 /** Loan types that require property valuation for LTV calculations */

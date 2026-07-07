@@ -343,6 +343,7 @@ export const PrymeAPI = {
   // then streams directly to S3 with cryptographic content-length-range enforcement.
   // If the file exceeds 5MB, AWS S3 rejects it AT THE EDGE — our backend never sees it.
   uploadApplicationDocument: async (applicationId: string, docType: string, file: File) => {
+    let policyResponse: any = null;
     try {
       // 1. Initialize Document metadata matrix
       const payload = {
@@ -354,7 +355,7 @@ export const PrymeAPI = {
       };
       
       // 🧠 Standard PUT URL (Bypasses S3 POST strictness and CORS failures)
-      const policyResponse = await fetchWithAuth(`/documents/initiate-upload`, {
+      policyResponse = await fetchWithAuth(`/documents/initiate-upload`, {
         method: "POST",
         body: JSON.stringify(payload)
       });
@@ -390,6 +391,16 @@ export const PrymeAPI = {
       return { data: { documentId: policyResponse.documentId }, error: null };
     } catch (error: any) {
       console.error("Document vault upload failed:", error);
+      
+      // 🧠 GHOST RECORD CLEANUP: If upload failed after initiating, scrub the pending DB record
+      if (policyResponse?.documentId) {
+        try {
+          await PrymeAPI.deleteDocument(policyResponse.documentId);
+        } catch (_) {
+          // Ignore cleanup errors
+        }
+      }
+      
       return { data: null, error: { message: error.message || "Failed to upload document. Please check your connection and try again." } };
     }
   },

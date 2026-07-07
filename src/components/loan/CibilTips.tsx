@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Lightbulb, TrendingUp, CreditCard, Clock, AlertTriangle,
   ShieldCheck, Users, Landmark, FileCheck, ChevronDown, Zap, Eye
@@ -94,10 +94,15 @@ const impactColors: Record<string, string> = {
   critical: "text-red-500 dark:text-red-400 bg-red-500/10 border-red-500/20",
 };
 
-const CibilTips = () => {
+interface CibilTipsProps {
+  calculatorHeight?: number;
+}
+
+const CibilTips = ({ calculatorHeight }: CibilTipsProps = {}) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [showAll, setShowAll] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredTips = filter === "all" ? tips : tips.filter(t => t.category === filter);
 
@@ -105,11 +110,28 @@ const CibilTips = () => {
     setExpandedIndex(prev => (prev === index ? null : index));
   };
 
+  // 🧠 Reset scroll position when minimizing to prevent blank view offsets
+  useEffect(() => {
+    if (!showAll && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [showAll]);
+
   // 🧠 Master lightbulb is "on" whenever ANY tip is expanded
   const isBulbActive = expandedIndex !== null;
 
   return (
-    <div className="bg-card dark:bg-[#080d1e] text-card-foreground border border-border dark:border-white/10 rounded-[2rem] p-4 md:p-5 shadow-xl dark:shadow-2xl relative overflow-hidden transition-all w-full h-full flex flex-col">
+    <motion.div 
+      animate={{
+        height: !showAll && calculatorHeight ? calculatorHeight : "auto"
+      }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 280, 
+        damping: 32 
+      }}
+      className="bg-card dark:bg-[#080d1e] text-card-foreground border border-slate-200/80 dark:border-[#103783]/20 rounded-[2rem] p-4 md:p-5 shadow-xl dark:shadow-2xl relative overflow-hidden w-full flex flex-col"
+    >
       {/* Ambient glow — intensifies when a tip is expanded */}
       <motion.div
         animate={{
@@ -180,9 +202,12 @@ const CibilTips = () => {
       </div>
 
       {/* Tips Accordion - Constrained Height with Custom Scrollbar */}
-      <div className="space-y-2 relative z-10 flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10">
-        <AnimatePresence mode="popLayout">
-          {(showAll ? filteredTips : filteredTips.slice(0, 3)).map((tip, index) => {
+      <div 
+        ref={scrollContainerRef}
+        className="space-y-2 relative z-10 flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10"
+      >
+        <AnimatePresence>
+          {filteredTips.map((tip, index) => {
             const isExpanded = expandedIndex === index;
             const Icon = tip.icon;
             const colors = impactColors[tip.impactType];
@@ -316,7 +341,7 @@ const CibilTips = () => {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

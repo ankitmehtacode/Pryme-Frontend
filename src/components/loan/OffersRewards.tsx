@@ -444,7 +444,7 @@ const OffersRewards = () => {
               </button>
 
               <Link
-                to="/apply"
+                to={`/apply?amount=${loanAmount}&type=${loanProduct}&employment=${employmentType}`}
                 className="w-full sm:w-auto bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] text-white px-6 py-3 rounded-xl text-xs font-bold shadow-lg shadow-[#103783]/20 transition-all flex items-center justify-center gap-2"
               >
                 Apply for Loan Now

@@ -15,7 +15,7 @@ export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children
         maxInlineSize: "var(--landing-artwork-width, clamp(620px, 58vw, 920px))",
         minBlockSize: "calc(var(--landing-hero-height, 430px) - 28px)",
         overflow: "visible",
-        transform: "translate(-130px, -15px)",
+        transform: "translate(0px, -15px)",
       }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ transform: "translateX(-192px)", zIndex: -1 }}>

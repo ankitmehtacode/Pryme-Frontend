@@ -101,19 +101,6 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
             )}
           </div>
           <ValidatedInput
-            label="Email Address"
-            type="email"
-            placeholder="rahul@company.com"
-            icon={Mail}
-            value={basicKYC.email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateBasicKYC({ email: e.target.value })}
-            isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(basicKYC.email)}
-            error={errors.email}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <ValidatedInput
             label="Date of Birth"
             type="date"
             max={new Date(new Date().setFullYear(new Date().getFullYear() - 19)).toISOString().split("T")[0]}
@@ -123,19 +110,6 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
             isValid={!!basicKYC.dateOfBirth}
             error={errors.dateOfBirth}
           />
-
-          <StyledSelect
-            label="Religion"
-            icon={User}
-            value={basicKYC.religion}
-            onValueChange={(v) => store.updateBasicKYC({ religion: v })}
-            placeholder="Select Religion"
-            error={errors.religion}
-          >
-            {RELIGIONS.map((r) => (
-              <SelectItem key={r} value={r} className="cursor-pointer">{r}</SelectItem>
-            ))}
-          </StyledSelect>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

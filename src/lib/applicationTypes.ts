@@ -15,7 +15,8 @@ export type LoanType =
   | 'LAP'                  // Loan Against Property
   | 'BUSINESS_LOAN'
   | 'PERSONAL_LOAN'
-  | 'AUTO_LOAN';
+  | 'AUTO_LOAN'
+  | 'BT_TOP_UP';
 
 export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   HOME_LOAN: 'Home Loan',
@@ -23,6 +24,7 @@ export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   BUSINESS_LOAN: 'Business Loan',
   PERSONAL_LOAN: 'Personal Loan',
   AUTO_LOAN: 'Auto Loan',
+  BT_TOP_UP: 'BT|Top Up',
 };
 
 // ─── EMPLOYMENT HIERARCHY (The Critical Pivot Point) ─────────────────────────

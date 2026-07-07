@@ -81,6 +81,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
     negativeEmployerType: "",
     negativeSalaryMode: "",
     marginByOccupation: "",
+    vintage: "",
+    bankStatementRequirement: "",
+    salarySlipRequirement: "",
+    gstReturnRequirement: "",
+    selfEmployedProfessionals: "",
+    formulae: "",
+    ltvGrid: "",
     providentFundMandatory: false,
     cityTier: "",
     profileRestrictions: "",
@@ -126,6 +133,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
           negativeEmployerType: "",
           negativeSalaryMode: "",
           marginByOccupation: "",
+          vintage: "",
+          bankStatementRequirement: "",
+          salarySlipRequirement: "",
+          gstReturnRequirement: "",
+          selfEmployedProfessionals: "",
+          formulae: "",
+          ltvGrid: "",
           providentFundMandatory: false,
           cityTier: "",
           profileRestrictions: "",
@@ -241,6 +255,13 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                     <option value="CASH_SALARY">Cash Salary</option>
                   </select>
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Self Employed Professionals Allowed</label>
+                  <input type="text" name="selfEmployedProfessionals" value={formData.selfEmployedProfessionals || ""} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. CA, Doctor, Architect (or NA)" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Min Age (Years)</label>
                   <input type="number" name="minAge" value={formData.minAge} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
@@ -268,12 +289,16 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-slate-400">Vintage (Years)</label>
+                  <label className="text-[11px] font-semibold text-slate-400">Vintage (Years - Numeric)</label>
                   <input type="number" name="workExpYears" value={formData.workExpYears} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold text-slate-400">Business Age (Years)</label>
                   <input type="number" name="businessAgeYears" value={formData.businessAgeYears} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Vintage (Text Condition)</label>
+                  <input type="text" name="vintage" value={formData.vintage || ""} onChange={handleChange} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-blue-500" placeholder="e.g. 3 years for specific profile" />
                 </div>
               </div>
 
@@ -327,12 +352,16 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                     <input required type="number" name="ltvAllowed" value={formData.ltvAllowed} onChange={handleChange} min={0} max={100} step="0.01" className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 outline-none focus:border-blue-500" />
                   </div>
                   <div className="space-y-2 border border-[#103783]/20 rounded-xl p-3 bg-slate-900/30">
-                    <label className="text-[11px] font-semibold text-cyan-500">Dynamic LTV Matrix</label>
+                    <label className="text-[11px] font-semibold text-cyan-500">Dynamic LTV Matrix (SpEL)</label>
                     <PricingMatrixBuilder
                       value={formData.ltvComputationLogic || ""}
                       onChange={(spel) => setFormData((prev: any) => ({ ...prev, ltvComputationLogic: spel }))}
                       baseRate={formData.ltvAllowed}
                     />
+                  </div>
+                  <div className="space-y-2 border border-[#103783]/20 rounded-xl p-3 bg-slate-900/30">
+                    <label className="text-[11px] font-semibold text-cyan-500">LTV Grid (JSON mapping from sheet)</label>
+                    <textarea name="ltvGrid" value={formData.ltvGrid || ""} onChange={handleChange} rows={4} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-[10px] font-mono text-emerald-400 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder={'e.g. [\n  {"min": 0, "max": 3000000, "ltv": 0.90},\n  {"min": 3000001, "max": 7500000, "ltv": 0.80}\n]'} />
                   </div>
                 </div>
 
@@ -359,13 +388,17 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
               <h3 className="text-sm font-semibold uppercase tracking-widest text-purple-500 border-b border-[#103783]/20 pb-2">Policy & Property Deviations</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <SpelBuilder
-                  label="Deviation Formulae"
+                  label="Deviation Formulae (SpEL)"
                   value={formData.deviationFormulae}
                   onChange={(val) => setFormData((prev: any) => ({ ...prev, deviationFormulae: val }))}
                   placeholder="e.g. Deviation applied if LTV > 85%..."
                 />
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Formulae (TSV Text)</label>
+                  <textarea name="formulae" value={formData.formulae || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Net Monthly Income" />
+                </div>
                 <SpelBuilder
-                  label="Conditions"
+                  label="Conditions (SpEL)"
                   value={formData.conditions}
                   onChange={(val) => setFormData((prev: any) => ({ ...prev, conditions: val }))}
                   placeholder="e.g. Mandatory co-applicant if CIBIL < 700"
@@ -382,6 +415,18 @@ export const AdminEligibilityModal: React.FC<AdminEligibilityModalProps> = ({
                   value={formData.negativeProperty}
                   onChange={(val) => setFormData((prev: any) => ({ ...prev, negativeProperty: val }))}
                 />
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Bank Statement Requirement</label>
+                  <textarea name="bankStatementRequirement" value={formData.bankStatementRequirement || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. 6 Months" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">Salary Slip Requirement</label>
+                  <textarea name="salarySlipRequirement" value={formData.salarySlipRequirement || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. 3 Months" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-400">GST Return Requirement</label>
+                  <textarea name="gstReturnRequirement" value={formData.gstReturnRequirement || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. 1 Year" />
+                </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-[11px] font-semibold text-slate-400">Negative Employer Type</label>
                   <textarea name="negativeEmployerType" value={formData.negativeEmployerType || ""} onChange={handleChange} rows={2} className="w-full bg-[#0d0d14] border border-[#103783]/20 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500 custom-scrollbar resize-none" placeholder="e.g. Partnership, Proprietorship, Trust" />

@@ -34,9 +34,7 @@ const EMICalculatorPage = () => {
 
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               <div className="lg:col-span-8">
-                <div className="bg-card text-card-foreground rounded-[2.5rem] border border-border p-4 md:p-8 shadow-2xl">
-                  <EMICalculator loanAmount={500000} showTerminology={true} />
-                </div>
+                <EMICalculator loanAmount={500000} showTerminology={true} />
               </div>
               
               <div className="lg:col-span-4 space-y-6">

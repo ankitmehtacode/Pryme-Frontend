@@ -13,14 +13,9 @@ import {
   Percent,
   ArrowDownRight,
   Info,
-  Zap
+  Zap,
+  ChevronDown
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const PrepaymentCalculatorPage = () => {
   const [loanAmount, setLoanAmount] = useState(2000000);
@@ -29,6 +24,7 @@ const PrepaymentCalculatorPage = () => {
   const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
   const [prepaymentMonth, setPrepaymentMonth] = useState(12);
   const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const calculations = useMemo(() => {
     const monthlyRate = interestRate / 12 / 100;
@@ -155,8 +151,7 @@ const PrepaymentCalculatorPage = () => {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
               {/* Calculator Card */}
               <div className="lg:col-span-8">
-                <div className="bg-card text-card-foreground rounded-2xl md:rounded-[2.5rem] border border-border p-4 md:p-8 shadow-2xl">
-                  <div className="bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-emerald-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
+                <div className="bg-card text-card-foreground border border-transparent dark:bg-[#080d1e] dark:border-transparent rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
 
                     {/* Header */}
                     <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">
@@ -196,8 +191,8 @@ const PrepaymentCalculatorPage = () => {
                     </div>
 
                     {/* Savings Hero */}
-                    <div className="flex flex-col md:flex-row items-stretch gap-3 md:gap-4 p-3 md:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-xl md:rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 mb-4 md:mb-6 relative z-10">
-                      <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 bg-white dark:bg-[#080d1e] rounded-xl border border-emerald-200/50 dark:border-emerald-500/10">
+                    <div className="flex flex-col md:flex-row items-stretch gap-3 md:gap-4 p-3 md:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-xl md:rounded-2xl border border-transparent mb-4 md:mb-6 relative z-10">
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl border border-transparent">
                         <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
                           Interest Saved
                         </span>
@@ -209,7 +204,7 @@ const PrepaymentCalculatorPage = () => {
                         </span>
                       </div>
                       <div className="flex flex-row md:flex-col gap-3 md:gap-3">
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
+                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent">
                           <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                             Tenure Saved
                           </span>
@@ -220,7 +215,7 @@ const PrepaymentCalculatorPage = () => {
                             </span>
                           </span>
                         </div>
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-white dark:bg-[#080d1e] rounded-xl border border-border dark:border-white/5">
+                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent">
                           <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                             Monthly EMI
                           </span>
@@ -233,7 +228,7 @@ const PrepaymentCalculatorPage = () => {
 
                     {/* Comparison Row */}
                     <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-6 relative z-10">
-                      <div className="p-2.5 md:p-3.5 bg-red-50/50 dark:bg-red-500/5 rounded-lg md:rounded-xl border border-red-200/50 dark:border-red-500/10">
+                      <div className="p-2.5 md:p-3.5 bg-red-50/15 dark:bg-red-500/[0.02] rounded-lg md:rounded-xl border border-transparent">
                         <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-red-500/70 mb-1">
                           Without Prepayment
                         </p>
@@ -244,7 +239,7 @@ const PrepaymentCalculatorPage = () => {
                           total interest • {tenureMonths} months
                         </p>
                       </div>
-                      <div className="p-2.5 md:p-3.5 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-lg md:rounded-xl border border-emerald-200/50 dark:border-emerald-500/10">
+                      <div className="p-2.5 md:p-3.5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-lg md:rounded-xl border border-transparent">
                         <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-emerald-500/70 mb-1">
                           With Prepayment
                         </p>
@@ -261,7 +256,7 @@ const PrepaymentCalculatorPage = () => {
                     {/* Sliders */}
                     <div className="space-y-3 md:space-y-4 relative z-10">
                       {/* Loan Amount */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
                         <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Loan Amount (₹)
@@ -270,7 +265,7 @@ const PrepaymentCalculatorPage = () => {
                             type="number"
                             value={loanAmount}
                             onChange={(e) => setLoanAmount(Number(e.target.value))}
-                            className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             min={100000}
                             max={10000000}
                           />
@@ -294,7 +289,7 @@ const PrepaymentCalculatorPage = () => {
                       </div>
 
                       {/* Interest Rate */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
                         <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Interest Rate (% p.a.)
@@ -303,7 +298,7 @@ const PrepaymentCalculatorPage = () => {
                             type="number"
                             value={interestRate}
                             onChange={(e) => setInterestRate(Number(e.target.value))}
-                            className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             min={6}
                             max={24}
                             step={0.1}
@@ -328,7 +323,7 @@ const PrepaymentCalculatorPage = () => {
                       </div>
 
                       {/* Tenure */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/20 dark:bg-[#0d1829] rounded-xl md:rounded-2xl border border-border dark:border-white/5 shadow-sm">
+                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
                         <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                             Loan Tenure (Months)
@@ -338,7 +333,7 @@ const PrepaymentCalculatorPage = () => {
                               type="number"
                               value={tenureMonths}
                               onChange={(e) => setTenureMonths(Number(e.target.value))}
-                              className="text-sm md:text-base font-bold text-foreground bg-background dark:bg-[#080d1e] px-3 py-1.5 rounded-lg border border-border dark:border-white/5 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                               min={12}
                               max={360}
                             />
@@ -368,7 +363,7 @@ const PrepaymentCalculatorPage = () => {
                       {strategy === "lump-sum" ? (
                         <>
                           {/* Prepayment Amount */}
-                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
+                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl md:rounded-2xl border border-transparent shadow-none">
                             <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                                 Prepayment Amount (₹)
@@ -377,7 +372,7 @@ const PrepaymentCalculatorPage = () => {
                                 type="number"
                                 value={prepaymentAmount}
                                 onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
-                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/30 dark:bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 min={10000}
                                 max={Math.min(loanAmount, 5000000)}
                               />
@@ -401,7 +396,7 @@ const PrepaymentCalculatorPage = () => {
                           </div>
 
                           {/* Prepayment Month */}
-                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl md:rounded-2xl border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm">
+                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl md:rounded-2xl border border-transparent shadow-none">
                             <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
                               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                                 Prepay After Month
@@ -410,7 +405,7 @@ const PrepaymentCalculatorPage = () => {
                                 type="number"
                                 value={prepaymentMonth}
                                 onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
-                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-500/15 shadow-sm w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/30 dark:bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 min={1}
                                 max={Math.max(1, tenureMonths - 1)}
                               />
@@ -435,7 +430,7 @@ const PrepaymentCalculatorPage = () => {
                         </>
                       ) : (
                         /* Strategy Explanation Card */
-                        <div className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-5 rounded-xl border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden select-none">
+                        <div className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-5 rounded-xl border border-transparent shadow-none flex flex-col justify-center relative overflow-hidden select-none">
                           <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
                           
                           {strategy === "13th-emi" && (
@@ -511,18 +506,27 @@ const PrepaymentCalculatorPage = () => {
                       )}
                     </div>
 
-                    {/* Terminology */}
+                    {/* Prepayment Guide */}
                     <div className="mt-4 md:mt-5 pt-4 border-t border-border dark:border-white/10 relative z-10">
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="terminology" className="border-0">
-                          <AccordionTrigger className="text-[11px] font-bold text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 py-2 hover:no-underline uppercase tracking-widest transition-colors">
-                            <div className="flex items-center gap-2.5">
-                              <Info className="w-4 h-4" />
-                              <span>Prepayment Guide</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="grid gap-3 pt-3">
+                      <div className="w-full">
+                        <button
+                          onClick={() => setIsGuideOpen(!isGuideOpen)}
+                          className="flex w-full items-center justify-between py-2 text-[11px] font-bold text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 uppercase tracking-widest transition-colors focus:outline-none"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Info className="w-4 h-4" />
+                            <span>Prepayment Guide</span>
+                          </div>
+                          <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform duration-200", isGuideOpen && "rotate-180")} />
+                        </button>
+                        <div
+                          className={cn(
+                            "grid transition-all duration-300 ease-in-out",
+                            isGuideOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0"
+                          )}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="grid gap-3 pb-4">
                               {[
                                 {
                                   term: "Part Prepayment",
@@ -547,7 +551,7 @@ const PrepaymentCalculatorPage = () => {
                               ].map((item) => (
                                 <div
                                   key={item.term}
-                                  className="p-3 bg-secondary/30 dark:bg-[#0d1829] rounded-xl border border-border dark:border-white/5 shadow-sm"
+                                  className="p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent"
                                 >
                                   <p className="text-xs font-bold text-foreground mb-1 uppercase tracking-wide">
                                     {item.term}
@@ -558,12 +562,11 @@ const PrepaymentCalculatorPage = () => {
                                 </div>
                               ))}
                             </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
               </div>
 
               {/* Side Info Cards */}
