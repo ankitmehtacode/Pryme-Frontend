@@ -20,8 +20,8 @@ export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children
     >
       <div className="absolute inset-0 pointer-events-none" style={{ transform: "translateX(-192px)", zIndex: -1 }}>
         <HeroIllustration
-          src={currentOffer?.heroImageUrl || heroBankImg}
-          alt={currentOffer?.heroImageUrl ? `${currentOffer?.bank} hero illustration` : "Professional walking toward a bank building"}
+          src={heroBankImg}
+          alt="Professional walking toward a bank building"
         />
       </div>
       {children && (
