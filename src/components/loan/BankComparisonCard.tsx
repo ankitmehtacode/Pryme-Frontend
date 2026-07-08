@@ -125,55 +125,70 @@ export const BankComparisonCard = memo(function BankComparisonCard({
           }}
         />
 
-        <div className="pl-6 pr-5 py-6 md:pl-8 md:pr-6 md:py-6">
-          {/* ── Main Desktop Grid ───────────────────────────── */}
-          <div className="grid grid-cols-[1fr] xl:grid-cols-[220px_auto_1fr_auto] 2xl:grid-cols-[245px_auto_1fr_auto] items-center gap-4 xl:gap-5 2xl:gap-6">
-
-            {/* ── Bank Identity ────────────────────────────── */}
-            <div className="flex items-center gap-4">
-              <div
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden transition-all duration-500 group-hover:scale-105 group-hover:shadow-xl bg-white border border-slate-200 dark:border-white/[0.08]"
-                style={{
-                  boxShadow: `0 4px 12px rgba(0,0,0,0.03)`,
-                  padding: offer.logoUrl && !logoError ? '4px' : '12px',
-                }}
-              >
-                {offer.logoUrl && !logoError ? (
-                  <img
-                    src={offer.logoUrl}
-                    alt={offer.bankName}
-                    className="w-full h-full object-contain"
-                    onError={() => setLogoError(true)}
-                  />
-                ) : (
-                  <div 
-                    className="w-full h-full flex items-center justify-center rounded-xl text-xl sm:text-2xl font-black"
-                    style={{ 
-                      backgroundColor: `${offer.brandHex}15`, 
-                      color: offer.brandHex,
-                      border: `1px solid ${offer.brandHex}30` 
-                    }}
-                  >
-                    {offer.bankName ? offer.bankName.charAt(0).toUpperCase() : <Building2 className="w-6 h-6 opacity-50" />}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex flex-col justify-center">
-                {isRecommended && (
-                  <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1.5 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
-                    <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
-                  </span>
-                )}
-                <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">{offer.bankName}</h3>
-                {matchingReward && (
-                  <div className="mt-1.5 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2.5 py-1 rounded-md w-fit shadow-sm">
-                    <RewardIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                    <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 leading-tight">
-                      {matchingReward.rewardText}
+        <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
+          {/* ── Main Grid ───────────────────────────── */}
+          <div className="flex flex-col xl:grid xl:grid-cols-[220px_auto_1fr_auto] 2xl:grid-cols-[245px_auto_1fr_auto] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
+            
+            {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
+            <div className="flex items-start justify-between w-full xl:w-auto">
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden transition-all duration-500 group-hover:scale-105 group-hover:shadow-xl bg-white border border-slate-200 dark:border-white/[0.08]"
+                  style={{
+                    boxShadow: `0 4px 12px rgba(0,0,0,0.03)`,
+                    padding: offer.logoUrl && !logoError ? '4px' : '12px',
+                  }}
+                >
+                  {offer.logoUrl && !logoError ? (
+                    <img
+                      src={offer.logoUrl}
+                      alt={offer.bankName}
+                      className="w-full h-full object-contain"
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <div 
+                      className="w-full h-full flex items-center justify-center rounded-xl text-xl sm:text-2xl font-black"
+                      style={{ 
+                        backgroundColor: `${offer.brandHex}15`, 
+                        color: offer.brandHex,
+                        border: `1px solid ${offer.brandHex}30` 
+                      }}
+                    >
+                      {offer.bankName ? offer.bankName.charAt(0).toUpperCase() : <Building2 className="w-6 h-6 opacity-50" />}
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex flex-col justify-center">
+                  {isRecommended && (
+                    <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
                     </span>
-                  </div>
-                )}
+                  )}
+                  <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-tight">{offer.bankName}</h3>
+                  {matchingReward && (
+                    <div className="mt-1.5 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2.5 py-1 rounded-md w-fit shadow-sm">
+                      <RewardIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                      <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 leading-tight">
+                        {matchingReward.rewardText}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Mobile Chevron */}
+              <button
+                onClick={() => onToggleExpand(offer.id)}
+                className={`xl:hidden flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 shrink-0 mt-1
+                  ${isExpanded
+                    ? 'bg-slate-100 dark:bg-white/10 text-foreground'
+                    : 'bg-transparent text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`}
+                title="View requirements"
+              >
+                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
             </div>
 
             {/* ── EMI & Comparison Diff (Grouped for Perfect Alignment) ── */}
@@ -235,100 +250,82 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               ))}
             </div>
 
-            {/* ── Mobile Stats Row ────────────────────────────── */}
-            <div className="xl:hidden mt-2 grid grid-cols-3 gap-2 w-full">
-              {[
-                { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
-                { label: "Interest", value: `${offer.interestRate}%` },
-                { label: "Tenure", value: `${offer.maxTenure} yrs` },
-              ].map((m, i) => (
-                <div
-                  key={i}
-                  className="px-2 py-3 rounded-2xl bg-slate-50/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] backdrop-blur-md shadow-sm transition-colors flex flex-col items-center justify-center text-center"
-                >
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{m.label}</p>
-                  <p className={`${m.bold ? 'text-sm sm:text-base font-extrabold' : 'text-xs sm:text-sm font-bold'} text-foreground tabular-nums tracking-tight`}>{m.value}</p>
+            {/* ── Mobile Premium Metrics Board ────────────────────────────── */}
+            <div className="xl:hidden w-full bg-slate-50/60 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/[0.05] rounded-[1.25rem] p-4 flex flex-col gap-3 shadow-inner">
+              <div className="flex justify-between items-end border-b border-slate-200/60 dark:border-white/[0.06] pb-3">
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70 mb-1">EMI</p>
+                  <p className="text-[26px] font-black text-foreground tabular-nums leading-none tracking-tight">
+                    <span className="text-base text-muted-foreground/40 mr-0.5 font-bold">₹</span>{emi.toLocaleString("en-IN")}
+                  </p>
                 </div>
-              ))}
+                <div className="text-right">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70 mb-1">Interest</p>
+                  <p className="text-xl font-extrabold text-foreground tabular-nums leading-none tracking-tight">{offer.interestRate}%</p>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-1">
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Tenure</p>
+                <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.maxTenure} yrs</p>
+              </div>
               {emiDiffFromHero !== 0 && (
-                <div className="col-span-3 mt-1 flex flex-col gap-0.5 items-center text-center bg-slate-50/50 dark:bg-white/[0.02] p-2.5 rounded-xl border border-slate-100 dark:border-white/[0.04]">
-                   <p className="text-xs font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
-                      {emiDiffFromHero > 0
-                        ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
-                        : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`} than {heroBankName}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground/60 font-semibold tabular-nums">
-                      {totalDiffFromHero > 0
-                        ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
-                        : totalDiffFromHero < 0
-                          ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
-                          : "Same total"}
-                    </p>
+                <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
+                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
+                    {emiDiffFromHero > 0
+                      ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo`
+                      : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo`}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/70 font-semibold tabular-nums uppercase tracking-widest">
+                    vs {heroBankName}
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* ── CTA ──────────────────────────────────────── */}
-            <div className="w-full xl:w-auto mt-2 xl:mt-0 xl:col-start-4 flex items-center xl:justify-end">
-              <div className="grid grid-cols-[1fr_auto] xl:flex xl:flex-col gap-2.5 w-full xl:w-[175px]">
-                <Button
-                  onClick={handleApplyClick}
-                  disabled={isGlobalLocking && !isLocking}
-                  className="rounded-xl h-11 xl:h-11 px-3 sm:px-5 text-xs sm:text-sm font-extrabold transition-all duration-300 w-full border-0 shadow-lg hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)] group/btn relative overflow-hidden"
-                  style={{
-                    background: localStatus === "resolved"
-                      ? '#10b981'
-                      : isRecommended
-                        ? '#eab308'
-                        : '#0f172a',
-                    color: localStatus === "resolved"
-                      ? 'white'
-                      : isRecommended
-                        ? '#0f172a'
-                        : 'white',
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                  {localStatus === "resolved" ? (
-                    <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
-                  ) : isLocking ? (
-                    <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
-                  ) : (
-                    <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
-                      Apply with Pryme 
-                      <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
-                    </span>
-                  )}
-                </Button>
+            {/* ── CTAs (Mobile Stacked, Desktop Row/Col) ──────────────────────── */}
+            <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
+              <Button
+                onClick={handleApplyClick}
+                disabled={isGlobalLocking && !isLocking}
+                className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
+                style={{
+                  background: localStatus === "resolved"
+                    ? '#10b981'
+                    : isRecommended
+                      ? '#eab308'
+                      : '#0f172a',
+                  color: localStatus === "resolved"
+                    ? 'white'
+                    : isRecommended
+                      ? '#0f172a'
+                      : 'white',
+                }}
+              >
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                {localStatus === "resolved" ? (
+                  <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
+                ) : isLocking ? (
+                  <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
+                ) : (
+                  <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
+                    Apply with Pryme 
+                    <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
+                  </span>
+                )}
+              </Button>
 
-                {/* Mobile Chevron */}
-                <button
-                  onClick={() => onToggleExpand(offer.id)}
-                  className={`xl:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
-                    ${isExpanded
-                      ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
-                      : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white hover:border-slate-300'
-                    }`}
-                  style={isExpanded ? { color: brand } : { color: 'var(--muted-foreground)' }}
-                  title="View requirements"
-                >
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Secondary Button */}
-                <button
-                  onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                  className="col-span-2 xl:col-span-1 rounded-xl h-10 xl:h-9 px-3 text-[11px] sm:text-xs font-bold transition-all border bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5 shadow-sm"
-                  title={`Apply directly on ${offer.bankName} website`}
-                >
-                  Apply Directly <ExternalLink className="w-3 h-3" />
-                </button>
-              </div>
+              <button
+                onClick={() => navigate(`/apply-direct/${offer.id}`)}
+                className="w-full xl:w-auto rounded-xl h-11 xl:h-11 px-4 text-xs font-bold transition-all border bg-transparent dark:bg-transparent border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5"
+                title={`Apply directly on ${offer.bankName} website`}
+              >
+                Apply Directly <ExternalLink className="w-3.5 h-3.5" />
+              </button>
 
               {/* Desktop Chevron */}
               <button
                 onClick={() => onToggleExpand(offer.id)}
-                className={`hidden xl:flex ml-3 p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
+                className={`hidden xl:flex ml-2 p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
                   ${isExpanded
                     ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
                     : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white hover:border-slate-300'
@@ -341,6 +338,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
             </div>
           </div>
         </div>
+
 
         {/* ── Expandable Details Panel ──────────────────────── */}
         <AnimatePresence>
