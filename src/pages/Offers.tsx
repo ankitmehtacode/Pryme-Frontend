@@ -443,6 +443,10 @@ export default function Offers() {
 
     // Skeleton done, still no offers → show rejection UI
     const rawViolations = (leadData as any).engineResults?.[0]?.rejectionReasons || (leadData as any).engineResults?.[0]?.violations || [];
+    const maxPossibleAmount = (leadData as any).engineResults?.reduce((max: number, result: any) => {
+      const amount = result?.maxEligibleAmount || 0;
+      return amount > max ? amount : max;
+    }, 0) || 0;
 
     return (
       <div className="min-h-screen pt-28 pb-20 bg-background flex items-center justify-center">
@@ -456,6 +460,17 @@ export default function Offers() {
               We evaluated your profile against our partner network. Unfortunately, we could not find an eligible loan match right now.
             </p>
           </div>
+
+          {maxPossibleAmount > 0 && leadData.loanAmount > maxPossibleAmount && (
+            <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl text-sm space-y-2">
+              <div className="font-bold text-primary flex items-center gap-2 text-base">
+                <ShieldCheck className="w-5 h-5" /> Maximum Eligibility: ₹{maxPossibleAmount.toLocaleString("en-IN")}
+              </div>
+              <p className="text-secondary-foreground/90">
+                You requested ₹{leadData.loanAmount.toLocaleString("en-IN")}, but based on your income and current obligations, the maximum loan amount you can get is <strong className="text-foreground">₹{maxPossibleAmount.toLocaleString("en-IN")}</strong>. Try reducing your loan amount.
+              </p>
+            </div>
+          )}
 
           <div className="bg-secondary/30 p-5 rounded-2xl text-sm space-y-3 border border-border/50">
             <div className="font-semibold text-foreground flex items-center gap-2">
@@ -509,9 +524,9 @@ export default function Offers() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-8 bg-slate-50/90 dark:bg-[#0c1322]/90 border border-slate-200 dark:border-white/[0.06] rounded-[1.25rem] px-5 py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-wrap items-center justify-between gap-4"
+            className="mb-6 md:mb-8 bg-slate-50/90 dark:bg-[#0c1322]/90 border border-slate-200 dark:border-white/[0.06] rounded-2xl md:rounded-[1.25rem] px-4 md:px-5 py-3 md:py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
           >
-            <div className="flex items-center gap-6 md:gap-8">
+            <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4 md:gap-8">
               {[
                 { label: "Amount", value: `₹${leadData.loanAmount.toLocaleString("en-IN")}` },
                 { label: "CIBIL", value: `${leadData.cibilScore}` },
@@ -519,11 +534,11 @@ export default function Offers() {
               ].map((s, i) => (
                 <div key={i}>
                   <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40">{s.label}</p>
-                  <p className="text-sm font-bold text-foreground tabular-nums">{s.value}</p>
+                  <p className="text-[13px] md:text-sm font-bold text-foreground tabular-nums">{s.value}</p>
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 self-end md:self-auto pt-1 md:pt-0 border-t border-border/40 md:border-t-0 w-full md:w-auto justify-end md:justify-end">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck className="w-3 h-3" /> No credit impact
               </div>
