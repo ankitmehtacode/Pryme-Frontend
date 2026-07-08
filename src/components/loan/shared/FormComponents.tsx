@@ -20,7 +20,7 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
           ref={ref}
           {...props}
           className={cn(
-            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
+            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl h-14 px-4 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
             Icon && "pl-11",
             error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
             isValid && !error && "border-primary/20 dark:border-[#103783]/20"
@@ -59,7 +59,7 @@ export const StyledSelect = ({
     <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
     <Select value={value || ""} onValueChange={onValueChange}>
       <SelectTrigger className={cn(
-        "relative w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl px-4 py-6 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
+        "relative w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl h-14 px-4 text-sm font-medium text-foreground transition-all duration-200 hover:border-primary/20 dark:hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
         Icon && "pl-11",
         error && "border-red-500/30"
       )}>

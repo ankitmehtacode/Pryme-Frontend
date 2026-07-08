@@ -235,13 +235,46 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               ))}
             </div>
 
+            {/* ── Mobile Stats Row ────────────────────────────── */}
+            <div className="xl:hidden mt-2 grid grid-cols-3 gap-2 w-full">
+              {[
+                { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
+                { label: "Interest", value: `${offer.interestRate}%` },
+                { label: "Tenure", value: `${offer.maxTenure} yrs` },
+              ].map((m, i) => (
+                <div
+                  key={i}
+                  className="px-2 py-3 rounded-2xl bg-slate-50/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] backdrop-blur-md shadow-sm transition-colors flex flex-col items-center justify-center text-center"
+                >
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{m.label}</p>
+                  <p className={`${m.bold ? 'text-sm sm:text-base font-extrabold' : 'text-xs sm:text-sm font-bold'} text-foreground tabular-nums tracking-tight`}>{m.value}</p>
+                </div>
+              ))}
+              {emiDiffFromHero !== 0 && (
+                <div className="col-span-3 mt-1 flex flex-col gap-0.5 items-center text-center bg-slate-50/50 dark:bg-white/[0.02] p-2.5 rounded-xl border border-slate-100 dark:border-white/[0.04]">
+                   <p className="text-xs font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
+                      {emiDiffFromHero > 0
+                        ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
+                        : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`} than {heroBankName}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground/60 font-semibold tabular-nums">
+                      {totalDiffFromHero > 0
+                        ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
+                        : totalDiffFromHero < 0
+                          ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
+                          : "Same total"}
+                    </p>
+                </div>
+              )}
+            </div>
+
             {/* ── CTA ──────────────────────────────────────── */}
-            <div className="flex items-center gap-3 justify-end w-full xl:w-auto mt-5 xl:mt-0 xl:col-start-4">
-              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-1 xl:flex-initial w-full xl:w-[175px]">
+            <div className="w-full xl:w-auto mt-2 xl:mt-0 xl:col-start-4 flex items-center xl:justify-end">
+              <div className="grid grid-cols-[1fr_auto] xl:flex xl:flex-col gap-2.5 w-full xl:w-[175px]">
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
-                  className="rounded-xl h-11 xl:h-11 px-3 sm:px-5 text-xs sm:text-sm font-extrabold transition-all duration-300 flex-1 xl:flex-none border-0 shadow-lg hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)] group/btn relative overflow-hidden"
+                  className="rounded-xl h-11 xl:h-11 px-3 sm:px-5 text-xs sm:text-sm font-extrabold transition-all duration-300 w-full border-0 shadow-lg hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)] group/btn relative overflow-hidden"
                   style={{
                     background: localStatus === "resolved"
                       ? '#10b981'
@@ -267,62 +300,45 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     </span>
                   )}
                 </Button>
+
+                {/* Mobile Chevron */}
+                <button
+                  onClick={() => onToggleExpand(offer.id)}
+                  className={`xl:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
+                    ${isExpanded
+                      ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
+                      : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white hover:border-slate-300'
+                    }`}
+                  style={isExpanded ? { color: brand } : { color: 'var(--muted-foreground)' }}
+                  title="View requirements"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Secondary Button */}
                 <button
                   onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                  className="rounded-xl h-11 xl:h-9 px-3 sm:px-4 text-[11px] sm:text-xs font-bold transition-all border bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-foreground hover:border-slate-300 dark:hover:border-white/[0.2] flex items-center justify-center gap-1.5 flex-1 xl:flex-none shadow-sm"
+                  className="col-span-2 xl:col-span-1 rounded-xl h-10 xl:h-9 px-3 text-[11px] sm:text-xs font-bold transition-all border bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5 shadow-sm"
                   title={`Apply directly on ${offer.bankName} website`}
                 >
                   Apply Directly <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
+
+              {/* Desktop Chevron */}
               <button
                 onClick={() => onToggleExpand(offer.id)}
-                className={`
-                  p-3 xl:p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
+                className={`hidden xl:flex ml-3 p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
                   ${isExpanded
                     ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
-                    : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/40'
-                  }
-                `}
+                    : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white hover:border-slate-300'
+                  }`}
                 style={isExpanded ? { color: brand } : { color: 'var(--muted-foreground)' }}
                 title="View requirements"
               >
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
               </button>
             </div>
-          </div>
-
-          {/* ── Mobile Stats Row ────────────────────────────── */}
-          <div className="xl:hidden mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: "EMI", value: `₹${emi.toLocaleString("en-IN")}`, bold: true },
-              { label: "Interest", value: `${offer.interestRate}%` },
-              { label: "Tenure", value: `${offer.maxTenure} yrs` },
-            ].map((m, i) => (
-              <div
-                key={i}
-                className="px-3 py-3 rounded-2xl bg-slate-50/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] backdrop-blur-md shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-white/[0.08]"
-              >
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{m.label}</p>
-                <p className={`${m.bold ? 'text-base sm:text-lg font-extrabold' : 'text-xs sm:text-sm font-bold'} text-foreground tabular-nums tracking-tight`}>{m.value}</p>
-              </div>
-            ))}
-            {emiDiffFromHero !== 0 && (
-              <div className="col-span-2 sm:col-span-4 mt-1.5 flex flex-col gap-0.5">
-                 <p className="text-xs sm:text-sm font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
-                    {emiDiffFromHero > 0
-                      ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
-                      : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`} than {heroBankName}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground/60 font-semibold tabular-nums">
-                    {totalDiffFromHero > 0
-                      ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
-                      : totalDiffFromHero < 0
-                        ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
-                        : "Same total"}
-                  </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -367,10 +383,10 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   // Format a value for display with fallback
                   const fmt = (val: any, fallbackVal: string): string => {
                     const checkVal = (val != null && val !== "") ? val : fallbackVal;
-                    if (checkVal === 0 || checkVal === "0" || checkVal === 0.0) return "Nil";
+                    if (checkVal === 0 || checkVal === "0" || checkVal === 0.0) return "₹0";
                     if (typeof checkVal === "number") return `₹${Math.round(checkVal).toLocaleString("en-IN")}`;
                     const s = String(checkVal).trim();
-                    if (s === "0") return "Nil";
+                    if (s === "0" || s.toLowerCase() === "nil") return "₹0";
                     if (s.includes("%")) {
                       const pct = parseFloat(s.replace(/[^\d.]/g, ""));
                       if (!isNaN(pct)) {
@@ -385,7 +401,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
                   // Fallbacks matching database seed patterns
                   const stampDutyFallback = isLap ? "0.50%" : "0.25%";
-                  const legalTechFallback = isLap ? "₹2,500" : "Nil";
+                  const legalTechFallback = isLap ? "₹2,500" : "₹0";
                   const loginFeeFallback = "₹1,000";
 
                   // Processing fee in ₹
@@ -456,7 +472,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                             <div className="flex justify-between text-xs py-2.5 mt-0.5">
                               <span className="font-extrabold text-foreground">Total Upfront Cost</span>
                               <span className="font-extrabold tabular-nums" style={{ color: brand }}>
-                                {totalUpfront > 0 ? `₹${totalUpfront.toLocaleString("en-IN")}` : "Nil"}
+                                {totalUpfront > 0 ? `₹${totalUpfront.toLocaleString("en-IN")}` : "₹0"}
                               </span>
                             </div>
                           </div>
