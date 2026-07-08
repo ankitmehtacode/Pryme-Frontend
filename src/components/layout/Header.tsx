@@ -115,6 +115,16 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               ))}
             </div>
           </div>
+          <div>
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">More</p>
+            <div className="space-y-1">
+              {navLinks.map((item) => (
+                <Link key={item.href} to={item.href} onClick={onClose} className="block p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                  <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="pt-4 border-t border-slate-100">
             {user ? (
               <div className="space-y-2">
