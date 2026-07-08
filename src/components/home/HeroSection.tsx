@@ -26,7 +26,7 @@ const HeroSection = memo(() => {
         style={{ gap: "var(--landing-hero-gap, var(--space-lg))" }}
       >
         {/* ─────── LEFT PANEL: Static Marketing Content ─────── */}
-        <HeroContent />
+        <HeroContent isInView={isInView} onActiveOfferChange={setCurrentOffer} />
 
         {/* ─────── RIGHT PANEL: Illustration + Offer Cards (direct child — no wrapper) ─────── */}
         <HeroArtwork currentOffer={currentOffer}>

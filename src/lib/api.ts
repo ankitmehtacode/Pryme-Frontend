@@ -448,6 +448,9 @@ export const PrymeAPI = {
   /** Hero offer data — GET /api/v1/public/offers/hero */
   getHeroOffers: async () => fetchWithAuth("/public/offers/hero", { method: "GET" }),
 
+  /** Public Product Rewards — GET /api/v1/public/offers/rewards */
+  getPublicProductRewards: async () => fetchWithAuth("/public/offers/rewards", { method: "GET" }),
+
   /** Bank recommendation engine — GET /api/v1/public/banks/recommendation */
   getBankRecommendation: async (params: { cibilScore: number; loanAmount: number; loanType: string; monthlyIncome?: number }) => {
     const qs = new URLSearchParams({
@@ -498,6 +501,14 @@ export const PrymeAPI = {
   updateAdminHeroOffer: async (id: string, data: any) =>
     fetchWithAuth(`/admin/offers/hero/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteAdminHeroOffer: async (id: string) => fetchWithAuth(`/admin/offers/hero/${id}`, { method: "DELETE" }),
+
+  /** Admin: Product Rewards CRUD — /api/v1/admin/offers/rewards */
+  getAdminProductRewards: async () => fetchWithAuth("/admin/offers/rewards", { method: "GET" }),
+  createAdminProductReward: async (data: any) =>
+    fetchWithAuth("/admin/offers/rewards", { method: "POST", body: JSON.stringify(data) }),
+  updateAdminProductReward: async (id: string, data: any) =>
+    fetchWithAuth(`/admin/offers/rewards/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteAdminProductReward: async (id: string) => fetchWithAuth(`/admin/offers/rewards/${id}`, { method: "DELETE" }),
 
   /** Admin: Testimonial CRUD — /api/v1/admin/reviews */
   getAdminReviews: async () => fetchWithAuth("/admin/reviews", { method: "GET" }),

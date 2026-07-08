@@ -171,7 +171,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   const dataToExport = eligibilityRules.map(rule => {
                     const row: Record<string, any> = {};
                     headers.forEach(header => {
-                      let value = rule[header];
+                      const value = rule[header];
                       
                       // Handle null, undefined, objects (like JSON arrays/objects)
                       if (value === null || value === undefined) {

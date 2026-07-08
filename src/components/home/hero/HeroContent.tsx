@@ -6,8 +6,14 @@ import { products as loanProducts } from "../ProductSelectorGrid";
 import { HeroBadges } from "./HeroBadges";
 import { HeroActions } from "./HeroActions";
 import { HeroMetrics } from "./HeroMetrics";
+import { HeroCarousel } from "./HeroCarousel";
 
-export const HeroContent = () => {
+export interface HeroContentProps {
+  isInView?: boolean;
+  onActiveOfferChange?: (offer: any) => void;
+}
+
+export const HeroContent: React.FC<HeroContentProps> = ({ isInView = true, onActiveOfferChange }) => {
   return (
     <div className="relative z-10 flex flex-col justify-center order-1 lg:order-1 max-w-[48ch] w-full md:max-w-[var(--landing-copy-width,48ch)]">
       {/* Eyebrow badges — hidden on mobile to reduce cognitive load */}
@@ -86,6 +92,11 @@ export const HeroContent = () => {
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* ─── MOBILE: Offer Carousel (Below Products) ─── */}
+      <div className="md:hidden mt-6 w-full pb-4" style={{ '--landing-offer-width': '100%' } as React.CSSProperties}>
+        <HeroCarousel isInView={isInView} onActiveOfferChange={onActiveOfferChange} />
       </div>
 
       {/* Trust Metrics Row */}

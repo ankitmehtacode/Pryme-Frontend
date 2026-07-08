@@ -1,7 +1,7 @@
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star } from "lucide-react";
+import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const parseExpenseValue = (val: any): string | null => {
@@ -47,6 +47,7 @@ interface BankComparisonCardProps {
   onApply: (providerId: string) => Promise<void>;
   isGlobalLocking: boolean;
   isRecommended?: boolean;
+  rewards?: any[];
 }
 
 export const BankComparisonCard = memo(function BankComparisonCard({
@@ -62,10 +63,15 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   onApply,
   isGlobalLocking,
   isRecommended = false,
+  rewards = [],
 }: BankComparisonCardProps) {
   const navigate = useNavigate();
   const [localStatus, setLocalStatus] = useState<"idle" | "processing" | "resolved">("idle");
   const [logoError, setLogoError] = useState(false);
+
+  useEffect(() => {
+    setLogoError(false);
+  }, [offer.logoUrl]);
 
   const handleApplyClick = async () => {
     setLocalStatus("processing");
@@ -79,6 +85,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
   const isLocking = localStatus === "processing";
   const brand = offer.brandHex;
+
+  const matchingReward = rewards?.find(r => r.productCode === offer.originalEngineResult?.productCode);
+  const RewardIcon = matchingReward?.iconType === "GIFT" ? Gift : 
+                     matchingReward?.iconType === "SMARTPHONE" ? Smartphone : 
+                     matchingReward?.iconType === "CAR" ? Car : 
+                     matchingReward?.iconType === "DISCOUNT" ? Tag : Gift;
 
   return (
     <motion.div
@@ -134,7 +146,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     onError={() => setLogoError(true)}
                   />
                 ) : (
-                  <Building2 className="w-6 h-6 text-slate-400" />
+                  <div 
+                    className="w-full h-full flex items-center justify-center rounded-xl text-xl sm:text-2xl font-black"
+                    style={{ 
+                      backgroundColor: `${offer.brandHex}15`, 
+                      color: offer.brandHex,
+                      border: `1px solid ${offer.brandHex}30` 
+                    }}
+                  >
+                    {offer.bankName ? offer.bankName.charAt(0).toUpperCase() : <Building2 className="w-6 h-6 opacity-50" />}
+                  </div>
                 )}
               </div>
               <div className="min-w-0 flex flex-col justify-center">
@@ -144,6 +165,14 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   </span>
                 )}
                 <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">{offer.bankName}</h3>
+                {matchingReward && (
+                  <div className="mt-1.5 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2.5 py-1 rounded-md w-fit shadow-sm">
+                    <RewardIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 leading-tight">
+                      {matchingReward.rewardText}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -161,11 +190,13 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   <>
                     <p
                       className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none"
-                      style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}
+                      style={{ color: emiDiffFromHero > 0 ? '#ea580c' : emiDiffFromHero < 0 ? '#10b981' : '#64748b' }}
                     >
                       {emiDiffFromHero > 0
                         ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
-                        : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`}
+                        : emiDiffFromHero < 0
+                          ? `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`
+                          : `Same EMI`}
                     </p>
                     <p className="text-[9px] text-muted-foreground/50 font-semibold tabular-nums whitespace-nowrap leading-none mt-1">
                       {totalDiffFromHero > 0

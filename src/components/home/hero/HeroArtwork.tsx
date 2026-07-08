@@ -28,10 +28,10 @@ export const HeroArtwork: React.FC<HeroArtworkProps> = ({ currentOffer, children
         <div
           className="absolute z-20"
           style={{
-            insetInlineStart: "calc(var(--offer-anchor-left, clamp(320px, 28vw, 420px)) + 125px)",
-            insetBlockEnd: "12px",
-            inlineSize: "var(--landing-offer-width, 360px)",
-            blockSize: "var(--landing-offer-height, 302px)",
+            insetInlineStart: "calc(var(--offer-anchor-left, clamp(320px, 28vw, 420px)) + 60px)",
+            insetBlockEnd: "36px",
+            inlineSize: "var(--landing-offer-width, 380px)",
+            blockSize: "var(--landing-offer-height, 318px)",
             overflow: "visible",
           }}
         >

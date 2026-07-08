@@ -276,7 +276,7 @@ const AdminDashboard = () => {
     queryKey: ["admin_products"],
     queryFn: async () => {
       const res = await PrymeAPI.getAdminProducts();
-      return res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []));
+      return res?.data?.content ? res.data.content : (res?.content ? res.content : (Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : [])));
     },
     enabled: activeTab === "settings"
   });

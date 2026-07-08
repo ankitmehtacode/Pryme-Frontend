@@ -3,6 +3,7 @@ import { Plus, Building2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { banks as localBankLogos } from "@/components/home/PartnerBankMarquee";
 
 interface BanksTabProps {
   bankStatusFilter: "all" | "active" | "inactive";
@@ -15,6 +16,40 @@ interface BanksTabProps {
   onEditBank: (bank: any) => void;
   onDeleteBank: (bank: any) => void;
 }
+
+const getLocalLogo = (bankName: string) => {
+  if (!bankName) return null;
+  const normalized = bankName.toLowerCase().trim();
+  
+  // Try exact match first
+  let match = localBankLogos.find(lb => lb.name.toLowerCase() === normalized);
+  if (match) return match.logo;
+
+  // Try partial match
+  match = localBankLogos.find(lb => 
+    normalized.includes(lb.name.toLowerCase()) || 
+    lb.name.toLowerCase().includes(normalized.replace(/ bank| limited| finance/g, "").trim())
+  );
+  return match ? match.logo : null;
+};
+
+const getInitial = (name: string) => name ? name.charAt(0).toUpperCase() : "?";
+
+const getAvatarStyles = (name: string) => {
+  const colors = [
+    "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    "bg-rose-500/20 text-rose-400 border-rose-500/30",
+    "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
+    "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  ];
+  if (!name) return colors[0];
+  const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  return colors[index];
+};
 
 export const BanksTab: React.FC<BanksTabProps> = ({
   bankStatusFilter, setBankStatusFilter, banks, filteredBanks,
@@ -66,24 +101,38 @@ export const BanksTab: React.FC<BanksTabProps> = ({
               </td>
             </tr>
           ) : (
-            filteredBanks.map((b: any) => (
+            filteredBanks.map((b: any) => {
+              const displayLogoUrl = b.logoUrl || getLocalLogo(b.bankName);
+              
+              return (
               <tr key={b.id} className="hover:bg-white/[0.03] transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     {/* Logo thumbnail */}
-                    <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden shrink-0">
-                      {b.logoUrl ? (
-                        <img
-                          src={b.logoUrl}
-                          alt={b.bankName}
-                          className="w-full h-full object-contain p-0.5"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-                          }}
-                        />
-                      ) : null}
-                      <ImageOff className={cn("w-4 h-4 text-slate-600", b.logoUrl && "hidden")} />
+                    <div className={cn(
+                      "w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border",
+                      displayLogoUrl ? "bg-white/[0.04] border-white/[0.06]" : getAvatarStyles(b.bankName)
+                    )}>
+                      {displayLogoUrl ? (
+                        <>
+                          <img
+                            src={displayLogoUrl}
+                            alt={b.bankName}
+                            className="w-full h-full object-contain p-0.5"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = "none";
+                              const parent = (e.target as HTMLImageElement).parentElement;
+                              if (parent) {
+                                parent.className = cn("w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border", getAvatarStyles(b.bankName));
+                              }
+                              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                            }}
+                          />
+                          <span className="font-bold text-lg hidden">{getInitial(b.bankName)}</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-lg">{getInitial(b.bankName)}</span>
+                      )}
                     </div>
                     <div>
                       <p className="font-semibold text-white">{b.bankName}</p>
@@ -92,22 +141,24 @@ export const BanksTab: React.FC<BanksTabProps> = ({
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  {b.logoUrl ? (
+                  {displayLogoUrl ? (
                     <div className="w-24 h-12 rounded-lg bg-white flex items-center justify-center overflow-hidden border border-white/[0.1] shadow-sm">
                       <img
-                        src={b.logoUrl}
+                        src={displayLogoUrl}
                         alt={`${b.bankName} logo`}
                         className="w-full h-full object-contain p-1"
                         onError={(e) => {
                           const parent = (e.target as HTMLImageElement).parentElement;
                           if (parent) {
-                            parent.innerHTML = '<span class="text-[10px] text-slate-400">Broken URL</span>';
+                            parent.innerHTML = `<div class="w-full h-full flex items-center justify-center ${getAvatarStyles(b.bankName)}"><span class="font-bold text-lg">${getInitial(b.bankName)}</span></div>`;
                           }
                         }}
                       />
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-600 italic">No logo uploaded</span>
+                    <div className={cn("w-24 h-12 rounded-lg flex items-center justify-center overflow-hidden border shadow-sm", getAvatarStyles(b.bankName))}>
+                      <span className="font-bold text-lg">{getInitial(b.bankName)}</span>
+                    </div>
                   )}
                 </td>
                 <td className="px-6 py-4">
@@ -144,7 +195,8 @@ export const BanksTab: React.FC<BanksTabProps> = ({
                   </div>
                 </td>
               </tr>
-            ))
+            );
+          })
           )}
         </tbody>
       </table>

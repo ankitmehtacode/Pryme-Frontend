@@ -3,6 +3,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { PrymeAPI } from "@/lib/api";
 import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck, AlertCircle } from "lucide-react";
 
 import Header from "@/components/layout/Header";
@@ -151,6 +153,11 @@ export default function Offers() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  const { data: productRewards = [] } = useQuery({
+    queryKey: ["publicProductRewards"],
+    queryFn: () => PrymeAPI.getPublicProductRewards()
+  });
 
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); }, []);
 
@@ -581,6 +588,7 @@ export default function Offers() {
                         onApply={handleApply}
                         isGlobalLocking={isLocking !== null}
                         isRecommended={offer.interestRate === heroOffer.interestRate && offer.processingFee === heroOffer.processingFee}
+                        rewards={productRewards}
                       />
                     );
                   })}

@@ -6,12 +6,12 @@ import { AutoGrid } from "@/components/layout/Primitives";
 
 // Assets safely imported from local directory
 // Assets safely imported from local directory
-import product1 from "@/assets/products/product-1.jpg"; // Car -> Auto
-import product2 from "@/assets/products/product-2.jpg"; // Wallet -> Personal
-import product3 from "@/assets/products/product-3.jpg"; // House -> Home
+import product1 from "@/assets/card-auto.png"; // Car -> Auto
+import product2 from "@/assets/card-personal.png"; // Wallet -> Personal
+import product3 from "@/assets/card-home.png"; // House -> Home
 import product4 from "@/assets/products/product-4.jpg"; // Briefcase -> Business
-import product5 from "@/assets/products/product-5.png"; // Building/House -> LAP
-import product6 from "@/assets/products/product-6.jpg"; // Balance Transfer
+import product5 from "@/assets/card-lap.png"; // Building/House -> LAP
+import product6 from "@/assets/card-balancetransfer.png"; // Balance Transfer
 
 export const BANK_OFFERS = [
   "Lowest Interest Rates Starting at 10.15% at Kotak Bank",
@@ -22,30 +22,6 @@ export const BANK_OFFERS = [
 ];
 
 export const products = [
-  {
-    id: "personal",
-    label: "PERSONAL LOAN",
-    image: product2,
-    tag: "CASHBACK",
-    href: "/apply?type=personal",
-    accent: "148, 62%, 42%",
-    bg: "transparent",
-    imgClass: "",
-    overlay: "transparent",
-    borderColor: "rgba(255,255,255,0.05)",
-  },
-  {
-    id: "business",
-    label: "BUSINESS LOAN",
-    image: product4,
-    tag: "LOWEST RATES",
-    href: "/apply?type=business",
-    accent: "217, 91%, 60%",
-    bg: "transparent",
-    imgClass: "",
-    overlay: "transparent",
-    borderColor: "rgba(255,255,255,0.05)",
-  },
   {
     id: "home",
     label: "HOME LOAN",
@@ -71,24 +47,48 @@ export const products = [
     borderColor: "rgba(255,255,255,0.05)",
   },
   {
-    id: "auto",
-    label: "AUTO LOAN",
-    image: product1,
-    tag: "INSTANT APPROVAL",
-    href: "/apply?type=auto",
-    accent: "12, 90%, 55%",
+    id: "transfer",
+    label: "BALANCE TRANSFER | TOP UP",
+    image: product6,
+    tag: "COMING SOON",
+    href: "/apply?type=transfer",
+    accent: "142, 70%, 45%",
     bg: "transparent",
     imgClass: "",
     overlay: "transparent",
     borderColor: "rgba(255,255,255,0.05)",
   },
   {
-    id: "transfer",
-    label: "BALANCE TRANSFER | TOP UP",
-    image: product6,
-    tag: "SAVE INTEREST",
-    href: "/apply?type=transfer",
-    accent: "142, 70%, 45%",
+    id: "personal",
+    label: "PERSONAL LOAN",
+    image: product2,
+    tag: "COMING SOON",
+    href: "/apply?type=personal",
+    accent: "148, 62%, 42%",
+    bg: "transparent",
+    imgClass: "",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
+  },
+  {
+    id: "business",
+    label: "BUSINESS LOAN",
+    image: product4,
+    tag: "COMING SOON",
+    href: "/apply?type=business",
+    accent: "217, 91%, 60%",
+    bg: "transparent",
+    imgClass: "",
+    overlay: "transparent",
+    borderColor: "rgba(255,255,255,0.05)",
+  },
+  {
+    id: "auto",
+    label: "AUTO LOAN",
+    image: product1,
+    tag: "COMING SOON",
+    href: "/apply?type=auto",
+    accent: "12, 90%, 55%",
     bg: "transparent",
     imgClass: "",
     overlay: "transparent",

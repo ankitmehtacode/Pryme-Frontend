@@ -561,24 +561,25 @@ const Dashboard: React.FC = () => {
               >
                 <Section spacing="xl">
                   <Container size="expanded">
-                <Surface className="relative overflow-hidden mb-[var(--space-10)] border border-[hsl(var(--border))]/40 dark:border-[hsl(var(--border))]/10 bg-[hsl(var(--background))]/60 backdrop-blur-3xl">
+                <Surface className="relative overflow-hidden mb-[var(--space-10)] border border-slate-200/60 bg-white/80 backdrop-blur-3xl shadow-xl shadow-slate-200/40 rounded-3xl">
                   <Section spacing="md">
                     <Container size="full">
                   {/* Subtle Glowing Orbs */}
-                  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-                  <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-400/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                  <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-400/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
                   
                   <Inline justify="space-between" align="start" className="relative z-10 mb-[var(--space-10)] flex-col md:flex-row gap-[var(--space-8)]">
                     <Inline gap="var(--space-6)" align="start" className="flex-col md:flex-row items-center md:items-start">
-                      <div className="w-20 h-20 rounded-[var(--surface-radius)] bg-gradient-to-br from-white/80 to-white/30 dark:from-white/10 dark:to-white/5 backdrop-blur-xl border border-[hsl(var(--border))]/50 dark:border-[hsl(var(--border))]/10 flex items-center justify-center shadow-lg">
-                        <Target className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-blue-50 backdrop-blur-xl border border-blue-100 flex items-center justify-center shadow-lg shadow-blue-500/10">
+                        <Target className="w-10 h-10 text-blue-600" />
                       </div>
                       <Stack gap="var(--space-3)">
                         <h1 className="text-[length:var(--text-display)] font-extrabold tracking-tight text-[hsl(var(--foreground))]">
                           Application Funnel
                         </h1>
                         <Inline gap="var(--space-3)" align="center" className="flex-wrap">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100/80 dark:bg-blue-500/10 text-blue-800 dark:text-blue-300 border border-blue-200/50 dark:border-blue-500/20 backdrop-blur-md">
+                          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse mr-2"></span>
                             ID: {activeApplication?.applicationId || "Initializing..."}
                           </span>
                           <span className="text-[length:var(--text-small)] font-medium text-[hsl(var(--muted-foreground))] flex items-center">
@@ -588,7 +589,7 @@ const Dashboard: React.FC = () => {
                       </Stack>
                     </Inline>
                     
-                    <Stack align="end" className="w-full md:w-auto bg-white/40 dark:bg-black/20 p-[var(--space-5)] rounded-[var(--surface-radius)] border border-white/50 dark:border-white/5 backdrop-blur-lg">
+                    <Stack align="end" className="w-full md:w-auto bg-white/60 p-6 rounded-2xl border border-slate-200/60 shadow-lg shadow-slate-200/40 backdrop-blur-xl relative overflow-hidden">
                       <Inline align="baseline" gap="var(--space-2)">
                         <span className="text-[length:var(--text-display)] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-none">
                           {Math.min(currentStage === 1 ? 5 : (currentStage - 1) * 50, 100)}
@@ -600,7 +601,7 @@ const Dashboard: React.FC = () => {
                   </Inline>
                   
                   {/* Premium Progress Track */}
-                  <div className="relative z-10 h-4 w-full bg-[hsl(var(--secondary))]/50 rounded-full overflow-hidden border border-white/60 dark:border-white/5 backdrop-blur-md shadow-inner">
+                  <div className="relative z-10 h-4 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 backdrop-blur-md shadow-inner">
                     <motion.div 
                       className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full relative overflow-hidden"
                       initial={{ width: 0 }}
@@ -617,10 +618,10 @@ const Dashboard: React.FC = () => {
 
                 <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-[var(--layout-panel-gap,var(--space-8))] items-start">
                   <SplitLayout.Media className="lg:col-span-4 sticky top-[var(--space-8)]">
-                    <Surface>
-                      <Section spacing="md">
+                    <Surface className="border-slate-200/50 shadow-lg shadow-slate-200/30 rounded-2xl bg-white/90 backdrop-blur-xl p-2 md:p-6">
+                      <Section spacing="none">
                         <Container size="full">
-                      <h3 className="font-bold text-[hsl(var(--foreground))] mb-[var(--space-6)]">Pipeline Stages</h3>
+                      <h3 className="font-bold text-slate-800 tracking-tight text-lg mb-8">Pipeline Stages</h3>
                       <Stack gap="var(--space-6)">
                         {stages.map((s) => {
                           const isCompleted = currentStage > s.id;
@@ -633,8 +634,8 @@ const Dashboard: React.FC = () => {
                                  <Circle className="w-6 h-6 text-[hsl(var(--muted-foreground))]" />}
                               </div>
                               <Stack gap="var(--space-1)">
-                                <p className={`font-semibold ${isActive ? "text-blue-500" : isCompleted ? "text-[hsl(var(--muted-foreground))]" : "text-[hsl(var(--foreground))]"}`}>{s.label}</p>
-                                <p className="text-[length:var(--text-caption)] text-[hsl(var(--muted-foreground))]">{s.desc}</p>
+                                <p className={`font-bold ${isActive ? "text-blue-600" : isCompleted ? "text-slate-400" : "text-slate-800"}`}>{s.label}</p>
+                                <p className="text-xs font-medium text-slate-500">{s.desc}</p>
                               </Stack>
                             </Inline>
                           );
@@ -647,29 +648,29 @@ const Dashboard: React.FC = () => {
 
                   <SplitLayout.Content className="lg:col-span-8">
                     <motion.div key={currentStage} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                      <Surface className="relative overflow-hidden">
-                        <Section spacing="lg">
+                      <Surface className="relative overflow-hidden border-slate-200/50 shadow-lg shadow-slate-200/30 rounded-2xl bg-white/90 backdrop-blur-xl p-2 md:p-6">
+                        <Section spacing="none">
                           <Container size="full">
                         
                         {currentStage === 1 && (
                           <Stack gap="var(--space-6)" className="relative z-10">
-                            <h2 className="text-[length:var(--text-heading)] font-bold border-b border-[hsl(var(--border))] pb-[var(--space-4)]">1. Identity & Location</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-6)]">
+                            <h2 className="text-2xl font-bold tracking-tight text-slate-800 border-b border-slate-200 pb-6">1. Identity & Location</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                               <Stack gap="var(--space-2)">
-                                <Label htmlFor="panNumber">PAN Number *</Label>
-                                <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="bg-[hsl(var(--background))] uppercase" maxLength={10} />
+                                <Label htmlFor="panNumber" className="text-xs font-bold uppercase tracking-wider text-slate-500">PAN Number *</Label>
+                                <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all uppercase rounded-xl text-slate-900 font-medium" maxLength={10} />
                               </Stack>
                               <Stack gap="var(--space-2)">
-                                <Label htmlFor="dob">Date of Birth *</Label>
-                                <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="bg-[hsl(var(--background))]" />
+                                <Label htmlFor="dob" className="text-xs font-bold uppercase tracking-wider text-slate-500">Date of Birth *</Label>
+                                <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
                               </Stack>
                               <Stack gap="var(--space-2)">
-                                <Label htmlFor="currentCity">Current City *</Label>
-                                <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} className="bg-[hsl(var(--background))]" />
+                                <Label htmlFor="currentCity" className="text-xs font-bold uppercase tracking-wider text-slate-500">Current City *</Label>
+                                <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
                               </Stack>
                               <Stack gap="var(--space-2)">
-                                <Label htmlFor="pinCode">Pin Code *</Label>
-                                <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\D/g, ''))} maxLength={6} className="bg-[hsl(var(--background))]" />
+                                <Label htmlFor="pinCode" className="text-xs font-bold uppercase tracking-wider text-slate-500">Pin Code *</Label>
+                                <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\D/g, ''))} maxLength={6} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
                               </Stack>
                             </div>
                           </Stack>
@@ -677,11 +678,11 @@ const Dashboard: React.FC = () => {
 
                         {currentStage === 2 && (
                           <Stack gap="var(--space-8)" className="relative z-10">
-                            <Inline gap="var(--space-3)" align="center" className="border-b border-[hsl(var(--border))] pb-[var(--space-4)]">
-                              <div className="bg-blue-500/10 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500"/></div>
+                            <Inline gap="var(--space-3)" align="center" className="border-b border-slate-200 pb-6">
+                              <div className="bg-blue-50 p-2.5 rounded-xl border border-blue-100 shadow-sm"><FileText className="w-6 h-6 text-blue-600"/></div>
                               <Stack gap="var(--space-1)">
-                                <h2 className="text-[length:var(--text-heading)] font-bold">2. Document Vault</h2>
-                                <p className="text-[length:var(--text-small)] text-[hsl(var(--muted-foreground))]">Final step. Securely upload documents to initiate underwriting.</p>
+                                <h2 className="text-2xl font-bold tracking-tight text-slate-800">2. Document Vault</h2>
+                                <p className="text-sm font-medium text-slate-500">Final step. Securely upload documents to initiate underwriting.</p>
                               </Stack>
                             </Inline>
 
@@ -732,12 +733,12 @@ const Dashboard: React.FC = () => {
                                           <Stack gap="var(--space-1)" className="z-10">
                                             <Inline align="center" gap="var(--space-2)">
                                               {isUploaded && <CheckCircle2 className="w-5 h-5 text-emerald-500 animate-checkmark" />}
-                                              <span className={`font-semibold text-[length:var(--text-small)] ${isUploaded ? 'text-emerald-900' : 'text-[hsl(var(--foreground))]'}`}>
+                                              <span className={`font-bold text-sm ${isUploaded ? 'text-emerald-700' : 'text-slate-800'}`}>
                                                 {doc.name} {doc.required && !isUploaded && <span className="text-red-500 ml-1">*</span>}
                                               </span>
                                             </Inline>
-                                            {!isUploaded && <span className="text-[length:var(--text-caption)] text-[hsl(var(--muted-foreground))]">PDF, JPG, PNG up to 10MB</span>}
-                                            {isUploaded && <span className="text-[length:var(--text-caption)] text-emerald-600/80 font-medium">Secured with AES-256</span>}
+                                            {!isUploaded && <span className="text-xs font-medium text-slate-500">PDF, JPG, PNG up to 10MB</span>}
+                                            {isUploaded && <span className="text-xs text-emerald-600 font-bold tracking-wide">Secured with AES-256</span>}
                                           </Stack>
                                           
                                           <Inline align="center" gap="var(--space-3)" className="z-10">
@@ -781,9 +782,9 @@ const Dashboard: React.FC = () => {
                                             {!isUploaded && !isUploading && (
                                               <Label 
                                                 htmlFor={`upload-${doc.id}`} 
-                                                className="inline-flex items-center justify-center rounded-[var(--surface-radius)] text-[length:var(--text-small)] font-semibold transition-all focus-visible:outline-none border border-[hsl(var(--border))] bg-[hsl(var(--background))] hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 shadow-sm h-10 px-4 cursor-pointer"
+                                                className="inline-flex items-center justify-center rounded-xl text-xs font-bold transition-all focus-visible:outline-none border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-sm h-10 px-5 cursor-pointer"
                                               >
-                                                <UploadCloud className="w-4 h-4 mr-2 text-blue-500" />
+                                                <UploadCloud className="w-4 h-4 mr-2 text-blue-600" />
                                                 Browse Files
                                               </Label>
                                             )}
@@ -798,11 +799,11 @@ const Dashboard: React.FC = () => {
                           </Stack>
                         )}
 
-                        <div className="mt-[var(--space-10)] pt-[var(--space-6)] border-t border-[hsl(var(--border))] flex justify-end relative z-10">
+                        <div className="mt-12 pt-8 border-t border-slate-200 flex justify-end relative z-10">
                           <Button 
                             onClick={currentStage === 2 ? handleFinalSubmit : handleNextStage} 
                             disabled={isSaving}
-                            className="h-12 px-8 text-[length:var(--text-body)] bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 disabled:opacity-70 transition-all"
+                            className="h-14 px-10 text-base font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 disabled:opacity-70 transition-all rounded-2xl hover:shadow-xl hover:-translate-y-0.5"
                           >
                             {isSaving ? (
                               <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {currentStage === 2 ? "Securing Data..." : "Saving..."}</>
