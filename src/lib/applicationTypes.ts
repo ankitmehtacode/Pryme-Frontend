@@ -147,6 +147,7 @@ export interface ProfessionalDetails {
   practiceAddress: string;
   annualGrossReceipts: number;   // Gross professional receipts (pre-expense)
   netMonthlyIncome: number;
+  itrFiledYears?: number;        // Years of ITR filed
   hasExistingLoans: boolean;
   existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)

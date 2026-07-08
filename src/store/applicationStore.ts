@@ -121,6 +121,7 @@ const defaultProfessional: ProfessionalDetails = {
   practiceAddress: '',
   annualGrossReceipts: 0,
   netMonthlyIncome: 0,
+  itrFiledYears: undefined,
   hasExistingLoans: false,
   existingEMI: undefined,
 };

@@ -814,6 +814,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
         eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0),
         itrYearsAvailable: (() => {
+          if (fin?.path === "PROFESSIONAL") {
+            const d = fin.data as any;
+            return d.itrFiledYears !== undefined && d.itrFiledYears !== null ? Number(d.itrFiledYears) : null;
+          }
           if (fin?.path !== "SELF_EMPLOYED") return null;
           const d = fin.data as any;
           const gstTurnover = Number(d.last12MonthsGstTurnover ?? 0);
