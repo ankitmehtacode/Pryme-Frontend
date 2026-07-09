@@ -182,6 +182,7 @@
     --container-bleed: 100%;
     
     /* --- SEMANTIC SPACING SCALE --- */
+    --space-none: 0px;
     --space-xs: clamp(12px, 1vw, 16px);
     --space-sm: clamp(16px, 1.5vw, 24px);
     --space-md: clamp(24px, 3vw, 48px);

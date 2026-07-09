@@ -14,87 +14,46 @@ import {
   ArrowDownRight,
   Info,
   Zap,
-  ChevronDown
+  ChevronDown,
+  ShieldAlert,
+  ShieldCheck,
+  Award,
+  AlertCircle,
+  HelpCircle,
+  Activity,
+  ArrowRight,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
+import { optimizePrepayment } from "@/lib/prepayment/optimizer";
+import { getSmartInsights } from "@/lib/prepayment/explainability";
+import { UserProfile, GoalType, EmergencySavingsTier } from "@/lib/prepayment/types";
 
 const PrepaymentCalculatorPage = () => {
-  const [loanAmount, setLoanAmount] = useState(2000000);
-  const [interestRate, setInterestRate] = useState(10.5);
-  const [tenureMonths, setTenureMonths] = useState(120);
-  const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
-  const [prepaymentMonth, setPrepaymentMonth] = useState(12);
-  const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  // --- Core Inputs ---
+  const [loanAmount, setLoanAmount] = useState(3500000); // Default: 35 Lakhs
+  const [interestRate, setInterestRate] = useState(9.5); // Default: 9.5% p.a.
+  const [tenureMonths, setTenureMonths] = useState(240); // Default: 20 years
 
-  const calculations = useMemo(() => {
-    const monthlyRate = interestRate / 12 / 100;
+  // --- Financial Profile ---
+  const [monthlyIncome, setMonthlyIncome] = useState(180000);
+  const [monthlyExpenses, setMonthlyExpenses] = useState(90000);
+  const [comfortableExtra, setComfortableExtra] = useState(15000);
+  const [emergencySavings, setEmergencySavings] = useState<EmergencySavingsTier>("3-6");
 
-    // Without Prepayment
-    const emiOriginal =
-      (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) /
-      (Math.pow(1 + monthlyRate, tenureMonths) - 1);
-    const totalOriginal = emiOriginal * tenureMonths;
-    const interestOriginal = totalOriginal - loanAmount;
+  // --- Goal & Investment Expectations ---
+  const [primaryGoal, setPrimaryGoal] = useState<GoalType>("max-savings");
+  const [expectedReturn, setExpectedReturn] = useState(12);
 
-    // With Prepayment / Step-up
-    let balance = loanAmount;
-    let totalPaidWithPrepayment = 0;
-    let monthsWithPrepayment = 0;
+  // --- Bonus & Future Events Toggles ---
+  const [hasAnnualBonus, setHasAnnualBonus] = useState(true);
+  const [annualBonusAmount, setAnnualBonusAmount] = useState(100000);
+  const [hasFestivalBonus, setHasFestivalBonus] = useState(true);
+  const [festivalBonusAmount, setFestivalBonusAmount] = useState(30000);
 
-    for (let m = 1; m <= tenureMonths * 2; m++) {
-      if (balance <= 0) break;
+  const [activeTab, setActiveTab] = useState<"recommendation" | "sensitivity" | "schedule">("recommendation");
 
-      const interestForMonth = balance * monthlyRate;
-      
-      // Calculate current EMI for this month (incorporating annual 5% step-up if active)
-      const isStepUp = strategy === "step-up" || strategy === "combo";
-      const yearIndex = Math.floor((m - 1) / 12);
-      const currentEmi = isStepUp ? emiOriginal * Math.pow(1.05, yearIndex) : emiOriginal;
-
-      // Regular monthly payment
-      const paymentForMonth = Math.min(currentEmi, balance + interestForMonth);
-      const principalForMonth = paymentForMonth - interestForMonth;
-      totalPaidWithPrepayment += paymentForMonth;
-      balance -= principalForMonth;
-      monthsWithPrepayment = m;
-
-      // Apply prepayments at the end of the month
-      if (balance <= 0) break;
-
-      // 1. Lump Sum Prepayment (only for lump-sum strategy)
-      if (strategy === "lump-sum" && m === prepaymentMonth) {
-        const actualPrepayment = Math.min(prepaymentAmount, balance);
-        balance -= actualPrepayment;
-        totalPaidWithPrepayment += actualPrepayment;
-      }
-
-      // 2. 13th EMI / Combo Prepayment
-      // paid at the end of every 12-month cycle (month 12, 24, 36...)
-      if ((strategy === "13th-emi" || strategy === "combo") && m % 12 === 0) {
-        const actualPrepayment = Math.min(currentEmi, balance);
-        balance -= actualPrepayment;
-        totalPaidWithPrepayment += actualPrepayment;
-      }
-
-      if (balance <= 0) break;
-    }
-
-    const interestWithPrepayment = totalPaidWithPrepayment - loanAmount;
-    const interestSaved = interestOriginal - interestWithPrepayment;
-    const tenureSaved = tenureMonths - monthsWithPrepayment;
-
-    return {
-      emiOriginal: Math.round(emiOriginal),
-      totalOriginal: Math.round(totalOriginal),
-      interestOriginal: Math.round(interestOriginal),
-      totalWithPrepayment: Math.round(totalPaidWithPrepayment),
-      interestWithPrepayment: Math.round(interestWithPrepayment),
-      interestSaved: Math.max(0, Math.round(interestSaved)),
-      tenureSaved: Math.max(0, tenureSaved),
-      monthsWithPrepayment,
-    };
-  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth, strategy]);
-
+  // Format currencies in Indian style
   const formatCurrency = (value: number) => {
     if (value >= 10000000) return `₹${(value / 10000000).toFixed(2)} Cr`;
     if (value >= 100000) return `₹${(value / 100000).toFixed(2)} L`;
@@ -105,515 +64,659 @@ const PrepaymentCalculatorPage = () => {
     }).format(value);
   };
 
-  const savingsPercentage =
-    calculations.interestOriginal > 0
-      ? (
-          (calculations.interestSaved / calculations.interestOriginal) *
-          100
-        ).toFixed(1)
-      : "0";
+  // Compile calculations and optimize
+  const optimizationResults = useMemo(() => {
+    const bonuses = [];
+    if (hasAnnualBonus && annualBonusAmount > 0) {
+      bonuses.push({
+        id: "bonus-annual",
+        type: "annual" as const,
+        amount: annualBonusAmount,
+        monthIndex: 12,
+        label: "Annual Performance Bonus",
+      });
+    }
+    if (hasFestivalBonus && festivalBonusAmount > 0) {
+      bonuses.push({
+        id: "bonus-festive",
+        type: "festival" as const,
+        amount: festivalBonusAmount,
+        monthIndex: 8,
+        label: "Diwali Bonus",
+      });
+    }
+
+    const profile: UserProfile = {
+      loanAmount,
+      interestRate,
+      tenureMonths,
+      monthlyIncome,
+      monthlyExpenses,
+      emergencySavingsMonths: emergencySavings,
+      monthlyExtraSavings: comfortableExtra,
+      expectedInvestmentReturn: expectedReturn,
+      bonuses,
+      futureEvents: []
+    };
+
+    return optimizePrepayment(profile, primaryGoal);
+  }, [
+    loanAmount,
+    interestRate,
+    tenureMonths,
+    monthlyIncome,
+    monthlyExpenses,
+    comfortableExtra,
+    emergencySavings,
+    primaryGoal,
+    expectedReturn,
+    hasAnnualBonus,
+    annualBonusAmount,
+    hasFestivalBonus,
+    festivalBonusAmount
+  ]);
+
+  const baseline = useMemo(() => {
+    const profile: UserProfile = {
+      loanAmount,
+      interestRate,
+      tenureMonths,
+      monthlyIncome,
+      monthlyExpenses,
+      emergencySavingsMonths: emergencySavings,
+      monthlyExtraSavings: 0,
+      expectedInvestmentReturn: expectedReturn,
+      bonuses: [],
+      futureEvents: []
+    };
+    return optimizePrepayment(profile, "max-savings").primaryRecommendation;
+  }, [loanAmount, interestRate, tenureMonths, monthlyIncome, monthlyExpenses, emergencySavings, expectedReturn]);
+
+  const best = optimizationResults.primaryRecommendation;
+  const healthScoreOriginal = 62; // Baseline reference score
+  const healthScoreOptimized = Math.min(98, healthScoreOriginal + Math.round((best.interestSaved / (baseline.interestPaid || 1)) * 36));
+
+  const smartInsights = useMemo(() => {
+    return getSmartInsights(best, baseline);
+  }, [best, baseline]);
+
+  // Investment decision rule
+  const investmentDecision = useMemo(() => {
+    const gap = expectedReturn - interestRate;
+    if (gap > 2) {
+      return {
+        winner: "INVEST",
+        text: `With expected returns of ${expectedReturn}% beating your loan rate of ${interestRate}%, investing your monthly surplus yields a higher mathematical net worth.`,
+        color: "text-blue-600 dark:text-blue-400 bg-blue-500/5 border-blue-500/20"
+      };
+    } else if (gap < -2) {
+      return {
+        winner: "PREPAY",
+        text: `Prepaying your loan saves a guaranteed, risk-free ${interestRate}% p.a. compound interest. This decisively beats an expected return of ${expectedReturn}% after tax.`,
+        color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 border-emerald-500/20"
+      };
+    } else {
+      return {
+        winner: "BALANCED",
+        text: `Your loan rate (${interestRate}%) and expected returns (${expectedReturn}%) are closely balanced. We recommend a hybrid strategy: prepaying covers your risk while investing captures growth.`,
+        color: "text-amber-600 dark:text-amber-400 bg-amber-500/5 border-amber-500/20"
+      };
+    }
+  }, [expectedReturn, interestRate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#070b19] font-sans transition-colors duration-300">
       <Helmet>
-        <title>Prepayment Calculator | PRYME Consulting</title>
+        <title>Decision Intelligence: Loan Prepayment Optimizer | PRYME</title>
         <meta
           name="description"
-          content="Calculate how much you can save by prepaying your loan early. See interest savings and reduced tenure instantly."
+          content="Wealthfront-grade Loan Prepayment Intelligence System. Compute optimal, stress-free prepayments based on liquidity constraints, interest rates, and investment ROI."
         />
       </Helmet>
 
       <Header />
 
       <SmoothScroll>
-        <main className="flex-1 pt-24 md:pt-32">
-          <section className="container mx-auto px-4 pb-24">
+        <main className="flex-1 pt-24 md:pt-32 pb-24">
+          <div className="container mx-auto px-4 max-w-7xl">
+            {/* Page Header */}
             <ScrollReveal direction="up">
-              <div className="max-w-4xl mx-auto text-center mb-12 md:mb-16">
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium uppercase tracking-widest mb-6 border border-emerald-500/20">
-                  <TrendingDown className="w-4 h-4" />
-                  Smart Savings
+              <div className="text-center mb-12">
+                <span className="inline-flex items-center gap-1.5 px-4.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold uppercase tracking-widest mb-4 border border-emerald-500/15">
+                  <Award className="w-3.5 h-3.5" />
+                  Pryme Decision Intelligence
                 </span>
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-4 md:mb-8 tracking-tight">
-                  Prepayment{" "}
-                  <span className="text-emerald-600 dark:text-emerald-400 italic">
-                    Savings
-                  </span>{" "}
-                  Calculator
+                <h1 className="text-3xl md:text-5xl font-extrabold text-[#0B1530] dark:text-white mb-4 tracking-tight leading-tight">
+                  Loan Prepayment <span className="text-emerald-600 dark:text-emerald-400 italic font-semibold">Optimizer</span>
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                  Discover how a smart prepayment strategy can dramatically
-                  reduce your total interest and loan tenure.
+                <p className="text-sm md:text-base text-[#64748B] dark:text-slate-400 max-w-xl mx-auto">
+                  Analyze thousands of cashflow combinations and identify the mathematically optimal strategy to eliminate debt efficiently.
                 </p>
               </div>
             </ScrollReveal>
 
-            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
-              {/* Calculator Card */}
-              <div className="lg:col-span-8">
-                <div className="bg-card text-card-foreground border border-transparent dark:bg-[#080d1e] dark:border-transparent rounded-2xl md:rounded-[2rem] p-4 md:p-6 lg:p-7 shadow-xl relative overflow-hidden">
+            {/* Main Interactive Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* LEFT COLUMN: Setup panel */}
+              <div className="lg:col-span-4 space-y-6">
+                
+                {/* 1. Loan Parameters */}
+                <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
+                  <h3 className="text-sm font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                    <Activity className="w-4 h-4 text-emerald-500" />
+                    1. Loan Profile
+                  </h3>
 
-                    {/* Header */}
-                    <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">
-                      <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-emerald-50 dark:bg-[#0d1829] shadow-sm flex items-center justify-center border border-emerald-200 dark:border-emerald-500/20 shrink-0">
-                        <TrendingDown className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="space-y-4">
+                    {/* Loan Amount */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Loan Principal</span>
+                        <span className="font-bold text-[#0B1530] dark:text-white">{formatCurrency(loanAmount)}</span>
                       </div>
-                      <div>
-                        <h3 className="text-lg md:text-2xl font-bold text-foreground tracking-tight leading-none mb-0.5 md:mb-1">
-                          Prepayment Calculator
-                        </h3>
-                        <p className="text-[8px] md:text-[9px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">
-                          Lump-sum & accelerated savings estimator
-                        </p>
-                      </div>
+                      <Slider
+                        value={[loanAmount]}
+                        onValueChange={(v) => setLoanAmount(v[0])}
+                        min={500000}
+                        max={20000000}
+                        step={100000}
+                        className="py-1 cursor-pointer"
+                      />
                     </div>
 
-                    {/* Strategy Selector Tabs */}
-                    <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/40 dark:bg-[#0d1829]/65 rounded-xl border border-border dark:border-white/5 mb-5 relative z-10 select-none shrink-0">
-                      {[
-                        { id: "lump-sum", label: "Lump Sum" },
-                        { id: "13th-emi", label: "13th EMI" },
-                        { id: "step-up", label: "5% Step-Up" },
-                        { id: "combo", label: "Pryme Combo" }
-                      ].map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => setStrategy(tab.id as any)}
-                          className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${
-                            strategy === tab.id
-                              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-emerald-500 dark:text-[#080d1e]"
-                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
-                          }`}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
+                    {/* Interest Rate */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Interest Rate (% p.a.)</span>
+                        <span className="font-bold text-[#0B1530] dark:text-white">{interestRate}%</span>
+                      </div>
+                      <Slider
+                        value={[interestRate]}
+                        onValueChange={(v) => setInterestRate(v[0])}
+                        min={6}
+                        max={18}
+                        step={0.1}
+                        className="py-1 cursor-pointer"
+                      />
                     </div>
 
-                    {/* Savings Hero */}
-                    <div className="flex flex-col md:flex-row items-stretch gap-3 md:gap-4 p-3 md:p-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-500/5 dark:to-emerald-900/10 rounded-xl md:rounded-2xl border border-transparent mb-4 md:mb-6 relative z-10">
-                      <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl border border-transparent">
-                        <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
-                          Interest Saved
+                    {/* Tenure */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Tenure</span>
+                        <span className="font-bold text-[#0B1530] dark:text-white">
+                          {tenureMonths} mo ({(tenureMonths / 12).toFixed(0)} Yrs)
                         </span>
-                        <span className="text-xl md:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                          {formatCurrency(calculations.interestSaved)}
-                        </span>
-                        <span className="text-[9px] md:text-[10px] font-bold text-emerald-500/70 mt-0.5">
-                          {savingsPercentage}% less interest
-                        </span>
                       </div>
-                      <div className="flex flex-row md:flex-col gap-3 md:gap-3">
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent">
-                          <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
-                            Tenure Saved
-                          </span>
-                          <span className="text-base md:text-xl font-bold text-foreground">
-                            {calculations.tenureSaved}{" "}
-                            <span className="text-[9px] md:text-xs text-muted-foreground font-medium">
-                              months
-                            </span>
-                          </span>
-                        </div>
-                        <div className="flex-1 flex flex-col items-center justify-center p-2.5 md:p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent">
-                          <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
-                            Monthly EMI
-                          </span>
-                          <span className="text-base md:text-xl font-bold text-foreground">
-                            {formatCurrency(calculations.emiOriginal)}
-                          </span>
-                        </div>
+                      <Slider
+                        value={[tenureMonths]}
+                        onValueChange={(v) => setTenureMonths(v[0])}
+                        min={24}
+                        max={360}
+                        step={12}
+                        className="py-1 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Goal & Constraint Parameters */}
+                <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
+                  <h3 className="text-sm font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                    <Zap className="w-4 h-4 text-emerald-500" />
+                    2. Goals & Constraints
+                  </h3>
+
+                  <div className="space-y-4">
+                    {/* Primary Goal */}
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Primary Goal Profile</label>
+                      <select
+                        value={primaryGoal}
+                        onChange={(e) => setPrimaryGoal(e.target.value as GoalType)}
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-[#0B1530] dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                      >
+                        <option value="max-savings">Save Maximum Interest</option>
+                        <option value="earliest-payoff">Debt-Free ASAP (Earliest Payoff)</option>
+                        <option value="preserve-liquidity">Preserve Liquid Reserves</option>
+                        <option value="stress-free">Minimize Financial Stress</option>
+                      </select>
+                    </div>
+
+                    {/* Monthly Income & Expenses */}
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="space-y-1">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Monthly Income</span>
+                        <input
+                          type="number"
+                          value={monthlyIncome}
+                          onChange={(e) => setMonthlyIncome(Number(e.target.value))}
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg p-2 font-bold focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Monthly Expenses</span>
+                        <input
+                          type="number"
+                          value={monthlyExpenses}
+                          onChange={(e) => setMonthlyExpenses(Number(e.target.value))}
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg p-2 font-bold focus:outline-none"
+                        />
                       </div>
                     </div>
 
-                    {/* Comparison Row */}
-                    <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-6 relative z-10">
-                      <div className="p-2.5 md:p-3.5 bg-red-50/15 dark:bg-red-500/[0.02] rounded-lg md:rounded-xl border border-transparent">
-                        <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-red-500/70 mb-1">
-                          Without Prepayment
-                        </p>
-                        <p className="text-sm md:text-lg font-bold text-foreground leading-none">
-                          {formatCurrency(calculations.interestOriginal)}
-                        </p>
-                        <p className="text-[8px] md:text-[9px] text-muted-foreground mt-0.5">
-                          total interest • {tenureMonths} months
-                        </p>
+                    {/* Extra Comfortable Savings */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Comfortable Extra/Month</span>
+                        <span className="font-bold text-[#0B1530] dark:text-white">{formatCurrency(comfortableExtra)}</span>
                       </div>
-                      <div className="p-2.5 md:p-3.5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-lg md:rounded-xl border border-transparent">
-                        <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-emerald-500/70 mb-1">
-                          With Prepayment
-                        </p>
-                        <p className="text-sm md:text-lg font-bold text-foreground leading-none">
-                          {formatCurrency(calculations.interestWithPrepayment)}
-                        </p>
-                        <p className="text-[8px] md:text-[9px] text-muted-foreground mt-0.5">
-                          total interest •{" "}
-                          {calculations.monthsWithPrepayment} months
-                        </p>
-                      </div>
+                      <Slider
+                        value={[comfortableExtra]}
+                        onValueChange={(v) => setComfortableExtra(v[0])}
+                        min={1000}
+                        max={100000}
+                        step={1000}
+                        className="py-1 cursor-pointer"
+                      />
                     </div>
 
-                    {/* Sliders */}
-                    <div className="space-y-3 md:space-y-4 relative z-10">
-                      {/* Loan Amount */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
-                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Loan Amount (₹)
-                          </span>
+                    {/* Emergency Reserves */}
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Emergency Savings Reserves</label>
+                      <select
+                        value={emergencySavings}
+                        onChange={(e) => setEmergencySavings(e.target.value as EmergencySavingsTier)}
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-[#0B1530] dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                      >
+                        <option value="less-3">Critical (Less than 3 Months Expenses)</option>
+                        <option value="3-6">Safe (3-6 Months Expenses)</option>
+                        <option value="6-12">Strong (6-12 Months Expenses)</option>
+                        <option value="12-plus">Bulletproof (12+ Months Expenses)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Expected Return Slider & Windfalls */}
+                <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
+                  <h3 className="text-sm font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                    <Percent className="w-4 h-4 text-emerald-500" />
+                    3. Investment & Windfalls
+                  </h3>
+
+                  <div className="space-y-4">
+                    {/* Expected Return */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Expected Market Return</span>
+                        <span className="font-bold text-blue-600 dark:text-blue-400">{expectedReturn}% p.a.</span>
+                      </div>
+                      <Slider
+                        value={[expectedReturn]}
+                        onValueChange={(v) => setExpectedReturn(v[0])}
+                        min={4}
+                        max={18}
+                        step={0.5}
+                        className="py-1 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Windfalls */}
+                    <div className="space-y-3 pt-2">
+                      <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase block">Scheduled Windfalls / Bonuses</label>
+                      
+                      <div className="space-y-3">
+                        {/* Annual Bonus */}
+                        <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5">
                           <input
-                            type="number"
-                            value={loanAmount}
-                            onChange={(e) => setLoanAmount(Number(e.target.value))}
-                            className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            min={100000}
-                            max={10000000}
+                            type="checkbox"
+                            checked={hasAnnualBonus}
+                            onChange={(e) => setHasAnnualBonus(e.target.checked)}
+                            className="mt-1 cursor-pointer focus:ring-emerald-500 text-emerald-600 rounded"
                           />
-                        </div>
-                        <Slider
-                          value={[loanAmount]}
-                          onValueChange={(v) => setLoanAmount(v[0])}
-                          min={100000}
-                          max={10000000}
-                          step={50000}
-                          className="cursor-pointer py-1"
-                        />
-                        <div className="flex justify-between mt-2 md:mt-3">
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            ₹1 Lakh
-                          </span>
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            ₹1 Crore
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Interest Rate */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
-                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Interest Rate (% p.a.)
-                          </span>
-                          <input
-                            type="number"
-                            value={interestRate}
-                            onChange={(e) => setInterestRate(Number(e.target.value))}
-                            className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            min={6}
-                            max={24}
-                            step={0.1}
-                          />
-                        </div>
-                        <Slider
-                          value={[interestRate]}
-                          onValueChange={(v) => setInterestRate(v[0])}
-                          min={6}
-                          max={24}
-                          step={0.25}
-                          className="cursor-pointer py-1"
-                        />
-                        <div className="flex justify-between mt-2 md:mt-3">
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            6%
-                          </span>
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            24%
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Tenure */}
-                      <div className="p-3 md:p-4 md:px-5 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl md:rounded-2xl border border-transparent shadow-none">
-                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Loan Tenure (Months)
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              value={tenureMonths}
-                              onChange={(e) => setTenureMonths(Number(e.target.value))}
-                              className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                              min={12}
-                              max={360}
-                            />
-                            <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
-                              ({(tenureMonths / 12).toFixed(1)} Yrs)
-                            </span>
-                          </div>
-                        </div>
-                        <Slider
-                          value={[tenureMonths]}
-                          onValueChange={(v) => setTenureMonths(v[0])}
-                          min={12}
-                          max={360}
-                          step={12}
-                          className="cursor-pointer py-1"
-                        />
-                        <div className="flex justify-between mt-2 md:mt-3">
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            1 Year
-                          </span>
-                          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                            30 Years
-                          </span>
-                        </div>
-                      </div>
-
-                      {strategy === "lump-sum" ? (
-                        <>
-                          {/* Prepayment Amount */}
-                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl md:rounded-2xl border border-transparent shadow-none">
-                            <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
-                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                Prepayment Amount (₹)
-                              </span>
+                          <div className="flex-1 text-xs">
+                            <span className="font-bold text-[#0B1530] dark:text-white block">Annual Bonus</span>
+                            {hasAnnualBonus && (
                               <input
                                 type="number"
-                                value={prepaymentAmount}
-                                onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
-                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/30 dark:bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                                min={10000}
-                                max={Math.min(loanAmount, 5000000)}
+                                value={annualBonusAmount}
+                                onChange={(e) => setAnnualBonusAmount(Number(e.target.value))}
+                                className="w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded p-1 font-bold focus:outline-none"
                               />
-                            </div>
-                            <Slider
-                              value={[prepaymentAmount]}
-                              onValueChange={(v) => setPrepaymentAmount(v[0])}
-                              min={10000}
-                              max={Math.min(loanAmount, 5000000)}
-                              step={10000}
-                              className="cursor-pointer py-1"
-                            />
-                            <div className="flex justify-between mt-2 md:mt-3">
-                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                                ₹10K
-                              </span>
-                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                                {formatCurrency(Math.min(loanAmount, 5000000))}
-                              </span>
-                            </div>
+                            )}
                           </div>
+                        </div>
 
-                          {/* Prepayment Month */}
-                          <div className="p-3 md:p-4 md:px-5 bg-emerald-50/15 dark:bg-emerald-500/[0.02] rounded-xl md:rounded-2xl border border-transparent shadow-none">
-                            <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
-                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                Prepay After Month
-                              </span>
+                        {/* Festival Bonus */}
+                        <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5">
+                          <input
+                            type="checkbox"
+                            checked={hasFestivalBonus}
+                            onChange={(e) => setHasFestivalBonus(e.target.checked)}
+                            className="mt-1 cursor-pointer focus:ring-emerald-500 text-emerald-600 rounded"
+                          />
+                          <div className="flex-1 text-xs">
+                            <span className="font-bold text-[#0B1530] dark:text-white block">Festival/Diwali Bonus</span>
+                            {hasFestivalBonus && (
                               <input
                                 type="number"
-                                value={prepaymentMonth}
-                                onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
-                                className="text-sm md:text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/30 dark:bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                                min={1}
-                                max={Math.max(1, tenureMonths - 1)}
+                                value={festivalBonusAmount}
+                                onChange={(e) => setFestivalBonusAmount(Number(e.target.value))}
+                                className="w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded p-1 font-bold focus:outline-none"
                               />
-                            </div>
-                            <Slider
-                              value={[prepaymentMonth]}
-                              onValueChange={(v) => setPrepaymentMonth(v[0])}
-                              min={1}
-                              max={Math.max(1, tenureMonths - 1)}
-                              step={1}
-                              className="cursor-pointer py-1"
-                            />
-                            <div className="flex justify-between mt-2 md:mt-3">
-                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                                Month 1
-                              </span>
-                              <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-                                Month {Math.max(1, tenureMonths - 1)}
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        /* Strategy Explanation Card */
-                        <div className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-5 rounded-xl border border-transparent shadow-none flex flex-col justify-center relative overflow-hidden select-none">
-                          <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-                          
-                          {strategy === "13th-emi" && (
-                            <div className="flex gap-4 items-start relative z-10">
-                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
-                                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">13th EMI Acceleration</h4>
-                                <p className="text-xs text-muted-foreground leading-relaxed">
-                                  By making <strong className="text-foreground font-semibold">one extra EMI payment every 12 months</strong>, you aggressively reduce your outstanding principal. This simple compounding habit can trim a 20-year loan by up to 4 years.
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
-                          {strategy === "step-up" && (
-                            <div className="flex gap-4 items-start relative z-10">
-                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
-                                <Percent className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">5% Step-Up Strategy</h4>
-                                <p className="text-xs text-muted-foreground leading-relaxed mb-2">
-                                  Increases your monthly EMI by <strong className="text-foreground font-semibold">5% at the end of every 12 months</strong>.
-                                </p>
-                                <ul className="text-xs text-muted-foreground space-y-1.5 pl-1 list-none">
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Entire 5% increment goes directly to principal reduction.</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Compound interest is stifled immediately.</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Repay a standard 20-year loan in <strong className="text-foreground font-semibold">12-14 years</strong>.</span>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          )}
-
-                          {strategy === "combo" && (
-                            <div className="flex gap-4 items-start relative z-10">
-                              <div className="p-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
-                                <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-1.5 uppercase tracking-wider">Pryme Dual-Engine Combo</h4>
-                                <p className="text-xs text-muted-foreground leading-relaxed mb-2">
-                                  Combines both <strong className="text-foreground font-semibold">13th EMI prepayments</strong> and a <strong className="text-foreground font-semibold">5% annual step-up</strong>.
-                                </p>
-                                <ul className="text-xs text-muted-foreground space-y-1.5 pl-1 list-none">
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Yearly 5% compounding EMI increment.</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Extra 13th EMI paid at the end of each year.</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>Ultimate acceleration: cuts loan tenure by more than half.</span>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Prepayment Guide */}
-                    <div className="mt-4 md:mt-5 pt-4 border-t border-border dark:border-white/10 relative z-10">
-                      <div className="w-full">
-                        <button
-                          onClick={() => setIsGuideOpen(!isGuideOpen)}
-                          className="flex w-full items-center justify-between py-2 text-[11px] font-bold text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 uppercase tracking-widest transition-colors focus:outline-none"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <Info className="w-4 h-4" />
-                            <span>Prepayment Guide</span>
-                          </div>
-                          <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform duration-200", isGuideOpen && "rotate-180")} />
-                        </button>
-                        <div
-                          className={cn(
-                            "grid transition-all duration-300 ease-in-out",
-                            isGuideOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0"
-                          )}
-                        >
-                          <div className="overflow-hidden">
-                            <div className="grid gap-3 pb-4">
-                              {[
-                                {
-                                  term: "Part Prepayment",
-                                  definition:
-                                    "Making a lump-sum payment over and above your regular EMI to reduce the outstanding principal balance.",
-                                },
-                                {
-                                  term: "Foreclosure",
-                                  definition:
-                                    "Repaying the entire remaining loan amount in one go before the loan tenure ends. Some banks charge 2-5% foreclosure fees.",
-                                },
-                                {
-                                  term: "Prepayment Penalty",
-                                  definition:
-                                    "A fee charged by some lenders for early repayment. As per RBI guidelines, floating rate loans from banks cannot have prepayment penalties.",
-                                },
-                                {
-                                  term: "Reducing Balance Method",
-                                  definition:
-                                    "Interest is calculated on the outstanding balance after each EMI. Prepayments directly reduce this balance, saving future interest.",
-                                },
-                              ].map((item) => (
-                                <div
-                                  key={item.term}
-                                  className="p-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-xl border border-transparent"
-                                >
-                                  <p className="text-xs font-bold text-foreground mb-1 uppercase tracking-wide">
-                                    {item.term}
-                                  </p>
-                                  <p className="text-[11px] font-medium text-muted-foreground dark:text-slate-400 leading-relaxed">
-                                    {item.definition}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
+
               </div>
 
-              {/* Side Info Cards */}
-              <div className="lg:col-span-4 space-y-4 md:space-y-6">
-                {[
-                  {
-                    icon: ArrowDownRight,
-                    title: "Earlier = Better",
-                    text: "Prepaying in the first few years saves the most interest since early EMIs are interest-heavy.",
-                    color: "emerald",
-                  },
-                  {
-                    icon: Percent,
-                    title: "No Penalty on Floating",
-                    text: "RBI mandates zero prepayment penalty on floating rate loans from banks. Check with NBFCs.",
-                    color: "emerald",
-                  },
-                  {
-                    icon: Calendar,
-                    title: "Reduce Tenure, Not EMI",
-                    text: "Keeping your EMI same after prepayment and reducing tenure saves more interest overall.",
-                    color: "emerald",
-                  },
-                  {
-                    icon: IndianRupee,
-                    title: "Tax Benefits",
-                    text: "Prepayment on home loans qualifies for tax deduction under Section 80C up to ₹1.5 Lakh.",
-                    color: "emerald",
-                  },
-                ].map((item, i) => (
-                  <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                    <div className="p-5 md:p-6 rounded-2xl md:rounded-3xl bg-secondary/50 border border-border backdrop-blur-md transition-all hover:bg-white dark:hover:bg-white/10">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3 md:mb-4">
-                        <item.icon className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 dark:text-emerald-400" />
+              {/* RIGHT COLUMN: Optimization results */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* 1. Health Score & Opportunity Cost Summary Banner */}
+                <div className="bg-gradient-to-br from-[#0b1530] to-[#12234f] dark:from-[#080d19] dark:to-[#0f1b35] text-white rounded-[2rem] p-6 shadow-xl relative overflow-hidden">
+                  <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center relative z-10">
+                    
+                    {/* Health Score Transition */}
+                    <div className="text-center md:text-left md:border-r md:border-white/10 md:pr-6">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Loan Health Score</span>
+                      <div className="flex items-baseline justify-center md:justify-start gap-2 mt-1">
+                        <span className="text-4xl font-extrabold text-slate-300 line-through decoration-[#ef4444] decoration-2">{healthScoreOriginal}</span>
+                        <ArrowRight className="w-5 h-5 text-emerald-400" />
+                        <span className="text-5xl font-black text-emerald-400">{healthScoreOptimized}</span>
+                        <span className="text-xs text-emerald-400/80 font-bold uppercase">/100</span>
                       </div>
-                      <h4 className="font-semibold text-foreground mb-1">
-                        {item.title}
-                      </h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {item.text}
+                      <span className="text-[10px] text-slate-400 block mt-2 font-medium">Optimal prepayments increase score by {healthScoreOptimized - healthScoreOriginal} points</span>
+                    </div>
+
+                    {/* Cost of Doing Nothing */}
+                    <div className="col-span-2 space-y-2">
+                      <div className="flex items-center gap-2 justify-center md:justify-start">
+                        <ShieldAlert className="w-5 h-5 text-rose-500" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-rose-400">Cost of Inaction</span>
+                      </div>
+                      <p className="text-xl md:text-2xl font-black tracking-tight text-center md:text-left">
+                        You will pay <span className="text-rose-500">{formatCurrency(best.interestSaved)}</span> in avoidable interest.
+                      </p>
+                      <p className="text-xs text-slate-300 text-center md:text-left">
+                        Adopting the optimized strategy eliminates this interest loss and cuts loan tenure by <strong className="text-emerald-400 font-bold">{best.tenureSaved} months</strong>.
                       </p>
                     </div>
-                  </ScrollReveal>
-                ))}
+
+                  </div>
+                </div>
+
+                {/* 2. Interactive Navigation Tabs */}
+                <div className="flex border-b border-slate-200 dark:border-white/5 gap-4">
+                  {[
+                    { id: "recommendation" as const, label: "Smart Advisor" },
+                    { id: "sensitivity" as const, label: "Sensitivity Analysis" },
+                    { id: "schedule" as const, label: "Timeline Projection" }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        "pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer",
+                        activeTab === tab.id
+                          ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+                          : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                      )}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* TAB CONTENT: ADVISOR RECOMMENDATION */}
+                {activeTab === "recommendation" && (
+                  <div className="space-y-6">
+                    
+                    {/* Primary Decision Card */}
+                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-6 shadow-sm border-l-4 border-emerald-500 dark:border-emerald-500/70 border-y border-r border-slate-100 dark:border-white/5 relative overflow-hidden">
+                      <div className="absolute right-4 top-4 flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        PEAK ROI STRATEGY
+                      </div>
+
+                      <h4 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Recommended Plan</h4>
+                      <h2 className="text-xl md:text-2xl font-black text-[#0B1530] dark:text-white tracking-tight mb-3">
+                        {best.strategyName}
+                      </h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
+                        {best.strategyDescription}
+                      </p>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-white/5 mb-6">
+                        <div>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Interest Saved</span>
+                          <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(best.interestSaved)}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Tenure Saved</span>
+                          <span className="text-base font-extrabold text-[#0B1530] dark:text-white">{best.tenureSaved} Months</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">ROI (Risk-Free)</span>
+                          <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">{best.roi}% p.a.</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Prepayment Multiplier</span>
+                          <span className="text-base font-extrabold text-[#0B1530] dark:text-white">₹{best.effectiveMultiplier} saved</span>
+                        </div>
+                      </div>
+
+                      {/* Explainability bullet points */}
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Decision Explainability</h5>
+                          <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/25 p-3 rounded-lg border border-slate-100 dark:border-white/5">
+                            {best.explainability.whyText}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Trade-offs & Constraints</h5>
+                          <ul className="text-xs space-y-1.5 pl-4 list-disc text-slate-500 dark:text-slate-400 font-medium">
+                            {best.explainability.tradeoffs.map((to, i) => (
+                              <li key={i}>{to}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Prepayment vs Investment Trade-off Box */}
+                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
+                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-3">Prepayment vs. Investment Trade-Off</h4>
+                      <div className={cn("p-4 rounded-xl border text-xs font-medium leading-relaxed mb-1", investmentDecision.color)}>
+                        {investmentDecision.text}
+                      </div>
+                    </div>
+
+                    {/* Scenario Engine Comparison Matrix */}
+                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
+                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4">Risk Tiers & Strategy Comparison</h4>
+                      
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-slate-100 dark:border-white/5 text-[10px] font-bold uppercase text-slate-400">
+                              <th className="pb-3 pr-2">Strategy Option</th>
+                              <th className="pb-3 px-2 text-right">Interest Saved</th>
+                              <th className="pb-3 px-2 text-right">Months Saved</th>
+                              <th className="pb-3 px-2 text-right">Extra/Mo commitment</th>
+                              <th className="pb-3 px-2 text-right">Stress Index</th>
+                              <th className="pb-3 pl-2 text-right">Overall Score</th>
+                            </tr>
+                          </thead>
+                          <tbody className="font-semibold text-[#0B1530] dark:text-slate-300">
+                            {/* Conservative */}
+                            <tr className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                              <td className="py-3.5 pr-2">
+                                <span className="block font-bold text-slate-700 dark:text-white">Conservative Tier</span>
+                                <span className="text-[10px] text-slate-400 font-medium">{optimizationResults.scenarios.conservative.strategyName}</span>
+                              </td>
+                              <td className="py-3.5 px-2 text-right text-emerald-600 dark:text-emerald-400">{formatCurrency(optimizationResults.scenarios.conservative.interestSaved)}</td>
+                              <td className="py-3.5 px-2 text-right">{optimizationResults.scenarios.conservative.tenureSaved} mo</td>
+                              <td className="py-3.5 px-2 text-right">{formatCurrency(optimizationResults.scenarios.conservative.extraMonthlyCommitment)}</td>
+                              <td className="py-3.5 px-2 text-right text-rose-500">{optimizationResults.scenarios.conservative.financialStress}/100</td>
+                              <td className="py-3.5 pl-2 text-right font-bold text-emerald-500">{optimizationResults.scenarios.conservative.overallScore}</td>
+                            </tr>
+                            
+                            {/* Balanced */}
+                            <tr className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 bg-emerald-500/5 dark:bg-emerald-500/[0.02]">
+                              <td className="py-3.5 pr-2">
+                                <span className="block font-bold text-slate-700 dark:text-white flex items-center gap-1">Balanced Tier <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /></span>
+                                <span className="text-[10px] text-slate-400 font-medium">{optimizationResults.scenarios.balanced.strategyName}</span>
+                              </td>
+                              <td className="py-3.5 px-2 text-right text-emerald-600 dark:text-emerald-400">{formatCurrency(optimizationResults.scenarios.balanced.interestSaved)}</td>
+                              <td className="py-3.5 px-2 text-right">{optimizationResults.scenarios.balanced.tenureSaved} mo</td>
+                              <td className="py-3.5 px-2 text-right">{formatCurrency(optimizationResults.scenarios.balanced.extraMonthlyCommitment)}</td>
+                              <td className="py-3.5 px-2 text-right text-amber-500">{optimizationResults.scenarios.balanced.financialStress}/100</td>
+                              <td className="py-3.5 pl-2 text-right font-bold text-emerald-500">{optimizationResults.scenarios.balanced.overallScore}</td>
+                            </tr>
+
+                            {/* Aggressive */}
+                            <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                              <td className="py-3.5 pr-2">
+                                <span className="block font-bold text-slate-700 dark:text-white">Aggressive Tier</span>
+                                <span className="text-[10px] text-slate-400 font-medium">{optimizationResults.scenarios.aggressive.strategyName}</span>
+                              </td>
+                              <td className="py-3.5 px-2 text-right text-emerald-600 dark:text-emerald-400">{formatCurrency(optimizationResults.scenarios.aggressive.interestSaved)}</td>
+                              <td className="py-3.5 px-2 text-right">{optimizationResults.scenarios.aggressive.tenureSaved} mo</td>
+                              <td className="py-3.5 px-2 text-right">{formatCurrency(optimizationResults.scenarios.aggressive.extraMonthlyCommitment)}</td>
+                              <td className="py-3.5 px-2 text-right text-rose-500">{optimizationResults.scenarios.aggressive.financialStress}/100</td>
+                              <td className="py-3.5 pl-2 text-right font-bold text-emerald-500">{optimizationResults.scenarios.aggressive.overallScore}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Dynamic Insights list */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {smartInsights.slice(0, 2).map((ins, i) => (
+                        <div key={i} className="p-4 bg-[#64748B]/5 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 rounded-xl flex items-start gap-3">
+                          <Info className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">{ins}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                  </div>
+                )}
+
+                {/* TAB CONTENT: SENSITIVITY ANALYSIS */}
+                {activeTab === "sensitivity" && (
+                  <div className="space-y-6">
+                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-white/5">
+                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-2">Sensitivity Stress Matrix</h4>
+                      <p className="text-xs text-[#64748B] dark:text-slate-400 mb-5">
+                        Evaluates whether your chosen strategy remains sustainable under macroeconomic changes or personal income drops.
+                      </p>
+
+                      <div className="space-y-4">
+                        {optimizationResults.sensitivity.map((sens, idx) => (
+                          <div
+                            key={idx}
+                            className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4"
+                          >
+                            <div>
+                              <span className="text-xs font-bold text-slate-700 dark:text-white block">{sens.scenarioName}</span>
+                              <span className="text-[10px] text-slate-400 font-medium block">Stress Index: {sens.stressIndex}/100</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-6 text-right">
+                              <div className="text-xs">
+                                <span className="block text-[10px] text-slate-400 font-medium">Interest Saved Under Stress</span>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(sens.impactInterestSaved)}</span>
+                              </div>
+                              <div className="text-xs">
+                                <span className="block text-[10px] text-slate-400 font-medium">Tenure Saved Under Stress</span>
+                                <span className="font-bold text-[#0B1530] dark:text-white">{sens.impactTenureSaved} mo</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-1 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                {sens.isStillAffordable ? (
+                                  <>
+                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-[10px] font-bold text-emerald-500 uppercase">SAFE</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertCircle className="w-4 h-4 text-rose-500" />
+                                    <span className="text-[10px] font-bold text-rose-500 uppercase">RISK</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB CONTENT: TIMELINE SCHEDULE */}
+                {activeTab === "schedule" && (
+                  <div className="space-y-6">
+                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-white/5">
+                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-2">Visual Payoff Timeline</h4>
+                      <p className="text-xs text-[#64748B] dark:text-slate-400 mb-6">
+                        Comparison of payoff schedule between your baseline plan and the optimized acceleration schedule.
+                      </p>
+
+                      {/* Visual Timeline Bar */}
+                      <div className="space-y-6 relative pb-4">
+                        {/* Baseline */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center text-xs font-bold">
+                            <span className="text-slate-400">Baseline Plan</span>
+                            <span className="text-rose-500">{tenureMonths} Months to Payoff</span>
+                          </div>
+                          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-rose-500 rounded-full" style={{ width: "100%" }} />
+                          </div>
+                        </div>
+
+                        {/* Optimized */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center text-xs font-bold">
+                            <span className="text-slate-400">Optimized Schedule ({best.strategyName})</span>
+                            <span className="text-emerald-500">{best.monthsToPayOff} Months to Payoff (-{best.tenureSaved} mo)</span>
+                          </div>
+                          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                              style={{ width: `${(best.monthsToPayOff / tenureMonths) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Timeline Legend */}
+                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wide border-t border-slate-100 dark:border-white/5 pt-4">
+                        <span>Today</span>
+                        <span>Optimized End (Month {best.monthsToPayOff})</span>
+                        <span>Original End (Month {tenureMonths})</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               </div>
             </div>
-          </section>
+
+          </div>
         </main>
         <Footer />
       </SmoothScroll>

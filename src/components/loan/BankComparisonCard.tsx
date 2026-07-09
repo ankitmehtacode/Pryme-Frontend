@@ -354,7 +354,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 className="border-t mx-5 md:mx-7"
                 style={{ borderColor: `${brand}15` }}
               />
-              <div className="p-5 md:px-7 md:py-6 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+              <div className="p-4 md:px-7 md:py-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
                 {(() => {
                   const er = offer.originalEngineResult;
                   const productCode = (er?.productCode || offer.id || "").toUpperCase();
@@ -461,8 +461,8 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                                 <span className="font-bold text-foreground tabular-nums">{r.value}</span>
                               </div>
                             ))}
-                            {/* Empty spacer row to align vertically with left column's 6 rows */}
-                            <div className="flex justify-between text-[11px] py-2 border-b border-dashed border-transparent invisible">
+                            {/* Empty spacer row to align vertically with left column's 6 rows (hidden on mobile) */}
+                            <div className="hidden md:flex justify-between text-[11px] py-2 border-b border-dashed border-transparent invisible">
                               <span>Spacer</span>
                               <span>Spacer</span>
                             </div>

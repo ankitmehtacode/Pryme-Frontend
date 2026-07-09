@@ -45,8 +45,8 @@ const Auth = () => {
           </Link>
         </div>
 
-        <PageShell className="relative z-10 flex items-start justify-center w-full h-full min-h-[100dvh] px-[8px] md:pl-[453px] md:pr-4">
-          <div className="w-full max-w-[480px] bg-white/85 dark:bg-[#0a0f1d]/85 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <PageShell className="relative z-10 flex items-center justify-center w-full h-full min-h-[100dvh] px-4 py-8">
+          <div className="w-full max-w-[440px] md:max-w-[clamp(440px,38vw,540px)] bg-white/85 dark:bg-[#0a0f1d]/85 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col items-center">
             {/* Soft ambient glow card background */}
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#103783]/5 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />

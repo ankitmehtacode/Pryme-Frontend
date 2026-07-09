@@ -5,7 +5,8 @@ import {
   FileText, Search, CheckCircle, CreditCard, Clock,
   AlertCircle, Building2, TrendingUp, Activity,
   ShieldCheck, ChevronRight, ArrowRight, Wallet,
-  UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X
+  UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X,
+  User, Briefcase, Lock, Mail, Users, Award, Building, Calendar, MapPin, Check, Plus, Phone, Landmark, Coins
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -18,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import applicationBannerImg from "@/assets/images/application-banner-isometric.png";
 
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
@@ -56,12 +58,15 @@ interface DashboardFormData {
   existingBank: string;
   coApplicant: string;
   loanPurpose: string;
+  requestedAmount: string;
+  tenure: string;
 }
 
 const initialFormData: DashboardFormData = {
   panNumber: "", dob: "", currentCity: "", pinCode: "", 
   companyName: "", designation: "", workExperience: "", officeEmail: "", 
   monthlyEMI: "", existingBank: "", coApplicant: "No", loanPurpose: "", 
+  requestedAmount: "", tenure: "",
 };
 
 type ViewState = "LOADING" | "FUNNEL" | "DASHBOARD" | "EMPTY";
@@ -164,8 +169,8 @@ const Dashboard: React.FC = () => {
 
           if (progress < 100) {
             setViewState("FUNNEL");
-            if (progress < 50) setCurrentStage(1);
-            else setCurrentStage(2); 
+            if (progress === 0 || progress < 50) setCurrentStage(1);
+            else setCurrentStage(2);
             
             if (primaryApp.metadata) {
               let parsedMeta: Partial<DashboardFormData> = {};
@@ -178,7 +183,17 @@ const Dashboard: React.FC = () => {
               } else if (typeof primaryApp.metadata === "object") {
                 parsedMeta = primaryApp.metadata;
               }
-              setFormData(prev => ({ ...prev, ...parsedMeta }));
+              setFormData(prev => ({ 
+                ...prev, 
+                ...parsedMeta,
+                requestedAmount: parsedMeta.requestedAmount || String(primaryApp.requestedAmount || ""),
+                tenure: parsedMeta.tenure || ""
+              }));
+            } else {
+              setFormData(prev => ({
+                ...prev,
+                requestedAmount: String(primaryApp.requestedAmount || ""),
+              }));
             }
           } else {
             setViewState("DASHBOARD");
@@ -307,6 +322,24 @@ const Dashboard: React.FC = () => {
           return false;
         }
         break;
+      case 2:
+        if (!formData.companyName || !formData.designation || !formData.workExperience || !formData.officeEmail) {
+          toast({ title: "Incomplete Employment Details", description: "Please complete all employment fields.", variant: "destructive" });
+          return false;
+        }
+        break;
+      case 3:
+        if (!formData.existingBank || !formData.coApplicant) {
+          toast({ title: "Incomplete Financial Profile", description: "Please complete all financial profile fields.", variant: "destructive" });
+          return false;
+        }
+        break;
+      case 4:
+        if (!formData.requestedAmount || !formData.tenure || !formData.loanPurpose) {
+          toast({ title: "Incomplete Loan Details", description: "Please complete all loan details fields.", variant: "destructive" });
+          return false;
+        }
+        break;
       default:
         break;
     }
@@ -345,7 +378,7 @@ const Dashboard: React.FC = () => {
            ...cachedApp, // Spread first so our explicit overrides win
            fullName: user?.name || "Pryme Client",
            phone: "9999999999", // Fallback required by backend validation
-           loanAmount: activeApplication.requestedAmount || cachedApp.loanAmount || 100000,
+           loanAmount: parseFloat(formData.requestedAmount) || activeApplication.requestedAmount || cachedApp.loanAmount || 100000,
            loanType: normalizedLoanType,
            productType: normalizedLoanType, // 🧠 FIX: submitLead prefers productType over loanType
            cibilScore: cachedApp.cibilScore || 0,
@@ -369,11 +402,27 @@ const Dashboard: React.FC = () => {
         localStorage.removeItem("pryme_pending_application");
       }
 
-      await api.patch(`/applications/${targetAppId}`, {
+      const patchData: Record<string, any> = {
          metadata: formData,
          completionPercentage: newProgress
-      });
+      };
+
+      if (formData.requestedAmount) {
+         patchData.requestedAmount = parseFloat(formData.requestedAmount);
+      }
+
+      await api.patch(`/applications/${targetAppId}`, patchData);
       toast({ title: "Progress Saved", description: "Your data has been securely saved." });
+      
+      // Sync applications and activeApplication state
+      const appResponse = await api.get("/applications/me");
+      const apps = appResponse?.data?.content ? appResponse.data.content : (Array.isArray(appResponse?.data) ? appResponse.data : []);
+      setMyApplications(apps);
+      const updatedApp = apps.find((a: any) => a.applicationId === targetAppId);
+      if (updatedApp) {
+        setActiveApplication(updatedApp);
+      }
+      
       setCurrentStage(newStage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
@@ -539,8 +588,8 @@ const Dashboard: React.FC = () => {
   }
 
   const stages = [
-    { id: 1, label: "Identity Matrix", desc: "Basic KYC Verification" },
-    { id: 2, label: "Document Vault", desc: "Secure File Ingestion" },
+    { id: 1, label: "Identity & Location", desc: "Basic KYC Verification" },
+    { id: 2, label: "Document Matrix", desc: "Review and submit application" },
   ];
 
   return (
@@ -550,7 +599,7 @@ const Dashboard: React.FC = () => {
         <Header />
 
         <PageShell className="flex-1">
-          <main className="flex-1 w-full pt-16 md:pt-20 flex flex-col">
+          <main className="flex-1 w-full pt-[150px] md:pt-[170px] flex flex-col">
             <AnimatePresence mode="wait">
             {viewState === "FUNNEL" && (
               <motion.div 
@@ -559,265 +608,356 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
               >
-                <Section spacing="xl">
-                  <Container size="expanded">
-                <Surface className="relative overflow-hidden mb-[var(--space-10)] border border-slate-200/60 bg-white/80 backdrop-blur-3xl shadow-xl shadow-slate-200/40 rounded-3xl">
-                  <Section spacing="md">
-                    <Container size="full">
-                  {/* Subtle Glowing Orbs */}
-                  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-400/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-                  <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-400/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
-                  
-                  <Inline justify="space-between" align="start" className="relative z-10 mb-[var(--space-10)] flex-col md:flex-row gap-[var(--space-8)]">
-                    <Inline gap="var(--space-6)" align="start" className="flex-col md:flex-row items-center md:items-start">
-                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-blue-50 backdrop-blur-xl border border-blue-100 flex items-center justify-center shadow-lg shadow-blue-500/10">
-                        <Target className="w-10 h-10 text-blue-600" />
+                <Section spacing="xs">
+                  <Container size="wide" className="max-w-[800px] -mt-[80px]">
+                    <Surface className="relative border border-slate-200/60 shadow-lg shadow-slate-200/30 rounded-3xl bg-white p-5 md:p-6">
+                      {/* Giant Graphic in Top Right Card Background */}
+                      <div className="absolute -top-[70px] right-0 w-64 h-64 md:w-[320px] md:h-[320px] pointer-events-none select-none z-0 hidden md:block">
+                        <img 
+                          src={applicationBannerImg} 
+                          className="w-full h-full object-contain animate-float-medium drop-shadow-xl" 
+                          alt="" 
+                        />
                       </div>
-                      <Stack gap="var(--space-3)">
-                        <h1 className="text-[length:var(--text-display)] font-extrabold tracking-tight text-[hsl(var(--foreground))]">
-                          Application Funnel
-                        </h1>
-                        <Inline gap="var(--space-3)" align="center" className="flex-wrap">
-                          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse mr-2"></span>
-                            ID: {activeApplication?.applicationId || "Initializing..."}
-                          </span>
-                          <span className="text-[length:var(--text-small)] font-medium text-[hsl(var(--muted-foreground))] flex items-center">
-                            Routing to: <span className="text-[hsl(var(--foreground))] font-bold ml-1">{activeApplication?.targetBank || "Pryme Aggregator"}</span>
-                          </span>
+                      <div className="border-b border-slate-100 pb-2 mb-3 flex flex-col justify-start gap-1 relative z-10">
+                        <Inline gap="var(--space-2)" align="center" className="text-blue-600 font-bold text-xs uppercase tracking-widest justify-start">
+                          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                          Your Application
                         </Inline>
-                      </Stack>
-                    </Inline>
-                    
-                    <Stack align="end" className="w-full md:w-auto bg-white/60 p-6 rounded-2xl border border-slate-200/60 shadow-lg shadow-slate-200/40 backdrop-blur-xl relative overflow-hidden">
-                      <Inline align="baseline" gap="var(--space-2)">
-                        <span className="text-[length:var(--text-display)] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-none">
-                          {Math.min(currentStage === 1 ? 5 : (currentStage - 1) * 50, 100)}
-                        </span>
-                        <span className="text-[length:var(--text-heading)] font-bold text-[hsl(var(--muted-foreground))]">%</span>
-                      </Inline>
-                      <p className="text-[length:var(--text-caption)] font-bold text-[hsl(var(--muted-foreground))] uppercase tracking-[0.2em]">Completion</p>
-                    </Stack>
-                  </Inline>
-                  
-                  {/* Premium Progress Track */}
-                  <div className="relative z-10 h-4 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 backdrop-blur-md shadow-inner">
-                    <motion.div 
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full relative overflow-hidden"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(currentStage === 1 ? 5 : (currentStage - 1) * 50, 100)}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-                    >
-                      {/* Glass Shimmer Effect */}
-                      <div className="absolute inset-0 w-full h-full opacity-30" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)' }}></div>
-                    </motion.div>
-                  </div>
-                    </Container>
-                  </Section>
-                </Surface>
-
-                <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-[var(--layout-panel-gap,var(--space-8))] items-start">
-                  <SplitLayout.Media className="lg:col-span-4 sticky top-[var(--space-8)]">
-                    <Surface className="border-slate-200/50 shadow-lg shadow-slate-200/30 rounded-2xl bg-white/90 backdrop-blur-xl p-2 md:p-6">
-                      <Section spacing="none">
-                        <Container size="full">
-                      <h3 className="font-bold text-slate-800 tracking-tight text-lg mb-8">Pipeline Stages</h3>
-                      <Stack gap="var(--space-6)">
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-display tracking-tight leading-tight">
+                          Let's get you funded
+                        </h1>
+                      </div>
+                  <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <SplitLayout.Media className="lg:col-span-3 sticky top-6 lg:border-r lg:border-slate-100 lg:pr-6">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Application Steps</h3>
+                      
+                      <div className="relative flex flex-col gap-6">
+                        {/* Timeline Connection Line */}
+                        <div className="absolute left-[23px] top-6 bottom-6 w-0.5 bg-slate-100 dark:bg-white/[0.04]"></div>
+                        
                         {stages.map((s) => {
                           const isCompleted = currentStage > s.id;
                           const isActive = currentStage === s.id;
+                          const isLocked = currentStage < s.id;
+
+                          // Icon config
+                          let StepIcon = Lock;
+                          if (isCompleted) StepIcon = Check;
+                          else {
+                            if (s.id === 1) StepIcon = User;
+                            else if (s.id === 2) StepIcon = Briefcase;
+                            else if (s.id === 3) StepIcon = Wallet;
+                            else if (s.id === 4) StepIcon = Coins;
+                            else StepIcon = FileText;
+                          }
+
                           return (
-                            <Inline key={s.id} gap="var(--space-4)" className="items-start">
-                              <div className="mt-1">
-                                {isCompleted ? <CheckCircle2 className="w-6 h-6 text-blue-500" /> : 
-                                 isActive ? <Circle className="w-6 h-6 text-blue-500 fill-blue-500/10" /> : 
-                                 <Circle className="w-6 h-6 text-[hsl(var(--muted-foreground))]" />}
+                            <button
+                              key={s.id}
+                              disabled={isLocked}
+                              onClick={() => setCurrentStage(s.id)}
+                              className={`flex items-start gap-4 text-left w-full transition-all duration-300 p-2.5 rounded-xl ${
+                                isActive 
+                                  ? "bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30 shadow-sm" 
+                                  : isCompleted 
+                                    ? "hover:bg-slate-50 dark:hover:bg-white/[0.02] cursor-pointer" 
+                                    : "opacity-60 cursor-not-allowed"
+                              }`}
+                            >
+                              {/* Step circle status indicator */}
+                              <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 border z-10 transition-all ${
+                                isCompleted 
+                                  ? "bg-emerald-500 border-emerald-500 text-white" 
+                                  : isActive 
+                                    ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20" 
+                                    : "bg-slate-50 border-slate-200 text-slate-400"
+                              }`}>
+                                <StepIcon className="w-5 h-5" />
                               </div>
-                              <Stack gap="var(--space-1)">
-                                <p className={`font-bold ${isActive ? "text-blue-600" : isCompleted ? "text-slate-400" : "text-slate-800"}`}>{s.label}</p>
-                                <p className="text-xs font-medium text-slate-500">{s.desc}</p>
-                              </Stack>
-                            </Inline>
+                              
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-bold truncate ${isActive ? "text-blue-600" : "text-slate-800"}`}>{s.label}</p>
+                                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{s.desc}</p>
+                              </div>
+                              {isActive && <ChevronRight className="w-4 h-4 text-blue-600 self-center shrink-0" />}
+                            </button>
                           );
                         })}
-                      </Stack>
-                        </Container>
-                      </Section>
-                    </Surface>
+                      </div>
+
+                      {/* 100% Secure & Confidential banner block */}
+                      <div className="mt-5 bg-blue-50/40 border border-blue-100 p-4 rounded-2xl flex gap-3.5 items-start">
+                        <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">100% Secure & Confidential</p>
+                          <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-relaxed">Your data is protected with bank-level security.</p>
+                        </div>
+                      </div>
                   </SplitLayout.Media>
 
-                  <SplitLayout.Content className="lg:col-span-8">
+                  <SplitLayout.Content className="lg:col-span-9 lg:pl-6">
                     <motion.div key={currentStage} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                      <Surface className="relative overflow-hidden border-slate-200/50 shadow-lg shadow-slate-200/30 rounded-2xl bg-white/90 backdrop-blur-xl p-2 md:p-6">
-                        <Section spacing="none">
-                          <Container size="full">
+                      <div className="relative z-10">
                         
                         {currentStage === 1 && (
-                          <Stack gap="var(--space-6)" className="relative z-10">
-                            <h2 className="text-2xl font-bold tracking-tight text-slate-800 border-b border-slate-200 pb-6">1. Identity & Location</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <Stack gap="var(--space-4)" className="relative z-10">
+                            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
+                              <div>
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">1. Identity & Location</h2>
+                                <p className="text-sm text-slate-500 font-medium mt-1">Let's start with some basic information to verify your identity.</p>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <Stack gap="var(--space-2)">
                                 <Label htmlFor="panNumber" className="text-xs font-bold uppercase tracking-wider text-slate-500">PAN Number *</Label>
-                                <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all uppercase rounded-xl text-slate-900 font-medium" maxLength={10} />
+                                <div className="relative">
+                                  <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
+                                  <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="pl-12 h-11 text-sm uppercase border-slate-200 bg-slate-50 rounded-xl font-medium" maxLength={10} />
+                                </div>
                               </Stack>
+                              
                               <Stack gap="var(--space-2)">
                                 <Label htmlFor="dob" className="text-xs font-bold uppercase tracking-wider text-slate-500">Date of Birth *</Label>
-                                <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
+                                <div className="relative">
+                                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
+                                  <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
+                                </div>
                               </Stack>
+                              
                               <Stack gap="var(--space-2)">
                                 <Label htmlFor="currentCity" className="text-xs font-bold uppercase tracking-wider text-slate-500">Current City *</Label>
-                                <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
+                                <div className="relative">
+                                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
+                                  <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} placeholder="Indore" className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
+                                </div>
                               </Stack>
+                              
                               <Stack gap="var(--space-2)">
                                 <Label htmlFor="pinCode" className="text-xs font-bold uppercase tracking-wider text-slate-500">Pin Code *</Label>
-                                <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\D/g, ''))} maxLength={6} className="h-12 bg-slate-50 border-slate-200 focus:bg-white shadow-sm focus:shadow-md transition-all rounded-xl text-slate-900 font-medium" />
+                                <div className="relative">
+                                  <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
+                                  <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\\D/g, ''))} placeholder="453200" maxLength={6} className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
+                                </div>
                               </Stack>
+                            </div>
+
+                            <div className="bg-blue-50/40 border border-blue-100/50 p-4 rounded-xl flex gap-3 items-center text-blue-700">
+                              <Lock className="w-4 h-4 shrink-0" />
+                              <span className="text-xs font-semibold">We use this information to fetch your credit profile securely.</span>
                             </div>
                           </Stack>
                         )}
 
                         {currentStage === 2 && (
-                          <Stack gap="var(--space-8)" className="relative z-10">
-                            <Inline gap="var(--space-3)" align="center" className="border-b border-slate-200 pb-6">
-                              <div className="bg-blue-50 p-2.5 rounded-xl border border-blue-100 shadow-sm"><FileText className="w-6 h-6 text-blue-600"/></div>
-                              <Stack gap="var(--space-1)">
-                                <h2 className="text-2xl font-bold tracking-tight text-slate-800">2. Document Vault</h2>
-                                <p className="text-sm font-medium text-slate-500">Final step. Securely upload documents to initiate underwriting.</p>
-                              </Stack>
-                            </Inline>
+                          <Stack gap="var(--space-5)" className="relative z-10">
+                            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
+                              <div>
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">2. Document Matrix</h2>
+                                <p className="text-sm text-slate-500 font-medium mt-1">Review your details, upload the required documentation, and submit to underwriting.</p>
+                              </div>
+                            </div>
+                            
+                            {/* Summary Grid */}
+                            <div className="grid grid-cols-1 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                              <div>
+                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Identity & Location</h4>
+                                <div className="space-y-1.5 text-xs">
+                                  <p><span className="text-slate-500">PAN:</span> <span className="font-bold text-slate-800">{formData.panNumber}</span></p>
+                                  <p><span className="text-slate-500">DOB:</span> <span className="font-bold text-slate-800">{formData.dob}</span></p>
+                                  <p><span className="text-slate-500">City:</span> <span className="font-bold text-slate-800">{formData.currentCity} ({formData.pinCode})</span></p>
+                                </div>
+                              </div>
+                            </div>
 
-                            <Stack gap="var(--space-8)">
-                              {docGroups.map((group) => {
-                                const categoryColors: Record<string, string> = {
-                                  "Identity Documents": "bg-blue-500",
-                                  "Income Documents": "bg-emerald-500",
-                                  "Property Documents": "bg-amber-500",
-                                  "Financial Documents": "bg-purple-500",
-                                  "Business Proof": "bg-indigo-500",
-                                  "Additional Documents": "bg-slate-500"
-                                };
-                                const badgeColor = categoryColors[group.displayName] || "bg-blue-500";
-                                
-                                const totalDocs = group.docs.length;
-                                const securedDocs = group.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length;
+                            {/* Documents Upload Section */}
+                            <Stack gap="var(--space-4)">
+                              <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-blue-500" /> Required Documentation
+                              </h3>
+                              
+                              <Stack gap="var(--space-4)">
+                                {docGroups.map((group) => {
+                                  const categoryColors: Record<string, string> = {
+                                    "Identity Documents": "bg-blue-500",
+                                    "Income Documents": "bg-emerald-500",
+                                    "Property Documents": "bg-amber-500",
+                                    "Financial Documents": "bg-purple-500",
+                                    "Business Proof": "bg-indigo-500",
+                                    "Additional Documents": "bg-slate-500"
+                                  };
+                                  const badgeColor = categoryColors[group.displayName] || "bg-blue-500";
+                                  
+                                  const totalDocs = group.docs.length;
+                                  const securedDocs = group.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length;
 
-                                return (
-                                <div key={group.category} className="relative pl-[var(--space-6)]">
-                                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${badgeColor} rounded-full opacity-60`}></div>
-                                  <Inline justify="space-between" align="center" className="mb-[var(--space-4)]">
-                                    <h4 className="text-[length:var(--text-small)] font-bold tracking-wider text-[hsl(var(--foreground))] uppercase">{group.displayName}</h4>
-                                    <span className="text-[length:var(--text-caption)] font-semibold text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-2 py-1 rounded-md">{securedDocs} / {totalDocs} Uploaded</span>
-                                  </Inline>
-                                  <Stack gap="var(--space-4)">
-                                    {group.docs.map((doc) => {
-                                      const isUploading = uploadingDocs[doc.id];
-                                      const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
-                                      const isDragging = dragOverDocId === doc.id;
-                                      const isConfirmingDelete = confirmDeleteId === doc.id;
+                                  return (
+                                    <div key={group.category} className="relative pl-6">
+                                      <div className={`absolute left-0 top-0 bottom-0 w-1 ${badgeColor} rounded-full opacity-60`}></div>
+                                      <Inline justify="space-between" align="center" className="mb-2">
+                                        <h4 className="text-xs font-bold tracking-wider text-slate-500 uppercase">{group.displayName}</h4>
+                                        <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">{securedDocs} / {totalDocs} Uploaded</span>
+                                      </Inline>
+                                      
+                                      <Stack gap="var(--space-3)">
+                                        {group.docs.map((doc) => {
+                                          const isUploading = uploadingDocs[doc.id];
+                                          const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
+                                          const isDragging = dragOverDocId === doc.id;
+                                          const isConfirmingDelete = confirmDeleteId === doc.id;
 
-                                      let cardClass = "doc-card-pending";
-                                      if (isDragging) cardClass = "doc-card-dragover";
-                                      if (isUploading) cardClass = "doc-card-uploading animate-pulse-glow";
-                                      if (isUploaded) cardClass = "doc-card-secured";
+                                          let cardClass = "doc-card-pending";
+                                          if (isDragging) cardClass = "doc-card-dragover";
+                                          if (isUploading) cardClass = "doc-card-uploading animate-pulse-glow";
+                                          if (isUploaded) cardClass = "doc-card-secured";
 
-                                      return (
-                                        <Inline 
-                                          key={doc.id} 
-                                          align="center"
-                                          justify="space-between"
-                                          className={`group relative p-[var(--space-5)] rounded-[var(--surface-radius)] ${cardClass}`}
-                                          onDragOver={(e) => onDragOver(e, doc.id)}
-                                          onDragLeave={onDragLeave}
-                                          onDrop={(e) => onDrop(e, doc)}
-                                        >
-                                          <Stack gap="var(--space-1)" className="z-10">
-                                            <Inline align="center" gap="var(--space-2)">
-                                              {isUploaded && <CheckCircle2 className="w-5 h-5 text-emerald-500 animate-checkmark" />}
-                                              <span className={`font-bold text-sm ${isUploaded ? 'text-emerald-700' : 'text-slate-800'}`}>
-                                                {doc.name} {doc.required && !isUploaded && <span className="text-red-500 ml-1">*</span>}
-                                              </span>
-                                            </Inline>
-                                            {!isUploaded && <span className="text-xs font-medium text-slate-500">PDF, JPG, PNG up to 10MB</span>}
-                                            {isUploaded && <span className="text-xs text-emerald-600 font-bold tracking-wide">Secured with AES-256</span>}
-                                          </Stack>
-                                          
-                                          <Inline align="center" gap="var(--space-3)" className="z-10">
-                                            <input 
-                                              title={`Upload ${doc.name}`}
-                                              type="file" 
-                                              id={`upload-${doc.id}`} 
-                                              className="hidden" 
-                                              accept=".pdf,.jpg,.jpeg,.png"
-                                              onChange={(e) => handleFileUpload(doc, e)}
-                                              disabled={isUploading || isUploaded}
-                                            />
-                                            
-                                            {isUploading && (
-                                              <Inline align="center" gap="var(--space-2)" className="bg-blue-50 text-blue-700 px-[var(--space-4)] py-[var(--space-2)] rounded-[var(--surface-radius)] font-medium text-[length:var(--text-small)]">
-                                                <Loader2 className="w-4 h-4 animate-spin" /> Encrypting
-                                              </Inline>
-                                            )}
-
-                                            {isUploaded && !isUploading && (
-                                              <Inline align="center" gap="var(--space-2)">
-                                                {isConfirmingDelete ? (
-                                                  <Inline align="center" className="bg-[hsl(var(--background))] shadow-sm border border-red-100 rounded-[var(--surface-radius)] p-1 animate-in fade-in zoom-in duration-200">
-                                                    <span className="text-[length:var(--text-caption)] font-medium text-red-600 px-2">Remove?</span>
-                                                    <Button size="sm" variant="ghost" className="h-7 hover:bg-red-50 text-red-600 px-2" onClick={() => handleRemoveDocument(doc)}>Yes</Button>
-                                                    <Button size="sm" variant="ghost" className="h-7 hover:bg-slate-100 px-2" onClick={() => setConfirmDeleteId(null)}>No</Button>
+                                          return (
+                                            <Inline 
+                                              key={doc.id} 
+                                              align="center"
+                                              justify="space-between"
+                                              className={`group relative p-4 rounded-xl border transition-all ${cardClass}`}
+                                              onDragOver={(e) => onDragOver(e, doc.id)}
+                                              onDragLeave={onDragLeave}
+                                              onDrop={(e) => onDrop(e, doc)}
+                                            >
+                                              <Stack gap="none" className="z-10">
+                                                <Inline align="center" gap="var(--space-2)">
+                                                  {isUploaded && <CheckCircle2 className="w-4 h-4 text-emerald-500 animate-checkmark" />}
+                                                  <span className={`font-bold text-xs ${isUploaded ? 'text-emerald-700' : 'text-slate-800'}`}>
+                                                    {doc.name} {doc.required && !isUploaded && <span className="text-red-500 ml-1">*</span>}
+                                                  </span>
+                                                </Inline>
+                                                {!isUploaded && <span className="text-[10px] font-medium text-slate-500 mt-0.5">PDF, JPG, PNG up to 10MB</span>}
+                                                {isUploaded && <span className="text-[10px] text-emerald-600 font-bold tracking-wide mt-0.5">Secured with AES-256</span>}
+                                              </Stack>
+                                              
+                                              <Inline align="center" gap="var(--space-3)" className="z-10">
+                                                <input 
+                                                  title={`Upload ${doc.name}`}
+                                                  type="file" 
+                                                  id={`upload-${doc.id}`} 
+                                                  className="hidden" 
+                                                  accept=".pdf,.jpg,.jpeg,.png"
+                                                  onChange={(e) => handleFileUpload(doc, e)}
+                                                  disabled={isUploading || isUploaded}
+                                                />
+                                                
+                                                {isUploading && (
+                                                  <Inline align="center" gap="var(--space-2)" className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg font-medium text-xs">
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Encrypting
                                                   </Inline>
-                                                ) : (
-                                                  <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    className="h-8 w-8 text-emerald-600/50 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                                                    onClick={() => setConfirmDeleteId(doc.id)}
+                                                )}
+
+                                                {isUploaded && !isUploading && (
+                                                  <Inline align="center" gap="var(--space-2)">
+                                                    {isConfirmingDelete ? (
+                                                      <Inline align="center" className="bg-white shadow-sm border border-red-100 rounded-lg p-1 animate-in fade-in zoom-in duration-200">
+                                                        <span className="text-[10px] font-medium text-red-600 px-2">Remove?</span>
+                                                        <Button size="sm" variant="ghost" className="h-7 hover:bg-red-50 text-red-600 px-2" onClick={() => handleRemoveDocument(doc)}>Yes</Button>
+                                                        <Button size="sm" variant="ghost" className="h-7 hover:bg-slate-100 px-2" onClick={() => setConfirmDeleteId(null)}>No</Button>
+                                                      </Inline>
+                                                    ) : (
+                                                      <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="h-8 w-8 text-emerald-600/50 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                                        onClick={() => setConfirmDeleteId(doc.id)}
+                                                      >
+                                                        <X className="w-4 h-4" />
+                                                      </Button>
+                                                    )}
+                                                  </Inline>
+                                                )}
+
+                                                {!isUploaded && !isUploading && (
+                                                  <Label 
+                                                    htmlFor={`upload-${doc.id}`} 
+                                                    className="inline-flex items-center justify-center rounded-xl text-xs font-bold transition-all focus-visible:outline-none border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-sm h-9 px-4 cursor-pointer"
                                                   >
-                                                    <X className="w-4 h-4" />
-                                                  </Button>
+                                                    <UploadCloud className="w-4 h-4 mr-2 text-blue-600" />
+                                                    Browse Files
+                                                  </Label>
                                                 )}
                                               </Inline>
-                                            )}
-
-                                            {!isUploaded && !isUploading && (
-                                              <Label 
-                                                htmlFor={`upload-${doc.id}`} 
-                                                className="inline-flex items-center justify-center rounded-xl text-xs font-bold transition-all focus-visible:outline-none border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-sm h-10 px-5 cursor-pointer"
-                                              >
-                                                <UploadCloud className="w-4 h-4 mr-2 text-blue-600" />
-                                                Browse Files
-                                              </Label>
-                                            )}
-                                          </Inline>
-                                        </Inline>
-                                      );
-                                    })}
-                                  </Stack>
-                                </div>
-                                )})}
+                                            </Inline>
+                                          );
+                                        })}
+                                      </Stack>
+                                    </div>
+                                  );
+                                })}
+                              </Stack>
                             </Stack>
                           </Stack>
                         )}
 
-                        <div className="mt-12 pt-8 border-t border-slate-200 flex justify-end relative z-10">
+                        {/* Navigation Actions Row */}
+                        <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center relative z-10">
+                          {currentStage > 1 ? (
+                            <Button 
+                              variant="ghost" 
+                              onClick={() => setCurrentStage(prev => prev - 1)}
+                              className="h-12 px-6 font-bold text-slate-600 hover:bg-slate-50 rounded-xl"
+                            >
+                              Back
+                            </Button>
+                          ) : <div />}
+
                           <Button 
                             onClick={currentStage === 2 ? handleFinalSubmit : handleNextStage} 
                             disabled={isSaving}
-                            className="h-14 px-10 text-base font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 disabled:opacity-70 transition-all rounded-2xl hover:shadow-xl hover:-translate-y-0.5"
+                            className="h-12 px-8 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/10 disabled:opacity-70 transition-all rounded-xl hover:-translate-y-0.5"
                           >
                             {isSaving ? (
-                              <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {currentStage === 2 ? "Securing Data..." : "Saving..."}</>
+                              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {currentStage === 2 ? "Submitting..." : "Saving..."}</>
                             ) : (
-                              <>{currentStage === 2 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-5 h-5 ml-2" /></>
+                              <>{currentStage === 2 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-4 h-4 ml-1.5" /></>
                             )}
                           </Button>
                         </div>
-                          </Container>
-                        </Section>
-                      </Surface>
+
+                      </div>
                     </motion.div>
                   </SplitLayout.Content>
                 </SplitLayout>
+              </Surface>
+
+                {/* Funnel Page bottom row features block */}
+                <div className="mt-8 max-w-[650px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 p-2">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 mb-2.5">
+                      <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Bank-Level Security</p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-normal">Your data is 100% secure</p>
+                  </div>
+                  
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 mb-2.5">
+                      <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Instant Processing</p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-normal">Quick & hassle-free</p>
+                  </div>
+                  
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 mb-2.5">
+                      <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Minimal Documentation</p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-normal">Only what's essential</p>
+                  </div>
+                  
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 mb-2.5">
+                      <Phone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">24/7 Support</p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-normal">We're here to help</p>
+                  </div>
+                </div>
                   </Container>
                 </Section>
               </motion.div>
@@ -832,7 +972,7 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
               >
-                <Surface className="aurora-gradient border-b border-[hsl(var(--border))] mb-[var(--space-section)]">
+                <Surface className="aurora-gradient border-b border-[hsl(var(--border))] mb-[var(--space-lg)]">
                   <Section spacing="lg">
                     <Container size="expanded">
                     <Inline justify="space-between" align="end" className="flex-col md:flex-row gap-[var(--space-4)]">
