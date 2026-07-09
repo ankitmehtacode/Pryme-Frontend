@@ -60,6 +60,7 @@ const Apply = () => {
     employmentType?: string;
     phone?: string; 
     name?: string;
+    loanAmount?: number;
     engineResults?: any[];
   } | null>(null);
 
@@ -262,15 +263,17 @@ const Apply = () => {
         console.error("Eligibility Engine evaluation failed:", engineError);
     }
 
-    setApplicationData({
+    setApplicationData((prev: any) => ({
+      ...prev,
       cibilScore: data.cibilScore,
       monthlyIncome: data.monthlyIncome,
       productType: data.productType,
       employmentType: data.employmentType,
       phone: leadPhone,
       name: leadName,
+      loanAmount: data.loanAmount,
       engineResults: engineData
-    });
+    }));
 
     setIsAnalyzing(true);
   };
