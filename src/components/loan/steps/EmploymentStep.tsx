@@ -332,15 +332,18 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
                     error={errors.netMonthlyIncome}
                   />
-                  <ValidatedInput
+                  <StyledSelect
                     label="ITR Filing (Years)"
-                    type="select"
-                    icon={CalendarDays}
+                    icon={Calendar}
                     value={store.financialDetails.path === "PROFESSIONAL" && store.financialDetails.data.itrFiledYears !== undefined && store.financialDetails.data.itrFiledYears !== null ? store.financialDetails.data.itrFiledYears.toString() : undefined}
-                    onChange={(val) => store.updateProfessionalDetails({ itrFiledYears: Number(val) })}
-                    options={itrYearOptions}
+                    onValueChange={(v) => store.updateProfessionalDetails({ itrFiledYears: Number(v) })}
                     placeholder="Select years of ITR filed"
-                  />
+                  >
+                    <SelectItem value="0">Not Filed</SelectItem>
+                    <SelectItem value="1">1 Year</SelectItem>
+                    <SelectItem value="2">2 Years</SelectItem>
+                    <SelectItem value="3">3+ Years</SelectItem>
+                  </StyledSelect>
                 </div>
 
                 {/* ── EMI Disclosure (Step A + conditional Step B) ── */}
