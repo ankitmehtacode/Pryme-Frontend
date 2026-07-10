@@ -22,7 +22,7 @@ const PrepaymentCalculator = ({
   const [interestRate, setInterestRate] = useState(10.5);
   const [tenureMonths, setTenureMonths] = useState(120);
   const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
-  const [prepaymentMonth, setPrepaymentMonth] = useState(12);
+  const prepaymentMonth = 12;
   const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
 
   // Formatting helpers
@@ -101,7 +101,7 @@ const PrepaymentCalculator = ({
       tenureSaved: Math.max(0, tenureSaved),
       monthsWithPrepayment,
     };
-  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, prepaymentMonth, strategy]);
+  }, [loanAmount, interestRate, tenureMonths, prepaymentAmount, strategy]);
 
   const savingsPercentage = calculations.interestOriginal > 0
     ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1)
@@ -222,41 +222,25 @@ const PrepaymentCalculator = ({
             </div>
 
             {strategy === "lump-sum" ? (
-              <>
-                {/* Prepayment Amount */}
-                <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
-                  <div className="flex justify-between items-center mb-1.5 gap-2">
-                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepayment Amount (₹)</label>
-                    <input
-                      type="number"
-                      value={prepaymentAmount}
-                      onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
-                      onWheel={(e) => e.currentTarget.blur()}
-                      className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      min={10000}
-                      max={Math.min(loanAmount, 5000000)}
-                    />
+              /* Prepayment Amount */
+              <div className="lg:row-span-2 bg-emerald-50/30 dark:bg-emerald-500/5 p-3 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center min-h-[140px]">
+                <div className="flex justify-between items-center mb-2.5 gap-2">
+                  <div className="space-y-0.5">
+                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Prepayment Amount (₹)</label>
+                    <span className="text-[8px] text-muted-foreground block">Assumes payment is made at month 12</span>
                   </div>
-                  <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+                  <input
+                    type="number"
+                    value={prepaymentAmount}
+                    onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                    onWheel={(e) => e.currentTarget.blur()}
+                    className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    min={10000}
+                    max={Math.min(loanAmount, 5000000)}
+                  />
                 </div>
-
-                {/* Prepayment Month */}
-                <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
-                  <div className="flex justify-between items-center mb-1.5 gap-2">
-                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Prepay After Month</label>
-                    <input
-                      type="number"
-                      value={prepaymentMonth}
-                      onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
-                      onWheel={(e) => e.currentTarget.blur()}
-                      className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-20 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      min={1}
-                      max={Math.max(1, tenureMonths - 1)}
-                    />
-                  </div>
-                  <Slider max={Math.max(1, tenureMonths - 1)} min={1} step={1} value={[prepaymentMonth]} onValueChange={(val) => setPrepaymentMonth(val[0])} className="w-full cursor-pointer py-0.5" />
-                </div>
-              </>
+                <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              </div>
             ) : (
               /* Strategy Explanation Card */
               <div className="lg:row-span-2 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-3.5 rounded-lg border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden select-none min-h-[140px]">
