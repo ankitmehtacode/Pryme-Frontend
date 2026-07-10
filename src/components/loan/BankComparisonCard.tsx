@@ -34,6 +34,7 @@ export interface BankOfferDTO {
   requiredDocs: string[];
   originalEngineResult?: any;
   employmentType?: string;
+  requestedTenure?: number;
 }
 
 interface BankComparisonCardProps {
@@ -303,7 +304,17 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
               <div className="flex justify-between items-center pt-1">
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Tenure</p>
-                <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.maxTenure} yrs</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.maxTenure} yrs</p>
+                  {offer.requestedTenure && offer.maxTenure < offer.requestedTenure && (
+                    <div className="group relative flex items-center justify-center">
+                      <AlertCircle className="w-4 h-4 text-amber-500" />
+                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900 dark:bg-slate-800 text-slate-100 text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                        Tenure clamped to {offer.maxTenure} years. The maximum tenure allowed by this product.
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               {emiDiffFromHero !== 0 && (
                 <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">

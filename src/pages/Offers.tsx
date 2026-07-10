@@ -234,6 +234,7 @@ export default function Offers() {
         interestRate: parseFloat(roiPercent.toFixed(2)),
         processingFee: parseFloat(processingFee.toFixed(2)),
         maxTenure: (er?.tenureMonths || 60) / 12,
+        requestedTenure: leadData.loanTenure,
         maxLoanAmount: er?.maxEligibleAmount || leadData.loanAmount,
         approvalOdds: 98,
         processingTime: "48 hrs",
