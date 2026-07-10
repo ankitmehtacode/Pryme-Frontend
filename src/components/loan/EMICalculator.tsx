@@ -262,7 +262,6 @@ const EMICalculator = ({
               </div>
             </div>
           </div>
-        </div>
       )}
     </div>
   );
