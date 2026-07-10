@@ -1112,8 +1112,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
       <Dialog open={!!openDoc} onOpenChange={(open) => !open && setOpenDoc(null)}>
         <DialogContent className="max-w-2xl h-[75vh] p-0 flex flex-col gap-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl bg-background/95 backdrop-blur-3xl sm:rounded-xl">
-          <DialogHeader className="p-4 md:p-6 border-b border-white/10 shrink-0 bg-background/50">
-            <DialogTitle className="text-xl flex items-center gap-2">
+          <DialogHeader className="p-4 md:p-6 border-b border-slate-200 dark:border-white/10 shrink-0 bg-background/95">
+            <DialogTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-white">
               <FileText className="w-5 h-5 text-primary" />
               {openDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
             </DialogTitle>

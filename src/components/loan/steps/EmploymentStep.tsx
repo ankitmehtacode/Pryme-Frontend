@@ -325,11 +325,17 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   <ValidatedInput
                     label="Professional Income as per ITR (₹)"
                     type="number"
-                    placeholder="150000"
+                    placeholder="e.g. 500000"
                     icon={IndianRupee}
-                    value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ netMonthlyIncome: Number(e.target.value) })}
-                    isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                    value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.netProfit || "") : ""}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const val = Number(e.target.value);
+                      store.updateProfessionalDetails({
+                        netProfit: val,
+                        netMonthlyIncome: Math.round(val / 12),
+                      });
+                    }}
+                    isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.netProfit || 0 : 0) >= 10000}
                     error={errors.netMonthlyIncome}
                   />
                   <StyledSelect
@@ -419,7 +425,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       error={errors.businessName}
                     />
                     <ValidatedInput
-                      label="GST Registration Date"
+                      label="GST Registration Date (Optional)"
                       type="date"
                       icon={Calendar}
                       value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.gstRegistrationDate || "") : ""}
@@ -462,7 +468,6 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                         store.updateBusinessDetails({
                           last12MonthsGstTurnover: val,
                           monthlyGSTTurnover: Math.round(val / 12),
-                          netMonthlyIncome: val > 0 ? Math.round(val / 12) : (store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0),
                           subType: val > 0 ? "GST_BASED" : "ITR_BASED"
                         });
                       }}
@@ -510,17 +515,18 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     <ValidatedInput
                       label="Business Income as per ITR (₹)"
                       type="number"
-                      placeholder="100000"
+                      placeholder="e.g. 500000"
                       icon={IndianRupee}
-                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netMonthlyIncome || "") : ""}
+                      value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.netProfit || "") : ""}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = Number(e.target.value);
                         store.updateBusinessDetails({
-                          netMonthlyIncome: val,
+                          netProfit: val,
+                          netMonthlyIncome: Math.round(val / 12),
                           subType: "ITR_BASED"
                         });
                       }}
-                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netMonthlyIncome : 0) >= 10000}
+                      isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.netProfit || 0 : 0) >= 10000}
                       error={errors.netMonthlyIncome}
                     />
                   </div>

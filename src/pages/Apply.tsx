@@ -221,6 +221,7 @@ const Apply = () => {
                         pat: data.netProfit || (data.monthlyIncome * 12),
                         depreciation: data.depreciation || null,
                         interestExpense: null,
+                        grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
                     };
                     break;
             }

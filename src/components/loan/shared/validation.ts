@@ -70,9 +70,7 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
   if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
     const d = fin.data;
     if (!d.businessName || d.businessName.trim().length < 2) errors.businessName = "Enter your business name";
-    if (!d.gstRegistrationDate) {
-      errors.gstRegistrationDate = "Enter your GST registration date";
-    } else {
+    if (d.gstRegistrationDate) {
       const regDate = new Date(d.gstRegistrationDate);
       if (isNaN(regDate.getTime())) {
         errors.gstRegistrationDate = "Enter a valid registration date";
