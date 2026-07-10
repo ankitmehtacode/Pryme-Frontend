@@ -149,12 +149,23 @@ const Apply = () => {
 
     let engineData = [];
     try {
-        // ── COMBINED INCOME FIX ──
-        const applicantIncome = Number(data.monthlyIncome) || 0;
+        // ── SILICON VALLEY GRADE INCOME NORMALIZATION ──
+        // Detects if the provided 'monthlyIncome' is actually an Annual ITR figure 
+        // (common UX/manual testing anomaly where users type Annual Income into Monthly fields).
+        // If the 'monthly' figure is abnormally high for a monthly salary (e.g. > ₹1,500,000),
+        // we safely auto-correct it to prevent calculating EMI eligibility on 12-years of income.
+        let safeMonthlyIncome = Number(data.monthlyIncome) || 0;
+        if (safeMonthlyIncome > 1500000 && data.financialPath !== "SALARIED") {
+            console.warn(`[Income Engine] Detected abnormally high monthly income (₹${safeMonthlyIncome}). Auto-correcting to Annual.`);
+            safeMonthlyIncome = Math.round(safeMonthlyIncome / 12);
+        }
+
+        const applicantIncome = safeMonthlyIncome;
         const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary 
             ? Number(data.coApplicantDetails.netMonthlySalary) 
             : 0;
         const totalEffectiveIncome = applicantIncome + coApplicantIncome;
+        const derivedAnnualIncome = totalEffectiveIncome * 12;
 
         // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
         let computedAge = 35;
@@ -167,21 +178,13 @@ const Apply = () => {
 
         // ── BUG-2 FIX: Resolve surrogate programName from employment path ──
         // The Java SurrogateIncomeResolver.resolve() switches on programName.
-        // Each path needs its own set of fields from IncomeComputationInput.java:
-        //   programName, pat, depreciation, interestExpense,
-        //   averageBankBalance, bankBalanceSamples,
-        //   gstrTurnover12Months, businessType,
-        //   grossReceipts, profession
         let incomeInput: any = { programName: null };
 
         if (data.financialPath === "SALARIED") {
             // Salaried: No surrogate program needed.
-            // The engine uses data.monthlyIncome directly if programName is null.
-            // But SurrogateIncomeResolver requires a programName, so we skip it
-            // by setting monthlyIncome on the request and using a simple NIP fallback
             incomeInput = {
                 programName: "NIP",
-                pat: data.monthlyIncome * 12,   // Annual salary as PAT
+                pat: derivedAnnualIncome,   // Safely annualized
                 depreciation: null,
                 interestExpense: null,
             };
@@ -189,7 +192,7 @@ const Apply = () => {
             // Professional (CA/CS/Doctor): SEP program
             incomeInput = {
                 programName: "SEP",
-                grossReceipts: data.annualGrossReceipts || (data.monthlyIncome * 12),
+                grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
                 profession: data.professionalSubType || "CA",
             };
         } else if (data.financialPath === "SELF_EMPLOYED") {
@@ -218,7 +221,7 @@ const Apply = () => {
                 default: // ITR_BASED or fallback
                     incomeInput = {
                         programName: "NIP",
-                        pat: data.netProfit || (data.monthlyIncome * 12),
+                        pat: data.netProfit || derivedAnnualIncome,
                         depreciation: data.depreciation || null,
                         interestExpense: null,
                         grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
@@ -226,10 +229,10 @@ const Apply = () => {
                     break;
             }
         } else {
-            // Fallback: use NIP with annualized monthlyIncome
+            // Fallback: use NIP with safely annualized income
             incomeInput = {
                 programName: "NIP",
-                pat: data.monthlyIncome * 12,
+                pat: derivedAnnualIncome,
                 depreciation: null,
                 interestExpense: null,
             };
