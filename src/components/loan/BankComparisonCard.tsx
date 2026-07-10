@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
   if (val == null || val === "" || val === "0" || val === 0) return null;
@@ -32,6 +33,7 @@ export interface BankOfferDTO {
   processingTime: string;
   requiredDocs: string[];
   originalEngineResult?: any;
+  employmentType?: string;
 }
 
 interface BankComparisonCardProps {
@@ -86,7 +88,42 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   const isLocking = localStatus === "processing";
   const brand = offer.brandHex;
 
-  const matchingReward = rewards?.find(r => r.productCode === offer.originalEngineResult?.productCode);
+  const matchingReward = rewards?.find(r => {
+    // 1. Match Product Code (Engine obfuscates to ABFL-HL, so we check if it ends with the reward's product code like 'HL')
+    const engineProdCode = offer.originalEngineResult?.productCode || offer.productType || "";
+    if (r.productCode && !engineProdCode.toUpperCase().endsWith(r.productCode.toUpperCase())) return false;
+    
+    // 2. Match Bank Name (case-insensitive)
+    if (r.bank?.toLowerCase() !== offer.bankName?.toLowerCase()) return false;
+    
+    // 3. Match Loan Amount Tier
+    const eligibleAmount = offer.originalEngineResult?.maxEligibleLoanAmount || offer.maxLoanAmount || 0;
+    
+    if (r.minLoanAmount != null && eligibleAmount < r.minLoanAmount) return false;
+    if (r.maxLoanAmount != null && eligibleAmount > r.maxLoanAmount) return false;
+    
+    // 4. Employment Type 
+    const empType = (offer.employmentType || offer.originalEngineResult?.profile?.employmentType || "").toUpperCase();
+    const rEmpType = (r.employmentType || "").toUpperCase();
+    
+    if (empType && rEmpType) {
+      // Map frontend/engine types (SALARIED, PROFESSIONAL, SELF_EMPLOYED) to reward types
+      const isSalariedMatch = empType === "SALARIED" && rEmpType === "SALARIED";
+      const isProfMatch = empType === "PROFESSIONAL" && rEmpType.includes("PROFESSIONAL") && !rEmpType.includes("NON");
+      const isNonProfMatch = empType === "SELF_EMPLOYED" && (rEmpType.includes("NON PROFESSIONAL") || rEmpType === "SELF_EMPLOYED");
+      
+      if (!isSalariedMatch && !isProfMatch && !isNonProfMatch) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+
+  const dynamicRewardText = matchingReward 
+    ? (matchingReward.rewardText || [matchingReward.reward1, matchingReward.reward2, matchingReward.pfWaiver].filter(Boolean).join(" • "))
+    : "";
+
   const RewardIcon = matchingReward?.iconType === "GIFT" ? Gift : 
                      matchingReward?.iconType === "SMARTPHONE" ? Smartphone : 
                      matchingReward?.iconType === "CAR" ? Car : 
@@ -170,7 +207,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     <div className="mt-1.5 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2.5 py-1 rounded-md w-fit shadow-sm">
                       <RewardIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
                       <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 leading-tight">
-                        {matchingReward.rewardText}
+                        {dynamicRewardText}
                       </span>
                     </div>
                   )}
@@ -284,35 +321,44 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
             {/* ── CTAs (Mobile Stacked, Desktop Row/Col) ──────────────────────── */}
             <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
-              <Button
-                onClick={handleApplyClick}
-                disabled={isGlobalLocking && !isLocking}
-                className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
-                style={{
-                  background: localStatus === "resolved"
-                    ? '#10b981'
-                    : isRecommended
-                      ? '#eab308'
-                      : '#0f172a',
-                  color: localStatus === "resolved"
-                    ? 'white'
-                    : isRecommended
-                      ? '#0f172a'
-                      : 'white',
-                }}
-              >
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                {localStatus === "resolved" ? (
-                  <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
-                ) : isLocking ? (
-                  <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
-                ) : (
-                  <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
-                    Apply with Pryme 
-                    <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
-                  </span>
-                )}
-              </Button>
+              {matchingReward?.buttonDesign ? (
+                <GlossyRewardButton 
+                  colorScheme={matchingReward.buttonDesign}
+                  onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
+                  disabled={isGlobalLocking && !isLocking}
+                  className="w-full xl:w-[175px] h-12 xl:h-11 flex justify-center items-center"
+                />
+              ) : (
+                <Button
+                  onClick={handleApplyClick}
+                  disabled={isGlobalLocking && !isLocking}
+                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
+                  style={{
+                    background: localStatus === "resolved"
+                      ? '#10b981'
+                      : isRecommended
+                        ? '#eab308'
+                        : '#0f172a',
+                    color: localStatus === "resolved"
+                      ? 'white'
+                      : isRecommended
+                        ? '#0f172a'
+                        : 'white',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                  {localStatus === "resolved" ? (
+                    <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
+                  ) : isLocking ? (
+                    <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
+                  ) : (
+                    <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
+                      Apply with Pryme 
+                      <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
+                    </span>
+                  )}
+                </Button>
+              )}
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}

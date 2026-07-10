@@ -112,6 +112,12 @@ interface ProductRewardFormData {
   rewardText: string;
   buttonDesign: string;
   logoUrl?: string;
+  minLoanAmount?: number;
+  maxLoanAmount?: number;
+  employmentType?: string;
+  reward1?: string;
+  reward2?: string;
+  pfWaiver?: string;
 }
 
 const initialRewardFormState: ProductRewardFormData = {
@@ -121,6 +127,12 @@ const initialRewardFormState: ProductRewardFormData = {
   rewardText: "",
   buttonDesign: "ocean-blue",
   logoUrl: "",
+  minLoanAmount: 0,
+  maxLoanAmount: 9999999999,
+  employmentType: "SALARIED",
+  reward1: "",
+  reward2: "",
+  pfWaiver: ""
 };
 
 export const MarketingTab: React.FC = () => {
@@ -827,13 +839,85 @@ export const MarketingTab: React.FC = () => {
                 </Select>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-400">Min Loan Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={rewardFormData.minLoanAmount}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, minLoanAmount: Number(e.target.value) })}
+                    className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-400">Max Loan Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={rewardFormData.maxLoanAmount}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, maxLoanAmount: Number(e.target.value) })}
+                    className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-400">Reward Text (Memo)</label>
+                <label className="text-xs font-medium text-slate-400">Employment Type</label>
+                <Select
+                  value={rewardFormData.employmentType}
+                  onValueChange={(val) => setRewardFormData({ ...rewardFormData, employmentType: val })}
+                >
+                  <SelectTrigger className="w-full bg-black/40 border-white/10 text-white">
+                    <SelectValue placeholder="Select Employment Type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#12121a] border-white/10">
+                    <SelectItem value="SALARIED" className="text-white focus:bg-white/10">SALARIED</SelectItem>
+                    <SelectItem value="SELF EMPLOYEED PROFESSIONAL" className="text-white focus:bg-white/10">SELF EMPLOYEED PROFESSIONAL</SelectItem>
+                    <SelectItem value="SELF EMPLOYEED NON PROFESSIONAL" className="text-white focus:bg-white/10">SELF EMPLOYEED NON PROFESSIONAL</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-400">Reward 1</label>
+                  <input
+                    type="text"
+                    value={rewardFormData.reward1 || ""}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, reward1: e.target.value })}
+                    placeholder="e.g. SMARTPHONE"
+                    className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-400">Reward 2</label>
+                  <input
+                    type="text"
+                    value={rewardFormData.reward2 || ""}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, reward2: e.target.value })}
+                    placeholder="e.g. LAPTOP"
+                    className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-400">PF Waiver</label>
                 <input
                   type="text"
-                  value={rewardFormData.rewardText}
+                  value={rewardFormData.pfWaiver || ""}
+                  onChange={(e) => setRewardFormData({ ...rewardFormData, pfWaiver: e.target.value })}
+                  placeholder="e.g. 50% PF WAIVER"
+                  className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-400">Reward Text (Override / Memo)</label>
+                <input
+                  type="text"
+                  value={rewardFormData.rewardText || ""}
                   onChange={(e) => setRewardFormData({ ...rewardFormData, rewardText: e.target.value })}
-                  placeholder="e.g., 50% off on processing fee"
+                  placeholder="Leave blank to auto-generate from Rewards"
                   className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
                 />
               </div>
@@ -914,24 +998,29 @@ export const MarketingTab: React.FC = () => {
                 <div className="shrink-0 min-w-[100px]">
                    <h3 className="text-[#103783] font-bold text-base mb-1.5 whitespace-nowrap">{rewardFormData.bank || "Select Bank"}</h3>
                    <div className="flex flex-col gap-2">
-                     {rewardFormData.rewardText ? (
-                       <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap self-start", 
-                          rewardFormData.iconType === 'GIFT' ? "text-emerald-600 bg-emerald-50 border-emerald-200" :
-                          rewardFormData.iconType === 'SMARTPHONE' ? "text-blue-600 bg-blue-50 border-blue-200" :
-                          rewardFormData.iconType === 'CAR' ? "text-amber-600 bg-amber-50 border-amber-200" :
-                          "text-purple-600 bg-purple-50 border-purple-200"
-                       )}>
-                         {rewardFormData.iconType === 'GIFT' && <Gift className="w-3 h-3" />}
-                         {rewardFormData.iconType === 'SMARTPHONE' && <Smartphone className="w-3 h-3" />}
-                         {rewardFormData.iconType === 'CAR' && <Car className="w-3 h-3" />}
-                         {rewardFormData.iconType === 'DISCOUNT' && <Percent className="w-3 h-3" />}
-                         <span>{rewardFormData.rewardText}</span>
-                       </div>
-                     ) : (
-                       <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border text-slate-400 bg-slate-50 border-slate-200 border-dashed whitespace-nowrap self-start">
-                         Add reward text to preview
-                       </div>
-                     )}
+                     {(() => {
+                       const dynamicRewardText = rewardFormData.rewardText || 
+                          [rewardFormData.reward1, rewardFormData.reward2, rewardFormData.pfWaiver].filter(Boolean).join(" • ");
+                       
+                       return dynamicRewardText ? (
+                         <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap self-start", 
+                            rewardFormData.iconType === 'GIFT' ? "text-emerald-600 bg-emerald-50 border-emerald-200" :
+                            rewardFormData.iconType === 'SMARTPHONE' ? "text-blue-600 bg-blue-50 border-blue-200" :
+                            rewardFormData.iconType === 'CAR' ? "text-amber-600 bg-amber-50 border-amber-200" :
+                            "text-purple-600 bg-purple-50 border-purple-200"
+                         )}>
+                           {rewardFormData.iconType === 'GIFT' && <Gift className="w-3 h-3" />}
+                           {rewardFormData.iconType === 'SMARTPHONE' && <Smartphone className="w-3 h-3" />}
+                           {rewardFormData.iconType === 'CAR' && <Car className="w-3 h-3" />}
+                           {rewardFormData.iconType === 'DISCOUNT' && <Percent className="w-3 h-3" />}
+                           <span>{dynamicRewardText}</span>
+                         </div>
+                       ) : (
+                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border text-slate-400 bg-slate-50 border-slate-200 border-dashed whitespace-nowrap self-start">
+                           Add reward text or items to preview
+                         </div>
+                       );
+                     })()}
                      <div className="flex items-center gap-1 text-[9px] text-slate-400 font-medium tracking-wide">
                         <ShieldCheck className="w-3 h-3 text-blue-400" /> <span className="text-blue-400 font-bold">Only with Pryme</span> <Sparkles className="w-3 h-3 text-amber-400" />
                      </div>
@@ -1021,8 +1110,11 @@ export const MarketingTab: React.FC = () => {
                             }
                           })()}
                         </td>
-                        <td className="px-4 py-3 text-slate-300 truncate max-w-[200px]">
-                          {reward.rewardText}
+                        <td className="px-4 py-3 text-slate-300">
+                          {reward.rewardText || [reward.reward1, reward.reward2, reward.pfWaiver].filter(Boolean).join(" • ")}
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            {reward.employmentType} | ₹{(reward.minLoanAmount/100000).toFixed(0)}L+
+                          </p>
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex gap-1 justify-end opacity-60 group-hover:opacity-100 transition-opacity">

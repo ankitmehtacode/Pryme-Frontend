@@ -309,12 +309,16 @@ const Dashboard: React.FC = () => {
   const validateCurrentStage = useCallback((): boolean => {
     switch (currentStage) {
       case 1:
-        if (!formData.panNumber || !formData.dob || !formData.currentCity || !formData.pinCode) {
-          toast({ title: "Incomplete Identity Data", description: "Please complete all fields in this section.", variant: "destructive" });
+        if (!formData.panNumber || formData.panNumber.length !== 10) {
+          toast({ title: "Invalid PAN", description: "Please enter a valid 10-character PAN number.", variant: "destructive" });
           return false;
         }
-        if (formData.panNumber.length !== 10) {
-          toast({ title: "Invalid PAN", description: "PAN Number must be exactly 10 characters.", variant: "destructive" });
+        if (!formData.dob) {
+          toast({ title: "Date of Birth Required", description: "Please provide your date of birth.", variant: "destructive" });
+          return false;
+        }
+        if (!formData.currentCity) {
+          toast({ title: "City Required", description: "Please enter your current city.", variant: "destructive" });
           return false;
         }
         if (formData.pinCode.length < 6) {
@@ -322,24 +326,7 @@ const Dashboard: React.FC = () => {
           return false;
         }
         break;
-      case 2:
-        if (!formData.companyName || !formData.designation || !formData.workExperience || !formData.officeEmail) {
-          toast({ title: "Incomplete Employment Details", description: "Please complete all employment fields.", variant: "destructive" });
-          return false;
-        }
-        break;
-      case 3:
-        if (!formData.existingBank || !formData.coApplicant) {
-          toast({ title: "Incomplete Financial Profile", description: "Please complete all financial profile fields.", variant: "destructive" });
-          return false;
-        }
-        break;
-      case 4:
-        if (!formData.requestedAmount || !formData.tenure || !formData.loanPurpose) {
-          toast({ title: "Incomplete Loan Details", description: "Please complete all loan details fields.", variant: "destructive" });
-          return false;
-        }
-        break;
+      // Stages 2+ are document uploads, which have their own validation logic
       default:
         break;
     }
@@ -382,7 +369,8 @@ const Dashboard: React.FC = () => {
            loanType: normalizedLoanType,
            productType: normalizedLoanType, // 🧠 FIX: submitLead prefers productType over loanType
            cibilScore: cachedApp.cibilScore || 0,
-           monthlyIncome: cachedApp.monthlyIncome || 0
+           monthlyIncome: cachedApp.monthlyIncome || 0,
+           employmentType: cachedApp.employmentType || "SALARIED",
         });
         
         const newLeadId = leadRes?.lead?.id || leadRes?.data?.lead?.id;

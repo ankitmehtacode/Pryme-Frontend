@@ -62,6 +62,7 @@ interface LeadDataPayload {
   leadId?: string;
   cibilScore: number;
   productType: string;
+  employmentType?: string;
   monthlyIncome: number;
   loanAmount: number;
   fullName: string;
@@ -238,6 +239,7 @@ export default function Offers() {
         processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
         originalEngineResult: er,
+        employmentType: leadData.employmentType || leadData.productType,
         bankKey: theme.bankKey
       };
     });

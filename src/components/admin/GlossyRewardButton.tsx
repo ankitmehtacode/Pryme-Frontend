@@ -2,9 +2,10 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 import premiumButtonImg from '../../assets/premium-reward-btn.png';
 
-interface GlossyRewardButtonProps {
-  colorScheme?: 'ocean-blue' | 'sunset-gradient' | 'deep-navy' | 'teal-gradient' | 'emerald-glow' | 'neon-cyber' | 'midnight-purple' | 'minimal-mono' | 'golden-prestige' | 'crimson-red';
+interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
+  colorScheme?: 'ocean-blue' | 'sunset-gradient' | 'deep-navy' | 'teal-gradient' | 'emerald-glow' | 'neon-cyber' | 'midnight-purple' | 'minimal-mono' | 'golden-prestige' | 'crimson-red' | string;
   className?: string;
+  disabled?: boolean;
 }
 
 const colorFilters: Record<string, string> = {
@@ -22,16 +23,25 @@ const colorFilters: Record<string, string> = {
 
 export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({ 
   colorScheme = "ocean-blue",
-  className
+  className,
+  disabled,
+  ...props
 }) => {
   const filterStyle = colorFilters[colorScheme] || colorFilters["ocean-blue"];
 
   return (
-    <div className={cn("relative inline-flex group cursor-pointer hover:scale-105 transition-transform duration-300", className)}>
+    <div 
+      className={cn(
+        "relative inline-flex group transition-transform duration-300", 
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105",
+        className
+      )}
+      {...props}
+    >
       <img 
         src={premiumButtonImg} 
         alt="Apply with Pryme" 
-        className="w-32 md:w-40 lg:w-48 h-auto drop-shadow-md object-contain"
+        className="w-full h-auto drop-shadow-md object-contain"
         style={{ filter: filterStyle }}
       />
     </div>

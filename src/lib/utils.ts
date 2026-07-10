@@ -28,7 +28,16 @@ export function generateSafeUUID(): string {
  * Ensures no unused or falsy fields (like business details for salaried users) pollute the CRM.
  */
 export function buildCleanMetadata(formData: any): Record<string, any> {
-  const path = formData.financialPath || formData.employmentType || "SALARIED";
+  const rawPath = String(formData.financialPath || formData.employmentType || "SALARIED").toUpperCase();
+  
+  let path = "SALARIED";
+  if (rawPath.includes("NON PROFESSIONAL") || rawPath === "SELF_EMPLOYED") {
+    path = "SELF_EMPLOYED";
+  } else if (rawPath.includes("PROFESSIONAL")) {
+    path = "PROFESSIONAL";
+  } else if (rawPath === "SALARIED") {
+    path = "SALARIED";
+  }
   
   // Calculate combined income (Applicant + Co-applicant)
   const applicantIncome = Number(formData.monthlyIncome) || 0;
@@ -41,9 +50,14 @@ export function buildCleanMetadata(formData: any): Record<string, any> {
     email: formData.email || formData.officialEmail,
     panNumber: formData.panCard || formData.panNumber,
     dob: formData.dob,
-    city: formData.city,
+    city: formData.city || formData.currentCity,
     state: formData.state,
     pinCode: formData.pinCode,
+
+    // Employment Identity
+    employmentType: formData.employmentType,
+    occupation: formData.occupation,
+    financialPath: path,
 
     // Financials
     cibilScore: formData.cibilScore,
@@ -60,9 +74,7 @@ export function buildCleanMetadata(formData: any): Record<string, any> {
     existingBank: formData.existingBank,
   };
 
-  const specific: Record<string, any> = {
-    financialPath: path
-  };
+  const specific: Record<string, any> = {};
 
   if (path === "SALARIED") {
     Object.assign(specific, {
