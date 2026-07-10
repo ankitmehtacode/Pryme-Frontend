@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Briefcase, Home, Building2, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const springConfig = { stiffness: 120, damping: 28, mass: 0.8 };
 
@@ -14,6 +15,7 @@ const ServicesSection = () => {
       rate: "10.5%",
       maxAmount: "₹40 Lakh",
       href: "/apply?type=personal",
+      disabled: true,
     },
     {
       icon: Briefcase,
@@ -22,6 +24,7 @@ const ServicesSection = () => {
       rate: "12%",
       maxAmount: "₹2 Crore",
       href: "/apply?type=business",
+      disabled: true,
     },
     {
       icon: Home,
@@ -73,7 +76,12 @@ const ServicesSection = () => {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ type: "spring", ...springConfig, delay: index * 0.08 }}
               whileHover={{ y: -3, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-              className="group relative bg-card/70 backdrop-blur-sm rounded-2xl border border-border/40 p-6 overflow-hidden transition-all duration-300 hover:border-primary/20 hover:shadow-[0_12px_40px_-15px_hsl(148_62%_42%/0.15)]"
+              className={cn(
+                "group relative bg-card/70 backdrop-blur-sm rounded-2xl border border-border/40 p-6 overflow-hidden transition-all duration-300",
+                service.disabled 
+                  ? "opacity-60 grayscale cursor-default" 
+                  : "hover:border-primary/20 hover:shadow-[0_12px_40px_-15px_hsl(148_62%_42%/0.15)]"
+              )}
             >
               {/* Ambient glow on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -103,11 +111,19 @@ const ServicesSection = () => {
                 </div>
 
                 {/* CTA */}
+                {service.disabled ? (
+                  <div className="block w-full mt-8">
+                    <Button disabled className="w-full bg-slate-100 text-slate-500 rounded-xl h-12 font-medium border border-slate-200">
+                      Coming Soon
+                    </Button>
+                  </div>
+                ) : (
                   <Link to={service.href} className="block w-full mt-8">
                     <Button className="w-full bg-transparent hover:bg-white/5 border border-white/20 text-white rounded-xl h-12 font-medium transition-all group-hover:border-primary/40 group-hover:bg-primary/10">
                       See My Loan Options
                     </Button>
                   </Link>
+                )}
               </div>
             </motion.div>
           ))}

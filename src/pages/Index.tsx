@@ -214,7 +214,7 @@ const Index = () => {
                       <div className="flex flex-col gap-2 md:gap-3 lg:gap-4 items-start w-full">
 
                         {/* Grid layout for Calculators side by side on large screens */}
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-start">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-14 lg:gap-8 w-full items-stretch">
                           {/* EMI Calculator */}
                           <div className="w-full flex">
                             <EMICalculator loanAmount={500000} showTerminology={true} />

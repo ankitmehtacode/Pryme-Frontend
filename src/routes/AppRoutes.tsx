@@ -20,6 +20,7 @@ const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
 const Faq = lazy(() => import("@/pages/Faq"));
 const Careers = lazy(() => import("@/pages/Careers"));
 const GrievanceRedressal = lazy(() => import("@/pages/GrievanceRedressal"));
+const ComingSoonCallback = lazy(() => import("@/pages/ComingSoonCallback"));
 
 // Tools
 const EMICalculatorPage = lazy(() => import("@/pages/tools/EMICalculatorPage"));
@@ -78,6 +79,7 @@ export const AppRoutes = () => {
         <Route path="/faq" element={<PageWrapper><Faq /></PageWrapper>} />
         <Route path="/careers" element={<PageWrapper><Careers /></PageWrapper>} />
         <Route path="/grievance-redressal" element={<PageWrapper><GrievanceRedressal /></PageWrapper>} />
+        <Route path="/coming-soon" element={<PageWrapper><ComingSoonCallback /></PageWrapper>} />
 
         {/* ════════════════════════════════════════════════════════════
             APPLICATION LAYER (Native 1:1 Coordinates)

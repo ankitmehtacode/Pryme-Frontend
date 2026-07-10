@@ -10,6 +10,12 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import React from "react";
@@ -531,6 +537,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [consent1, setConsent1] = useState(false);
   const [consent2, setConsent2] = useState(false);
+  const [openDoc, setOpenDoc] = useState<'privacy' | 'terms' | null>(null);
 
   const formEndRef = useRef<HTMLDivElement>(null);
   const [isBottomVisible, setIsBottomVisible] = useState(false);
@@ -1046,9 +1053,9 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               </div>
               <span className="text-xs md:text-sm text-muted-foreground group-hover:text-foreground/80 select-none leading-relaxed transition-colors">
                 I confirm that I have read and understood the{" "}
-                <a href="/faq" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Terms & Conditions</a>{" "}
+                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDoc('terms'); }} className="text-primary hover:underline font-semibold cursor-pointer">Terms & Conditions</button>{" "}
                 and{" "}
-                <a href="/faq" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Privacy Policy</a>,{" "}
+                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenDoc('privacy'); }} className="text-primary hover:underline font-semibold cursor-pointer">Privacy Policy</button>,{" "}
                 and I voluntarily provide my consent to proceed.
               </span>
             </label>
@@ -1102,6 +1109,24 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           </div>
         </div>
       </motion.div>
+
+      <Dialog open={!!openDoc} onOpenChange={(open) => !open && setOpenDoc(null)}>
+        <DialogContent className="max-w-2xl h-[75vh] p-0 flex flex-col gap-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl bg-background/95 backdrop-blur-3xl sm:rounded-xl">
+          <DialogHeader className="p-4 md:p-6 border-b border-white/10 shrink-0 bg-background/50">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              {openDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 w-full bg-white/5 relative h-full">
+            <iframe 
+              src={openDoc === 'privacy' ? '/documents/privacy-policy.pdf#toolbar=0&navpanes=0&scrollbar=0' : '/documents/terms-conditions.pdf#toolbar=0&navpanes=0&scrollbar=0'}
+              className="absolute inset-0 w-full h-full border-0"
+              title="Document Viewer"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

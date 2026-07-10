@@ -177,30 +177,30 @@ const PrepaymentCalculatorPage = () => {
       <Header />
 
       <SmoothScroll>
-        <main className="flex-1 pt-24 md:pt-32 pb-24">
+        <main className="flex-1 pt-16 md:pt-24 pb-24">
           <div className="container mx-auto px-4 max-w-7xl">
-            {/* Page Header */}
-            <ScrollReveal direction="up">
-              <div className="text-center mb-12">
-                <span className="inline-flex items-center gap-1.5 px-4.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold uppercase tracking-widest mb-4 border border-emerald-500/15">
-                  <Award className="w-3.5 h-3.5" />
-                  Pryme Decision Intelligence
-                </span>
-                <h1 className="text-3xl md:text-5xl font-extrabold text-[#0B1530] dark:text-white mb-4 tracking-tight leading-tight">
-                  Loan Prepayment <span className="text-emerald-600 dark:text-emerald-400 italic font-semibold">Optimizer</span>
-                </h1>
-                <p className="text-sm md:text-base text-[#64748B] dark:text-slate-400 max-w-xl mx-auto">
-                  Analyze thousands of cashflow combinations and identify the mathematically optimal strategy to eliminate debt efficiently.
-                </p>
-              </div>
-            </ScrollReveal>
-
             {/* Main Interactive Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               
               {/* LEFT COLUMN: Setup panel */}
-              <div className="lg:col-span-4 space-y-6">
+              <div className="lg:col-span-5 space-y-6">
                 
+                {/* Page Header */}
+                <ScrollReveal direction="up">
+                  <div className="text-left mb-6">
+                    <span className="inline-flex items-center gap-1.5 px-4.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold uppercase tracking-widest mb-4 border border-emerald-500/15">
+                      <Award className="w-3.5 h-3.5" />
+                      Pryme Decision Intelligence
+                    </span>
+                    <h1 className="text-3xl md:text-5xl font-extrabold text-[#0B1530] dark:text-white mb-4 tracking-tight leading-tight">
+                      Loan Prepayment <span className="text-emerald-600 dark:text-emerald-400 italic font-semibold">Optimizer</span>
+                    </h1>
+                    <p className="text-sm md:text-base text-[#64748B] dark:text-slate-400 max-w-xl">
+                      Analyze thousands of cashflow combinations and identify the mathematically optimal strategy to eliminate debt efficiently.
+                    </p>
+                  </div>
+                </ScrollReveal>
+
                 {/* 1. Loan Parameters */}
                 <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
                   <h3 className="text-sm font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
@@ -338,86 +338,10 @@ const PrepaymentCalculatorPage = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* 3. Expected Return Slider & Windfalls */}
-                <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-white/5">
-                  <h3 className="text-sm font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                    <Percent className="w-4 h-4 text-emerald-500" />
-                    3. Investment & Windfalls
-                  </h3>
-
-                  <div className="space-y-4">
-                    {/* Expected Return */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold text-slate-500 dark:text-slate-400">Expected Market Return</span>
-                        <span className="font-bold text-blue-600 dark:text-blue-400">{expectedReturn}% p.a.</span>
-                      </div>
-                      <Slider
-                        value={[expectedReturn]}
-                        onValueChange={(v) => setExpectedReturn(v[0])}
-                        min={4}
-                        max={18}
-                        step={0.5}
-                        className="py-1 cursor-pointer"
-                      />
-                    </div>
-
-                    {/* Windfalls */}
-                    <div className="space-y-3 pt-2">
-                      <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase block">Scheduled Windfalls / Bonuses</label>
-                      
-                      <div className="space-y-3">
-                        {/* Annual Bonus */}
-                        <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5">
-                          <input
-                            type="checkbox"
-                            checked={hasAnnualBonus}
-                            onChange={(e) => setHasAnnualBonus(e.target.checked)}
-                            className="mt-1 cursor-pointer focus:ring-emerald-500 text-emerald-600 rounded"
-                          />
-                          <div className="flex-1 text-xs">
-                            <span className="font-bold text-[#0B1530] dark:text-white block">Annual Bonus</span>
-                            {hasAnnualBonus && (
-                              <input
-                                type="number"
-                                value={annualBonusAmount}
-                                onChange={(e) => setAnnualBonusAmount(Number(e.target.value))}
-                                className="w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded p-1 font-bold focus:outline-none"
-                              />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Festival Bonus */}
-                        <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5">
-                          <input
-                            type="checkbox"
-                            checked={hasFestivalBonus}
-                            onChange={(e) => setHasFestivalBonus(e.target.checked)}
-                            className="mt-1 cursor-pointer focus:ring-emerald-500 text-emerald-600 rounded"
-                          />
-                          <div className="flex-1 text-xs">
-                            <span className="font-bold text-[#0B1530] dark:text-white block">Festival/Diwali Bonus</span>
-                            {hasFestivalBonus && (
-                              <input
-                                type="number"
-                                value={festivalBonusAmount}
-                                onChange={(e) => setFestivalBonusAmount(Number(e.target.value))}
-                                className="w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded p-1 font-bold focus:outline-none"
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
               {/* RIGHT COLUMN: Optimization results */}
-              <div className="lg:col-span-8 space-y-6">
+              <div className="lg:col-span-7 space-y-6">
                 
                 {/* 1. Health Score & Opportunity Cost Summary Banner */}
                 <div className="bg-gradient-to-br from-[#0b1530] to-[#12234f] dark:from-[#080d19] dark:to-[#0f1b35] text-white rounded-[2rem] p-6 shadow-xl relative overflow-hidden">
@@ -454,30 +378,6 @@ const PrepaymentCalculatorPage = () => {
                   </div>
                 </div>
 
-                {/* 2. Interactive Navigation Tabs */}
-                <div className="flex border-b border-slate-200 dark:border-white/5 gap-4">
-                  {[
-                    { id: "recommendation" as const, label: "Smart Advisor" },
-                    { id: "sensitivity" as const, label: "Sensitivity Analysis" },
-                    { id: "schedule" as const, label: "Timeline Projection" }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={cn(
-                        "pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer",
-                        activeTab === tab.id
-                          ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
-                          : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* TAB CONTENT: ADVISOR RECOMMENDATION */}
-                {activeTab === "recommendation" && (
                   <div className="space-y-6">
                     
                     {/* Primary Decision Card */}
@@ -613,105 +513,7 @@ const PrepaymentCalculatorPage = () => {
                     </div>
 
                   </div>
-                )}
 
-                {/* TAB CONTENT: SENSITIVITY ANALYSIS */}
-                {activeTab === "sensitivity" && (
-                  <div className="space-y-6">
-                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-white/5">
-                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-2">Sensitivity Stress Matrix</h4>
-                      <p className="text-xs text-[#64748B] dark:text-slate-400 mb-5">
-                        Evaluates whether your chosen strategy remains sustainable under macroeconomic changes or personal income drops.
-                      </p>
-
-                      <div className="space-y-4">
-                        {optimizationResults.sensitivity.map((sens, idx) => (
-                          <div
-                            key={idx}
-                            className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4"
-                          >
-                            <div>
-                              <span className="text-xs font-bold text-slate-700 dark:text-white block">{sens.scenarioName}</span>
-                              <span className="text-[10px] text-slate-400 font-medium block">Stress Index: {sens.stressIndex}/100</span>
-                            </div>
-                            
-                            <div className="flex items-center gap-6 text-right">
-                              <div className="text-xs">
-                                <span className="block text-[10px] text-slate-400 font-medium">Interest Saved Under Stress</span>
-                                <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(sens.impactInterestSaved)}</span>
-                              </div>
-                              <div className="text-xs">
-                                <span className="block text-[10px] text-slate-400 font-medium">Tenure Saved Under Stress</span>
-                                <span className="font-bold text-[#0B1530] dark:text-white">{sens.impactTenureSaved} mo</span>
-                              </div>
-                              
-                              <div className="flex items-center gap-1 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200/50 dark:border-white/5">
-                                {sens.isStillAffordable ? (
-                                  <>
-                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                                    <span className="text-[10px] font-bold text-emerald-500 uppercase">SAFE</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="w-4 h-4 text-rose-500" />
-                                    <span className="text-[10px] font-bold text-rose-500 uppercase">RISK</span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB CONTENT: TIMELINE SCHEDULE */}
-                {activeTab === "schedule" && (
-                  <div className="space-y-6">
-                    <div className="bg-white dark:bg-[#0b1224] rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-white/5">
-                      <h4 className="text-xs font-bold text-[#0B1530] dark:text-white uppercase tracking-wider mb-2">Visual Payoff Timeline</h4>
-                      <p className="text-xs text-[#64748B] dark:text-slate-400 mb-6">
-                        Comparison of payoff schedule between your baseline plan and the optimized acceleration schedule.
-                      </p>
-
-                      {/* Visual Timeline Bar */}
-                      <div className="space-y-6 relative pb-4">
-                        {/* Baseline */}
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center text-xs font-bold">
-                            <span className="text-slate-400">Baseline Plan</span>
-                            <span className="text-rose-500">{tenureMonths} Months to Payoff</span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-rose-500 rounded-full" style={{ width: "100%" }} />
-                          </div>
-                        </div>
-
-                        {/* Optimized */}
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center text-xs font-bold">
-                            <span className="text-slate-400">Optimized Schedule ({best.strategyName})</span>
-                            <span className="text-emerald-500">{best.monthsToPayOff} Months to Payoff (-{best.tenureSaved} mo)</span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                              style={{ width: `${(best.monthsToPayOff / tenureMonths) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Timeline Legend */}
-                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wide border-t border-slate-100 dark:border-white/5 pt-4">
-                        <span>Today</span>
-                        <span>Optimized End (Month {best.monthsToPayOff})</span>
-                        <span>Original End (Month {tenureMonths})</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
               </div>
             </div>

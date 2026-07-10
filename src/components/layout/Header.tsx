@@ -39,10 +39,10 @@ const CONTACT_PHONE_LINK = "tel:+919243294291";
 const productLinks = [
   { href: "/apply?type=home", label: "Home Loans", icon: Home, description: "Make your dream home real" },
   { href: "/apply?type=lap", label: "LAP", icon: Building2, description: "Borrow against your property" },
-  { href: "/apply?type=vehicle", label: "Vehicle Loans", icon: Car, description: "Drive your dream today" },
-  { href: "/apply?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs" },
-  { href: "/apply?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth" },
-  { href: "/apply?type=transfer", label: "BT|Top Up", icon: RefreshCw, description: "Balance transfer & top up" },
+  { href: "/apply?type=vehicle", label: "Vehicle Loans", icon: Car, description: "Drive your dream today", disabled: true },
+  { href: "/apply?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs", disabled: true },
+  { href: "/apply?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth", disabled: true },
+  { href: "/apply?type=transfer", label: "BT|Top Up", icon: RefreshCw, description: "Balance transfer & top up", disabled: true },
 ];
 
 const toolLinks = [
@@ -97,9 +97,12 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Products</p>
             <div className="space-y-1">
               {productLinks.map((item) => (
-                <Link key={item.href} to={item.href} onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors">
+                <Link key={item.href} to={item.disabled ? "#" : item.href} onClick={(e) => { if (item.disabled) { e.preventDefault(); onClose?.(); } else { onClose?.(); } }} className={cn("flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors", item.disabled && "opacity-50 grayscale cursor-default hover:bg-transparent")}>
                   <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><item.icon className="w-4 h-4 text-[#103783]" /></div>
-                  <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                  <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    {item.label}
+                    {item.disabled && <span className="text-[9px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Soon</span>}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -348,10 +351,12 @@ const Header = memo(() => {
       requestAnimationFrame(() => {
         const currentY = window.scrollY;
 
-        // Morphed state: past 100px scroll
-        setIsScrolled(currentY > 100);
+        // Morph into the solid pill very early (at 10px) so the transparent 
+        // background becomes solid BEFORE the text can scroll up and hit the logo!
+        setIsScrolled(currentY > 10);
 
-        // Hide navbar past 100px scroll; show only when scrolled back to top
+        // Keep the user's requested behavior: completely hide the nav bar 
+        // after we slide down a bit (past 100px).
         setIsHidden(currentY > 100);
 
         lastScrollY.current = currentY;
@@ -404,9 +409,15 @@ const Header = memo(() => {
                     <div className="w-[500px] p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
                       <div className="grid grid-cols-2 gap-2">
                         {productLinks.map((item) => (
-                          <Link key={item.href} to={item.href} className="flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group">
+                          <Link key={item.href} to={item.disabled ? "#" : item.href} onClick={(e) => { if (item.disabled) e.preventDefault(); }} className={cn("flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group", item.disabled && "opacity-50 grayscale cursor-default hover:bg-transparent")}>
                             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><item.icon className="w-5 h-5 text-[#103783]" /></div>
-                            <div><p className="text-sm font-semibold text-[#0a1530] mb-1">{item.label}</p><p className="text-xs text-slate-500 line-clamp-1">{item.description}</p></div>
+                            <div>
+                              <p className="text-sm font-semibold text-[#0a1530] mb-1 flex items-center gap-2">
+                                {item.label}
+                                {item.disabled && <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Soon</span>}
+                              </p>
+                              <p className="text-xs text-slate-500 line-clamp-1">{item.description}</p>
+                            </div>
                           </Link>
                         ))}
                       </div>

@@ -50,8 +50,7 @@ export const products = [
     id: "transfer",
     label: "BALANCE TRANSFER | TOP UP",
     image: product6,
-    tag: "COMING SOON",
-    href: "/apply?type=transfer",
+    href: "/coming-soon?type=transfer",
     accent: "217, 91%, 60%",
     bg: "transparent",
     imgClass: "",
@@ -62,8 +61,7 @@ export const products = [
     id: "personal",
     label: "PERSONAL LOAN",
     image: product2,
-    tag: "COMING SOON",
-    href: "/apply?type=personal",
+    href: "/coming-soon?type=personal",
     accent: "217, 91%, 60%",
     bg: "transparent",
     imgClass: "",
@@ -74,8 +72,7 @@ export const products = [
     id: "business",
     label: "BUSINESS LOAN",
     image: product4,
-    tag: "COMING SOON",
-    href: "/apply?type=business",
+    href: "/coming-soon?type=business",
     accent: "217, 91%, 60%",
     bg: "transparent",
     imgClass: "",
@@ -86,8 +83,7 @@ export const products = [
     id: "auto",
     label: "AUTO LOAN",
     image: product1,
-    tag: "COMING SOON",
-    href: "/apply?type=auto",
+    href: "/coming-soon?type=auto",
     accent: "217, 91%, 60%",
     bg: "transparent",
     imgClass: "",
@@ -161,7 +157,7 @@ const ProductSelectorGrid = memo(() => {
               >
                 <Link
                   to={product.href}
-                  className="relative flex flex-col items-center cursor-pointer group outline-none"
+                  className={`relative flex flex-col items-center group outline-none cursor-pointer`}
                 >
                   {/* PERF: will-change:transform on this wrapper tells the compositor to
                     pre-promote this element. hover:scale-105 then runs entirely on the
@@ -193,18 +189,27 @@ const ProductSelectorGrid = memo(() => {
                       <img
                         src={product.image}
                         alt={product.label}
-                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass}`}
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass} ${product.tag === "COMING SOON" ? "grayscale opacity-40 mix-blend-luminosity" : ""}`}
                         loading="lazy"
                         draggable={false}
                       />
                     </div>
 
                     {/* Ribbon Tag */}
-                    {product.tag && (
+                    {product.tag && product.tag !== "COMING SOON" && (
                       <div
                         className="absolute -top-3 left-1/2 -translate-x-1/2 group-hover:-translate-y-1 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300"
                       >
                         {product.tag}
+                      </div>
+                    )}
+
+                    {/* Coming Soon Button Overlay */}
+                    {product.tag === "COMING SOON" && (
+                      <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+                        <div className="bg-black/80 backdrop-blur-sm text-white/90 border border-white/20 text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                          Coming Soon
+                        </div>
                       </div>
                     )}
 

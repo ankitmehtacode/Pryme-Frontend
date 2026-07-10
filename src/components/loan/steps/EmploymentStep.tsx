@@ -475,10 +475,10 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       onValueChange={(v) => store.updateBusinessDetails({ industryType: v })}
                       placeholder="Select industry type"
                     >
-                      <SelectItem value="Service">Service (10% Margin)</SelectItem>
-                      <SelectItem value="Retail">Retail (12% Margin)</SelectItem>
-                      <SelectItem value="Wholesale">Wholesale (8% Margin)</SelectItem>
-                      <SelectItem value="Manufacturing">Manufacturing (4% Margin)</SelectItem>
+                      <SelectItem value="Service">Service</SelectItem>
+                      <SelectItem value="Retail">Retail</SelectItem>
+                      <SelectItem value="Wholesale">Wholesale</SelectItem>
+                      <SelectItem value="Manufacturing">Manufacturing</SelectItem>
                     </StyledSelect>
                   </div>
                 </div>

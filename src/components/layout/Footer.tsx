@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram, FileText } from "lucide-react";
 import prymeLogo from "@/assets/Pryme2.svg";
 import { Container } from "@/components/layout/Primitives";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,6 +27,7 @@ const SOCIAL_LINKS = {
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [openDoc, setOpenDoc] = useState<'privacy' | 'terms' | null>(null);
 
   // 200 IQ fix: Scroll to top on route change, but preserve native behavior for anchor hash links
   const handleLinkClick = (href: string) => {
@@ -199,8 +201,31 @@ const Footer = () => {
                 © {currentYear} GOPRYME FINTECH Pvt. Ltd. All rights reserved. CIN: U70200MP2026PTC081776
               </p>
               <div className="flex flex-wrap items-center gap-4">
-                {legalLinks.map((link) => (
-                  link.isExternal ? (
+                {legalLinks.map((link) => {
+                  if (link.label === "Privacy Policy") {
+                    return (
+                      <button
+                        key={link.label}
+                        onClick={() => setOpenDoc('privacy')}
+                        className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors bg-transparent border-none p-0 cursor-pointer"
+                      >
+                        {link.label}
+                      </button>
+                    );
+                  }
+                  if (link.label === "Terms of Service") {
+                    return (
+                      <button
+                        key={link.label}
+                        onClick={() => setOpenDoc('terms')}
+                        className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors bg-transparent border-none p-0 cursor-pointer"
+                      >
+                        {link.label}
+                      </button>
+                    );
+                  }
+
+                  return link.isExternal ? (
                     <a
                       key={link.label}
                       href={link.href}
@@ -219,8 +244,8 @@ const Footer = () => {
                     >
                       {link.label}
                     </Link>
-                  )
-                ))}
+                  );
+                })}
                 <Dialog>
                   <DialogTrigger className="text-[11px] text-zinc-600 hover:text-[#9BAFD9] transition-colors">
                     RBI Guidelines
@@ -245,6 +270,25 @@ const Footer = () => {
                       <a href="https://www.rbi.org.in/commonperson/english/scripts/FAQs.aspx?Id=3407" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-700 dark:text-zinc-300 hover:text-[#103783] dark:hover:text-[#9BAFD9] transition-colors">
                         FAQs on NBFCs
                       </a>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                {/* PDF Document Viewer Modal */}
+                <Dialog open={!!openDoc} onOpenChange={(open) => !open && setOpenDoc(null)}>
+                  <DialogContent className="max-w-2xl h-[75vh] p-0 flex flex-col gap-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl bg-background/95 backdrop-blur-3xl sm:rounded-xl">
+                    <DialogHeader className="p-4 md:p-6 border-b border-white/10 shrink-0 bg-background/50">
+                      <DialogTitle className="text-xl flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-primary" />
+                        {openDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 w-full bg-white/5 relative h-full">
+                      <iframe 
+                        src={openDoc === 'privacy' ? '/documents/privacy-policy.pdf#toolbar=0&navpanes=0&scrollbar=0' : '/documents/terms-conditions.pdf#toolbar=0&navpanes=0&scrollbar=0'}
+                        className="absolute inset-0 w-full h-full border-0"
+                        title="Document Viewer"
+                      />
                     </div>
                   </DialogContent>
                 </Dialog>

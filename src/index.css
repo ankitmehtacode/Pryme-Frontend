@@ -22,6 +22,8 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* 200 IQ Fix: Disable Mac/iOS rubber-band bounce effect globally so footers don't glitch */
+    overscroll-behavior-y: none;
   }
 
   /* ═══════════════════════════════════════════════════════════════

@@ -278,7 +278,9 @@ export const PrymeAPI = {
 
         // Financial & Advanced Underwriting
         cibilScore: formData.cibilScore,
-        monthlyIncome: formData.monthlyIncome,
+        monthlyIncome: (Number(formData.monthlyIncome) || 0) + 
+                       (formData.hasCoApplicant && formData.coApplicantDetails?.netMonthlySalary 
+                         ? Number(formData.coApplicantDetails.netMonthlySalary) : 0),
         monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
         grossSalary: formData.grossSalary || 0,
         netProfit: formData.netProfit || 0,
@@ -310,6 +312,7 @@ export const PrymeAPI = {
         isAbove50Lakhs: formData.isAbove50Lakhs ? "Yes" : "No",
         hasExistingLoan: formData.hasExistingLoan ? "Yes" : "No",
         coApplicant: formData.hasCoApplicant ? "Yes" : "No",
+        coApplicantIncome: formData.hasCoApplicant && formData.coApplicantDetails?.netMonthlySalary ? Number(formData.coApplicantDetails.netMonthlySalary) : 0,
         existingBank: formData.existingBank,
         currentCity: formData.city,
       }
