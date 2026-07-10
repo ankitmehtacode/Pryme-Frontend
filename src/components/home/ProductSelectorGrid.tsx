@@ -1,17 +1,16 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
+
 import { motion } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/BackgroundBeams";
 import { AutoGrid } from "@/components/layout/Primitives";
 
-// Assets safely imported from local directory
-// Assets safely imported from local directory
-import product1 from "@/assets/card-auto.png"; // Car -> Auto
-import product2 from "@/assets/card-personal.png"; // Wallet -> Personal
-import product3 from "@/assets/card-home.png"; // House -> Home
+import product1 from "@/assets/card-auto.png";
+import product2 from "@/assets/card-personal.png";
+import product3 from "@/assets/card-home.png";
 import product4 from "@/assets/products/product-4.jpg"; // Briefcase -> Business
-import product5 from "@/assets/card-lap.png"; // Building/House -> LAP
-import product6 from "@/assets/card-balancetransfer.png"; // Balance Transfer
+import product5 from "@/assets/card-lap.png";
+import product6 from "@/assets/card-balancetransfer.png";
 
 export const BANK_OFFERS = [
   "Lowest Interest Rates Starting at 10.15% at Kotak Bank",
@@ -50,6 +49,7 @@ export const products = [
     id: "transfer",
     label: "BALANCE TRANSFER | TOP UP",
     image: product6,
+    tag: "COMING SOON",
     href: "/coming-soon?type=transfer",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -61,6 +61,7 @@ export const products = [
     id: "personal",
     label: "PERSONAL LOAN",
     image: product2,
+    tag: "COMING SOON",
     href: "/coming-soon?type=personal",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -72,6 +73,7 @@ export const products = [
     id: "business",
     label: "BUSINESS LOAN",
     image: product4,
+    tag: "COMING SOON",
     href: "/coming-soon?type=business",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -83,6 +85,7 @@ export const products = [
     id: "auto",
     label: "AUTO LOAN",
     image: product1,
+    tag: "COMING SOON",
     href: "/coming-soon?type=auto",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -189,14 +192,14 @@ const ProductSelectorGrid = memo(() => {
                       <img
                         src={product.image}
                         alt={product.label}
-                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass} ${product.tag === "COMING SOON" ? "grayscale opacity-40 mix-blend-luminosity" : ""}`}
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 ${product.imgClass}`}
                         loading="lazy"
                         draggable={false}
                       />
                     </div>
 
                     {/* Ribbon Tag */}
-                    {product.tag && product.tag !== "COMING SOON" && (
+                    {product.tag && (
                       <div
                         className="absolute -top-3 left-1/2 -translate-x-1/2 group-hover:-translate-y-1 bg-[#0a1f4d] text-[#4ade80] border border-[#166534] text-[7px] md:text-[8px] font-semibold uppercase tracking-wider px-2 py-1 rounded shadow-xl whitespace-nowrap z-30 transition-transform duration-300"
                       >
@@ -204,14 +207,7 @@ const ProductSelectorGrid = memo(() => {
                       </div>
                     )}
 
-                    {/* Coming Soon Button Overlay */}
-                    {product.tag === "COMING SOON" && (
-                      <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-                        <div className="bg-black/80 backdrop-blur-sm text-white/90 border border-white/20 text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded shadow-2xl transition-transform duration-300 group-hover:scale-105">
-                          Coming Soon
-                        </div>
-                      </div>
-                    )}
+
 
                     {/* Glowing Ring — opacity-only transition, compositor-safe */}
                     <div
