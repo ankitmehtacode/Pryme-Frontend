@@ -39,9 +39,9 @@ const Footer = () => {
   const productLinks = [
     { label: "Home Loans", href: "/apply?type=home" },
     { label: "LAP", href: "/apply?type=lap" },
-    { label: "Vehicle Loans", href: "/apply?type=vehicle" },
-    { label: "Personal Loan", href: "/apply?type=personal" },
-    { label: "Business Loan", href: "/apply?type=business" },
+    { label: "Vehicle Loans", href: "/coming-soon?type=auto" },
+    { label: "Personal Loan", href: "/coming-soon?type=personal" },
+    { label: "Business Loan", href: "/coming-soon?type=business" },
   ];
 
   const companyLinks = [

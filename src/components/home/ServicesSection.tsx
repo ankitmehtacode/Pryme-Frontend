@@ -14,7 +14,7 @@ const ServicesSection = () => {
       description: "Quick disbursement for your personal needs. Flexible EMIs starting from ₹2,000/month.",
       rate: "10.5%",
       maxAmount: "₹40 Lakh",
-      href: "/apply?type=personal",
+      href: "/coming-soon?type=personal",
       disabled: true,
     },
     {
@@ -23,7 +23,7 @@ const ServicesSection = () => {
       description: "Fuel your business growth with competitive rates and minimal documentation.",
       rate: "12%",
       maxAmount: "₹2 Crore",
-      href: "/apply?type=business",
+      href: "/coming-soon?type=business",
       disabled: true,
     },
     {
