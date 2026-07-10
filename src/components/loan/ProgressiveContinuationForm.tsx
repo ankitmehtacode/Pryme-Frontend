@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { PrymeAPI } from "@/lib/api";
+import api, { PrymeAPI } from "@/lib/api";
 
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
@@ -73,7 +73,7 @@ export default function ProgressiveContinuationForm({
     // Without this, PAN, Existing Bank, and Monthly EMI are captured in UI but never saved.
     if (applicationId) {
       try {
-        await PrymeAPI.updateLeadProfile(applicationId, {
+        await api.patch(`/applications/${applicationId}`, {
           metadata: {
             panNumber: formData.panNumber,
             existingBank: formData.existingBank,

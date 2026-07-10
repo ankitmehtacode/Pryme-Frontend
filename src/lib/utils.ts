@@ -22,3 +22,83 @@ export function generateSafeUUID(): string {
     return v.toString(16);
   });
 }
+
+/**
+ * Cleanly maps form data to a CRM-friendly metadata object based on the user's financial path.
+ * Ensures no unused or falsy fields (like business details for salaried users) pollute the CRM.
+ */
+export function buildCleanMetadata(formData: any): Record<string, any> {
+  const path = formData.financialPath || formData.employmentType || "SALARIED";
+  
+  // Calculate combined income (Applicant + Co-applicant)
+  const applicantIncome = Number(formData.monthlyIncome) || 0;
+  const coApplicantIncome = formData.hasCoApplicant && formData.coApplicantDetails?.netMonthlySalary 
+    ? Number(formData.coApplicantDetails.netMonthlySalary) 
+    : 0;
+  
+  const base = {
+    // Core identity
+    email: formData.email || formData.officialEmail,
+    panNumber: formData.panCard || formData.panNumber,
+    dob: formData.dob,
+    city: formData.city,
+    state: formData.state,
+    pinCode: formData.pinCode,
+
+    // Financials
+    cibilScore: formData.cibilScore,
+    monthlyIncome: applicantIncome + coApplicantIncome, // Adds co-applicant income perfectly
+    monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
+    hasCoApplicant: formData.hasCoApplicant ? "Yes" : "No",
+    coApplicantIncome: coApplicantIncome > 0 ? coApplicantIncome : undefined,
+    
+    // Loan details
+    loanPurpose: formData.loanPurpose,
+    propertyType: formData.propertyType,
+    propertyValue: formData.estimatedPropertyValue || formData.propertyValue || undefined,
+    propertyIdentified: formData.propertyIdentified ? "Yes" : "No",
+    existingBank: formData.existingBank,
+  };
+
+  const specific: Record<string, any> = {
+    financialPath: path
+  };
+
+  if (path === "SALARIED") {
+    Object.assign(specific, {
+      companyName: formData.companyName,
+      designation: formData.designation,
+      grossSalary: formData.grossSalary,
+      workExperience: formData.totalExperienceYears || formData.workExperience,
+      officialEmail: formData.officialEmail,
+    });
+  } else if (path === "SELF_EMPLOYED") {
+    Object.assign(specific, {
+      businessIndustryType: formData.businessIndustryType,
+      businessSubType: formData.businessSubType,
+      businessVintageYears: formData.businessVintageYears,
+      netProfit: formData.netProfit,
+      depreciation: formData.depreciation,
+      last12MonthsGstTurnover: formData.last12MonthsGstTurnover,
+      averageBankBalance: formData.averageBankBalance,
+      itrYearsAvailable: formData.itrYearsAvailable,
+      isCaCertifiedOrAudited: formData.isCaCertifiedOrAudited ? "Yes" : "No",
+    });
+  } else if (path === "PROFESSIONAL") {
+    Object.assign(specific, {
+      professionalSubType: formData.professionalSubType,
+      annualGrossReceipts: formData.annualGrossReceipts,
+      totalPracticeYears: formData.totalPracticeYears || formData.totalExperienceYears || formData.workExperience,
+    });
+  }
+
+  // Filter out undefined, null, or empty string values perfectly
+  const result: Record<string, any> = {};
+  for (const [key, val] of Object.entries({ ...base, ...specific })) {
+    if (val !== undefined && val !== null && val !== "") {
+      result[key] = val;
+    }
+  }
+
+  return result;
+}

@@ -1,5 +1,5 @@
 // src/lib/api.ts
-import { generateSafeUUID } from "@/lib/utils";
+import { generateSafeUUID, buildCleanMetadata } from "@/lib/utils";
 import type { MeResponse, DictionaryMap } from "@/types/auth.types";
 
 
@@ -260,62 +260,14 @@ export const PrymeAPI = {
   },
 
   submitLead: async (formData: any) => {
-    // 🧠 PIPELINE FIX: Forward ALL form fields into metadata so Admin Dashboard
-    // can display every detail the user provided. Previously only 5 fields were sent.
+    // 🧠 PIPELINE FIX: Forward strictly mapped form fields into metadata so Admin Dashboard
+    // cleanly displays details without polluting the CRM with empty/irrelevant fields.
     const payload = {
       userName: formData.fullName || formData.userName,
       phone: formData.phone,
       loanAmount: formData.loanAmount,
       loanType: formData.productType || formData.loanType,
-      metadata: {
-        // Core identity
-        email: formData.email,
-        panNumber: formData.panCard || formData.panNumber,
-        dob: formData.dob,
-        city: formData.city,
-        state: formData.state,
-        pinCode: formData.pinCode,
-
-        // Financial & Advanced Underwriting
-        cibilScore: formData.cibilScore,
-        monthlyIncome: (Number(formData.monthlyIncome) || 0) + 
-                       (formData.hasCoApplicant && formData.coApplicantDetails?.netMonthlySalary 
-                         ? Number(formData.coApplicantDetails.netMonthlySalary) : 0),
-        monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
-        grossSalary: formData.grossSalary || 0,
-        netProfit: formData.netProfit || 0,
-        depreciation: formData.depreciation || 0,
-        annualGrossReceipts: formData.annualGrossReceipts || 0,
-        last12MonthsGstTurnover: formData.last12MonthsGstTurnover || 0,
-        averageBankBalance: formData.averageBankBalance || 0,
-        isCaCertifiedOrAudited: formData.isCaCertifiedOrAudited ? "Yes" : "No",
-
-        // Employment & Business
-        employmentType: formData.employmentType,
-        financialPath: formData.financialPath,
-        professionalSubType: formData.professionalSubType,
-        businessSubType: formData.businessSubType,
-        businessIndustryType: formData.businessIndustryType,
-        occupation: formData.occupation,
-        companyName: formData.companyName,
-        designation: formData.designation,
-        officialEmail: formData.officialEmail,
-        workExperience: formData.totalExperienceYears || formData.workExperience,
-        businessVintageYears: formData.businessVintageYears,
-        itrYearsAvailable: formData.itrYearsAvailable !== undefined ? formData.itrYearsAvailable : null,
-
-        // Loan & Property details
-        loanPurpose: formData.loanPurpose,
-        propertyType: formData.propertyType,
-        propertyValue: formData.estimatedPropertyValue || formData.propertyValue || 0,
-        propertyIdentified: formData.propertyIdentified ? "Yes" : "No",
-        isAbove50Lakhs: formData.isAbove50Lakhs ? "Yes" : "No",
-        hasExistingLoan: formData.hasExistingLoan ? "Yes" : "No",
-        coApplicant: formData.hasCoApplicant ? "Yes" : "No",
-        coApplicantIncome: formData.hasCoApplicant && formData.coApplicantDetails?.netMonthlySalary ? Number(formData.coApplicantDetails.netMonthlySalary) : 0,
-        existingBank: formData.existingBank,
-        currentCity: formData.city,
-      }
+      metadata: buildCleanMetadata(formData)
     };
 
     // 🧠 CLOSED-LOOP FIX: Backend's PublicLeadController lives at /api/v1/public/leads

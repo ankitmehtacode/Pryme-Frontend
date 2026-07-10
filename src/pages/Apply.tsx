@@ -149,6 +149,13 @@ const Apply = () => {
 
     let engineData = [];
     try {
+        // ── COMBINED INCOME FIX ──
+        const applicantIncome = Number(data.monthlyIncome) || 0;
+        const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary 
+            ? Number(data.coApplicantDetails.netMonthlySalary) 
+            : 0;
+        const totalEffectiveIncome = applicantIncome + coApplicantIncome;
+
         // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
         let computedAge = 35;
         if (data.dob) {
@@ -172,7 +179,6 @@ const Apply = () => {
             // The engine uses data.monthlyIncome directly if programName is null.
             // But SurrogateIncomeResolver requires a programName, so we skip it
             // by setting monthlyIncome on the request and using a simple NIP fallback
-            // with the salary as PAT (annualized then /12 = same number).
             incomeInput = {
                 programName: "NIP",
                 pat: data.monthlyIncome * 12,   // Annual salary as PAT
@@ -244,7 +250,7 @@ const Apply = () => {
             loanAmount: data.loanAmount || 0,
             propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
             requestedTenureMonths: (data.loanTenure || 5) * 12,
-            monthlyIncome: data.monthlyIncome || 0,
+            monthlyIncome: totalEffectiveIncome,
             existingEmiTotal: data.eligibleExistingEmi || 0,
             businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
             workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,

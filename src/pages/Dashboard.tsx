@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn, buildCleanMetadata } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import applicationBannerImg from "@/assets/images/application-banner-isometric.png";
@@ -403,7 +403,7 @@ const Dashboard: React.FC = () => {
       }
 
       const patchData: Record<string, any> = {
-         metadata: formData,
+         metadata: buildCleanMetadata(formData),
          completionPercentage: newProgress
       };
 
