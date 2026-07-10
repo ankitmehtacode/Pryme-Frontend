@@ -149,23 +149,35 @@ const Apply = () => {
 
     let engineData = [];
     try {
-        // ── SILICON VALLEY GRADE INCOME NORMALIZATION ──
-        // Detects if the provided 'monthlyIncome' is actually an Annual ITR figure 
-        // (common UX/manual testing anomaly where users type Annual Income into Monthly fields).
-        // If the 'monthly' figure is abnormally high for a monthly salary (e.g. > ₹1,500,000),
-        // we safely auto-correct it to prevent calculating EMI eligibility on 12-years of income.
-        let safeMonthlyIncome = Number(data.monthlyIncome) || 0;
-        if (safeMonthlyIncome > 1500000 && data.financialPath !== "SALARIED") {
-            console.warn(`[Income Engine] Detected abnormally high monthly income (₹${safeMonthlyIncome}). Auto-correcting to Annual.`);
-            safeMonthlyIncome = Math.round(safeMonthlyIncome / 12);
+        // ── SILICON VALLEY GRADE INCOME NORMALIZATION (DETERMINISTIC) ──
+        // Instead of heuristics, we rely on the explicitly typed annual fields 
+        // (netProfit / annualGrossReceipts) passed from the UI. If those are present, 
+        // we use them to securely anchor the annual income, and mathematically derive 
+        // the monthly income. This fixes precision errors and prevents low-earning CAs 
+        // from being incorrectly scaled.
+        let baseAnnual = 0;
+        let baseMonthly = Number(data.monthlyIncome) || 0;
+
+        if (data.financialPath === "PROFESSIONAL" || data.financialPath === "SELF_EMPLOYED") {
+            // Favor explicit annual fields over reconstructed monthly fields
+            const explicitAnnual = Number(data.netProfit) || Number(data.annualGrossReceipts) || 0;
+            if (explicitAnnual > 0) {
+                baseAnnual = explicitAnnual;
+                baseMonthly = Math.round(explicitAnnual / 12);
+            } else {
+                baseAnnual = baseMonthly * 12;
+            }
+        } else {
+            // Salaried
+            baseAnnual = baseMonthly * 12;
         }
 
-        const applicantIncome = safeMonthlyIncome;
+        const applicantIncome = baseMonthly;
         const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary 
             ? Number(data.coApplicantDetails.netMonthlySalary) 
             : 0;
         const totalEffectiveIncome = applicantIncome + coApplicantIncome;
-        const derivedAnnualIncome = totalEffectiveIncome * 12;
+        const derivedAnnualIncome = baseAnnual + (coApplicantIncome * 12);
 
         // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
         let computedAge = 35;
