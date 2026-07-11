@@ -1,7 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag } from "lucide-react";
+import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 
