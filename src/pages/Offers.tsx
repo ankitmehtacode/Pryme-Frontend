@@ -49,7 +49,7 @@ interface BankOffer {
   brandHex: string;
   interestRate: number;
   processingFee: number;
-  maxTenure: number;
+  effectiveTenureYears: number;
   maxLoanAmount: number;
   approvalOdds: number;
   processingTime: string;
@@ -65,6 +65,7 @@ interface LeadDataPayload {
   employmentType?: string;
   monthlyIncome: number;
   loanAmount: number;
+  loanTenure?: number;
   fullName: string;
   engineResults?: any[];
 }
@@ -233,7 +234,7 @@ export default function Offers() {
         logoUrl: theme.img,
         interestRate: parseFloat(roiPercent.toFixed(2)),
         processingFee: parseFloat(processingFee.toFixed(2)),
-        maxTenure: (er?.tenureMonths || 60) / 12,
+        effectiveTenureYears: (er?.tenureMonths || 60) / 12,
         requestedTenure: leadData.loanTenure,
         maxLoanAmount: er?.maxEligibleAmount || leadData.loanAmount,
         approvalOdds: 98,
@@ -288,14 +289,14 @@ export default function Offers() {
   const emis = useMemo(() => {
     if (!leadData || dynamicOffers.length === 0) return {};
     const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure); });
+    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.effectiveTenureYears); });
     return m;
   }, [dynamicOffers, leadData]);
 
   const totalRepayments = useMemo(() => {
     if (!leadData || dynamicOffers.length === 0) return {};
     const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.maxTenure) * o.maxTenure * 12; });
+    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.effectiveTenureYears) * o.effectiveTenureYears * 12; });
     return m;
   }, [dynamicOffers, leadData]);
 

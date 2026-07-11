@@ -306,8 +306,10 @@ const Apply = () => {
       state: {
         cibilScore: applicationData?.cibilScore,
         productType: applicationData?.productType,
+        employmentType: applicationData?.employmentType,
         monthlyIncome: applicationData?.monthlyIncome,
         loanAmount: loanAmount,
+        loanTenure: tenure,
         fullName: applicationData?.name || localStorage.getItem("pryme_lead_name") || "Guest",
         engineResults: applicationData?.engineResults || [],
         // 🧠 RELAY FIX: Pass leadId so Offers.tsx can forward it to Auth.tsx

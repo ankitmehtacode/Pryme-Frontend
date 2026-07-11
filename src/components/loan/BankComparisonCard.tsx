@@ -27,7 +27,7 @@ export interface BankOfferDTO {
   brandHex: string; // e.g. "#004c8f" — the bank's primary brand colour
   interestRate: number;
   processingFee: number;
-  maxTenure: number;
+  effectiveTenureYears: number;
   maxLoanAmount: number;
   approvalOdds: number;
   processingTime: string;
@@ -276,7 +276,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
             <div className="hidden xl:flex items-center gap-2 2xl:gap-3">
               {[
                 { label: "Interest", value: `${offer.interestRate}%` },
-                { label: "Tenure", value: `${offer.maxTenure} yrs` },
+                { label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
               ].map((m, i) => (
                 <div
                   key={i}
@@ -305,12 +305,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               <div className="flex justify-between items-center pt-1">
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Tenure</p>
                 <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.maxTenure} yrs</p>
-                  {offer.requestedTenure && offer.maxTenure < offer.requestedTenure && (
+                  <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.effectiveTenureYears} yrs</p>
+                  {offer.requestedTenure && offer.effectiveTenureYears < offer.requestedTenure && (
                     <div className="group relative flex items-center justify-center">
                       <AlertCircle className="w-4 h-4 text-amber-500" />
                       <div className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900 dark:bg-slate-800 text-slate-100 text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-                        Tenure clamped to {offer.maxTenure} years. The maximum tenure allowed by this product.
+                        Tenure clamped to {offer.effectiveTenureYears} years. The maximum tenure allowed by this product.
                       </div>
                     </div>
                   )}
@@ -473,7 +473,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   const coreRows = [
                     { label: "Principal Amount", value: `₹${principalAmount.toLocaleString("en-IN")}` },
                     { label: "Interest Rate", value: `${offer.interestRate}% p.a.` },
-                    { label: "Loan Tenure", value: `${offer.maxTenure} Years` },
+                    { label: "Loan Tenure", value: `${offer.effectiveTenureYears} Years` },
                     { label: "Estimated Monthly EMI", value: `₹${emi.toLocaleString("en-IN")}` },
                     { label: "Total Interest Payable", value: `₹${(totalRepayment - principalAmount).toLocaleString("en-IN")}` },
                     { label: "Total Cost of Loan", value: `₹${totalRepayment.toLocaleString("en-IN")}` },
