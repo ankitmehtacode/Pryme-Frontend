@@ -1,7 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle } from "lucide-react";
+import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 
@@ -329,6 +329,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 </div>
               )}
             </div>
+
+            {/* ── Amount Capping Info Banner (shown when requested > max eligible) ── */}
+            {offer.originalEngineResult?.rejectionReasons?.length > 0 && offer.originalEngineResult?.eligible && (
+              <div className="xl:col-span-full w-full bg-blue-50/80 dark:bg-blue-500/10 border border-blue-200/60 dark:border-blue-500/20 px-4 py-2.5 rounded-xl flex items-center gap-2.5 shadow-sm">
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <p className="text-[11px] sm:text-xs font-semibold text-blue-700 dark:text-blue-300 leading-snug">
+                  {offer.originalEngineResult.rejectionReasons[0]}
+                </p>
+              </div>
+            )}
 
             {/* ── CTAs (Mobile Stacked, Desktop Row/Col) ──────────────────────── */}
             <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
