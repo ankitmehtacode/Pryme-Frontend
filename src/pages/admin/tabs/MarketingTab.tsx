@@ -218,6 +218,15 @@ export const MarketingTab: React.FC = () => {
     },
   });
 
+  // Reward matching (BankComparisonCard.tsx) compares against the OBFUSCATED
+  // public product code the engine returns to applicants (EligibilityResult.
+  // toPublicResult() truncates e.g. "ABFL-HL-0001" -> "ABFL-HL"), via
+  // `publicCode.endsWith(reward.productCode)`. A reward saved with a full
+  // product code (e.g. "ABFL-HL-0001") can never match -- a longer string
+  // can't be a suffix of a shorter one -- so it must be entered/stored the
+  // same lender-loanType prefix, not a specific product variant.
+  const deriveProductPrefix = (code: string) => code.split("-").slice(0, 2).join("-");
+
   // Fetch all banks to populate the bank dropdown comprehensively
   const { data: allBanks = [] } = useQuery({
     queryKey: ["admin_banks"],
@@ -790,11 +799,13 @@ export const MarketingTab: React.FC = () => {
                     <SelectValue placeholder="Select Product" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#12121a] border-white/10">
-                    {loanProducts
-                      .filter((p: any) => p.lenderName?.toLowerCase().trim() === rewardFormData.bank?.toLowerCase().trim())
-                      .map((product: any) => (
-                        <SelectItem key={product.productCode} value={product.productCode} className="text-white focus:bg-white/10">
-                          {product.productCode} - {product.productName}
+                    {Array.from(new Set(
+                      loanProducts
+                        .filter((p: any) => p.lenderName?.toLowerCase().trim() === rewardFormData.bank?.toLowerCase().trim())
+                        .map((product: any) => deriveProductPrefix(product.productCode))
+                    )).sort().map((prefix: string) => (
+                        <SelectItem key={prefix} value={prefix} className="text-white focus:bg-white/10">
+                          {prefix}
                         </SelectItem>
                       ))}
                   </SelectContent>

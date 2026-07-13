@@ -441,8 +441,14 @@ export const PrymeAPI = {
     fetchWithAuth(`/admin/banks/${id}/visibility`, { method: "PATCH", body: JSON.stringify({ active }) }),
   deleteAdminBank: async (id: string) => fetchWithAuth(`/admin/banks/${id}`, { method: "DELETE" }),
 
-  /** Admin: Product (Offer) CRUD — /api/v1/admin/products */
-  getAdminProducts: async () => fetchWithAuth("/admin/products", { method: "GET" }),
+  /** Admin: Product (Offer) CRUD — /api/v1/admin/products
+   *  size=1000 overrides the backend's @PageableDefault(size=50, sort=id DESC) --
+   *  with 50, only the 50 most-recently-inserted products load, so any lender
+   *  seeded earlier (e.g. ICICI) silently drops out of client-side lookups
+   *  like the Policy Matrix's bank-name resolution (AdminDashboard.tsx
+   *  filteredEligibilityRules) and the Product Matrix tab itself. The full
+   *  catalog is ~250 rows -- small enough to fetch in one page. */
+  getAdminProducts: async () => fetchWithAuth("/admin/products?size=1000", { method: "GET" }),
   createAdminProduct: async (data: any) =>
     fetchWithAuth("/admin/products", { method: "POST", body: JSON.stringify(data) }),
   updateAdminProduct: async (id: string, data: any) =>

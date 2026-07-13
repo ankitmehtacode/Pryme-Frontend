@@ -10,6 +10,20 @@ export function cn(...inputs: ClassValue[]) {
  * Safely falls back to a Math.random polyfill if crypto.randomUUID is unavailable 
  * (e.g., testing on local network IPs over HTTP).
  */
+/**
+ * Formats a rupee amount for display using Indian Lakh/Crore notation
+ * (e.g. 4000000 -> "₹40 L", 12500000 -> "₹1.25 Cr"), rounding away any
+ * paise so loan-amount figures never render with stray decimals.
+ */
+export function formatIndianCurrency(value: number): string {
+  if (value == null || isNaN(value)) return "₹0";
+  const rounded = Math.round(value);
+  const abs = Math.abs(rounded);
+  if (abs >= 10000000) return `₹${(rounded / 10000000).toFixed(2).replace(/\.?0+$/, "")} Cr`;
+  if (abs >= 100000) return `₹${(rounded / 100000).toFixed(2).replace(/\.?0+$/, "")} L`;
+  return `₹${rounded.toLocaleString("en-IN")}`;
+}
+
 export function generateSafeUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     return window.crypto.randomUUID();

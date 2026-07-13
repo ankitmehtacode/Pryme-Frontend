@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Search, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Search, CreditCard, ChevronDown, ChevronUp, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
@@ -53,10 +53,13 @@ export const OffersTab: React.FC<OffersTabProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [collapsedLenders, setCollapsedLenders] = useState<Set<string>>(new Set());
+
+  const activeSearchQuery = (globalSearchQuery || searchQuery).toLowerCase().trim();
 
   const searchFilteredProducts = useMemo(() => {
     const list = filteredProducts || [];
-    const q = (globalSearchQuery || searchQuery).toLowerCase().trim();
+    const q = activeSearchQuery;
     if (!q) return list;
     return list.filter((p: any) =>
       p && (
@@ -67,7 +70,41 @@ export const OffersTab: React.FC<OffersTabProps> = ({
         (p.loanType?.toLowerCase() ?? "").includes(q)
       )
     );
-  }, [filteredProducts, searchQuery, globalSearchQuery]);
+  }, [filteredProducts, activeSearchQuery]);
+
+  // Group by lender, then sort each lender's products by loan type + code,
+  // so HL/LAP variants of the same lender sit together instead of being
+  // scattered across the raw id-insertion order the API returns them in.
+  const lenderGroups = useMemo(() => {
+    const groups = new Map<string, any[]>();
+    for (const p of searchFilteredProducts) {
+      const key = p.lenderName || "Unknown Lender";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(p);
+    }
+    for (const products of groups.values()) {
+      products.sort((a, b) =>
+        (a.loanType || "").localeCompare(b.loanType || "") ||
+        (a.productCode || "").localeCompare(b.productCode || "")
+      );
+    }
+    return Array.from(groups.entries())
+      .sort(([a], [b]) => a.localeCompare(b));
+  }, [searchFilteredProducts]);
+
+  // While actively searching, force every matching group open -- collapsing
+  // would otherwise hide the very results the search just found.
+  const isLenderExpanded = (lenderName: string) =>
+    activeSearchQuery ? true : !collapsedLenders.has(lenderName);
+
+  const toggleLender = (lenderName: string) => {
+    setCollapsedLenders(prev => {
+      const next = new Set(prev);
+      if (next.has(lenderName)) next.delete(lenderName);
+      else next.add(lenderName);
+      return next;
+    });
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col flex-1 min-h-0 space-y-6">
@@ -130,7 +167,7 @@ export const OffersTab: React.FC<OffersTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
-              {searchFilteredProducts.length === 0 ? (
+              {lenderGroups.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-3">
@@ -145,7 +182,24 @@ export const OffersTab: React.FC<OffersTabProps> = ({
                   </td>
                 </tr>
               ) : (
-                searchFilteredProducts.map((p: any) => (
+                lenderGroups.map(([lenderName, products]) => (
+                  <React.Fragment key={lenderName}>
+                    <tr
+                      className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors cursor-pointer select-none"
+                      onClick={() => toggleLender(lenderName)}
+                    >
+                      <td colSpan={8} className="px-6 py-3">
+                        <div className="flex items-center gap-2.5 text-sm font-bold text-slate-200">
+                          {isLenderExpanded(lenderName)
+                            ? <ChevronUp className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                            : <ChevronDown className="w-3.5 h-3.5 text-purple-400 shrink-0" />}
+                          <Building2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                          <span>{lenderName}</span>
+                          <span className="text-xs font-normal text-slate-500">({products.length} product{products.length === 1 ? "" : "s"})</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {isLenderExpanded(lenderName) && products.map((p: any) => (
                   <React.Fragment key={p.id}>
                     <tr className={cn("hover:bg-white/[0.02] transition-colors border-b border-white/[0.04]", expandedId === p.id && "bg-white/[0.02]")}>
                       <td className="px-6 py-4">
@@ -326,6 +380,8 @@ export const OffersTab: React.FC<OffersTabProps> = ({
                         </td>
                       </tr>
                     )}
+                  </React.Fragment>
+                    ))}
                   </React.Fragment>
                 ))
               )}

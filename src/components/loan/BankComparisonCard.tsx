@@ -165,7 +165,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
         <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Grid ───────────────────────────── */}
-          <div className="flex flex-col xl:grid xl:grid-cols-[220px_auto_1fr_auto] 2xl:grid-cols-[245px_auto_1fr_auto] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
+          <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_1fr] 2xl:grid-cols-[245px_260px_180px_1fr] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
             
             {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
             <div className="flex items-start justify-between w-full xl:w-auto">
@@ -280,10 +280,10 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               ].map((m, i) => (
                 <div
                   key={i}
-                  className="px-2.5 py-2 2xl:px-3.5 2xl:py-2.5 rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
+                  className="w-[74px] 2xl:w-[84px] py-2 2xl:py-2.5 text-center rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15] shrink-0"
                 >
-                  <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5">{m.label}</p>
-                  <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight">{m.value}</p>
+                  <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5 whitespace-nowrap">{m.label}</p>
+                  <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight whitespace-nowrap">{m.value}</p>
                 </div>
               ))}
             </div>

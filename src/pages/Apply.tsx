@@ -236,7 +236,12 @@ const Apply = () => {
               pat: data.netProfit || derivedAnnualIncome,
               depreciation: data.depreciation || null,
               interestExpense: null,
-              grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
+              // Caps PAT+Depreciation in SurrogateIncomeResolver.resolveNip() so a large
+              // self-reported depreciation add-back can't inflate income past what the
+              // business actually turns over. annualTurnover (the ITR-relevant figure)
+              // takes priority; GST turnover / gross receipts are fallbacks for cases
+              // where turnover itself wasn't entered.
+              grossReceipts: data.annualTurnover || data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
             };
             break;
         }

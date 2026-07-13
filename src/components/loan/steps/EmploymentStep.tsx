@@ -472,14 +472,14 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const dateVal = e.target.value;
                         const years = calculateVintageYears(dateVal);
-                        store.updateBusinessDetails({ 
+                        store.updateBusinessDetails({
                           gstRegistrationDate: dateVal,
                           vintageYears: years
                         });
                       }}
                       isValid={(() => {
                         const regDateStr = store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.gstRegistrationDate : "";
-                        if (!regDateStr) return false;
+                        if (!regDateStr) return true; // optional — blank is valid
                         const regDate = new Date(regDateStr);
                         return !isNaN(regDate.getTime()) && regDate.getTime() <= Date.now();
                       })()}

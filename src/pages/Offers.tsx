@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
+import { formatIndianCurrency } from "@/lib/utils";
 
 import hdfcLogo from "@/assets/hdfc.svg";
 import iciciLogo from "@/assets/icici.svg";
@@ -51,6 +52,7 @@ interface BankOffer {
   processingFee: number;
   effectiveTenureYears: number;
   maxLoanAmount: number;
+  principalAmount: number;
   approvalOdds: number;
   processingTime: string;
   requiredDocs: string[];
@@ -225,6 +227,10 @@ export default function Offers() {
       // Map dynamic backend fields without hardcoded fallbacks
       const roiPercent = er?.roi != null ? (er.roi < 1 ? er.roi * 100 : er.roi) : 0;
       const processingFee = er?.processingFee != null ? er.processingFee : 0;
+      const maxLoanAmount = er?.maxEligibleAmount || leadData.loanAmount;
+      // Bank can never disburse more than it deems the applicant eligible for —
+      // EMI/repayment figures must be based on this capped amount, not the raw request.
+      const principalAmount = Math.min(leadData.loanAmount, maxLoanAmount);
 
       return {
         id: er?.productCode || er?.lenderId || Math.random().toString(),
@@ -236,7 +242,8 @@ export default function Offers() {
         processingFee: parseFloat(processingFee.toFixed(2)),
         effectiveTenureYears: (er?.tenureMonths || 60) / 12,
         requestedTenure: leadData.loanTenure,
-        maxLoanAmount: er?.maxEligibleAmount || leadData.loanAmount,
+        maxLoanAmount,
+        principalAmount,
         approvalOdds: 98,
         processingTime: "48 hrs",
         requiredDocs: ["PAN Card", "Aadhaar Card", "Salary Slips (3 months)", "Bank Statement (6 months)"],
@@ -246,8 +253,11 @@ export default function Offers() {
       };
     });
 
-    // Sort mapped offers: lowest interest rate first, then lowest processing fee
+    // Sort mapped offers: highest eligible loan amount first, then lowest interest rate, then lowest processing fee
     const sortedOffers = mappedOffers.sort((a, b) => {
+      if (a.maxLoanAmount !== b.maxLoanAmount) {
+        return b.maxLoanAmount - a.maxLoanAmount;
+      }
       if (a.interestRate !== b.interestRate) {
         return a.interestRate - b.interestRate;
       }
@@ -289,16 +299,24 @@ export default function Offers() {
   const emis = useMemo(() => {
     if (!leadData || dynamicOffers.length === 0) return {};
     const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.effectiveTenureYears); });
+    dynamicOffers.forEach(o => {
+      // Prefer the engine's own proposed EMI (already computed on the capped/eligible
+      // amount server-side); fall back to a local calc on the capped principal only
+      // if the backend didn't return one.
+      const backendEmi = o.originalEngineResult?.proposedEmi;
+      m[o.id] = backendEmi != null
+        ? Math.round(Number(backendEmi))
+        : calcEMI(o.principalAmount, o.interestRate, o.effectiveTenureYears);
+    });
     return m;
   }, [dynamicOffers, leadData]);
 
   const totalRepayments = useMemo(() => {
     if (!leadData || dynamicOffers.length === 0) return {};
     const m: Record<string, number> = {};
-    dynamicOffers.forEach(o => { m[o.id] = calcEMI(leadData.loanAmount, o.interestRate, o.effectiveTenureYears) * o.effectiveTenureYears * 12; });
+    dynamicOffers.forEach(o => { m[o.id] = (emis[o.id] || 0) * o.effectiveTenureYears * 12; });
     return m;
-  }, [dynamicOffers, leadData]);
+  }, [dynamicOffers, leadData, emis]);
 
   const savingsVsNext = useMemo(() => {
     if (dynamicOffers.length < 2 || !leadData) return { emiDiff: 0, totalDiff: 0, comparedTo: "" };
@@ -468,10 +486,10 @@ export default function Offers() {
           {maxPossibleAmount > 0 && leadData.loanAmount > maxPossibleAmount && (
             <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl text-sm space-y-2">
               <div className="font-bold text-primary flex items-center gap-2 text-base">
-                <ShieldCheck className="w-5 h-5" /> Maximum Eligibility: ₹{maxPossibleAmount.toLocaleString("en-IN")}
+                <ShieldCheck className="w-5 h-5" /> Maximum Eligibility: {formatIndianCurrency(maxPossibleAmount)}
               </div>
               <p className="text-secondary-foreground/90">
-                You requested ₹{leadData.loanAmount.toLocaleString("en-IN")}, but based on your income and current obligations, the maximum loan amount you can get is <strong className="text-foreground">₹{maxPossibleAmount.toLocaleString("en-IN")}</strong>. Try reducing your loan amount.
+                You requested {formatIndianCurrency(leadData.loanAmount)}, but based on your income and current obligations, the maximum loan amount you can get is <strong className="text-foreground">{formatIndianCurrency(maxPossibleAmount)}</strong>. Try reducing your loan amount.
               </p>
             </div>
           )}
@@ -601,7 +619,7 @@ export default function Offers() {
                         emiDiffFromHero={emiDiffFromHero}
                         totalDiffFromHero={totalDiffFromHero}
                         heroBankName={heroOffer.bankName}
-                        principalAmount={leadData.loanAmount}
+                        principalAmount={offer.principalAmount}
                         isExpanded={isExpanded}
                         onToggleExpand={handleToggleExpand}
                         onApply={handleApply}
