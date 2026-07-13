@@ -163,6 +163,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
           }}
         />
 
+        {/* ── Top Promo Bar/Ribbon for Reward ── */}
+        {matchingReward && (
+          <div className="bg-purple-50/90 dark:bg-purple-950/20 border-b border-purple-100/80 dark:border-purple-900/30 px-5 py-2.5 md:px-8 flex items-center gap-2">
+            <RewardIcon className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+            <span className="text-[10px] md:text-[11px] font-extrabold text-purple-700 dark:text-purple-300 uppercase tracking-widest leading-none">
+              Exclusive Reward: {dynamicRewardText}
+            </span>
+          </div>
+        )}
+
         <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Grid ───────────────────────────── */}
           <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_1fr] 2xl:grid-cols-[245px_260px_180px_1fr] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
@@ -204,14 +214,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     </span>
                   )}
                   <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-tight">{offer.bankName}</h3>
-                  {matchingReward && (
-                    <div className="mt-1.5 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2.5 py-1 rounded-md w-fit shadow-sm">
-                      <RewardIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                      <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 leading-tight">
-                        {dynamicRewardText}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
 

@@ -362,15 +362,64 @@ const AdminDashboard = () => {
     return products.filter((p: any) => productStatusFilter === "active" ? (p.active ?? p.isActive) : !(p.active ?? p.isActive));
   }, [products, productStatusFilter]);
 
+  // rule.ltvAllowed and a "rule.foirMax" field the Policy Matrix table used to
+  // read are almost never populated -- the real LTV lives in rule.ltvGrid
+  // (JSON, either the new flat per-subtype format or the legacy loan-amount-
+  // tiered format), and FOIR isn't a per-condition field at all -- it's a
+  // matrix keyed by product+employment+income-band (product_foir_matrix),
+  // which isn't loaded into this admin view. Derive the best available
+  // summary from what IS loaded: scan ltvGrid for its percentage range, and
+  // fall back through ltvAllowed -> the linked product's flat ltv/FOIR
+  // ceiling, rather than silently rendering 0%.
+  const deriveLtvDisplay = (rule: any, product: any): string => {
+    if (rule.ltvGrid) {
+      try {
+        const parsed = typeof rule.ltvGrid === "string" ? JSON.parse(rule.ltvGrid) : rule.ltvGrid;
+        const percents: number[] = [];
+        const walk = (node: any) => {
+          if (node == null) return;
+          if (typeof node === "string" && /^\d+(\.\d+)?%$/.test(node.trim())) {
+            percents.push(parseFloat(node));
+          } else if (typeof node === "object") {
+            Object.values(node).forEach(walk);
+          }
+        };
+        walk(parsed);
+        if (percents.length > 0) {
+          const min = Math.min(...percents);
+          const max = Math.max(...percents);
+          return min === max ? `${min}%` : `${min}–${max}%`;
+        }
+      } catch {
+        // fall through to scalar sources below
+      }
+    }
+    if (rule.ltvAllowed) return `${(rule.ltvAllowed * 100).toFixed(0)}%`;
+    if (product?.ltv) {
+      const n = Number(product.ltv);
+      return `${(n < 1 ? n * 100 : n).toFixed(0)}%`;
+    }
+    return "—";
+  };
+
+  const deriveFoirDisplay = (product: any): string => {
+    if (product?.maxEmiNmiRatio == null) return "—";
+    const n = Number(product.maxEmiNmiRatio);
+    return `≤${(n < 1 ? n * 100 : n).toFixed(0)}%`;
+  };
+
   const filteredEligibilityRules = useMemo(() => {
     const resolvedRules = eligibilityRules.map((rule: any) => {
-      if (!rule.bankName || rule.bankName.trim() === "") {
-        const matchingProduct = products.find((p: any) => p.productCode === rule.productCode);
-        if (matchingProduct) {
-          return { ...rule, bankName: matchingProduct.lenderName };
-        }
-      }
-      return rule;
+      const matchingProduct = products.find((p: any) => p.productCode === rule.productCode);
+      const resolvedBankName = (!rule.bankName || rule.bankName.trim() === "")
+        ? matchingProduct?.lenderName
+        : rule.bankName;
+      return {
+        ...rule,
+        bankName: resolvedBankName,
+        ltvDisplay: deriveLtvDisplay(rule, matchingProduct),
+        foirDisplay: deriveFoirDisplay(matchingProduct),
+      };
     });
 
     if (ruleStatusFilter === "all") return resolvedRules;

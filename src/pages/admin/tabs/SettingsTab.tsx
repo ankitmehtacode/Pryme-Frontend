@@ -271,7 +271,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm text-emerald-400 font-mono">
-                              {(rule.ltvAllowed ? rule.ltvAllowed * 100 : 0)}% / {(rule.foirMax ? rule.foirMax * 100 : 0)}%
+                              {rule.ltvDisplay || "—"} / {rule.foirDisplay || "—"}
                             </div>
                           </td>
                           <td className="px-6 py-4">
