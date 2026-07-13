@@ -349,13 +349,13 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   colorScheme={matchingReward.buttonDesign}
                   onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                   disabled={isGlobalLocking && !isLocking}
-                  className="w-full xl:w-[175px] h-12 xl:h-11 flex justify-center items-center"
+                  className="w-full xl:w-[175px] h-12 xl:h-11 flex justify-center items-center shrink-0"
                 />
               ) : (
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
-                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
+                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden shrink-0"
                   style={{
                     background: localStatus === "resolved"
                       ? '#10b981'
