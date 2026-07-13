@@ -32,7 +32,7 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   return (
     <div 
       className={cn(
-        "relative inline-flex group transition-transform duration-300 overflow-visible shrink-0", 
+        "relative inline-flex group transition-transform duration-300 overflow-visible", 
         disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105",
         className
       )}
