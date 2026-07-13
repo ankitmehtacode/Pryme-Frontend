@@ -30,18 +30,18 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   const filterStyle = colorFilters[colorScheme] || colorFilters["ocean-blue"];
 
   return (
-    <div 
+    <div
       className={cn(
-        "relative inline-flex group transition-transform duration-300 overflow-visible", 
+        "relative inline-flex group transition-transform duration-300 overflow-hidden rounded-xl",
         disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105",
         className
       )}
       {...props}
     >
-      <img 
-        src={premiumButtonImg} 
-        alt="Apply with Pryme" 
-        className="w-full xl:w-[215px] xl:max-w-none h-auto xl:h-[54px] xl:absolute xl:left-1/2 xl:top-1/2 xl:-translate-x-1/2 xl:-translate-y-1/2 object-contain drop-shadow-md"
+      <img
+        src={premiumButtonImg}
+        alt="Apply with Pryme"
+        className="w-full h-full object-contain drop-shadow-md"
         style={{ filter: filterStyle }}
       />
     </div>
