@@ -22,7 +22,6 @@ const PrepaymentCalculator = ({
   const [interestRate, setInterestRate] = useState(10.5);
   const [tenureMonths, setTenureMonths] = useState(120);
   const [prepaymentAmount, setPrepaymentAmount] = useState(200000);
-  const [prepaymentMonth, setPrepaymentMonth] = useState(12);
   const [strategy, setStrategy] = useState<"lump-sum" | "13th-emi" | "step-up" | "combo">("lump-sum");
 
   // Formatting helpers
@@ -49,6 +48,13 @@ const PrepaymentCalculator = ({
     let totalPaidWithPrepayment = 0;
     let monthsWithPrepayment = 0;
 
+    // Apply immediate prepayment in Day 0 (pre-loop) for lump-sum strategy
+    if (strategy === "lump-sum") {
+      const actualPrepayment = Math.min(prepaymentAmount, balance);
+      balance -= actualPrepayment;
+      totalPaidWithPrepayment += actualPrepayment;
+    }
+
     for (let m = 1; m <= tenureMonths * 2; m++) {
       if (balance <= 0) break;
 
@@ -68,13 +74,6 @@ const PrepaymentCalculator = ({
 
       // Apply prepayments at the end of the month
       if (balance <= 0) break;
-
-      // 1. Lump Sum Prepayment (only for lump-sum strategy)
-      if (strategy === "lump-sum" && m === prepaymentMonth) {
-        const actualPrepayment = Math.min(prepaymentAmount, balance);
-        balance -= actualPrepayment;
-        totalPaidWithPrepayment += actualPrepayment;
-      }
 
       // 2. 13th EMI / Combo Prepayment
       // paid at the end of every 12-month cycle (month 12, 24, 36...)
@@ -163,8 +162,8 @@ const PrepaymentCalculator = ({
         {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 relative z-10 w-full items-stretch">
 
-          {/* Left Col: 5 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
-          <div className="lg:grid lg:grid-rows-5 lg:gap-2 flex flex-col space-y-2 lg:space-y-0 w-full min-w-0">
+          {/* Left Col: 4 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
+          <div className="lg:grid lg:grid-rows-4 lg:gap-2 flex flex-col space-y-2 lg:space-y-0 w-full min-w-0">
 
             {/* Loan Amount */}
             <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
@@ -222,46 +221,25 @@ const PrepaymentCalculator = ({
             </div>
 
             {strategy === "lump-sum" ? (
-              <>
-                {/* Prepayment Amount */}
-                <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
-                  <div className="flex justify-between items-center mb-1.5 gap-2">
-                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
-                    <input
-                      type="number"
-                      value={prepaymentAmount}
-                      onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
-                      onWheel={(e) => e.currentTarget.blur()}
-                      className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      min={10000}
-                      max={Math.min(loanAmount, 5000000)}
-                    />
-                  </div>
-                  <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              /* Prepayment Amount */
+              <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+                <div className="flex justify-between items-center mb-1.5 gap-2">
+                  <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={prepaymentAmount}
+                    onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                    onWheel={(e) => e.currentTarget.blur()}
+                    className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    min={10000}
+                    max={Math.min(loanAmount, 5000000)}
+                  />
                 </div>
-
-                {/* Prepayment Month */}
-                <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
-                  <div className="flex justify-between items-center mb-1.5 gap-2">
-                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Paid At (Month)</label>
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={prepaymentMonth}
-                        onChange={(e) => setPrepaymentMonth(Number(e.target.value))}
-                        onWheel={(e) => e.currentTarget.blur()}
-                        className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-16 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        min={1}
-                        max={tenureMonths - 1}
-                      />
-                    </div>
-                  </div>
-                  <Slider max={tenureMonths - 1} min={1} step={1} value={[prepaymentMonth]} onValueChange={(val) => setPrepaymentMonth(val[0])} className="w-full cursor-pointer py-0.5" />
-                </div>
-              </>
+                <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              </div>
             ) : (
               /* Strategy Explanation Card */
-              <div className="lg:row-span-2 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-3.5 rounded-lg border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden select-none min-h-[140px]">
+              <div className="lg:row-span-1 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-[#0d1829]/80 dark:to-[#052015]/30 p-3.5 rounded-lg border border-emerald-500/15 dark:border-emerald-500/30 shadow-sm flex flex-col justify-center relative overflow-hidden select-none min-h-[140px]">
                 <div className="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
 
                 {strategy === "13th-emi" && (

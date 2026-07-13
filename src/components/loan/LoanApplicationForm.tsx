@@ -805,10 +805,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         hasCoApplicant: fp?.hasCoApplicant ?? false,
 
         // Phase 5 underwriting variables safely mapped
-        depreciation: Number((fin?.data as any)?.depreciation ?? 0),
+        depreciation: Number((fin?.data as any)?.depreciation ?? (fin?.data as any)?.annualDepreciation ?? 0),
         netProfit: Number((fin?.data as any)?.netProfit ?? 0),
         grossSalary: Number((fin?.data as any)?.grossSalary ?? 0),
-        isCaCertifiedOrAudited: Boolean((fin?.data as any)?.isCaCertifiedOrAudited ?? false),
+        isCaCertifiedOrAudited: Boolean((fin?.data as any)?.isCaCertifiedOrAudited ?? (fin?.data as any)?.caCertifiedAccounts ?? false),
         last12MonthsGstTurnover: Number((fin?.data as any)?.last12MonthsGstTurnover ?? 0),
         annualGrossReceipts: Number((fin?.data as any)?.annualGrossReceipts ?? 0),
         totalPracticeYears: Number((fin?.data as any)?.totalPracticeYears ?? 0),

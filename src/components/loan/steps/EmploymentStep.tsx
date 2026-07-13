@@ -6,6 +6,7 @@ import {
   BriefcaseBusiness, FileText, Check, Home, AlertCircle 
 } from "lucide-react";
 import { SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useApplicationStore } from "@/store/applicationStore";
 import { cn } from "@/lib/utils";
 import { ValidatedInput, StyledSelect, PillSelector } from "../shared/FormComponents";
@@ -314,7 +315,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                 {/* ── Income fields ──────────────────────────────────── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <ValidatedInput
-                    label="Annual Gross Receipts (₹)"
+                    label="Annual Gross Receipts (Yearly, ₹)"
                     type="number"
                     placeholder="e.g. 3600000"
                     icon={IndianRupee}
@@ -323,7 +324,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     isValid={(store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.annualGrossReceipts : 0) > 0}
                   />
                   <ValidatedInput
-                    label="Professional Income as per ITR (₹)"
+                    label="Professional Income as per ITR (Yearly, ₹)"
                     type="number"
                     placeholder="e.g. 500000"
                     icon={IndianRupee}
@@ -351,6 +352,45 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     <SelectItem value="3">3+ Years</SelectItem>
                   </StyledSelect>
                 </div>
+
+                {store.loanRequirements?.loanType === 'LAP' || store.loanRequirements?.loanType === 'HOME_LOAN' ? (
+                  <div className="mt-6 p-4 rounded-xl border border-[#DDA35D]/30 bg-[#FDFBF7] dark:bg-[#DDA35D]/5 space-y-4">
+                    <h4 className="text-xs font-bold text-[#DDA35D] uppercase tracking-widest flex items-center gap-1">
+                      <IndianRupee className="w-3.5 h-3.5" /> P&L Normalisation (Property Loan)
+                    </h4>
+                    
+                    <ValidatedInput
+                      label="Annual Depreciation Add-back (₹)"
+                      type="number"
+                      placeholder="e.g. 240000 — from P&L / Balance Sheet"
+                      icon={IndianRupee}
+                      value={store.financialDetails.path === "PROFESSIONAL" && store.financialDetails.data.annualDepreciation !== undefined ? store.financialDetails.data.annualDepreciation : ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateProfessionalDetails({ annualDepreciation: e.target.value === "" ? undefined : Number(e.target.value) })}
+                      isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.annualDepreciation || 0) : 0) >= 0}
+                    />
+
+                    <div className="flex items-start space-x-3 p-3 rounded-lg border border-border/50 bg-background/50">
+                      <Checkbox 
+                        id="ca-certified-professional"
+                        checked={store.financialDetails.path === "PROFESSIONAL" ? store.financialDetails.data.caCertifiedAccounts : false}
+                        onCheckedChange={(checked) => store.updateProfessionalDetails({ caCertifiedAccounts: checked === true })}
+                        className="mt-1"
+                      />
+                      <div className="space-y-1 leading-none">
+                        <label
+                          htmlFor="ca-certified-professional"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Accounts are CA-Certified / Audited
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                          Declaring CA-certified accounts improves creditworthiness assessment and may unlock better rates.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
 
                 {/* ── EMI Disclosure (Step A + conditional Step B) ── */}
                 <div className="h-px bg-gradient-to-r from-transparent via-border dark:via-white/[0.06] to-transparent" />
@@ -498,7 +538,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ValidatedInput
-                      label="Annual Turnover (₹)"
+                      label="Annual Turnover (Yearly, ₹)"
                       type="number"
                       placeholder="5000000"
                       icon={IndianRupee}
@@ -513,7 +553,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       isValid={(store.financialDetails.path === "SELF_EMPLOYED" ? store.financialDetails.data.annualTurnover || 0 : 0) >= 0}
                     />
                     <ValidatedInput
-                      label="Business Income as per ITR (₹)"
+                      label="Business Income as per ITR (Yearly, ₹)"
                       type="number"
                       placeholder="e.g. 500000"
                       icon={IndianRupee}

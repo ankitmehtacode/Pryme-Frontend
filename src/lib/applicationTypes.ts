@@ -148,6 +148,11 @@ export interface ProfessionalDetails {
   annualGrossReceipts: number;   // Gross professional receipts (pre-expense)
   netMonthlyIncome: number;
   itrFiledYears?: number;        // Years of ITR filed
+  
+  // P&L Normalisation (Property Loan specific)
+  annualDepreciation?: number;   // Annual depreciation add-back
+  caCertifiedAccounts?: boolean; // Accounts are CA-Certified / Audited
+
   hasExistingLoans: boolean;
   existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)

@@ -122,6 +122,8 @@ const defaultProfessional: ProfessionalDetails = {
   annualGrossReceipts: 0,
   netMonthlyIncome: 0,
   itrFiledYears: undefined,
+  annualDepreciation: undefined,
+  caCertifiedAccounts: false,
   hasExistingLoans: false,
   existingEMI: undefined,
 };
