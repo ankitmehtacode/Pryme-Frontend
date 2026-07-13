@@ -81,6 +81,19 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
     if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";
   }
 
+  const lr = store.loanRequirements || {};
+  if (lr.loanType === 'HOME_LOAN' || lr.loanType === 'LAP') {
+    if (!lr.propertyType) errors.propertyType = "Select a property type";
+    if (lr.loanType === 'LAP' && !lr.propertyCategory) {
+      errors.propertyCategory = "Select a property category";
+    }
+  }
+
+  if (lr.loanType === 'BUSINESS_LOAN' || (lr.loanType === 'LAP' && lr.propertyCategory === 'COMMERCIAL_INDUSTRIAL')) {
+    if (lr.loanType === 'BUSINESS_LOAN' && !lr.propertyType) errors.propertyType = "Select a property type";
+    if (!lr.businessPropertyCategory) errors.businessPropertyCategory = "Select a business property category";
+  }
+
   return errors;
 }
 
@@ -154,6 +167,9 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   businessName: 'section-employment',
   vintageYears: 'section-employment',
   gstRegistrationDate: 'section-employment',
+  propertyType: 'section-employment',
+  propertyCategory: 'section-employment',
+  businessPropertyCategory: 'section-employment',
 };
 
 export const STAGE_LABELS_FRIENDLY: Record<string, string> = {

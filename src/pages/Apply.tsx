@@ -51,14 +51,14 @@ const Apply = () => {
       setIsFormFocused(false);
     }
   }, []);
-  
+
   // 🧠 State Persistence Matrix
   const [applicationData, setApplicationData] = useState<{
     cibilScore: number;
     monthlyIncome: number;
     productType: string;
     employmentType?: string;
-    phone?: string; 
+    phone?: string;
     name?: string;
     loanAmount?: number;
     engineResults?: any[];
@@ -99,190 +99,190 @@ const Apply = () => {
 
     // 1. Silent Local Cache (Picked up by Dashboard 25% stage)
     localStorage.setItem("pryme_pending_application", JSON.stringify({
-        loanType: data.productType,
-        employmentType: data.employmentType || "SALARIED", 
-        loanAmount: data.loanAmount
+      loanType: data.productType,
+      employmentType: data.employmentType || "SALARIED",
+      loanAmount: data.loanAmount
     }));
 
     // 2. 🧠 SILENT DATABASE INGESTION: Hit Java PublicLeadController BEFORE comparison
     try {
-        const leadRes = await PrymeAPI.submitLead({
-          fullName: leadName,
-          phone: leadPhone,
-          productType: data.productType,
-          loanAmount: data.loanAmount,
-          cibilScore: data.cibilScore,
-          monthlyIncome: data.monthlyIncome,
-          // 🧠 PIPELINE FIX: Forward ALL form fields so the metadata JSON blob
-          // in the Lead table is fully populated. Without these, the Admin Dashboard
-          // shows empty fields for Company Name, Designation, Gross Salary, etc.
-          email: data.email,
-          panCard: data.panCard,
-          dob: data.dob,
-          city: data.city,
-          state: data.state,
-          pinCode: data.pinCode,
-          employmentType: data.employmentType,
-          financialPath: data.financialPath,
-          occupation: data.occupation,
-          companyName: data.companyName,
-          designation: data.designation,
-          officialEmail: data.officialEmail,
-          grossSalary: data.grossSalary,
-          totalExperienceYears: data.totalExperienceYears,
-          businessVintageYears: data.businessVintageYears,
-          loanPurpose: data.loanPurpose,
-          propertyType: data.propertyType,
-          hasCoApplicant: data.hasCoApplicant,
-          existingBank: data.existingBank,
-          eligibleExistingEmi: data.eligibleExistingEmi,
-          itrYearsAvailable: data.itrYearsAvailable,
-        });
-        
-        // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION
-        if (leadRes?.lead?.id) {
-            localStorage.setItem("pryme_pending_lead_id", leadRes.lead.id);
-        }
+      const leadRes = await PrymeAPI.submitLead({
+        fullName: leadName,
+        phone: leadPhone,
+        productType: data.productType,
+        loanAmount: data.loanAmount,
+        cibilScore: data.cibilScore,
+        monthlyIncome: data.monthlyIncome,
+        // 🧠 PIPELINE FIX: Forward ALL form fields so the metadata JSON blob
+        // in the Lead table is fully populated. Without these, the Admin Dashboard
+        // shows empty fields for Company Name, Designation, Gross Salary, etc.
+        email: data.email,
+        panCard: data.panCard,
+        dob: data.dob,
+        city: data.city,
+        state: data.state,
+        pinCode: data.pinCode,
+        employmentType: data.employmentType,
+        financialPath: data.financialPath,
+        occupation: data.occupation,
+        companyName: data.companyName,
+        designation: data.designation,
+        officialEmail: data.officialEmail,
+        grossSalary: data.grossSalary,
+        totalExperienceYears: data.totalExperienceYears,
+        businessVintageYears: data.businessVintageYears,
+        loanPurpose: data.loanPurpose,
+        propertyType: data.propertyType,
+        hasCoApplicant: data.hasCoApplicant,
+        existingBank: data.existingBank,
+        eligibleExistingEmi: data.eligibleExistingEmi,
+        itrYearsAvailable: data.itrYearsAvailable,
+      });
+
+      // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION
+      if (leadRes?.lead?.id) {
+        localStorage.setItem("pryme_pending_lead_id", leadRes.lead.id);
+      }
     } catch (error) {
-        console.warn("Silent lead capture sync failed.", error);
+      console.warn("Silent lead capture sync failed.", error);
     }
 
     let engineData = [];
     try {
-        // ── SILICON VALLEY GRADE INCOME NORMALIZATION (DETERMINISTIC) ──
-        // Instead of heuristics, we rely on the explicitly typed annual fields 
-        // (netProfit / annualGrossReceipts) passed from the UI. If those are present, 
-        // we use them to securely anchor the annual income, and mathematically derive 
-        // the monthly income. This fixes precision errors and prevents low-earning CAs 
-        // from being incorrectly scaled.
-        let baseAnnual = 0;
-        let baseMonthly = Number(data.monthlyIncome) || 0;
+      // ── SILICON VALLEY GRADE INCOME NORMALIZATION (DETERMINISTIC) ──
+      // Instead of heuristics, we rely on the explicitly typed annual fields 
+      // (netProfit / annualGrossReceipts) passed from the UI. If those are present, 
+      // we use them to securely anchor the annual income, and mathematically derive 
+      // the monthly income. This fixes precision errors and prevents low-earning CAs 
+      // from being incorrectly scaled.
+      let baseAnnual = 0;
+      let baseMonthly = Number(data.monthlyIncome) || 0;
 
-        if (data.financialPath === "PROFESSIONAL" || data.financialPath === "SELF_EMPLOYED") {
-            // Favor explicit annual fields over reconstructed monthly fields
-            const explicitAnnual = Number(data.netProfit) || Number(data.annualGrossReceipts) || 0;
-            if (explicitAnnual > 0) {
-                baseAnnual = explicitAnnual;
-                baseMonthly = Math.round(explicitAnnual / 12);
-            } else {
-                baseAnnual = baseMonthly * 12;
-            }
+      if (data.financialPath === "PROFESSIONAL" || data.financialPath === "SELF_EMPLOYED") {
+        // Favor explicit annual fields over reconstructed monthly fields
+        const explicitAnnual = Number(data.netProfit) || Number(data.annualGrossReceipts) || 0;
+        if (explicitAnnual > 0) {
+          baseAnnual = explicitAnnual;
+          baseMonthly = Math.round(explicitAnnual / 12);
         } else {
-            // Salaried
-            baseAnnual = baseMonthly * 12;
+          baseAnnual = baseMonthly * 12;
         }
+      } else {
+        // Salaried
+        baseAnnual = baseMonthly * 12;
+      }
 
-        const applicantIncome = baseMonthly;
-        const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary 
-            ? Number(data.coApplicantDetails.netMonthlySalary) 
-            : 0;
-        const totalEffectiveIncome = applicantIncome + coApplicantIncome;
-        const derivedAnnualIncome = baseAnnual + (coApplicantIncome * 12);
+      const applicantIncome = baseMonthly;
+      const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary
+        ? Number(data.coApplicantDetails.netMonthlySalary)
+        : 0;
+      const totalEffectiveIncome = applicantIncome + coApplicantIncome;
+      const derivedAnnualIncome = baseAnnual + (coApplicantIncome * 12);
 
-        // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
-        let computedAge = 35;
-        if (data.dob) {
-            const birthDate = new Date(data.dob);
-            if (!isNaN(birthDate.getTime())) {
-                computedAge = Math.floor((Date.now() - birthDate.getTime()) / 3.156e+10);
-            }
+      // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
+      let computedAge = 35;
+      if (data.dob) {
+        const birthDate = new Date(data.dob);
+        if (!isNaN(birthDate.getTime())) {
+          computedAge = Math.floor((Date.now() - birthDate.getTime()) / 3.156e+10);
         }
+      }
 
-        // ── BUG-2 FIX: Resolve surrogate programName from employment path ──
-        // The Java SurrogateIncomeResolver.resolve() switches on programName.
-        let incomeInput: any = { programName: null };
+      // ── BUG-2 FIX: Resolve surrogate programName from employment path ──
+      // The Java SurrogateIncomeResolver.resolve() switches on programName.
+      let incomeInput: any = { programName: null };
 
-        if (data.financialPath === "SALARIED") {
-            // Salaried: No surrogate program needed.
-            incomeInput = {
-                programName: "NIP",
-                pat: derivedAnnualIncome,   // Safely annualized
-                depreciation: null,
-                interestExpense: null,
-            };
-        } else if (data.financialPath === "PROFESSIONAL") {
-            // Professional (CA/CS/Doctor): SEP program
-            incomeInput = {
-                programName: "SEP",
-                grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
-                profession: data.professionalSubType || "CA",
-            };
-        } else if (data.financialPath === "SELF_EMPLOYED") {
-            // Self-Employed: Program depends on businessSubType
-            const subType = data.businessSubType || "ITR_BASED";
-            switch (subType) {
-                case "GST_BASED":
-                    incomeInput = {
-                        programName: "GST",
-                        gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
-                        businessType: data.businessIndustryType || "Service",
-                    };
-                    break;
-                case "BANKING_PROGRAM":
-                    incomeInput = {
-                        programName: "BANKING",
-                        averageBankBalance: data.averageBankBalance || 0,
-                    };
-                    break;
-                case "CASH_FLOW_PROGRAM":
-                    incomeInput = {
-                        programName: "CASHFLOW",
-                        averageBankBalance: data.averageBankBalance || 0,
-                    };
-                    break;
-                default: // ITR_BASED or fallback
-                    incomeInput = {
-                        programName: "NIP",
-                        pat: data.netProfit || derivedAnnualIncome,
-                        depreciation: data.depreciation || null,
-                        interestExpense: null,
-                        grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
-                    };
-                    break;
-            }
-        } else {
-            // Fallback: use NIP with safely annualized income
-            incomeInput = {
-                programName: "NIP",
-                pat: derivedAnnualIncome,
-                depreciation: null,
-                interestExpense: null,
-            };
-        }
-
-        const payload = {
-            lenderId: null, // Aggregator Mode — evaluate across all lenders
-            // BUG-1 FIX: Raw loanType enum from the store. No transformation.
-            loanType: data.productType || "HOME_LOAN",
-            cibilScore: data.cibilScore || 750,
-            // BUG-3 FIX: Computed age, not hardcoded
-            applicantAge: computedAge,
-            employmentType: data.employmentType?.toUpperCase() || "SALARIED",
-            // BUG-4 FIX: Real property type from form
-            propertyType: data.propertyType || "RESIDENTIAL",
-            propertyCategory: data.propertyCategory || null,
-            businessPropertyCategory: data.businessPropertyCategory || null,
-            cityTier: "TIER_1",
-            loanAmount: data.loanAmount || 0,
-            propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
-            requestedTenureMonths: (data.loanTenure || 5) * 12,
-            monthlyIncome: totalEffectiveIncome,
-            existingEmiTotal: data.eligibleExistingEmi || 0,
-            businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
-            workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
-            idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
-            // GEO-FENCE: Pass pinCode to engine for Indore-only validation
-            pinCode: data.pinCode || "",
-            // BUG-2 FIX: Correct field names matching Java IncomeComputationInput record
-            incomeComputationInput: incomeInput,
-            itrYearsAvailable: data.itrYearsAvailable !== undefined && data.itrYearsAvailable !== null ? Number(data.itrYearsAvailable) : null
+      if (data.financialPath === "SALARIED") {
+        // Salaried: No surrogate program needed.
+        incomeInput = {
+          programName: "NIP",
+          pat: derivedAnnualIncome,   // Safely annualized
+          depreciation: null,
+          interestExpense: null,
         };
-        const engineRes = await PrymeAPI.evaluateEligibility(payload);
-        if (engineRes && Array.isArray(engineRes)) {
-            engineData = engineRes;
+      } else if (data.financialPath === "PROFESSIONAL") {
+        // Professional (CA/CS/Doctor): SEP program
+        incomeInput = {
+          programName: "SEP",
+          grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
+          profession: data.professionalSubType || "CA",
+        };
+      } else if (data.financialPath === "SELF_EMPLOYED") {
+        // Self-Employed: Program depends on businessSubType
+        const subType = data.businessSubType || "ITR_BASED";
+        switch (subType) {
+          case "GST_BASED":
+            incomeInput = {
+              programName: "GST",
+              gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
+              businessType: data.businessIndustryType || "Service",
+            };
+            break;
+          case "BANKING_PROGRAM":
+            incomeInput = {
+              programName: "BANKING",
+              averageBankBalance: data.averageBankBalance || 0,
+            };
+            break;
+          case "CASH_FLOW_PROGRAM":
+            incomeInput = {
+              programName: "CASHFLOW",
+              averageBankBalance: data.averageBankBalance || 0,
+            };
+            break;
+          default: // ITR_BASED or fallback
+            incomeInput = {
+              programName: "NIP",
+              pat: data.netProfit || derivedAnnualIncome,
+              depreciation: data.depreciation || null,
+              interestExpense: null,
+              grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
+            };
+            break;
         }
+      } else {
+        // Fallback: use NIP with safely annualized income
+        incomeInput = {
+          programName: "NIP",
+          pat: derivedAnnualIncome,
+          depreciation: null,
+          interestExpense: null,
+        };
+      }
+
+      const payload = {
+        lenderId: null, // Aggregator Mode — evaluate across all lenders
+        // BUG-1 FIX: Raw loanType enum from the store. No transformation.
+        loanType: data.productType || "HOME_LOAN",
+        cibilScore: data.cibilScore || 750,
+        // BUG-3 FIX: Computed age, not hardcoded
+        applicantAge: computedAge,
+        employmentType: data.employmentType?.toUpperCase() || "SALARIED",
+        // BUG-4 FIX: Real property type from form
+        propertyType: data.propertyType || null,
+        propertyCategory: data.propertyCategory || null,
+        businessPropertyCategory: data.businessPropertyCategory || null,
+        cityTier: "TIER_1",
+        loanAmount: data.loanAmount || 0,
+        propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
+        requestedTenureMonths: (data.loanTenure || 5) * 12,
+        monthlyIncome: totalEffectiveIncome,
+        existingEmiTotal: data.eligibleExistingEmi || 0,
+        businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
+        workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
+        idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
+        // GEO-FENCE: Pass pinCode to engine for Indore-only validation
+        pinCode: data.pinCode || "",
+        // BUG-2 FIX: Correct field names matching Java IncomeComputationInput record
+        incomeComputationInput: incomeInput,
+        itrYearsAvailable: data.itrYearsAvailable !== undefined && data.itrYearsAvailable !== null ? Number(data.itrYearsAvailable) : null
+      };
+      const engineRes = await PrymeAPI.evaluateEligibility(payload);
+      if (engineRes && Array.isArray(engineRes)) {
+        engineData = engineRes;
+      }
     } catch (engineError) {
-        console.error("Eligibility Engine evaluation failed:", engineError);
+      console.error("Eligibility Engine evaluation failed:", engineError);
     }
 
     setApplicationData((prev: any) => ({
@@ -325,53 +325,53 @@ const Apply = () => {
   // 🧠 THE CORE GATEWAY: Pushes intent -> Auth -> Inline Progressive Continuation
   const handleApplyWithPyrme = async (bankId: string) => {
     const bank = bankOffers.find(b => b.id === bankId);
-    
+
     // Cache exact target to resolve later
     localStorage.setItem("pryme_target_bank", bank?.bankName || "Pryme Aggregator");
 
     if (!isLeadCaptured() && !user) {
-        // High-intent action intercepted: Trigger the Auth Gate now
-        setPendingBankId(bankId);
-        setShowAuthGate(true);
-        return;
+      // High-intent action intercepted: Trigger the Auth Gate now
+      setPendingBankId(bankId);
+      setShowAuthGate(true);
+      return;
     }
 
     // 🧠 160 IQ ELEVATION HANDSHAKE
     // Before showing the form, ensure we have a valid LoanApplication footprint in Java
     if (user?.id) {
-        const pendingLeadId = localStorage.getItem("pryme_pending_lead_id");
-        const isUuid = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+      const pendingLeadId = localStorage.getItem("pryme_pending_lead_id");
+      const isUuid = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
-        if (pendingLeadId && isUuid(pendingLeadId) && isUuid(user.id)) {
-            try {
-                const targetBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
-                const elevationRes = await PrymeAPI.elevateLead(pendingLeadId, user.id, targetBank);
-                if (elevationRes?.applicationId) {
-                    setActiveApplicationId(elevationRes.applicationId);
-                    localStorage.removeItem("pryme_pending_lead_id");
-                }
-            } catch (error: any) {
-                // 🧠 409 CONFLICT RECOVERY: Lead already elevated
-                if (error.message?.includes("already been converted") || error.message?.includes("409")) {
-                    localStorage.removeItem("pryme_pending_lead_id");
-                }
-                console.error("Lead elevation failed:", error);
-                try {
-                    const myApps = await PrymeAPI.getMyApplications();
-                    if (myApps && myApps.length > 0) {
-                        setActiveApplicationId(myApps[0].applicationId);
-                    }
-                } catch (e) { /* ignore */ }
+      if (pendingLeadId && isUuid(pendingLeadId) && isUuid(user.id)) {
+        try {
+          const targetBank = localStorage.getItem("pryme_target_bank") || "Pryme Aggregator";
+          const elevationRes = await PrymeAPI.elevateLead(pendingLeadId, user.id, targetBank);
+          if (elevationRes?.applicationId) {
+            setActiveApplicationId(elevationRes.applicationId);
+            localStorage.removeItem("pryme_pending_lead_id");
+          }
+        } catch (error: any) {
+          // 🧠 409 CONFLICT RECOVERY: Lead already elevated
+          if (error.message?.includes("already been converted") || error.message?.includes("409")) {
+            localStorage.removeItem("pryme_pending_lead_id");
+          }
+          console.error("Lead elevation failed:", error);
+          try {
+            const myApps = await PrymeAPI.getMyApplications();
+            if (myApps && myApps.length > 0) {
+              setActiveApplicationId(myApps[0].applicationId);
             }
-        } else {
-            // No lead? Check if they already have an application
-            try {
-                const myApps = await PrymeAPI.getMyApplications();
-                if (myApps && myApps.length > 0) {
-                    setActiveApplicationId(myApps[0].applicationId);
-                }
-            } catch (e) { /* ignore */ }
+          } catch (e) { /* ignore */ }
         }
+      } else {
+        // No lead? Check if they already have an application
+        try {
+          const myApps = await PrymeAPI.getMyApplications();
+          if (myApps && myApps.length > 0) {
+            setActiveApplicationId(myApps[0].applicationId);
+          }
+        } catch (e) { /* ignore */ }
+      }
     }
 
     // Step 3: Trigger Progressive Continuation Form directly beneath instead of hard reload
@@ -400,18 +400,18 @@ const Apply = () => {
       </Helmet>
 
       {showAuthGate && (
-        <LeadCaptureGate 
+        <LeadCaptureGate
           onCaptured={() => {
             setShowAuthGate(false);
             if (pendingBankId) {
               handleApplyWithPyrme(pendingBankId);
             }
-          }} 
+          }}
         />
       )}
 
-      <AnalysisLoader 
-        isVisible={isAnalyzing} 
+      <AnalysisLoader
+        isVisible={isAnalyzing}
         onComplete={handleAnalysisComplete}
         data={applicationData}
       />
@@ -442,7 +442,7 @@ const Apply = () => {
         <main className="flex-1 w-full flex flex-col items-center min-h-[90vh] pt-24 md:pt-28 pb-12 relative z-10">
           <AnimatePresence mode="wait">
             {!showComparison ? (
-              <motion.section 
+              <motion.section
                 key="application-form"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -452,7 +452,7 @@ const Apply = () => {
               >
                 {/* Minimalist Centered Header */}
                 <div className="text-center mb-6 w-full max-w-2xl mx-auto">
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}
                     className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 shadow-sm"
                   >
@@ -467,18 +467,18 @@ const Apply = () => {
                 </div>
 
                 {/* Premium Fintech Card Container */}
-                <div 
+                <div
                   className="w-full relative"
                   onFocus={handleFormFocus}
                   onBlur={handleFormBlur}
                   tabIndex={-1}
                   style={{ outline: "none" }}
                 >
-                  <motion.div 
+                  <motion.div
                     className="relative bg-white dark:bg-[#0a1224] border border-slate-200 dark:border-white/[0.08] shadow-2xl overflow-hidden z-10 transition-colors duration-500"
                     animate={{
-                      boxShadow: isFormFocused 
-                        ? "0 25px 50px -12px rgba(16, 55, 131, 0.15), 0 0 0 1px rgba(16, 55, 131, 0.1)" 
+                      boxShadow: isFormFocused
+                        ? "0 25px 50px -12px rgba(16, 55, 131, 0.15), 0 0 0 1px rgba(16, 55, 131, 0.1)"
                         : "0 10px 30px -10px rgba(0,0,0,0.05)",
                       transform: isFormFocused ? "translateY(-2px)" : "translateY(0px)",
                     }}
@@ -487,7 +487,7 @@ const Apply = () => {
                   >
                     {/* Sophisticated subtle inner glow, stripped of over-the-top Web3 stuff */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 dark:via-blue-500/30 to-transparent" />
-                    
+
                     <div className="p-5 md:p-8 relative z-10">
                       <LoanApplicationForm
                         onAmountChange={setLoanAmount}
@@ -527,9 +527,9 @@ const Apply = () => {
                         <p className="text-sm font-medium text-muted-foreground">
                           Based on your CIBIL and entered income.
                         </p>
-                        
+
                         <div className="mt-6 w-full h-2 rounded-full bg-secondary overflow-hidden">
-                          <motion.div 
+                          <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: "78%" }}
                             transition={{ duration: 1.5, delay: 0.2, ease: "easeOut" }}

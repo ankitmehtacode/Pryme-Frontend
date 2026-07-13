@@ -315,7 +315,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                 {/* ── Income fields ──────────────────────────────────── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <ValidatedInput
-                    label="Annual Gross Receipts (Yearly, ₹)"
+                    label="Annual Gross Receipts (Yearly, ₹ as per itr)"
                     type="number"
                     placeholder="e.g. 3600000"
                     icon={IndianRupee}
@@ -739,7 +739,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                   {store.loanRequirements.loanType === "LAP" && (
                     <StyledSelect
                       label="Type of Property"
-                      value={store.loanRequirements.propertyCategory || "RESIDENTIAL"}
+                      value={store.loanRequirements.propertyCategory || ""}
                       onValueChange={(v) => store.updateLoanRequirements({ propertyCategory: v as 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL', propertyType: undefined, businessPropertyCategory: undefined })}
                       placeholder="Select category"
                     >
