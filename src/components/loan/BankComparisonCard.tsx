@@ -165,9 +165,9 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
         {/* ── Top Promo Bar/Ribbon for Reward ── */}
         {matchingReward && (
-          <div className="bg-purple-50/90 dark:bg-purple-950/20 border-b border-purple-100/80 dark:border-purple-900/30 px-5 py-2.5 md:px-8 flex flex-row items-center flex-wrap gap-2">
+          <div className="bg-purple-50/90 dark:bg-purple-950/20 border-b border-purple-100/80 dark:border-purple-900/30 px-5 py-2.5 md:px-8 flex items-center gap-2">
             <RewardIcon className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-            <span className="text-[10px] md:text-[11px] font-extrabold text-purple-700 dark:text-purple-300 uppercase tracking-widest leading-normal whitespace-normal break-words">
+            <span className="text-[10px] md:text-[11px] font-extrabold text-purple-700 dark:text-purple-300 uppercase tracking-widest leading-none">
               Exclusive Reward: {dynamicRewardText}
             </span>
           </div>
@@ -175,7 +175,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
         <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Grid ───────────────────────────── */}
-          <div className="flex flex-col xl:grid xl:grid-cols-[170px_185px_140px_1fr] 2xl:grid-cols-[245px_260px_180px_1fr] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
+          <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_1fr] 2xl:grid-cols-[245px_260px_180px_1fr] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
             
             {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
             <div className="flex items-start justify-between w-full xl:w-auto">
@@ -282,7 +282,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               ].map((m, i) => (
                 <div
                   key={i}
-                  className="w-[74px] xl:w-[64px] 2xl:w-[84px] py-2 2xl:py-2.5 text-center rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15] shrink-0"
+                  className="w-[74px] 2xl:w-[84px] py-2 2xl:py-2.5 text-center rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15] shrink-0"
                 >
                   <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5 whitespace-nowrap">{m.label}</p>
                   <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight whitespace-nowrap">{m.value}</p>
