@@ -139,7 +139,7 @@ const PrepaymentCalculator = ({
         </div>
 
         {/* Strategy Tabs Selector */}
-        <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/40 dark:bg-[#0d1829]/65 rounded-lg border border-border dark:border-white/5 mb-3 md:mb-4 relative z-10 select-none shrink-0">
+        <div className="grid grid-cols-4 gap-1 p-1 bg-secondary/45 dark:bg-[#0d1829]/65 rounded-lg border border-border dark:border-white/5 mb-3 md:mb-4 relative z-10 select-none shrink-0 h-10 items-center">
           {[
             { id: "lump-sum", label: "Lump Sum" },
             { id: "13th-emi", label: "13th EMI" },
@@ -149,8 +149,8 @@ const PrepaymentCalculator = ({
             <button
               key={tab.id}
               onClick={() => setStrategy(tab.id as any)}
-              className={`py-2 px-1 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer text-center whitespace-nowrap leading-none ${strategy === tab.id
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-emerald-500 dark:text-[#080d1e]"
+              className={`h-8 rounded-md text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center whitespace-nowrap leading-none ${strategy === tab.id
+                  ? "bg-emerald-600 text-white shadow-sm dark:bg-emerald-500 dark:text-[#080d1e]"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
                 }`}
             >
