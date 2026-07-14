@@ -16,6 +16,16 @@ import type {
   BusinessSubType, HomePropertyType, CommercialPropertyType, IndustrialPropertyType, PropertyType
 } from "@/lib/applicationTypes";
 
+// Mirrors SurrogateIncomeResolver.resolveGst()'s default margin table on the
+// backend: monthly income = turnover * margin / 12, not turnover / 12 alone.
+// Also mirrored in LoanApplicationForm.tsx's businessSubType heuristic.
+const GST_MARGIN_BY_INDUSTRY: Record<string, number> = {
+  Service: 0.10,
+  Retail: 0.12,
+  Wholesale: 0.08,
+  Manufacturing: 0.04,
+};
+
 const calculateVintageYears = (dateStr: string): number => {
   if (!dateStr) return 0;
   const regDate = new Date(dateStr);
@@ -359,9 +369,11 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? "") : ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const val = e.target.value === "" ? undefined : Math.max(0, Number(e.target.value));
+                      // Professionals are always the "Service" GST margin bucket (see
+                      // Apply.tsx's hardcoded businessType: "Service" for the SEP path).
                       store.updateProfessionalDetails({
                         last12MonthsGstTurnover: val,
-                        netMonthlyIncome: val !== undefined ? Math.round(val / 12) : 0,
+                        netMonthlyIncome: val !== undefined ? Math.round((val * GST_MARGIN_BY_INDUSTRY.Service) / 12) : 0,
                       });
                     }}
                     isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? -1) : -1) >= 0}
@@ -520,10 +532,12 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.last12MonthsGstTurnover || "") : ""}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = Number(e.target.value);
+                        const industry = store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.industryType || "Service") : "Service";
+                        const margin = GST_MARGIN_BY_INDUSTRY[industry] ?? GST_MARGIN_BY_INDUSTRY.Service;
                         store.updateBusinessDetails({
                           last12MonthsGstTurnover: val,
                           monthlyGSTTurnover: Math.round(val / 12),
-                          netMonthlyIncome: Math.round(val / 12),
+                          netMonthlyIncome: Math.round((val * margin) / 12),
                           subType: val > 0 ? "GST_BASED" : "ITR_BASED"
                         });
                       }}
@@ -533,7 +547,17 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                       label="Business Industry Type"
                       icon={Briefcase}
                       value={store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.industryType || "Service") : undefined}
-                      onValueChange={(v) => store.updateBusinessDetails({ industryType: v })}
+                      onValueChange={(v) => {
+                        const turnover = store.financialDetails.path === "SELF_EMPLOYED" ? (store.financialDetails.data.last12MonthsGstTurnover || 0) : 0;
+                        const margin = GST_MARGIN_BY_INDUSTRY[v] ?? GST_MARGIN_BY_INDUSTRY.Service;
+                        store.updateBusinessDetails({
+                          industryType: v,
+                          // Re-derive income from turnover when the industry (and thus margin)
+                          // changes after turnover was already entered -- otherwise it stays
+                          // stale at whatever margin was in effect when turnover was typed.
+                          ...(turnover > 0 ? { netMonthlyIncome: Math.round((turnover * margin) / 12) } : {}),
+                        });
+                      }}
                       placeholder="Select industry type"
                     >
                       <SelectItem value="Service">Service</SelectItem>
