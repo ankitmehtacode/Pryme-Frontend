@@ -154,9 +154,7 @@ const OffersRewards = () => {
         id: r.id,
         type: hasPhysicalItem ? "gift" : "discount",
         title: hasPhysicalItem ? items.join(" + ") : (r.pfWaiver || "Special Offer"),
-        description: hasPhysicalItem && r.pfWaiver
-          ? `Plus ${r.pfWaiver} on successful disbursement.`
-          : "Exclusive benefit on successful loan disbursement.",
+        description: hasPhysicalItem ? (r.pfWaiver || "") : "",
         bank: r.bank,
         validTill: "Ongoing",
       });
@@ -430,39 +428,46 @@ const OffersRewards = () => {
                 </p>
               </div>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {calculatedOffers.map((offer) => {
                 const Icon = getOfferIcon(offer.type);
                 const styling = getOfferStyling(offer.type);
 
                 return (
-                  <div 
-                    key={offer.id} 
-                    className="bg-white dark:bg-[#0c1829] border border-slate-200/80 dark:border-[#103783]/20 rounded-[1.5rem] p-5 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col h-full hover:-translate-y-1"
+                  <div
+                    key={offer.id}
+                    className="group relative bg-white dark:bg-[#0c1829] border border-slate-200/70 dark:border-[#103783]/15 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                   >
-                    {/* Icon Top */}
-                    <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center mb-5 border transition-transform duration-500 group-hover:scale-110", styling)}>
-                      <Icon className="w-5.5 h-5.5" />
-                    </div>
+                    {/* Brand accent bar — consistent with the bank-card left stripe used elsewhere on the site */}
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#103783] to-[#1e56c7]" />
 
-                    {/* Content */}
-                    <h4 className="font-extrabold text-base text-[#0a1530] dark:text-white mb-2 leading-tight tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-                      {offer.title}
-                    </h4>
-                    <p className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-6 flex-1">
-                      {offer.description}
-                    </p>
-
-                    {/* Footer Meta */}
-                    <div className="mt-auto pt-4 border-t border-slate-100 dark:border-[#103783]/10 flex items-center justify-between gap-2">
-                      {offer.bank && (
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#103783] bg-[#103783]/5 dark:bg-[#1e56c7]/10 dark:text-[#1e56c7] px-2 py-0.5 rounded border border-[#103783]/10">
+                    <div className="pl-4 pr-3.5 py-3.5">
+                      {/* Header: icon + bank name */}
+                      <div className="flex items-center gap-2 mb-2.5">
+                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-transform duration-300 group-hover:scale-110", styling)}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <span
+                          className="text-[10px] font-extrabold uppercase tracking-wide text-[#103783] dark:text-[#3b82f6] truncate"
+                          title={offer.bank}
+                        >
                           {offer.bank}
                         </span>
-                      )}
-                      {offer.validTill && (
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                          Valid: {offer.validTill}
+                      </div>
+
+                      {/* Reward headline */}
+                      <h4
+                        className="font-extrabold text-[13px] text-[#0a1530] dark:text-white leading-snug tracking-tight line-clamp-2 min-h-[2.4em]"
+                        style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
+                        title={offer.title}
+                      >
+                        {offer.title}
+                      </h4>
+
+                      {/* Secondary benefit pill */}
+                      {offer.description && (
+                        <span className="inline-block mt-2 text-[9px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/60 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
+                          {offer.description}
                         </span>
                       )}
                     </div>
