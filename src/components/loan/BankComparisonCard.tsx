@@ -426,33 +426,40 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               <div className="p-4 md:px-7 md:py-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
                 {(() => {
                   const er = offer.originalEngineResult;
-                  const productCode = (er?.productCode || offer.id || "").toUpperCase();
-                  const isLap = productCode.includes("LAP");
 
-                  // Parse a raw fee value into a displayable ₹ amount number (for totaling)
-                  const toNumeric = (val: any, fallbackVal: string): number => {
-                    let checkVal = val;
-                    if (checkVal == null || checkVal === "") {
-                      checkVal = fallbackVal;
-                    }
-                    if (checkVal === "Nil" || checkVal === "0") return 0;
-                    if (typeof checkVal === "number") return checkVal;
-                    const s = String(checkVal).replace(/[₹,\s]/g, "");
-                    if (s.includes("%")) {
-                      // Percentage based (e.g. stamp duty 0.25%) - compute percentage of principal
-                      const pct = parseFloat(s.replace("%", ""));
+                  // A range like "9,000-18,000" (SBI Legal & Technical) or a variable
+                  // formula like "5000+Mortgage charge between 2500-15000 according to
+                  // loan amount" (BOB-LAP Other Fees) isn't a single number -- shown as
+                  // text and deliberately excluded from Total Upfront Cost rather than
+                  // guessing a point estimate.
+                  const isRangeOrFormula = (s: string) => /\d\s*-\s*\d|according to loan amount/i.test(s);
+
+                  // Parse a raw fee value (real data only -- no fallback substitution;
+                  // if the backend has no figure for this product, it's excluded from
+                  // the total rather than silently replaced with a guessed default).
+                  const toNumeric = (val: any): number => {
+                    if (val == null || val === "") return 0;
+                    if (val === "Nil" || val === "0" || val === 0) return 0;
+                    if (typeof val === "number") return val;
+                    const s = String(val).trim();
+                    if (isRangeOrFormula(s)) return 0;
+                    const cleaned = s.replace(/[₹,\s]/g, "");
+                    if (cleaned.includes("%")) {
+                      const pct = parseFloat(cleaned.replace("%", ""));
                       return isNaN(pct) ? 0 : Math.round(principalAmount * pct / 100);
                     }
-                    const n = parseFloat(s);
+                    const n = parseFloat(cleaned);
                     return isNaN(n) ? 0 : n;
                   };
 
-                  // Format a value for display with fallback
-                  const fmt = (val: any, fallbackVal: string): string => {
-                    const checkVal = (val != null && val !== "") ? val : fallbackVal;
-                    if (checkVal === 0 || checkVal === "0" || checkVal === 0.0) return "₹0";
-                    if (typeof checkVal === "number") return `₹${Math.round(checkVal).toLocaleString("en-IN")}`;
-                    const s = String(checkVal).trim();
+                  // Format a value for display. No fallback substitution to a guessed
+                  // default -- but a missing/null figure still renders as ₹0 rather
+                  // than leaking "null" or an ambiguous placeholder into the UI.
+                  const fmt = (val: any): string => {
+                    if (val == null || val === "") return "₹0";
+                    if (val === 0 || val === "0" || val === 0.0) return "₹0";
+                    if (typeof val === "number") return `₹${Math.round(val).toLocaleString("en-IN")}`;
+                    const s = String(val).trim();
                     if (s === "0" || s.toLowerCase() === "nil") return "₹0";
                     if (s.includes("%")) {
                       const pct = parseFloat(s.replace(/[^\d.]/g, ""));
@@ -460,27 +467,44 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                         return `₹${Math.round(principalAmount * pct / 100).toLocaleString("en-IN")}`;
                       }
                     }
-                    if (s.startsWith("₹") || s.includes("-")) return s;
+                    if (isRangeOrFormula(s)) {
+                      // Format bare number ranges ("9000-18000") as currency; leave
+                      // free-text formulas (BOB-LAP's mortgage-charge note) as-is.
+                      const rangeMatch = s.match(/^([\d,]+)\s*-\s*([\d,]+)$/);
+                      if (rangeMatch) {
+                        const lo = parseInt(rangeMatch[1].replace(/,/g, ""), 10);
+                        const hi = parseInt(rangeMatch[2].replace(/,/g, ""), 10);
+                        return `₹${lo.toLocaleString("en-IN")} - ₹${hi.toLocaleString("en-IN")} (est.)`;
+                      }
+                      return `${s} (est.)`;
+                    }
+                    if (s.startsWith("₹")) return s;
                     const n = parseFloat(s.replace(/[₹,\s]/g, ""));
                     if (!isNaN(n)) return `₹${Math.round(n).toLocaleString("en-IN")}`;
                     return s;
                   };
-
-                  // Fallbacks matching database seed patterns
-                  const stampDutyFallback = isLap ? "0.50%" : "0.25%";
-                  const legalTechFallback = isLap ? "₹2,500" : "₹0";
-                  const loginFeeFallback = "₹1,000";
 
                   // Processing fee in ₹
                   const pfAmount = offer.processingFee >= 100
                     ? Math.round(offer.processingFee)
                     : Math.round(principalAmount * offer.processingFee / 100);
 
-                  const loginFeeNum = toNumeric(er?.loginFee, loginFeeFallback);
-                  const stampDutyNum = toNumeric(er?.stampDuty, stampDutyFallback);
-                  const legalTechNum = toNumeric(er?.legalTechnicalCharges, legalTechFallback);
+                  const loginFeeNum = toNumeric(er?.loginFee);
+                  const stampDutyNum = toNumeric(er?.stampDuty);
 
-                  const totalUpfront = pfAmount + loginFeeNum + stampDutyNum + legalTechNum;
+                  // "Other Charges" = Legal & Technical Fees + Other Fees combined into
+                  // one line, since both are lender-side fixed/variable charges that
+                  // aren't stamp duty or processing/login fees.
+                  const legalTechRaw = er?.legalTechnicalCharges;
+                  const otherExpenseRaw = er?.otherExpense;
+                  const otherChargesNum = toNumeric(legalTechRaw) + toNumeric(otherExpenseRaw);
+                  const otherChargesEstimated = [legalTechRaw, otherExpenseRaw].some(
+                    (v) => typeof v === "string" && isRangeOrFormula(v)
+                  );
+                  const otherChargesDisplay = `₹${otherChargesNum.toLocaleString("en-IN")}${otherChargesEstimated ? " (est.)" : ""}`;
+
+                  const totalUpfront = pfAmount + loginFeeNum + stampDutyNum + otherChargesNum;
+                  const hasEstimatedFees = otherChargesEstimated || (typeof er?.stampDuty === "string" && isRangeOrFormula(er.stampDuty));
 
                   const coreRows = [
                     { label: "Principal Amount", value: `₹${principalAmount.toLocaleString("en-IN")}` },
@@ -493,9 +517,9 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
                   const feeRows = [
                     { label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
-                    { label: "Login Fees", value: fmt(er?.loginFee, loginFeeFallback) },
-                    { label: "Stamp Duty", value: fmt(er?.stampDuty, stampDutyFallback) },
-                    { label: "Legal & Technical Fees", value: fmt(er?.legalTechnicalCharges, legalTechFallback) },
+                    { label: "Login Fees", value: fmt(er?.loginFee) },
+                    { label: "Stamp Duty", value: fmt(er?.stampDuty) },
+                    { label: "Other Charges", value: otherChargesDisplay },
                   ];
 
                   return (
@@ -542,6 +566,11 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                                 {totalUpfront > 0 ? `₹${totalUpfront.toLocaleString("en-IN")}` : "₹0"}
                               </span>
                             </div>
+                            {hasEstimatedFees && (
+                              <p className="text-[10px] text-muted-foreground/70 leading-snug -mt-1">
+                                Excludes one variable, lender-quoted charge shown above as an estimate — actual amount depends on loan amount and will be confirmed by the lender.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
