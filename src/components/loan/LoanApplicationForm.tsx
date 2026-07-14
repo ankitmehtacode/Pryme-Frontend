@@ -827,34 +827,21 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
         eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0),
+        // ITR years filed is real, reported data -- always forward it when the
+        // applicant provided it. The old logic here guessed whether the applicant
+        // was "ITR_BASED" or "GST_BASED" and silently zeroed this out (sent null)
+        // whenever GST-derived income looked larger than ITR income, discarding a
+        // real ITR filing history the backend's vintage floor (Math.max(businessAge,
+        // itrYearsAvailable) in EligibilityEngineService.buildRequestForProgram)
+        // needs -- causing GST-heavy self-employed applicants with a short/recent
+        // GST registration date to be rejected everywhere on vintage grounds even
+        // though they'd genuinely clear it via ITR history. The backend's cascade
+        // already evaluates every program on its own merits; this field shouldn't
+        // pre-filter based on a guess.
         itrYearsAvailable: (() => {
-          if (fin?.path === "PROFESSIONAL") {
-            const d = fin.data as any;
-            return d.itrFiledYears !== undefined && d.itrFiledYears !== null ? Number(d.itrFiledYears) : null;
-          }
-          if (fin?.path !== "SELF_EMPLOYED") return null;
+          if (fin?.path !== "PROFESSIONAL" && fin?.path !== "SELF_EMPLOYED") return null;
           const d = fin.data as any;
-          const gstTurnover = Number(d.last12MonthsGstTurnover ?? 0);
-          const itrIncome = Number(d.netMonthlyIncome ?? 0);
-          const annualTurnover = Number(d.annualTurnover ?? 0);
-          let resolvedSubType = "ITR_BASED";
-          if (gstTurnover > 0 && annualTurnover === 0 && itrIncome === 0) {
-            resolvedSubType = "GST_BASED";
-          } else if (gstTurnover > 0) {
-            const industry = d.industryType || "Service";
-            const margin = industry === "Service" ? 0.10 : (industry === "Retail" ? 0.12 : (industry === "Wholesale" ? 0.08 : 0.04));
-            const gstIncome = (gstTurnover * margin) / 12;
-            if (gstIncome > itrIncome) {
-              resolvedSubType = "GST_BASED";
-            }
-          }
-          
-          if (resolvedSubType === "ITR_BASED") {
-            return d.itrFiledYears !== undefined && d.itrFiledYears !== null
-              ? Number(d.itrFiledYears)
-              : null;
-          }
-          return null;
+          return d.itrFiledYears !== undefined && d.itrFiledYears !== null ? Number(d.itrFiledYears) : null;
         })()
       };
 

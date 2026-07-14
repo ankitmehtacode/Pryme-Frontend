@@ -21,7 +21,7 @@ export default defineConfig({
       // The browser sees same-origin, so the PRYME_SID cookie attaches on every request.
       // changeOrigin rewrites the Host header to match the target.
       '/api': {
-        target: 'http://localhost:8090',
+        target: 'http://187.127.138.20',
         changeOrigin: true,
         secure: false
       }
