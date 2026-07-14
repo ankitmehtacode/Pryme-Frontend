@@ -69,6 +69,21 @@ const BANKS_MAP: Record<string, BankDetails> = {
   indusind: { id: "indusind", name: "INDUS IND BANK", logo: indusindLogo }
 };
 
+// Backend's LeadService.normalizeLoanType only strips a trailing "_loan"
+// suffix (so "Personal Loan"/"Home Loan"/"Business Loan" happen to survive
+// the old .toUpperCase().replace(/\s/g, "_") transform by accident), then
+// checks against a short-code allow-list: personal, business, home,
+// education, lap, auto. "Loan Against Property" doesn't end in "_loan", so
+// it was never stripped down to "lap" and the submission always failed with
+// a 409. Map explicitly to the codes the backend actually accepts instead
+// of relying on that suffix-stripping coincidence.
+const LOAN_TYPE_LABEL_TO_CODE: Record<string, string> = {
+  "Personal Loan": "personal",
+  "Home Loan": "home",
+  "Loan Against Property": "lap",
+  "Business Loan": "business",
+};
+
 export default function ApplyDirect() {
   const { bankId } = useParams<{ bankId: string }>();
   const navigate = useNavigate();
@@ -229,7 +244,7 @@ export default function ApplyDirect() {
       await PrymeAPI.submitLead({
         fullName: formData.fullName,
         phone: formData.phone,
-        productType: formData.loanType.toUpperCase().replace(/\s/g, "_"),
+        productType: LOAN_TYPE_LABEL_TO_CODE[formData.loanType],
         loanAmount: 1000000,
         cibilScore: 750,
         monthlyIncome: 50000,
