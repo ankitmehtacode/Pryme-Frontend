@@ -217,13 +217,23 @@ const Apply = () => {
         // pat+depreciation (its formula is PAT + Depreciation x multiplier).
         // Send both so the backend can genuinely evaluate both candidates
         // instead of only ever trying the one program this form used to
-        // hardcode.
+        // hardcode. GST is also a candidate for select professions (e.g.
+        // IndusInd allow-lists Doctor/MBBS/BDS/CA/Architect on its GST HL/LAP
+        // rows) -- forward the turnover so the backend can attempt it too.
+        // GST registration in India is turnover-based, not occupation-based,
+        // so a CA/doctor/architect practice above the threshold registers
+        // and files as a service provider; "Service" is the correct margin
+        // bucket per the curated sheet's Margin-by-occupation column
+        // (Service 10% / Retailer / Wholesale / Manufacturer / Trader), not
+        // just a fallback to avoid a zero margin.
         incomeInput = {
           programName: "SEP",
           grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
           profession: data.professionalSubType || "CA",
           pat: data.netProfit || 0,
           depreciation: data.depreciation || 0,
+          gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
+          businessType: "Service",
         };
       } else if (data.financialPath === "SELF_EMPLOYED") {
         // SENP candidates are NIP, GST, BANKING -- send whatever raw data

@@ -520,6 +520,7 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                         store.updateBusinessDetails({
                           last12MonthsGstTurnover: val,
                           monthlyGSTTurnover: Math.round(val / 12),
+                          netMonthlyIncome: Math.round(val / 12),
                           subType: val > 0 ? "GST_BASED" : "ITR_BASED"
                         });
                       }}
