@@ -352,16 +352,16 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     <SelectItem value="3">3+ Years</SelectItem>
                   </StyledSelect>
                   <ValidatedInput
-                    label="GST Returns Filed (Months)"
+                    label="Last 12 Months GST Turnover (₹)"
                     type="number"
-                    placeholder="e.g. 12"
-                    icon={FileText}
-                    value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.gstFilingMonths ?? "") : ""}
+                    placeholder="e.g. 6000000"
+                    icon={IndianRupee}
+                    value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? "") : ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const val = e.target.value === "" ? undefined : Math.max(0, Number(e.target.value));
-                      store.updateProfessionalDetails({ gstFilingMonths: val });
+                      store.updateProfessionalDetails({ last12MonthsGstTurnover: val });
                     }}
-                    isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.gstFilingMonths ?? -1) : -1) >= 0}
+                    isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? -1) : -1) >= 0}
                   />
                 </div>
 

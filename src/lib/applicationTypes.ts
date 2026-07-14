@@ -149,6 +149,7 @@ export interface ProfessionalDetails {
   netMonthlyIncome: number;
   itrFiledYears?: number;        // Years of ITR filed
   gstFilingMonths?: number;      // Months of GST returns filed (documentation only -- not an income formula input)
+  last12MonthsGstTurnover?: number; // Aggregate GST turnover for last 12 months
 
   // P&L Normalisation (Property Loan specific)
   annualDepreciation?: number;   // Annual depreciation add-back

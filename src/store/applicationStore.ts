@@ -123,6 +123,7 @@ const defaultProfessional: ProfessionalDetails = {
   netMonthlyIncome: 0,
   itrFiledYears: undefined,
   gstFilingMonths: undefined,
+  last12MonthsGstTurnover: undefined,
   annualDepreciation: undefined,
   caCertifiedAccounts: false,
   hasExistingLoans: false,
