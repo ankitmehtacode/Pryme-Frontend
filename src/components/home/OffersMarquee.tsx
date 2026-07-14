@@ -1,17 +1,16 @@
 import { Percent, Tag, Zap, Gift, Sparkles, Star, Car } from "lucide-react";
 
 // Import Bank Logos
-import hdfcLogo from "@/assets/card-personal.png"; // Fallback or find hdfc svg if available, using personal as placeholder if not
-import iciciLogo from "@/assets/icici.svg";
-import axisLogo from "@/assets/axis-bank-logo-1.svg";
-import sbiLogo from "@/assets/card-home.png"; // Fallback
+import hdfcLogo from "@/assets/hdfc.png";
+import iciciLogo from "@/assets/icici.png";
+import axisLogo from "@/assets/axis-bank.png";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
-import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank.png";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
-import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
+import tataLogo from "@/assets/tata-capital.png";
 
 const offers = [
-  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: null, color: "text-blue-500" },
+  { id: 1, bank: "HDFC", text: "HDFC Personal Loan @ 10.49% ROI", icon: Percent, logo: hdfcLogo, color: "text-blue-500" },
   { id: 2, bank: "ICICI", text: "Zero Processing Fee for Salaried Pros", icon: Tag, logo: iciciLogo, color: "text-blue-500" },
   { id: 3, bank: "AXIS", text: "Instant Disbursal in 2 Hours", icon: Zap, logo: axisLogo, color: "text-amber-500" },
   { id: 4, bank: "TATA", text: "Flat ₹5,000 Voucher on LAP", icon: Gift, logo: tataLogo, color: "text-blue-700" },

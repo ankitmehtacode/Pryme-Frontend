@@ -1,23 +1,23 @@
 import { memo } from "react";
 import { Container } from "@/components/layout/Primitives";
-import iciciLogo from "@/assets/icici.svg";
-import axisLogo from "@/assets/axis-bank-logo-1.svg";
-import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
+import iciciLogo from "@/assets/icici.png";
+import axisLogo from "@/assets/axis-bank.png";
+import idbiLogo from "@/assets/idbi-bank.png";
 import unionLogo from "@/assets/union-bank-of-india.svg";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
-import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank.png";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
-import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
-import hdfcLogo from "@/assets/hdfc.svg";
-import sbiLogo from "@/assets/sbi-logo.svg";
-import bobLogo from "@/assets/bob-logo.svg";
+import tataLogo from "@/assets/tata-capital.png";
+import hdfcLogo from "@/assets/hdfc.png";
+import sbiLogo from "@/assets/sbi.png";
+import bobLogo from "@/assets/bob.png";
 import scLogo from "@/assets/sc-logo.svg";
 import indusindLogo from "@/assets/indusind-logo.svg";
 import rblLogo from "@/assets/rbl-bank.svg";
-import bajajLogo from "@/assets/bajaj-finserv.svg";
-import ltLogo from "@/assets/lt-finance.svg";
-import bandhanLogo from "@/assets/bandhan-bank.svg";
-import abflLogo from "@/assets/abfl.svg";
+import bajajLogo from "@/assets/bajaj-finserv.png";
+import ltLogo from "@/assets/lt-finance.png";
+import bandhanLogo from "@/assets/bandhan-bank.png";
+import abflLogo from "@/assets/abfl.png";
 
 export const banks = [
   { name: "Axis Bank", logo: axisLogo },

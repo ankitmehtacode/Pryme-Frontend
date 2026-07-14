@@ -18,25 +18,25 @@ import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparis
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { formatIndianCurrency } from "@/lib/utils";
 
-import hdfcLogo from "@/assets/hdfc.svg";
-import iciciLogo from "@/assets/icici.svg";
-import axisLogo from "@/assets/axis-bank-logo-1.svg";
+import hdfcLogo from "@/assets/hdfc.png";
+import iciciLogo from "@/assets/icici.png";
+import axisLogo from "@/assets/axis-bank.png";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
-import sbiLogo from "@/assets/sbi.svg";
-import bobLogo from "@/assets/bob.svg";
+import sbiLogo from "@/assets/sbi.png";
+import bobLogo from "@/assets/bob.png";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
-import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank.png";
 import rblLogo from "@/assets/rbl-bank.svg";
-import bajajLogo from "@/assets/bajaj-finserv.svg";
-import ltLogo from "@/assets/lt-finance.svg";
-import bandhanLogo from "@/assets/bandhan-bank.svg";
-import abflLogo from "@/assets/abfl.svg";
+import bajajLogo from "@/assets/bajaj-finserv.png";
+import ltLogo from "@/assets/lt-finance.png";
+import bandhanLogo from "@/assets/bandhan-bank.png";
+import abflLogo from "@/assets/abfl.png";
 import scLogo from "@/assets/sc.svg";
 import indusindLogo from "@/assets/indusind.svg";
-import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
-import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
-import idfcLogo from "@/assets/idfc.svg";
-import jioLogo from "@/assets/jio.svg";
+import idbiLogo from "@/assets/idbi-bank.png";
+import tataLogo from "@/assets/tata-capital.png";
+import idfcLogo from "@/assets/idfc.png";
+import jioLogo from "@/assets/jio.png";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES

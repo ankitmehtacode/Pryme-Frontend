@@ -12,13 +12,13 @@ import { PrymeAPI } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 // Import bank logos for live preview resolution
-import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
-import axisLogo from "@/assets/axis-bank-logo-1.svg";
+import idbiLogo from "@/assets/idbi-bank.png";
+import axisLogo from "@/assets/axis-bank.png";
 import unionLogo from "@/assets/union-bank-of-india.svg";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
-import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
-import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
+import yesLogo from "@/assets/yes-bank.png";
+import tataLogo from "@/assets/tata-capital.png";
 import heroBankImg from "@/assets/hero-bank-building.png";
 import { GlossyRewardButton } from "../../../components/admin/GlossyRewardButton";
 

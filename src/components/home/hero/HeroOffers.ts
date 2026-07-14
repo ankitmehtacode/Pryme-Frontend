@@ -1,15 +1,15 @@
 import { Sparkles, Percent, Zap, TrendingUp, ShieldCheck, Award, Building2, Star } from "lucide-react";
 
-import idbiLogo from "@/assets/idbi-bank-logo-1.svg";
-import axisLogo from "@/assets/axis-bank-logo-1.svg";
+import idbiLogo from "@/assets/idbi-bank.png";
+import axisLogo from "@/assets/axis-bank.png";
 import unionLogo from "@/assets/union-bank-of-india.svg";
 import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.svg";
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
-import yesLogo from "@/assets/yes-bank-new-logo-download_logoshape.com.svg";
-import tataLogo from "@/assets/tata-capital-logo-svg_logoshape.com.svg";
-import hdfcLogo from "@/assets/hdfc.svg";
-import idfcLogo from "@/assets/idfc.svg";
-import jioLogo from "@/assets/jio.svg";
+import yesLogo from "@/assets/yes-bank.png";
+import tataLogo from "@/assets/tata-capital.png";
+import hdfcLogo from "@/assets/hdfc.png";
+import idfcLogo from "@/assets/idfc.png";
+import jioLogo from "@/assets/jio.png";
 
 import axisBanner from "@/assets/axis_festive_banner.png";
 import hdfcBanner from "@/assets/hdfc_preferred_banner.png";
