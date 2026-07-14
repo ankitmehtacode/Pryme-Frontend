@@ -359,7 +359,10 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? "") : ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const val = e.target.value === "" ? undefined : Math.max(0, Number(e.target.value));
-                      store.updateProfessionalDetails({ last12MonthsGstTurnover: val });
+                      store.updateProfessionalDetails({
+                        last12MonthsGstTurnover: val,
+                        netMonthlyIncome: val !== undefined ? Math.round(val / 12) : 0,
+                      });
                     }}
                     isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.last12MonthsGstTurnover ?? -1) : -1) >= 0}
                   />
