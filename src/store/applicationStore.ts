@@ -122,7 +122,6 @@ const defaultProfessional: ProfessionalDetails = {
   annualGrossReceipts: 0,
   netMonthlyIncome: 0,
   itrFiledYears: undefined,
-  gstFilingMonths: undefined,
   last12MonthsGstTurnover: undefined,
   annualDepreciation: undefined,
   caCertifiedAccounts: false,
@@ -147,7 +146,6 @@ const defaultBusiness: BusinessDetails = {
   gstNumber: undefined,
   last12MonthsGstTurnover: 0,        // new primary GST income field
   monthlyGSTTurnover: 0,
-  gstFilingMonths: undefined,
   // Banking
   abbTier: undefined,
   primaryBankName: undefined,

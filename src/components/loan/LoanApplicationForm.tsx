@@ -813,12 +813,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         last12MonthsGstTurnover: Number((fin?.data as any)?.last12MonthsGstTurnover ?? 0),
         annualGrossReceipts: Number((fin?.data as any)?.annualGrossReceipts ?? 0),
         totalPracticeYears: Number((fin?.data as any)?.totalPracticeYears ?? 0),
-        // Documentation field only -- not consumed by any income formula or
-        // eligibility check today (mirrors gst_return_requirement's role on
-        // the backend: a document checklist item, not a computation input).
-        gstFilingMonths: (fin?.data as any)?.gstFilingMonths !== undefined && (fin?.data as any)?.gstFilingMonths !== null
-          ? Number((fin.data as any).gstFilingMonths)
-          : null,
         businessVintageYears: Number((fin?.data as any)?.vintageYears ?? 0),
         totalExperienceYears: Number((fin?.data as any)?.totalExperienceYears ?? 0),
         averageBankBalance: Number((fin?.data as any)?.abbTier ? (fin.data as any).abbTier * 100000 : 0), // ABB tier in lakhs → rupees

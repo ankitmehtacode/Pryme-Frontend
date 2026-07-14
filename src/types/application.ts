@@ -110,7 +110,6 @@ export interface BusinessData {
   // ── GST-Based Fields ──
   gstNumber?: string;                       // 15-digit GSTIN
   gstMonthlyTurnover?: number;              // Average monthly GST turnover
-  gstFilingMonths?: number;                 // Months of continuous GST filing
 
   // ── Banking Program Fields ──
   abbTier?: ABBTierLakhs;                   // Average Bank Balance tier in lakhs
