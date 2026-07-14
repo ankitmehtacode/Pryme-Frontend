@@ -1,21 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  Gift, 
-  Percent, 
-  Tag, 
-  Sparkles, 
-  Briefcase, 
-  User, 
-  UserCheck, 
-  ShieldCheck, 
-  Clock, 
-  ArrowRight, 
+import {
+  Gift,
+  Percent,
+  Tag,
+  Sparkles,
+  Briefcase,
+  User,
+  UserCheck,
+  ShieldCheck,
+  Clock,
+  ArrowRight,
   ArrowLeft,
   ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { PrymeAPI } from "@/lib/api";
 import loyaltyGiftImg from "@/assets/loyalty-gift.png";
 
 interface Offer {
@@ -27,6 +28,21 @@ interface Offer {
   validTill?: string;
 }
 
+// Real product_rewards row shape (see AdminProductRewardController / PublicProductRewardController)
+interface ProductRewardRow {
+  id: string;
+  bank: string;
+  productCode: string;
+  iconType?: string;
+  rewardText?: string;
+  minLoanAmount?: number | null;
+  maxLoanAmount?: number | null;
+  employmentType?: string;
+  reward1?: string;
+  reward2?: string;
+  pfWaiver?: string;
+}
+
 const products = [
   { id: "personal", label: "Personal Loan" },
   { id: "business", label: "Business Loan" },
@@ -35,16 +51,58 @@ const products = [
   { id: "auto", label: "Auto Loan" },
 ];
 
+// Loan product selection -> product_code prefix suffix used in seeded reward data
+// (e.g. "ABFL-HL", "ABFL-LAP"). Personal/Business/Auto have no reward data seeded
+// yet (the curated sheet only covered Home Loan and LAP) -- left unmapped on
+// purpose rather than guessing, so those profiles honestly show "no rewards"
+// instead of fabricated ones.
+const PRODUCT_TO_CODE_SUFFIX: Record<string, string | null> = {
+  personal: null,
+  business: null,
+  home: "-HL",
+  lap: "-LAP",
+  auto: null,
+};
+
+// Employment selection -> exact employment_type string stored in product_rewards
+// (sourced verbatim from Rewards_Offers_Mapped.xlsx, including its own spelling).
+const EMPLOYMENT_TO_REWARD_TYPE: Record<string, string> = {
+  salaried: "SALARIED",
+  "non-professional": "SELF EMPLOYEED NON PROFESSIONAL",
+  professional: "SELF EMPLOYEED PROFESSIONAL",
+};
+
 const OffersRewards = () => {
   // Form State
   const [loanAmount, setLoanAmount] = useState<number | "">("");
   const [loanProduct, setLoanProduct] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [employmentType, setEmploymentType] = useState<string>("salaried");
-  
+
   // Navigation Step State
   const [step, setStep] = useState<"form" | "results">("form");
   const [calculatedOffers, setCalculatedOffers] = useState<Offer[]>([]);
+
+  // Real reward data, fetched once from the public catalogue
+  const [rewardRows, setRewardRows] = useState<ProductRewardRow[]>([]);
+  const [rewardsLoading, setRewardsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    PrymeAPI.getPublicProductRewards()
+      .then((res: any) => {
+        if (cancelled) return;
+        const list = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+        setRewardRows(list);
+      })
+      .catch(() => {
+        if (!cancelled) setRewardRows([]);
+      })
+      .finally(() => {
+        if (!cancelled) setRewardsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   // Format amount input as numbers
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,77 +122,45 @@ const OffersRewards = () => {
     return new Intl.NumberFormat("en-IN").format(value);
   };
 
-  // Logic to calculate dynamic rewards based on user inputs
+  // Match real seeded reward rows against the applicant's inputs -- no
+  // fabricated offers. If nothing in product_rewards matches (e.g. Personal/
+  // Business/Auto loans, which have no reward data seeded yet), the result
+  // list is honestly empty rather than inventing a plausible-looking offer.
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
-    const amount = Number(loanAmount) || 1000000;
-    
-    // Dynamic calculations
-    const processingFeeDiscount = amount >= 5000000 ? "100% Processing Fee Waiver" : "50% Off Processing Fee";
-    const processingFeeDesc = amount >= 5000000 
-      ? "Exclusive premium benefit: zero processing charges on your loan application."
-      : "Save on setup costs with a 50% discount on standard bank processing fees.";
+    const amount = Number(loanAmount) || 0;
+    const codeSuffix = PRODUCT_TO_CODE_SUFFIX[loanProduct];
+    const targetEmpType = EMPLOYMENT_TO_REWARD_TYPE[employmentType];
 
-    // Amazon voucher calculation
-    let amazonCardVal = "₹1,000 Amazon Gift Card";
-    let amazonCardDesc = "Get an Amazon shopping voucher upon successful disbursal.";
-    if (amount >= 3000000) {
-      amazonCardVal = "₹5,000 Amazon Gift Card";
-      amazonCardDesc = "Premium milestone gift: ₹5,000 Amazon voucher added to your account.";
-    } else if (amount >= 1000000) {
-      amazonCardVal = "₹2,500 Amazon Gift Card";
-      amazonCardDesc = "Special reward: ₹2,500 Amazon voucher credited on disbursal.";
+    const matches = rewardRows.filter((r) => {
+      if (codeSuffix && !r.productCode?.toUpperCase().endsWith(codeSuffix)) return false;
+      if (targetEmpType && r.employmentType && r.employmentType.toUpperCase() !== targetEmpType) return false;
+      if (r.minLoanAmount != null && amount < r.minLoanAmount) return false;
+      if (r.maxLoanAmount != null && amount > r.maxLoanAmount) return false;
+      return true;
+    });
+
+    // One card per matching lender, deduplicated by bank (a lender could in
+    // theory have more than one row matching the same bracket).
+    const seenBanks = new Set<string>();
+    const generatedOffers: Offer[] = [];
+    for (const r of matches) {
+      if (seenBanks.has(r.bank)) continue;
+      seenBanks.add(r.bank);
+
+      const items = [r.reward1, r.reward2].filter(Boolean);
+      const hasPhysicalItem = items.length > 0;
+      generatedOffers.push({
+        id: r.id,
+        type: hasPhysicalItem ? "gift" : "discount",
+        title: hasPhysicalItem ? items.join(" + ") : (r.pfWaiver || "Special Offer"),
+        description: hasPhysicalItem && r.pfWaiver
+          ? `Plus ${r.pfWaiver} on successful disbursement.`
+          : "Exclusive benefit on successful loan disbursement.",
+        bank: r.bank,
+        validTill: "Ongoing",
+      });
     }
-
-    // Cashback calculation
-    let cashbackVal = "₹2,000 Instant Cashback";
-    let cashbackDesc = "Direct cashback credited on your first successful EMI payment.";
-    if (employmentType === "professional") {
-      cashbackVal = "₹5,000 Cashback Bonus";
-      cashbackDesc = "Special Self-Employed Professional bonus: ₹5,000 first EMI cashback.";
-    } else if (amount >= 2000000) {
-      cashbackVal = "₹3,500 High-Value Cashback";
-      cashbackDesc = "Enhanced cashback of ₹3,500 for loan amounts exceeding ₹20 Lakhs.";
-    }
-
-    // Loyalty points calculation
-    const loyaltyPoints = amount >= 5000000 ? "15,000 Pryme Reward Points" : "10,000 Pryme Reward Points";
-    const loyaltyDesc = `Earn loyalty points redeemable for premium travel and hotel vouchers.`;
-
-    const generatedOffers: Offer[] = [
-      {
-        id: "d1",
-        type: "discount",
-        title: processingFeeDiscount,
-        description: processingFeeDesc,
-        bank: "HDFC Bank",
-        validTill: "31 Dec 2026"
-      },
-      {
-        id: "d2",
-        type: "cashback",
-        title: cashbackVal,
-        description: cashbackDesc,
-        bank: "ICICI Bank",
-        validTill: "31 Dec 2026"
-      },
-      {
-        id: "d3",
-        type: "gift",
-        title: amazonCardVal,
-        description: amazonCardDesc,
-        bank: "Axis Bank",
-        validTill: "31 Dec 2026"
-      },
-      {
-        id: "d4",
-        type: "reward",
-        title: loyaltyPoints,
-        description: loyaltyDesc,
-        bank: "SBI",
-        validTill: "Ongoing"
-      }
-    ];
 
     setCalculatedOffers(generatedOffers);
     setStep("results");
@@ -337,9 +363,10 @@ const OffersRewards = () => {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  className="w-full bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-[#103783]/10 hover:shadow-[#103783]/20 transition-all flex items-center justify-center gap-1.5 mt-2"
+                  disabled={rewardsLoading}
+                  className="w-full bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-[#103783]/10 hover:shadow-[#103783]/20 transition-all flex items-center justify-center gap-1.5 mt-2"
                 >
-                  Calculate Rewards
+                  {rewardsLoading ? "Loading rewards…" : "Calculate Rewards"}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </form>
@@ -392,6 +419,17 @@ const OffersRewards = () => {
             </div>
 
             {/* ────────────── RESULTS GRID ────────────── */}
+            {calculatedOffers.length === 0 ? (
+              <div className="text-center py-16 px-6 bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl">
+                <Gift className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-sm font-bold text-[#0a1530] dark:text-white mb-1">No rewards currently available for this profile</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  {PRODUCT_TO_CODE_SUFFIX[loanProduct] === null
+                    ? "Reward offers are currently only available for Home Loan and Loan Against Property applications."
+                    : "Try a different loan amount or employment type, or check back soon — new lender offers are added regularly."}
+                </p>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {calculatedOffers.map((offer) => {
                 const Icon = getOfferIcon(offer.type);
@@ -432,6 +470,7 @@ const OffersRewards = () => {
                 );
               })}
             </div>
+            )}
 
             {/* Back action below results */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 pt-6 border-t border-slate-100 dark:border-[#103783]/10">
