@@ -47,10 +47,9 @@ const RewardsCalculatorPage = () => {
               </div>
             </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 max-w-xl mx-auto">
                 {[
                   { icon: Coins, title: "Cashbacks", text: "Direct statement credits on successful disbursement." },
-                  { icon: Sparkles, title: "Gold Tier", text: "Exclusive access to airport lounges and concierge." },
                   { icon: Zap, title: "Instant Vouchers", text: "Receive brand vouchers instantly upon approval." }
                 ].map((item, i) => (
                   <ScrollReveal key={i} direction="up" delay={i * 0.1}>

@@ -278,24 +278,39 @@ const OffersRewards = () => {
                               transition={{ duration: 0.15 }}
                               className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-[#0c1829] border border-slate-200 dark:border-[#103783]/20 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
                             >
-                              {products.map((p) => (
-                                <button
-                                  key={p.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setLoanProduct(p.id);
-                                    setIsDropdownOpen(false);
-                                  }}
-                                  className={cn(
-                                    "w-full text-left px-3 py-2 text-xs font-bold transition-all flex items-center justify-between hover:bg-[#103783]/5 dark:hover:bg-[#1e56c7]/5 hover:text-[#103783] dark:hover:text-white",
-                                    loanProduct === p.id 
-                                      ? "text-[#103783] dark:text-white bg-[#103783]/5 dark:bg-[#1e56c7]/5" 
-                                      : "text-slate-600 dark:text-slate-350"
-                                  )}
-                                >
-                                  {p.label}
-                                </button>
-                              ))}
+                              {products.map((p) => {
+                                const hasRewards = PRODUCT_TO_CODE_SUFFIX[p.id] != null;
+                                return (
+                                  <button
+                                    key={p.id}
+                                    type="button"
+                                    disabled={!hasRewards}
+                                    onClick={() => {
+                                      if (!hasRewards) return;
+                                      setLoanProduct(p.id);
+                                      setIsDropdownOpen(false);
+                                    }}
+                                    className={cn(
+                                      "w-full text-left px-3 py-2 text-xs font-bold transition-all flex items-center justify-between",
+                                      !hasRewards
+                                        ? "text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                        : cn(
+                                            "hover:bg-[#103783]/5 dark:hover:bg-[#1e56c7]/5 hover:text-[#103783] dark:hover:text-white",
+                                            loanProduct === p.id
+                                              ? "text-[#103783] dark:text-white bg-[#103783]/5 dark:bg-[#1e56c7]/5"
+                                              : "text-slate-600 dark:text-slate-350"
+                                          )
+                                    )}
+                                  >
+                                    <span>{p.label}</span>
+                                    {!hasRewards && (
+                                      <span className="text-[9px] font-bold uppercase tracking-wide text-slate-300 dark:text-slate-600">
+                                        Coming Soon
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
                             </motion.div>
                           </>
                         )}
