@@ -351,6 +351,18 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     <SelectItem value="2">2 Years</SelectItem>
                     <SelectItem value="3">3+ Years</SelectItem>
                   </StyledSelect>
+                  <ValidatedInput
+                    label="GST Returns Filed (Months)"
+                    type="number"
+                    placeholder="e.g. 12"
+                    icon={FileText}
+                    value={store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.gstFilingMonths ?? "") : ""}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const val = e.target.value === "" ? undefined : Math.max(0, Number(e.target.value));
+                      store.updateProfessionalDetails({ gstFilingMonths: val });
+                    }}
+                    isValid={(store.financialDetails.path === "PROFESSIONAL" ? (store.financialDetails.data.gstFilingMonths ?? -1) : -1) >= 0}
+                  />
                 </div>
 
                 {store.loanRequirements?.loanType === 'LAP' || store.loanRequirements?.loanType === 'HOME_LOAN' ? (

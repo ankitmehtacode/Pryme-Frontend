@@ -148,7 +148,8 @@ export interface ProfessionalDetails {
   annualGrossReceipts: number;   // Gross professional receipts (pre-expense)
   netMonthlyIncome: number;
   itrFiledYears?: number;        // Years of ITR filed
-  
+  gstFilingMonths?: number;      // Months of GST returns filed (documentation only -- not an income formula input)
+
   // P&L Normalisation (Property Loan specific)
   annualDepreciation?: number;   // Annual depreciation add-back
   caCertifiedAccounts?: boolean; // Accounts are CA-Certified / Audited
