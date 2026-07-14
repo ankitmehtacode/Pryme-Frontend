@@ -188,9 +188,21 @@ const Apply = () => {
         }
       }
 
-      // ── BUG-2 FIX: Resolve surrogate programName from employment path ──
-      // The Java SurrogateIncomeResolver.resolve() switches on programName.
-      let incomeInput: any = { programName: null };
+      // ── UNIFIED INCOME PAYLOAD (multi-program cascade) ──
+      // The backend no longer hurries to a single frontend-guessed program:
+      // EligibilityEngineService.evaluateProductCascaded exhaustively tries
+      // every program applicable to the applicant's employment type (see
+      // CANDIDATE_PROGRAMS_BY_EMPLOYMENT: SALARIED→[NIP], SEP→[NIP,SEP,
+      // CPM_SEP], SENP→[NIP,GST,BANKING]) and picks the genuine best offer.
+      // That only works if this payload actually carries every program's
+      // raw fields at once -- previously this switched to ONE program
+      // (via an inaccurate client-side GST margin heuristic) and silently
+      // dropped the applicant's other data, so the backend had nothing to
+      // evaluate for the programs it now checks. programName here is
+      // advisory: it only decides whether NIP passes pat/depreciation
+      // through unchanged vs. re-deriving from monthlyIncome (see
+      // buildRequestForProgram).
+      let incomeInput: any = { programName: "NIP" };
 
       if (data.financialPath === "SALARIED") {
         // Salaried: No surrogate program needed.
@@ -201,50 +213,43 @@ const Apply = () => {
           interestExpense: null,
         };
       } else if (data.financialPath === "PROFESSIONAL") {
-        // Professional (CA/CS/Doctor): SEP program
+        // SEP needs grossReceipts+profession; CPM_SEP additionally needs
+        // pat+depreciation (its formula is PAT + Depreciation x multiplier).
+        // Send both so the backend can genuinely evaluate both candidates
+        // instead of only ever trying the one program this form used to
+        // hardcode.
         incomeInput = {
           programName: "SEP",
           grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
           profession: data.professionalSubType || "CA",
+          pat: data.netProfit || 0,
+          depreciation: data.depreciation || 0,
         };
       } else if (data.financialPath === "SELF_EMPLOYED") {
-        // Self-Employed: Program depends on businessSubType
-        const subType = data.businessSubType || "ITR_BASED";
-        switch (subType) {
-          case "GST_BASED":
-            incomeInput = {
-              programName: "GST",
-              gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
-              businessType: data.businessIndustryType || "Service",
-            };
-            break;
-          case "BANKING_PROGRAM":
-            incomeInput = {
-              programName: "BANKING",
-              averageBankBalance: data.averageBankBalance || 0,
-            };
-            break;
-          case "CASH_FLOW_PROGRAM":
-            incomeInput = {
-              programName: "CASHFLOW",
-              averageBankBalance: data.averageBankBalance || 0,
-            };
-            break;
-          default: // ITR_BASED or fallback
-            incomeInput = {
-              programName: "NIP",
-              pat: data.netProfit || derivedAnnualIncome,
-              depreciation: data.depreciation || null,
-              interestExpense: null,
-              // Caps PAT+Depreciation in SurrogateIncomeResolver.resolveNip() so a large
-              // self-reported depreciation add-back can't inflate income past what the
-              // business actually turns over. annualTurnover (the ITR-relevant figure)
-              // takes priority; GST turnover / gross receipts are fallbacks for cases
-              // where turnover itself wasn't entered.
-              grossReceipts: data.annualTurnover || data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
-            };
-            break;
-        }
+        // SENP candidates are NIP, GST, BANKING -- send whatever raw data
+        // the applicant actually entered for each. Declare programName
+        // "NIP" whenever real ITR net profit was reported, so the backend
+        // passes pat/depreciation through unchanged (preserving the real
+        // depreciation add-back) instead of re-deriving a depreciation-less
+        // estimate from monthlyIncome; this doesn't suppress GST/BANKING --
+        // those are still evaluated as separate candidates from the same
+        // unified fields.
+        const hasItrProfit = Number(data.netProfit) > 0;
+        const hasGstTurnover = Number(data.last12MonthsGstTurnover) > 0;
+        incomeInput = {
+          programName: hasItrProfit ? "NIP" : (hasGstTurnover ? "GST" : "NIP"),
+          pat: data.netProfit || 0,
+          depreciation: data.depreciation || 0,
+          // Caps PAT+Depreciation in SurrogateIncomeResolver.resolveNip() so a large
+          // self-reported depreciation add-back can't inflate income past what the
+          // business actually turns over. annualTurnover (the ITR-relevant figure)
+          // takes priority; GST turnover / gross receipts are fallbacks for cases
+          // where turnover itself wasn't entered.
+          grossReceipts: data.annualTurnover || data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
+          gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
+          businessType: data.businessIndustryType || "Service",
+          averageBankBalance: data.averageBankBalance || 0,
+        };
       } else {
         // Fallback: use NIP with safely annualized income
         incomeInput = {
