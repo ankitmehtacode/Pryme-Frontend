@@ -60,7 +60,13 @@ const BANKS_MAP: Record<string, BankDetails> = {
   jio: { id: "jio", name: "JIO FINANCE", logo: jioLogo },
   idbi: { id: "idbi", name: "IDBI BANK", logo: idbiLogo },
   tata: { id: "tata", name: "TATA CAPITAL", logo: tataLogo },
-  idfc: { id: "idfc", name: "IDFC FIRST BANK", logo: idfcLogo }
+  idfc: { id: "idfc", name: "IDFC FIRST BANK", logo: idfcLogo },
+  // L&T Finance and Indus Ind Bank are active, real lenders (product codes
+  // LT-* / INDUSIND-*) that were never added here -- every offer from either
+  // one silently fell through to the HDFC fallback below. L&T alone has more
+  // active products than any other lender, so this was firing constantly.
+  lt: { id: "lt", name: "L&T FINANCE", logo: ltLogo },
+  indusind: { id: "indusind", name: "INDUS IND BANK", logo: indusindLogo }
 };
 
 export default function ApplyDirect() {
@@ -106,6 +112,44 @@ export default function ApplyDirect() {
 
   const pincode = getUserPinCode();
 
+  // Retrieve the loan type the user actually selected earlier in the flow,
+  // from the same session blob getUserPinCode() already reads. Previously
+  // this was never read at all -- the form defaulted to the literal
+  // "Personal Loan" regardless of what the user had actually applied for.
+  const getUserLoanType = (): string => {
+    const RAW_TO_LABEL: Record<string, string> = {
+      HOME_LOAN: "Home Loan",
+      LAP: "Loan Against Property",
+      LOAN_AGAINST_PROPERTY: "Loan Against Property",
+      BUSINESS_LOAN: "Business Loan",
+      PERSONAL_LOAN: "Personal Loan",
+    };
+    try {
+      const loanSessionStr = sessionStorage.getItem("pryme-loan-session");
+      if (loanSessionStr) {
+        const sessionObj = JSON.parse(loanSessionStr);
+        const rawType = sessionObj?.state?.loanRequirements?.loanType;
+        if (rawType && RAW_TO_LABEL[rawType]) {
+          return RAW_TO_LABEL[rawType];
+        }
+      }
+    } catch (e) {
+      console.error("Error reading loan type from loan session:", e);
+    }
+    try {
+      const pendingApp = localStorage.getItem("pryme_pending_application");
+      if (pendingApp) {
+        const parsed = JSON.parse(pendingApp);
+        if (parsed?.loanType && RAW_TO_LABEL[parsed.loanType]) {
+          return RAW_TO_LABEL[parsed.loanType];
+        }
+      }
+    } catch (e) {
+      console.error("Error reading loan type from pending application:", e);
+    }
+    return "Personal Loan";
+  };
+
   // Calculate nearest branch address in Indore based on pincode
   const getBranchAddress = (bankKey: string, pin: string): string => {
     const cleanPin = parseInt(pin.trim(), 10) || 452001;
@@ -137,7 +181,7 @@ export default function ApplyDirect() {
     fullName: localStorage.getItem("pryme_lead_name") || "",
     phone: localStorage.getItem("pryme_lead_phone") || "",
     preferredTime: "Morning (9 AM - 12 PM)",
-    loanType: "Personal Loan",
+    loanType: getUserLoanType(),
     message: ""
   });
 
