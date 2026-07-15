@@ -158,10 +158,10 @@ const PrepaymentCalculator = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 relative z-10 w-full items-stretch flex-1">
 
           {/* Left Col: 4 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
-          <div className="lg:grid lg:grid-rows-4 lg:gap-2 flex flex-col space-y-2 lg:space-y-0 w-full min-w-0">
+          <div className="lg:grid lg:grid-rows-4 flex flex-col divide-y divide-border/60 dark:divide-white/5 lg:divide-y-0 w-full min-w-0">
 
             {/* Loan Amount */}
-            <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="lg:row-span-1 py-2.5 lg:pt-0 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding Loan Amount (₹)</label>
                 <input
@@ -178,7 +178,7 @@ const PrepaymentCalculator = ({
             </div>
 
             {/* Interest Rate */}
-            <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="lg:row-span-1 py-2.5 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Current Interest Rate (% p.a.)</label>
                 <input
@@ -196,7 +196,7 @@ const PrepaymentCalculator = ({
             </div>
 
             {/* Tenure */}
-            <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+            <div className="lg:row-span-1 py-2.5 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Remaining Tenure (Months)</label>
                 <div className="flex items-center gap-1">
@@ -217,7 +217,7 @@ const PrepaymentCalculator = ({
 
             {strategy === "lump-sum" ? (
               /* Prepayment Amount */
-              <div className="lg:row-span-1 bg-emerald-50/30 dark:bg-emerald-500/5 p-2.5 rounded-lg border border-emerald-200/30 dark:border-emerald-500/10 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
+              <div className="lg:row-span-1 py-2.5 lg:pb-0 flex flex-col justify-center">
                 <div className="flex justify-between items-center mb-1.5 gap-2">
                   <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
                   <input
@@ -225,7 +225,7 @@ const PrepaymentCalculator = ({
                     value={prepaymentAmount}
                     onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
                     onWheel={(e) => e.currentTarget.blur()}
-                    className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     min={10000}
                     max={Math.min(loanAmount, 5000000)}
                   />
