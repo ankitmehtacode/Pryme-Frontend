@@ -124,7 +124,7 @@ const PrepaymentCalculator = ({
   return (
     <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-5 shadow-lg relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col w-full", className)}>
 
-      <div className="flex-1 flex flex-col relative z-10 w-full">
+      <div className="flex-1 flex flex-col lg:min-h-[546px] relative z-10 w-full">
         {/* Header */}
         <div className="flex items-center gap-3 mb-3 md:mb-4 relative z-10 w-full shrink-0">
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
