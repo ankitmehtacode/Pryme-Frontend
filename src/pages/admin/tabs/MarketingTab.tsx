@@ -619,12 +619,14 @@ export const MarketingTab: React.FC = () => {
 
             </div>
           </div>
-      {/* 2. Configured Offers — Always shows all 3 (DB + defaults merged) */}
+      {/* 2. Configured Offers — real DB-backed offers plus unpublished fallback
+           preview rows merged in so the table always has 3 example rows. Only
+           the "Live" count reflects what's actually shown on the homepage. */}
       <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden">
             <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
               <h3 className="font-semibold text-white">Configured Offers</h3>
               <span className="text-xs text-slate-400 font-semibold bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/[0.06]">
-                Total: {mergedOffers.length}
+                Live: {offers.filter((o: any) => o.active).length} / Total: {mergedOffers.length}
               </span>
             </div>
 
@@ -687,9 +689,12 @@ export const MarketingTab: React.FC = () => {
                           </td>
                           <td className="px-4 py-3">
                             {isDefault ? (
-                              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold bg-green-500/10 text-green-400 border-green-500/20">
-                                <ToggleRight className="w-3.5 h-3.5" />
-                                Active
+                              <span
+                                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold bg-slate-500/10 text-slate-400 border-slate-500/20"
+                                title="This is a fallback preview row only -- it has never been published and is not shown on the live site."
+                              >
+                                <ToggleLeft className="w-3.5 h-3.5" />
+                                Not Published
                               </span>
                             ) : (
                               <button
