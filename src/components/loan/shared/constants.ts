@@ -81,10 +81,6 @@ export const CITY_PIN_PREFIXES: Record<string, string[]> = {
   "Surat": ["394", "395"],
 };
 
-export const RELIGIONS = [
-  "Hinduism", "Islam", "Christianity", "Sikhism", "Buddhism", "Jainism", "Other"
-];
-
 export const EMPLOYMENT_OPTIONS: { value: EmploymentType; label: string; icon: any }[] = [
   { value: "SALARIED", label: "Salaried", icon: Building2 },
   { value: "PROFESSIONAL", label: "Professional", icon: GraduationCap },

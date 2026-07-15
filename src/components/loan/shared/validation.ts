@@ -151,7 +151,6 @@ export const ERROR_SECTION_MAP: Record<string, string> = {
   state: 'section-identity',
   city: 'section-identity',
   pinCode: 'section-identity',
-  religion: 'section-identity',
   // Stage 2 — Employment
   employmentType: 'section-employment',
   subType: 'section-employment',

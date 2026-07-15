@@ -6,7 +6,7 @@ import { useApplicationStore } from "@/store/applicationStore";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
-import { RELIGIONS, STATE_CITIES } from "../shared/constants";
+import { STATE_CITIES } from "../shared/constants";
 
 interface IdentityStepProps {
   cardCn: string;
@@ -24,7 +24,6 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
     state: '',
     city: '',
     pinCode: '',
-    religion: '',
     employmentType: null,
   };
   const errors = store.validationErrors || {};

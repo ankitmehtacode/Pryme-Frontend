@@ -37,6 +37,13 @@ export type SalariedSubType = 'PRIVATE' | 'GOVERNMENT';
 
 export type ProfessionalSubType = 'CA' | 'CS' | 'DOCTOR' | 'LAWYER';
 
+// Standard relationship set used by PolicyBazaar/BankBazaar-style aggregators
+// for co-applicant KYC -- most lenders' co-applicant eligibility is
+// relationship-gated (spouse/parent/child near-universally accepted,
+// siblings vary by lender).
+export type CoApplicantRelationship =
+  | 'SPOUSE' | 'FATHER' | 'MOTHER' | 'SON' | 'DAUGHTER' | 'BROTHER' | 'SISTER' | 'OTHER';
+
 /** Business underwriting programs — each has a fundamentally different doc matrix */
 export type BusinessSubType =
   | 'ITR_BASED'             // Standard: 2-3yr ITR + P&L + Balance Sheet
@@ -106,9 +113,6 @@ export interface BasicKYC {
   state: string;
   city: string;
   pinCode: string;               // 6-digit
-
-  // Religion
-  religion: string;
 
   // Employment pivot — this single field determines the entire downstream flow
   employmentType: EmploymentType | null;
@@ -245,7 +249,7 @@ export interface LoanRequirements {
 export interface CoApplicantDetails {
   fullName: string;
   mobileNumber: string;
-  email: string;
+  relationship: CoApplicantRelationship | '';
   dateOfBirth: string;
   pinCode: string;
   employmentType: EmploymentType | null;

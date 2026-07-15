@@ -1,12 +1,13 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  UserPlus, User, Phone, Mail, Calendar, 
-  MapPin, Briefcase, BriefcaseBusiness, 
-  GraduationCap, Building2, IndianRupee 
+import {
+  UserPlus, User, Phone, Users, Calendar,
+  MapPin, Briefcase, BriefcaseBusiness,
+  GraduationCap, Building2, IndianRupee
 } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
-import { ValidatedInput, PillSelector, ToggleSwitch } from "../shared/FormComponents";
+import { ValidatedInput, StyledSelect, PillSelector, ToggleSwitch } from "../shared/FormComponents";
+import { SelectItem } from "@/components/ui/select";
 
 interface CoApplicantStepProps {
   cardCn: string;
@@ -18,7 +19,7 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
   const coApplicant = financialFootprint.coApplicantDetails || {
     fullName: '',
     mobileNumber: '',
-    email: '',
+    relationship: '',
     dateOfBirth: '',
     pinCode: '',
     employmentType: null,
@@ -77,15 +78,22 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                   isValid={/^[6-9]\d{9}$/.test(coApplicant.mobileNumber)}
                 />
-                <ValidatedInput
-                  label="Email Address"
-                  type="email"
-                  placeholder="co-applicant@email.com"
-                  icon={Mail}
-                  value={coApplicant.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ email: e.target.value })}
-                  isValid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coApplicant.email)}
-                />
+                <StyledSelect
+                  label="Relationship with Applicant"
+                  icon={Users}
+                  value={coApplicant.relationship || undefined}
+                  onValueChange={(v) => updateCoApplicant({ relationship: v as any })}
+                  placeholder="Select relationship"
+                >
+                  <SelectItem value="SPOUSE">Spouse</SelectItem>
+                  <SelectItem value="FATHER">Father</SelectItem>
+                  <SelectItem value="MOTHER">Mother</SelectItem>
+                  <SelectItem value="SON">Son</SelectItem>
+                  <SelectItem value="DAUGHTER">Daughter</SelectItem>
+                  <SelectItem value="BROTHER">Brother</SelectItem>
+                  <SelectItem value="SISTER">Sister</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
+                </StyledSelect>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <ValidatedInput

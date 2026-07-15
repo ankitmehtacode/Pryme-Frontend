@@ -61,7 +61,6 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
       state: '',
       city: '',
       pinCode: '',
-      religion: '',
       employmentType: null,
     },
     financialDetails: rawStore.financialDetails || { path: null, data: {} },

@@ -49,7 +49,6 @@ const createFreshState = (): ApplicationState => ({
     state: '',
     city: '',
     pinCode: '',
-    religion: '',
     employmentType: null,
   },
 
@@ -74,7 +73,7 @@ const createFreshState = (): ApplicationState => ({
     coApplicantDetails: {
       fullName: '',
       mobileNumber: '',
-      email: '',
+      relationship: '',
       dateOfBirth: '',
       pinCode: '',
       employmentType: null,
@@ -284,7 +283,7 @@ export const useApplicationStore = create<ApplicationStore>()(
               ...(state.financialFootprint?.coApplicantDetails || {
                 fullName: '',
                 mobileNumber: '',
-                email: '',
+                relationship: '',
                 dateOfBirth: '',
                 pinCode: '',
                 employmentType: null,
