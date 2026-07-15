@@ -19,7 +19,6 @@ import { PrymeAPI } from "@/lib/api"; // 🧠 ARCHITECTURE FIX: Import explicit 
 import LoanApplicationForm from "@/components/loan/LoanApplicationForm";
 import EMICalculator from "@/components/loan/EMICalculator";
 import BankComparisonTable from "@/components/loan/BankComparisonTable";
-import EligibilityScore from "@/components/loan/EligibilityScore";
 import CibilTips from "@/components/loan/CibilTips";
 import OffersRewards from "@/components/loan/OffersRewards";
 import ProgressiveContinuationForm from "@/components/loan/ProgressiveContinuationForm";
@@ -172,12 +171,21 @@ const Apply = () => {
         baseAnnual = baseMonthly * 12;
       }
 
+      // ── CO-APPLICANT INCOME: kept separate from the primary applicant's own
+      // figures below, not summed into them. A co-applicant's personal salary
+      // and a business/professional surrogate's turnover-derived income are
+      // measured by different formulas -- the backend resolves the primary
+      // applicant's income via whichever program applies (NIP/GST/SEP/etc.)
+      // and adds coApplicantMonthlyIncome to the result afterward
+      // (EligibilityEngineService's effectiveIncome computation), the same
+      // combined-income model PolicyBazaar/BankBazaar-style aggregators use.
+      // Blending it in here would double it for NIP (which already re-derives
+      // pat from monthlyIncome) and silently vanish for GST/SEP/Banking (which
+      // never read monthlyIncome at all) -- see the investigation that led here.
       const applicantIncome = baseMonthly;
       const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary
         ? Number(data.coApplicantDetails.netMonthlySalary)
         : 0;
-      const totalEffectiveIncome = applicantIncome + coApplicantIncome;
-      const derivedAnnualIncome = baseAnnual + (coApplicantIncome * 12);
 
       // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
       let computedAge = 35;
@@ -208,7 +216,7 @@ const Apply = () => {
         // Salaried: No surrogate program needed.
         incomeInput = {
           programName: "NIP",
-          pat: derivedAnnualIncome,   // Safely annualized
+          pat: baseAnnual,   // Safely annualized, primary applicant only
           depreciation: null,
           interestExpense: null,
         };
@@ -228,7 +236,7 @@ const Apply = () => {
         // just a fallback to avoid a zero margin.
         incomeInput = {
           programName: "SEP",
-          grossReceipts: data.annualGrossReceipts || derivedAnnualIncome,
+          grossReceipts: data.annualGrossReceipts || baseAnnual,
           profession: data.professionalSubType || "CA",
           pat: data.netProfit || 0,
           depreciation: data.depreciation || 0,
@@ -264,7 +272,7 @@ const Apply = () => {
         // Fallback: use NIP with safely annualized income
         incomeInput = {
           programName: "NIP",
-          pat: derivedAnnualIncome,
+          pat: baseAnnual,
           depreciation: null,
           interestExpense: null,
         };
@@ -286,7 +294,11 @@ const Apply = () => {
         loanAmount: data.loanAmount || 0,
         propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
         requestedTenureMonths: (data.loanTenure || 5) * 12,
-        monthlyIncome: totalEffectiveIncome,
+        monthlyIncome: applicantIncome,
+        // Added to the primary applicant's surrogate-resolved income on the
+        // backend (not blended in here) -- see EligibilityEngineService's
+        // effectiveIncome computation.
+        coApplicantMonthlyIncome: coApplicantIncome || null,
         existingEmiTotal: data.eligibleExistingEmi || 0,
         businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
         workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
@@ -396,15 +408,6 @@ const Apply = () => {
 
     // Step 3: Trigger Progressive Continuation Form directly beneath instead of hard reload
     setActiveContinuationBankId(bankId);
-  };
-
-  const calculateEligibilityScore = () => {
-    if (!applicationData) return 70;
-    let score = ((applicationData.cibilScore - 300) / 600) * 40;
-    const ratio = loanAmount / (applicationData.monthlyIncome * 12);
-    score += Math.max(0, (1 - ratio / 10) * 40);
-    score += 20;
-    return Math.min(100, Math.round(score));
   };
 
   const features = [
