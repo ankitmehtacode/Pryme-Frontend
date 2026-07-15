@@ -23,7 +23,6 @@ interface Offer {
   id: string;
   type: "discount" | "cashback" | "reward" | "gift";
   title: string;
-  description: string;
   bank?: string;
   validTill?: string;
 }
@@ -148,13 +147,14 @@ const OffersRewards = () => {
       if (seenBanks.has(r.bank)) continue;
       seenBanks.add(r.bank);
 
-      const items = [r.reward1, r.reward2].filter(Boolean);
-      const hasPhysicalItem = items.length > 0;
+      // All three reward categories (item 1, item 2, PF waiver) shown as one
+      // line separated by "/" rather than splitting the physical items with
+      // "+" and demoting the PF waiver to a separate pill.
+      const items = [r.reward1, r.reward2, r.pfWaiver].filter(Boolean);
       generatedOffers.push({
         id: r.id,
-        type: hasPhysicalItem ? "gift" : "discount",
-        title: hasPhysicalItem ? items.join(" + ") : (r.pfWaiver || "Special Offer"),
-        description: hasPhysicalItem ? (r.pfWaiver || "") : "",
+        type: items.length > 0 ? "gift" : "discount",
+        title: items.length > 0 ? items.join(" / ") : "Special Offer",
         bank: r.bank,
         validTill: "Ongoing",
       });
@@ -478,13 +478,6 @@ const OffersRewards = () => {
                       >
                         {offer.title}
                       </h4>
-
-                      {/* Secondary benefit pill */}
-                      {offer.description && (
-                        <span className="inline-block mt-2 text-[9px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/60 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
-                          {offer.description}
-                        </span>
-                      )}
                     </div>
                   </div>
                 );
