@@ -175,7 +175,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
         <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Grid ───────────────────────────── */}
-          <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_1fr] 2xl:grid-cols-[245px_260px_180px_1fr] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
+          <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_minmax(0,1fr)] 2xl:grid-cols-[245px_260px_180px_minmax(0,1fr)] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
             
             {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
             <div className="flex items-start justify-between w-full xl:w-auto">
@@ -349,7 +349,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
+            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col xl:flex-row xl:flex-wrap items-center xl:justify-end gap-3 xl:gap-2.5">
               {matchingReward?.buttonDesign ? (
                 <GlossyRewardButton 
                   colorScheme={matchingReward.buttonDesign}
