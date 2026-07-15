@@ -44,14 +44,6 @@ const BANNER_MAP: Record<string, string> = {
   idbi: idbiBanner,
 };
 
-// Default hero offers that always display on the homepage carousel
-// These are the source-of-truth fallbacks from HeroSection.tsx
-const DEFAULT_HERO_OFFERS = [
-  { logoType: "axis", bank: "AXIS BANK", tag: "SPECIAL FESTIVE OFFER", title: "Axis Bank Special Festive Offer", highlights: "Zero documentation (salary a/c) | Disbursed within 3 hours | Dedicated Relationship Manager", orderIndex: 1, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
-  { logoType: "hdfc", bank: "HDFC BANK", tag: "PREFERRED OFFER", title: "HDFC Preferred Loan Offer Interest rates from 10.5% p.a.", highlights: "Flexible repayment options | Paperless process | Approval in 24 hours", orderIndex: 2, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
-  { logoType: "idbi", bank: "IDBI Bank", tag: "ZERO FEE OFFER", title: "Zero Processing Fee on Personal Loans", highlights: "Quick digital sanction in 4 hours | Foreclosure charges waived off | No hidden charges", orderIndex: 3, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
-];
-
 // Preset colors and gradients for the live preview cards based on chosen bank
 const THEME_PRESETS: Record<string, { accentColor: string; bgGradient: string }> = {
   idbi: { accentColor: "#0284c7", bgGradient: "conic-gradient(from 220deg at 30% 40%, #38bdf8 0deg, #818cf8 120deg, #0284c7 240deg, #38bdf8 360deg)" },
@@ -364,20 +356,8 @@ export const MarketingTab: React.FC = () => {
     }
   };
 
-  // ── Merge defaults into configured offers so all 3 are always visible ──
-  const mergedOffers = useMemo(() => {
-    const list = [...offers] as any[];
-    DEFAULT_HERO_OFFERS.forEach((def) => {
-      const exists = list.some(
-        (o: any) =>
-          o.logoType?.toLowerCase() === def.logoType.toLowerCase() ||
-          o.bank?.toUpperCase() === def.bank.toUpperCase()
-      );
-      if (!exists) {
-        list.push({ ...def, id: `default-${def.logoType}`, _isDefault: true });
-      }
-    });
-    return list.sort((a: any, b: any) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+  const sortedOffers = useMemo(() => {
+    return [...offers].sort((a: any, b: any) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
   }, [offers]);
 
   // Determine current active preview properties
@@ -619,14 +599,14 @@ export const MarketingTab: React.FC = () => {
 
             </div>
           </div>
-      {/* 2. Configured Offers — real DB-backed offers plus unpublished fallback
-           preview rows merged in so the table always has 3 example rows. Only
-           the "Live" count reflects what's actually shown on the homepage. */}
+      {/* 2. Configured Offers — real DB-backed rows only. What's shown here is
+           exactly what PublicOfferController.heroOffers() serves to the
+           homepage; there is no frontend-only fallback data anymore. */}
       <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] overflow-hidden">
             <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02]">
               <h3 className="font-semibold text-white">Configured Offers</h3>
               <span className="text-xs text-slate-400 font-semibold bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/[0.06]">
-                Live: {offers.filter((o: any) => o.active).length} / Total: {mergedOffers.length}
+                Live: {offers.filter((o: any) => o.active).length} / Total: {sortedOffers.length}
               </span>
             </div>
 
@@ -652,9 +632,14 @@ export const MarketingTab: React.FC = () => {
                         </div>
                       </td>
                     </tr>
+                  ) : sortedOffers.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-slate-500">
+                        No offers configured yet. Use the form above to publish one.
+                      </td>
+                    </tr>
                   ) : (
-                    mergedOffers.map((offer: any) => {
-                      const isDefault = !!offer._isDefault;
+                    sortedOffers.map((offer: any) => {
                       const offerBanner = offer.bannerImageUrl || BANNER_MAP[offer.logoType?.toLowerCase()] || "";
                       return (
                         <tr key={offer.id} className="hover:bg-white/[0.02] transition-colors group">
@@ -667,9 +652,6 @@ export const MarketingTab: React.FC = () => {
                                 <p className="font-semibold text-white">{offer.bank}</p>
                                 <p className="text-[9px] text-slate-500 tracking-wide uppercase mt-0.5">{offer.tag}</p>
                               </div>
-                              {isDefault && (
-                                <span className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">Default</span>
-                              )}
                             </div>
                           </td>
                           <td className="px-4 py-3 max-w-[200px] truncate">
@@ -688,38 +670,28 @@ export const MarketingTab: React.FC = () => {
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            {isDefault ? (
-                              <span
-                                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold bg-slate-500/10 text-slate-400 border-slate-500/20"
-                                title="This is a fallback preview row only -- it has never been published and is not shown on the live site."
-                              >
-                                <ToggleLeft className="w-3.5 h-3.5" />
-                                Not Published
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => toggleStatusMutation.mutate(offer)}
-                                className={cn(
-                                  "flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold transition-all",
-                                  offer.active
-                                    ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20"
-                                    : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
-                                )}
-                                disabled={toggleStatusMutation.isPending}
-                              >
-                                {offer.active ? (
-                                  <>
-                                    <ToggleRight className="w-3.5 h-3.5" />
-                                    Active
-                                  </>
-                                ) : (
-                                  <>
-                                    <ToggleLeft className="w-3.5 h-3.5" />
-                                    Inactive
-                                  </>
-                                )}
-                              </button>
-                            )}
+                            <button
+                              onClick={() => toggleStatusMutation.mutate(offer)}
+                              className={cn(
+                                "flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold transition-all",
+                                offer.active
+                                  ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20"
+                                  : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
+                              )}
+                              disabled={toggleStatusMutation.isPending}
+                            >
+                              {offer.active ? (
+                                <>
+                                  <ToggleRight className="w-3.5 h-3.5" />
+                                  Active
+                                </>
+                              ) : (
+                                <>
+                                  <ToggleLeft className="w-3.5 h-3.5" />
+                                  Inactive
+                                </>
+                              )}
+                            </button>
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="flex gap-1 justify-end opacity-60 group-hover:opacity-100 transition-opacity">
@@ -731,16 +703,14 @@ export const MarketingTab: React.FC = () => {
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </Button>
-                              {!isDefault && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
-                                  onClick={() => handleDelete(offer.id, offer.bank)}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </Button>
-                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
+                                onClick={() => handleDelete(offer.id, offer.bank)}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
                             </div>
                           </td>
                         </tr>
