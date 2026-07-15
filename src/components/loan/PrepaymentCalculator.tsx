@@ -124,18 +124,13 @@ const PrepaymentCalculator = ({
   return (
     <div className={cn("bg-card text-card-foreground border border-border dark:bg-[#080d1e] dark:border-white/10 rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-5 shadow-lg relative overflow-hidden transition-all dark:hover:border-emerald-500/30 flex flex-col w-full", className)}>
 
-      <div className="flex-1 flex flex-col lg:min-h-[500px] justify-between relative z-10 w-full">
+      <div className="flex-1 flex flex-col relative z-10 w-full">
         {/* Header */}
         <div className="flex items-center gap-3 mb-3 md:mb-4 relative z-10 w-full shrink-0">
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-secondary dark:bg-[#0d1829] border border-border dark:border-emerald-500/20 shadow-sm flex items-center justify-center shrink-0">
             <Calculator className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none mb-1">Prepayment Analysis</h3>
-            <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-sm inline-block leading-none">
-              REDUCE INTEREST BURDEN
-            </p>
-          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-none">Prepayment Calculator</h3>
         </div>
 
         {/* Strategy Tabs Selector */}
@@ -160,7 +155,7 @@ const PrepaymentCalculator = ({
         </div>
 
         {/* HORIZONTAL LAYOUT IMPLEMENTATION */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 relative z-10 w-full items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 relative z-10 w-full items-stretch flex-1">
 
           {/* Left Col: 4 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
           <div className="lg:grid lg:grid-rows-4 lg:gap-2 flex flex-col space-y-2 lg:space-y-0 w-full min-w-0">
@@ -168,7 +163,7 @@ const PrepaymentCalculator = ({
             {/* Loan Amount */}
             <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
-                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Amount (₹)</label>
+                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding Loan Amount (₹)</label>
                 <input
                   type="number"
                   value={loanAmount}
@@ -185,7 +180,7 @@ const PrepaymentCalculator = ({
             {/* Interest Rate */}
             <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
-                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Interest Rate (% p.a.)</label>
+                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Current Interest Rate (% p.a.)</label>
                 <input
                   type="number"
                   value={interestRate}
@@ -203,7 +198,7 @@ const PrepaymentCalculator = ({
             {/* Tenure */}
             <div className="lg:row-span-1 bg-secondary/20 dark:bg-[#0d1829] p-2.5 rounded-lg border border-border dark:border-white/5 shadow-sm transition-all focus-within:border-emerald-500/50 hover:border-emerald-500/30 flex flex-col justify-center">
               <div className="flex justify-between items-center mb-1.5 gap-2">
-                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Loan Tenure (Months)</label>
+                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Remaining Tenure (Months)</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
