@@ -158,7 +158,7 @@ const PrepaymentCalculator = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 relative z-10 w-full items-stretch flex-1">
 
           {/* Left Col: 4 Compact Interactive Sliders or 3 Sliders + Explanation Card */}
-          <div className="lg:grid lg:grid-rows-4 flex flex-col divide-y divide-border/60 dark:divide-white/5 lg:divide-y-0 w-full min-w-0">
+          <div className="lg:grid lg:grid-rows-[auto_auto_auto_1fr] flex flex-col divide-y divide-border/60 dark:divide-white/5 lg:divide-y-0 w-full min-w-0">
 
             {/* Loan Amount */}
             <div className="lg:row-span-1 py-2.5 lg:pt-0 flex flex-col justify-center">
