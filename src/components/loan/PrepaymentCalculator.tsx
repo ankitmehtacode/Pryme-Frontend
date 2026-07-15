@@ -106,6 +106,14 @@ const PrepaymentCalculator = ({
     ? ((calculations.interestSaved / calculations.interestOriginal) * 100).toFixed(1)
     : "0";
 
+  // Tenure-saved ring (Lump Sum tab) — complements the Interest Saved hero on
+  // the right with a time-saved visual on the left, filling what used to be
+  // dead space below the Lump Sum Amount slider.
+  const tenureRadius = 46;
+  const tenureCircumference = 2 * Math.PI * tenureRadius;
+  const tenureSavedPct = tenureMonths > 0 ? Math.min(100, (calculations.tenureSaved / tenureMonths) * 100) : 0;
+  const tenureSavedArc = (tenureSavedPct / 100) * tenureCircumference;
+
   const prepaymentTerminology = [
     {
       term: "Part Prepayment",
@@ -217,20 +225,49 @@ const PrepaymentCalculator = ({
 
             {strategy === "lump-sum" ? (
               /* Prepayment Amount */
-              <div className="lg:row-span-1 py-2.5 lg:pb-0 flex flex-col justify-center">
-                <div className="flex justify-between items-center mb-1.5 gap-2">
-                  <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
-                  <input
-                    type="number"
-                    value={prepaymentAmount}
-                    onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
-                    onWheel={(e) => e.currentTarget.blur()}
-                    className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    min={10000}
-                    max={Math.min(loanAmount, 5000000)}
-                  />
+              <div className="lg:row-span-1 py-2.5 lg:pb-0 flex flex-col justify-between gap-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1.5 gap-2">
+                    <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
+                    <input
+                      type="number"
+                      value={prepaymentAmount}
+                      onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                      onWheel={(e) => e.currentTarget.blur()}
+                      className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      min={10000}
+                      max={Math.min(loanAmount, 5000000)}
+                    />
+                  </div>
+                  <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
                 </div>
-                <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+
+                {/* Tenure Saved ring — fills the space below the slider */}
+                <div className="flex items-center gap-4 p-3 rounded-lg bg-emerald-50/30 dark:bg-emerald-500/5 border border-emerald-100/60 dark:border-emerald-500/10">
+                  <div className="relative w-[88px] h-[88px] shrink-0">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 112 112">
+                      <circle cx="56" cy="56" r={tenureRadius} fill="none" strokeWidth="10" className="stroke-slate-200 dark:stroke-white/10" />
+                      <circle
+                        cx="56" cy="56" r={tenureRadius} fill="none" strokeWidth="10"
+                        strokeDasharray={`${tenureSavedArc} ${tenureCircumference}`} strokeLinecap="round"
+                        className="stroke-emerald-500 transition-all duration-1000 ease-out"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-sm font-extrabold text-foreground leading-none">{Math.round(tenureSavedPct)}%</span>
+                      <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mt-0.5">Saved</span>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Tenure Reduced By</p>
+                    <p className="text-lg font-extrabold text-foreground leading-none">
+                      {calculations.tenureSaved} <span className="text-xs font-semibold text-muted-foreground">Months</span>
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
+                      {(calculations.tenureSaved / 12).toFixed(1)} years off your original {(tenureMonths / 12).toFixed(1)}-year term
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
               /* Strategy Explanation Card */
