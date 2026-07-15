@@ -79,6 +79,7 @@ const createFreshState = (): ApplicationState => ({
       employmentType: null,
       companyName: '',
       netMonthlySalary: '',
+      financialDetails: { path: null, data: {} } as FinancialDetails,
     },
   },
 
@@ -157,11 +158,23 @@ const defaultBusiness: BusinessDetails = {
   existingEMI: undefined,
 };
 
+const defaultCoApplicant = (): CoApplicantDetails => ({
+  fullName: '',
+  mobileNumber: '',
+  relationship: '',
+  dateOfBirth: '',
+  pinCode: '',
+  employmentType: null,
+  companyName: '',
+  netMonthlySalary: '',
+  financialDetails: { path: null, data: {} } as FinancialDetails,
+});
+
 // ─── STORE SCHEMA VERSION ───────────────────────────────────────────────────
 // Bump this when the ApplicationState shape changes. Zustand's persist
 // middleware uses this to decide whether to hydrate or purge stale data.
 
-const STORE_VERSION = 5;
+const STORE_VERSION = 6;
 
 // ─── THE STORE ──────────────────────────────────────────────────────────────
 
@@ -276,25 +289,97 @@ export const useApplicationStore = create<ApplicationStore>()(
         })),
 
       updateCoApplicantDetails: (data: Partial<CoApplicantDetails>) =>
-        set((state) => ({
-          financialFootprint: {
-            ...state.financialFootprint,
-            coApplicantDetails: {
-              ...(state.financialFootprint?.coApplicantDetails || {
-                fullName: '',
-                mobileNumber: '',
-                relationship: '',
-                dateOfBirth: '',
-                pinCode: '',
-                employmentType: null,
-                companyName: '',
-                netMonthlySalary: '',
-              }),
-              ...data,
+        set((state) => {
+          const existing = state.financialFootprint?.coApplicantDetails || defaultCoApplicant();
+
+          // Mirrors updateBasicKYC: if employmentType changed, reset financialDetails
+          // to prevent stale data from a previous path leaking through.
+          const employmentChanged =
+            data.employmentType !== undefined &&
+            data.employmentType !== existing.employmentType;
+
+          return {
+            financialFootprint: {
+              ...state.financialFootprint,
+              coApplicantDetails: {
+                ...existing,
+                ...data,
+                financialDetails: employmentChanged
+                  ? ({ path: null, data: {} } as FinancialDetails)
+                  : existing.financialDetails,
+              },
             },
-          },
-          lastModifiedAt: new Date().toISOString(),
-        })),
+            lastModifiedAt: new Date().toISOString(),
+          };
+        }),
+
+      // Mirrors updateSalariedDetails/updateProfessionalDetails/updateBusinessDetails
+      // above, but scoped to financialFootprint.coApplicantDetails.financialDetails
+      // instead of the root financialDetails — so the co-applicant employment form
+      // reuses the exact same fields/defaults/3-way-merge behavior as the primary
+      // applicant's.
+      updateCoApplicantSalariedDetails: (data: Partial<SalariedDetails>) =>
+        set((state) => {
+          const coApplicant = state.financialFootprint?.coApplicantDetails || defaultCoApplicant();
+          const persisted = coApplicant.financialDetails?.path === 'SALARIED'
+            ? coApplicant.financialDetails.data
+            : ({} as Partial<SalariedDetails>);
+          return {
+            financialFootprint: {
+              ...state.financialFootprint,
+              coApplicantDetails: {
+                ...coApplicant,
+                financialDetails: {
+                  path: 'SALARIED' as const,
+                  data: { ...defaultSalaried, ...persisted, ...data },
+                },
+              },
+            },
+            lastModifiedAt: new Date().toISOString(),
+          };
+        }),
+
+      updateCoApplicantProfessionalDetails: (data: Partial<ProfessionalDetails>) =>
+        set((state) => {
+          const coApplicant = state.financialFootprint?.coApplicantDetails || defaultCoApplicant();
+          const persisted = coApplicant.financialDetails?.path === 'PROFESSIONAL'
+            ? coApplicant.financialDetails.data
+            : ({} as Partial<ProfessionalDetails>);
+          return {
+            financialFootprint: {
+              ...state.financialFootprint,
+              coApplicantDetails: {
+                ...coApplicant,
+                financialDetails: {
+                  path: 'PROFESSIONAL' as const,
+                  data: { ...defaultProfessional, ...persisted, ...data },
+                },
+              },
+            },
+            lastModifiedAt: new Date().toISOString(),
+          };
+        }),
+
+      updateCoApplicantBusinessDetails: (data: Partial<BusinessDetails>) =>
+        set((state) => {
+          const coApplicant = state.financialFootprint?.coApplicantDetails || defaultCoApplicant();
+          const persisted = coApplicant.financialDetails?.path === 'SELF_EMPLOYED'
+            ? coApplicant.financialDetails.data
+            : ({} as Partial<BusinessDetails>);
+          return {
+            financialFootprint: {
+              ...state.financialFootprint,
+              coApplicantDetails: {
+                ...coApplicant,
+                financialDetails: {
+                  path: 'SELF_EMPLOYED' as const,
+                  data: { ...defaultBusiness, ...persisted, ...data },
+                },
+              },
+            },
+            lastModifiedAt: new Date().toISOString(),
+          };
+        }),
 
       updateDocuments: (docs: DocumentItem[]) =>
         set({

@@ -253,8 +253,14 @@ export interface CoApplicantDetails {
   dateOfBirth: string;
   pinCode: string;
   employmentType: EmploymentType | null;
+  /** @deprecated superseded by financialDetails — kept for session hydration compat */
   companyName: string;
+  /** @deprecated superseded by financialDetails — kept for session hydration compat */
   netMonthlySalary: string | number;
+  // Mirrors the primary applicant's FinancialDetails union exactly, so the
+  // co-applicant employment form reuses the same fields/options and its
+  // income is resolved with the same GST-margin/ITR-annualization formulas.
+  financialDetails: FinancialDetails;
 }
 
 // ─── FINANCIAL FOOTPRINT (Stage 4 — Universal + Conditional Overrides) ──────
@@ -343,6 +349,9 @@ export interface ApplicationActions {
   updateLoanRequirements: (data: Partial<LoanRequirements>) => void;
   updateFinancialFootprint: (data: Partial<FinancialFootprint>) => void;
   updateCoApplicantDetails: (data: Partial<CoApplicantDetails>) => void;
+  updateCoApplicantSalariedDetails: (data: Partial<SalariedDetails>) => void;
+  updateCoApplicantProfessionalDetails: (data: Partial<ProfessionalDetails>) => void;
+  updateCoApplicantBusinessDetails: (data: Partial<BusinessDetails>) => void;
   updateDocuments: (docs: DocumentItem[]) => void;
   setDocumentStatus: (docId: string, status: DocumentStatus, fileUrl?: string, fileName?: string) => void;
   setConsent: (field: keyof ApplicationState['consent'], value: boolean) => void;

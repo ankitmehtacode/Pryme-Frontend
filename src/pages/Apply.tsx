@@ -183,8 +183,19 @@ const Apply = () => {
       // pat from monthlyIncome) and silently vanish for GST/SEP/Banking (which
       // never read monthlyIncome at all) -- see the investigation that led here.
       const applicantIncome = baseMonthly;
-      const coApplicantIncome = data.hasCoApplicant && data.coApplicantDetails?.netMonthlySalary
-        ? Number(data.coApplicantDetails.netMonthlySalary)
+      // Co-applicant now goes through the exact same employment form/options as
+      // the primary applicant (EmploymentDetailsFields), so their monthly income
+      // is already correctly resolved in the store via the same GST-margin/ITR
+      // formulas -- SALARIED keeps it in netMonthlySalary, PROFESSIONAL/
+      // SELF_EMPLOYED derive it into netMonthlyIncome on every relevant field
+      // change. No need to re-derive it here, just read the resolved figure.
+      const coApplicantFin = data.coApplicantDetails?.financialDetails;
+      const coApplicantIncome = data.hasCoApplicant && coApplicantFin
+        ? (coApplicantFin.path === "SALARIED"
+            ? Number(coApplicantFin.data?.netMonthlySalary || 0)
+            : coApplicantFin.path === "PROFESSIONAL" || coApplicantFin.path === "SELF_EMPLOYED"
+              ? Number(coApplicantFin.data?.netMonthlyIncome || 0)
+              : 0)
         : 0;
 
       // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──

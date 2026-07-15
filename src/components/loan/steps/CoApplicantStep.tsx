@@ -1,13 +1,12 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  UserPlus, User, Phone, Users, Calendar,
-  MapPin, Briefcase, BriefcaseBusiness,
-  GraduationCap, Building2, IndianRupee
-} from "lucide-react";
+import { UserPlus, User, Phone, Users, Calendar, MapPin, Briefcase } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { ValidatedInput, StyledSelect, PillSelector, ToggleSwitch } from "../shared/FormComponents";
+import { EmploymentDetailsFields } from "../shared/EmploymentDetailsFields";
+import { EMPLOYMENT_OPTIONS } from "../shared/constants";
 import { SelectItem } from "@/components/ui/select";
+import type { EmploymentType, FinancialDetails } from "@/lib/applicationTypes";
 
 interface CoApplicantStepProps {
   cardCn: string;
@@ -25,8 +24,10 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
     employmentType: null,
     companyName: '',
     netMonthlySalary: '',
+    financialDetails: { path: null, data: {} } as FinancialDetails,
   };
   const updateCoApplicant = store.updateCoApplicantDetails || (() => {});
+  const coApplicantFinancialDetails = coApplicant.financialDetails || ({ path: null, data: {} } as FinancialDetails);
 
   return (
     <div className={cardCn}>
@@ -114,40 +115,25 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                 />
               </div>
 
-              {/* Employment */}
-              <PillSelector
+              {/* Employment — exact same options/divisions as the primary applicant,
+                  mapped through the same shared component so both forms compute
+                  income with identical GST-margin/ITR-annualization formulas. */}
+              <PillSelector<EmploymentType>
                 label="Employment Type"
                 icon={Briefcase}
-                options={[
-                  { value: 'SALARIED', label: 'Salaried', icon: Briefcase },
-                  { value: 'SELF_EMPLOYED', label: 'Business', icon: BriefcaseBusiness },
-                  { value: 'PROFESSIONAL', label: 'Professional', icon: GraduationCap },
-                ]}
+                options={EMPLOYMENT_OPTIONS}
                 value={coApplicant.employmentType || null}
-                onChange={(v) => updateCoApplicant({ employmentType: v as any })}
+                onChange={(v) => updateCoApplicant({ employmentType: v })}
               />
 
-              {coApplicant.employmentType && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <ValidatedInput
-                    label={coApplicant.employmentType === 'SALARIED' ? 'Company Name' : coApplicant.employmentType === 'PROFESSIONAL' ? 'Practice / Firm Name' : 'Business Name'}
-                    placeholder={coApplicant.employmentType === 'SALARIED' ? 'Infosys Ltd' : coApplicant.employmentType === 'PROFESSIONAL' ? 'Dr. Mehta Clinic' : 'Mehta Enterprises'}
-                    icon={Building2}
-                    value={coApplicant.companyName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ companyName: e.target.value })}
-                    isValid={(coApplicant.companyName || "").length >= 2}
-                  />
-                  <ValidatedInput
-                    label="Net Monthly Income (₹)"
-                    type="number"
-                    placeholder="50000"
-                    icon={IndianRupee}
-                    value={coApplicant.netMonthlySalary}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ netMonthlySalary: e.target.value })}
-                    isValid={Number(coApplicant.netMonthlySalary) >= 10000}
-                  />
-                </div>
-              )}
+              <EmploymentDetailsFields
+                employmentType={coApplicant.employmentType}
+                financialDetails={coApplicantFinancialDetails}
+                onUpdateSalaried={store.updateCoApplicantSalariedDetails}
+                onUpdateProfessional={store.updateCoApplicantProfessionalDetails}
+                onUpdateBusiness={store.updateCoApplicantBusinessDetails}
+                loanType={store.loanRequirements?.loanType}
+              />
             </div>
           </motion.div>
         )}

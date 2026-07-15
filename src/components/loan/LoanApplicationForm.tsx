@@ -803,6 +803,11 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         loanPurpose: store.loanRequirements?.purpose ?? "",
         existingBank: fp?.primaryBankName ?? "",
         hasCoApplicant: fp?.hasCoApplicant ?? false,
+        // Forwarded as-is (full FinancialDetails union) so Apply.tsx can
+        // resolve the co-applicant's income with the exact same
+        // GST-margin/ITR-annualization formulas used for the primary
+        // applicant, instead of a single flat salary figure.
+        coApplicantDetails: fp?.hasCoApplicant ? (fp?.coApplicantDetails ?? null) : null,
 
         // Phase 5 underwriting variables safely mapped
         depreciation: Number((fin?.data as any)?.depreciation ?? (fin?.data as any)?.annualDepreciation ?? 0),
