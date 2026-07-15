@@ -253,13 +253,24 @@ export default function Offers() {
       };
     });
 
-    // Sort mapped offers: highest eligible loan amount first, then lowest interest rate, then lowest processing fee
+    // Sort mapped offers: lowest EMI first (the actual cost the applicant pays),
+    // then highest eligible loan amount, then lowest processing fee as tiebreakers.
+    // EMI here mirrors the same derivation the `emis` memo below uses -- prefer
+    // the engine's own proposedEmi (already computed on the capped/eligible
+    // amount), falling back to a local calc only if the backend didn't return one.
+    const emiOf = (o: typeof mappedOffers[number]) => {
+      const backendEmi = o.originalEngineResult?.proposedEmi;
+      return backendEmi != null
+        ? Math.round(Number(backendEmi))
+        : calcEMI(o.principalAmount, o.interestRate, o.effectiveTenureYears);
+    };
     const sortedOffers = mappedOffers.sort((a, b) => {
+      const emiA = emiOf(a), emiB = emiOf(b);
+      if (emiA !== emiB) {
+        return emiA - emiB;
+      }
       if (a.maxLoanAmount !== b.maxLoanAmount) {
         return b.maxLoanAmount - a.maxLoanAmount;
-      }
-      if (a.interestRate !== b.interestRate) {
-        return a.interestRate - b.interestRate;
       }
       return a.processingFee - b.processingFee;
     });
