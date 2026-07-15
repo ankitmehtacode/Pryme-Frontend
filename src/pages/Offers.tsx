@@ -318,6 +318,24 @@ export default function Offers() {
     return m;
   }, [dynamicOffers, leadData, emis]);
 
+  // The list is ranked by highest eligible loan amount first (see sortedOffers
+  // above), not by EMI -- a generous-FOIR lender can rank #1 while genuinely
+  // having a higher EMI than a lender below it. "Lowest EMI" must be computed
+  // independently from the ranking so the tag never claims something false.
+  const lowestEmiOfferId = useMemo(() => {
+    if (!dynamicOffers.length) return null;
+    let bestId = dynamicOffers[0].id;
+    let bestEmi = emis[bestId] ?? Infinity;
+    for (const o of dynamicOffers) {
+      const e = emis[o.id];
+      if (e != null && e < bestEmi) {
+        bestEmi = e;
+        bestId = o.id;
+      }
+    }
+    return bestId;
+  }, [dynamicOffers, emis]);
+
   const savingsVsNext = useMemo(() => {
     if (dynamicOffers.length < 2 || !leadData) return { emiDiff: 0, totalDiff: 0, comparedTo: "" };
     const hero = dynamicOffers[0], next = dynamicOffers[1];
@@ -606,8 +624,13 @@ export default function Offers() {
                   {dynamicOffers.map((offer, idx) => {
                     const emi = emis[offer.id] || 0;
                     const totalRep = totalRepayments[offer.id] || 0;
-                    const emiDiffFromHero = idx === 0 ? 0 : emi - (emis[heroOffer.id] || 0);
-                    const totalDiffFromHero = idx === 0 ? 0 : totalRep - (totalRepayments[heroOffer.id] || 0);
+                    // Diff is measured against whichever offer genuinely has the
+                    // lowest EMI -- not against the #1 ranked (highest eligible
+                    // amount) card -- so "+₹X/mo more" is always truthful even
+                    // when the top-ranked lender isn't the cheapest one.
+                    const isLowestEmi = offer.id === lowestEmiOfferId;
+                    const emiDiffFromHero = isLowestEmi ? 0 : emi - (emis[lowestEmiOfferId || ""] || 0);
+                    const totalDiffFromHero = isLowestEmi ? 0 : totalRep - (totalRepayments[lowestEmiOfferId || ""] || 0);
                     const isExpanded = expandedCard === offer.id;
 
                     return (
@@ -625,6 +648,7 @@ export default function Offers() {
                         onApply={handleApply}
                         isGlobalLocking={isLocking !== null}
                         isRecommended={offer.interestRate === heroOffer.interestRate && offer.processingFee === heroOffer.processingFee}
+                        isLowestEmi={isLowestEmi}
                         rewards={productRewards}
                       />
                     );

@@ -50,6 +50,10 @@ interface BankComparisonCardProps {
   onApply: (providerId: string) => Promise<void>;
   isGlobalLocking: boolean;
   isRecommended?: boolean;
+  /** True only for the offer with the genuine lowest EMI across the list --
+   * independent of isRecommended, which reflects the highest-eligible-amount
+   * ranking and can be a different card. */
+  isLowestEmi?: boolean;
   rewards?: any[];
 }
 
@@ -66,6 +70,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   onApply,
   isGlobalLocking,
   isRecommended = false,
+  isLowestEmi = false,
   rewards = [],
 }: BankComparisonCardProps) {
   const navigate = useNavigate();
@@ -210,7 +215,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 <div className="min-w-0 flex flex-col justify-center">
                   {isRecommended && (
                     <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
-                      <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Highest Eligibility
                     </span>
                   )}
                   <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-tight">{offer.bankName}</h3>
@@ -241,7 +246,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
               
               <div className="pb-0.5 flex flex-col justify-end">
-                {!isRecommended ? (
+                {!isLowestEmi ? (
                   <>
                     <p
                       className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none"
