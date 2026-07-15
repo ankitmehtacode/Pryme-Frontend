@@ -1033,14 +1033,7 @@ export const MarketingTab: React.FC = () => {
               {/* Right: Apply Button */}
               <div className="flex flex-col items-center gap-0 mt-6 md:-mt-2 relative z-10 w-full md:w-auto shrink-0 justify-center">
                  <div className="-mb-8 md:-mb-12">
-                   {/* Matches the exact sizing used on the live comparison card
-                       (BankComparisonCard.tsx) -- without a fixed size the
-                       button image renders at its native pixel dimensions and
-                       overflows past the card edge. */}
-                   <GlossyRewardButton
-                     colorScheme={rewardFormData.buttonDesign as any}
-                     className="w-[175px] h-11 flex justify-center items-center"
-                   />
+                   <GlossyRewardButton colorScheme={rewardFormData.buttonDesign as any} />
                  </div>
                  <button className="px-5 py-1.5 rounded-full font-medium text-[11px] text-slate-500 border border-slate-200 hover:bg-slate-50 transition-colors w-full md:w-auto whitespace-nowrap relative z-20">
                    Apply Directly 
