@@ -48,17 +48,17 @@ interface BankDetails {
 
 const BANKS_MAP: Record<string, BankDetails> = {
   hdfc: { id: "hdfc", name: "HDFC BANK", logo: hdfcLogo },
-  sbi: { id: "sbi", name: "STATE BANK OF INDIA", logo: sbiLogo },
+  sbi: { id: "sbi", name: "State Bank of India", logo: sbiLogo },
   icici: { id: "icici", name: "ICICI BANK", logo: iciciLogo },
   axis: { id: "axis", name: "AXIS BANK", logo: axisLogo },
   kotak: { id: "kotak", name: "KOTAK MAHINDRA BANK", logo: kotakLogo },
   bob: { id: "bob", name: "BANK OF BARODA", logo: bobLogo },
   bandhan: { id: "bandhan", name: "BANDHAN BANK", logo: bandhanLogo },
   abfl: { id: "abfl", name: "ADITYA BIRLA FINANCE", logo: abflLogo },
-  bajaj: { id: "bajaj", name: "BAJAJ FINSERV", logo: bajajLogo },
-  yes: { id: "yes", name: "YES BANK", logo: yesLogo },
-  jio: { id: "jio", name: "JIO FINANCE", logo: jioLogo },
-  idbi: { id: "idbi", name: "IDBI BANK", logo: idbiLogo },
+  bajaj: { id: "bajaj", name: "Bajaj Finserv", logo: bajajLogo },
+  yes: { id: "yes", name: "Yes Bank", logo: yesLogo },
+  jio: { id: "jio", name: "Jio Finance", logo: jioLogo },
+  idbi: { id: "idbi", name: "IDBI Bank", logo: idbiLogo },
   tata: { id: "tata", name: "TATA CAPITAL", logo: tataLogo },
   idfc: { id: "idfc", name: "IDFC FIRST BANK", logo: idfcLogo },
   // L&T Finance and IndusInd Bank are active, real lenders (product codes

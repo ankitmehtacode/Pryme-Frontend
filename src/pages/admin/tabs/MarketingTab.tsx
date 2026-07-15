@@ -49,7 +49,7 @@ const BANNER_MAP: Record<string, string> = {
 const DEFAULT_HERO_OFFERS = [
   { logoType: "axis", bank: "AXIS BANK", tag: "SPECIAL FESTIVE OFFER", title: "Axis Bank Special Festive Offer", highlights: "Zero documentation (salary a/c) | Disbursed within 3 hours | Dedicated Relationship Manager", orderIndex: 1, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
   { logoType: "hdfc", bank: "HDFC BANK", tag: "PREFERRED OFFER", title: "HDFC Preferred Loan Offer Interest rates from 10.5% p.a.", highlights: "Flexible repayment options | Paperless process | Approval in 24 hours", orderIndex: 2, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
-  { logoType: "idbi", bank: "IDBI BANK", tag: "ZERO FEE OFFER", title: "Zero Processing Fee on Personal Loans", highlights: "Quick digital sanction in 4 hours | Foreclosure charges waived off | No hidden charges", orderIndex: 3, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
+  { logoType: "idbi", bank: "IDBI Bank", tag: "ZERO FEE OFFER", title: "Zero Processing Fee on Personal Loans", highlights: "Quick digital sanction in 4 hours | Foreclosure charges waived off | No hidden charges", orderIndex: 3, active: true, bannerImageUrl: "", heroImageUrl: "", targetUrl: "/apply" },
 ];
 
 // Preset colors and gradients for the live preview cards based on chosen bank

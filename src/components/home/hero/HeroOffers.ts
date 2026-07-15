@@ -54,7 +54,7 @@ export const initialOffers = [
     bannerImageUrl: hdfcBanner
   },
   {
-    id: "idbi-personal", bank: "IDBI BANK", logo: idbiLogo,
+    id: "idbi-personal", bank: "IDBI Bank", logo: idbiLogo,
     title: "IDBI Special Processing Fee Waiver",
     headline: "Zero Processing Fee on Personal Loans",
     amount: "Save up to ₹25,000",
