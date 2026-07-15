@@ -343,7 +343,13 @@ export const BankComparisonCard = memo(function BankComparisonCard({
             )}
 
             {/* ── CTAs (Mobile Stacked, Desktop Row/Col) ──────────────────────── */}
-            <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
+            {/* xl:row-start-1 pins this to the same grid row as bank identity/EMI/
+                metrics. Without it, the Amount Capping banner above (col-span-full,
+                placed between the metrics chips and this div in DOM order) can't fit
+                in row 1's remaining space and gets auto-placed into row 2 -- which
+                then pushes this col-start-4 item into row 3 instead of staying next
+                to the rest of the card's top row, whenever that banner is shown. */}
+            <div className="w-full xl:w-auto mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col xl:flex-row items-center xl:justify-end gap-3 xl:gap-2.5">
               {matchingReward?.buttonDesign ? (
                 <GlossyRewardButton 
                   colorScheme={matchingReward.buttonDesign}
