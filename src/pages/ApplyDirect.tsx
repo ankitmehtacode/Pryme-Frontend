@@ -61,12 +61,12 @@ const BANKS_MAP: Record<string, BankDetails> = {
   idbi: { id: "idbi", name: "IDBI BANK", logo: idbiLogo },
   tata: { id: "tata", name: "TATA CAPITAL", logo: tataLogo },
   idfc: { id: "idfc", name: "IDFC FIRST BANK", logo: idfcLogo },
-  // L&T Finance and Indus Ind Bank are active, real lenders (product codes
+  // L&T Finance and IndusInd Bank are active, real lenders (product codes
   // LT-* / INDUSIND-*) that were never added here -- every offer from either
   // one silently fell through to the HDFC fallback below. L&T alone has more
   // active products than any other lender, so this was firing constantly.
   lt: { id: "lt", name: "L&T FINANCE", logo: ltLogo },
-  indusind: { id: "indusind", name: "INDUS IND BANK", logo: indusindLogo }
+  indusind: { id: "indusind", name: "INDUSIND BANK", logo: indusindLogo }
 };
 
 // Backend's LeadService.normalizeLoanType only strips a trailing "_loan"
