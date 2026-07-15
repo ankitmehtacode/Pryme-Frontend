@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Edit2, Trash2, Sparkles, CheckCircle2, Zap,
-  Percent, ShieldCheck, Loader2, Eye, ToggleLeft, ToggleRight,
+  Percent, Loader2, Eye, ToggleLeft, ToggleRight,
   ImageIcon, Link2, Gift, Smartphone, Car
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,6 @@ import kotakLogo from "@/assets/kotak-mahindra-bank-logo-vector_logoshape.com.sv
 import pnbLogo from "@/assets/punjab-national-bank-vector-logo_logoshape.com.svg";
 import yesLogo from "@/assets/yes-bank.png";
 import tataLogo from "@/assets/tata-capital.png";
-import heroBankImg from "@/assets/hero-bank-building.png";
-import { GlossyRewardButton } from "../../../components/admin/GlossyRewardButton";
 
 // Import fallback banner images (matches HeroSection.tsx initialOffers)
 import axisBanner from "@/assets/axis_festive_banner.png";
@@ -962,86 +960,8 @@ export const MarketingTab: React.FC = () => {
           </div>
         </div>
 
-        {/* Table & Mockup Column */}
+        {/* Active Rewards Table Column */}
         <div className="xl:col-span-8 flex flex-col">
-          
-          {/* Live Interactive Mockup for Rewards */}
-          <div className="bg-[#0a0a0f] border border-white/5 rounded-2xl p-6 relative overflow-hidden mb-6 flex-shrink-0">
-            <h4 className="text-xs font-semibold text-slate-400 tracking-wider uppercase flex items-center gap-1.5 mb-4">
-              <Eye className="w-4 h-4 text-purple-400" />
-              Live Interactive Mockup
-            </h4>
-            
-            <div className="bg-white rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between shadow-xl min-w-full relative overflow-hidden">
-              {/* Optional background accent pattern */}
-              <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "radial-gradient(#103783 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
-              
-              {/* Left: Bank Logo & Reward Tag */}
-              <div className="flex items-center gap-3 md:gap-4 relative z-10 w-full md:w-auto shrink-0">
-                <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center p-2 shrink-0 bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-slate-100">
-                   <img src={rewardFormData.logoUrl || LOGO_MAP[rewardFormData.bank?.toLowerCase()] || heroBankImg} alt="Bank Logo" className="max-w-full max-h-full object-contain" />
-                </div>
-                <div className="shrink-0 min-w-[100px]">
-                   <h3 className="text-[#103783] font-bold text-base mb-1.5 whitespace-nowrap">{rewardFormData.bank || "Select Bank"}</h3>
-                   <div className="flex flex-col gap-2">
-                     {(() => {
-                       const dynamicRewardText = rewardFormData.rewardText || 
-                          [rewardFormData.reward1, rewardFormData.reward2, rewardFormData.pfWaiver].filter(Boolean).join(" • ");
-                       
-                       return dynamicRewardText ? (
-                         <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap self-start", 
-                            rewardFormData.iconType === 'GIFT' ? "text-emerald-600 bg-emerald-50 border-emerald-200" :
-                            rewardFormData.iconType === 'SMARTPHONE' ? "text-blue-600 bg-blue-50 border-blue-200" :
-                            rewardFormData.iconType === 'CAR' ? "text-amber-600 bg-amber-50 border-amber-200" :
-                            "text-purple-600 bg-purple-50 border-purple-200"
-                         )}>
-                           {rewardFormData.iconType === 'GIFT' && <Gift className="w-3 h-3" />}
-                           {rewardFormData.iconType === 'SMARTPHONE' && <Smartphone className="w-3 h-3" />}
-                           {rewardFormData.iconType === 'CAR' && <Car className="w-3 h-3" />}
-                           {rewardFormData.iconType === 'DISCOUNT' && <Percent className="w-3 h-3" />}
-                           <span>{dynamicRewardText}</span>
-                         </div>
-                       ) : (
-                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border text-slate-400 bg-slate-50 border-slate-200 border-dashed whitespace-nowrap self-start">
-                           Add reward text or items to preview
-                         </div>
-                       );
-                     })()}
-                     <div className="flex items-center gap-1 text-[9px] text-slate-400 font-medium tracking-wide">
-                        <ShieldCheck className="w-3 h-3 text-blue-400" /> <span className="text-blue-400 font-bold">Only with Pryme</span> <Sparkles className="w-3 h-3 text-amber-400" />
-                     </div>
-                   </div>
-                </div>
-              </div>
-
-              {/* Middle: EMI info (Mocked) */}
-              <div className="hidden lg:flex items-center gap-4 px-4 xl:px-6 border-x border-slate-100 relative z-10 shrink-0">
-                 <div>
-                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold mb-0.5 whitespace-nowrap">EMI</p>
-                   <p className="text-[#103783] font-black text-lg whitespace-nowrap">₹27,663</p>
-                 </div>
-                 <div className="text-center">
-                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold mb-0.5 whitespace-nowrap">% Interest</p>
-                   <p className="text-slate-700 font-bold text-xs whitespace-nowrap">7.25%</p>
-                 </div>
-                 <div className="text-center">
-                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold mb-0.5 whitespace-nowrap">Tenure</p>
-                   <p className="text-slate-700 font-bold text-xs whitespace-nowrap">20 yrs</p>
-                 </div>
-              </div>
-
-              {/* Right: Apply Button */}
-              <div className="flex flex-col items-center gap-0 mt-6 md:-mt-2 relative z-10 w-full md:w-auto shrink-0 justify-center">
-                 <div className="-mb-8 md:-mb-12">
-                   <GlossyRewardButton colorScheme={rewardFormData.buttonDesign as any} />
-                 </div>
-                 <button className="px-5 py-1.5 rounded-full font-medium text-[11px] text-slate-500 border border-slate-200 hover:bg-slate-50 transition-colors w-full md:w-auto whitespace-nowrap relative z-20">
-                   Apply Directly 
-                 </button>
-              </div>
-            </div>
-          </div>
-
           <div className="bg-[#0a0a0f] border border-white/5 rounded-2xl overflow-hidden flex-1 flex flex-col">
             <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <h3 className="text-sm font-semibold text-white flex items-center gap-2">
