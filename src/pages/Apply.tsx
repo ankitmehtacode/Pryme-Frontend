@@ -60,6 +60,7 @@ const Apply = () => {
     phone?: string;
     name?: string;
     loanAmount?: number;
+    propertyValue?: number;
     engineResults?: any[];
   } | null>(null);
 
@@ -91,7 +92,8 @@ const Apply = () => {
       productType: data.productType,
       employmentType: data.employmentType,
       phone: leadPhone,
-      name: leadName
+      name: leadName,
+      propertyValue: data.estimatedPropertyValue || data.propertyValue || 0
     });
     setLoanAmount(data.loanAmount);
     setTenure(data.loanTenure);
@@ -353,6 +355,7 @@ const Apply = () => {
         monthlyIncome: applicationData?.monthlyIncome,
         loanAmount: loanAmount,
         loanTenure: tenure,
+        propertyValue: applicationData?.propertyValue,
         fullName: applicationData?.name || localStorage.getItem("pryme_lead_name") || "Guest",
         engineResults: applicationData?.engineResults || [],
         // 🧠 RELAY FIX: Pass leadId so Offers.tsx can forward it to Auth.tsx

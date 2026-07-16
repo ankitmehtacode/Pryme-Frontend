@@ -72,6 +72,7 @@ interface LeadDataPayload {
   monthlyIncome: number;
   loanAmount: number;
   loanTenure?: number;
+  propertyValue?: number;
   fullName: string;
   engineResults?: any[];
 }
@@ -81,6 +82,17 @@ interface LeadDataPayload {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const spring = { type: "spring" as const, stiffness: 200, damping: 26 };
+
+// Raw store enum values (loanRequirements.loanType) -> human-readable labels
+// for the sticky summary bar's "Product" field.
+const PRODUCT_TYPE_LABELS: Record<string, string> = {
+  HOME_LOAN: "Home Loan",
+  LAP: "Loan Against Property",
+  PERSONAL_LOAN: "Personal Loan",
+  BUSINESS_LOAN: "Business Loan",
+  AUTO_LOAN: "Auto Loan",
+  BT_TOP_UP: "Balance Transfer",
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SHIMMER EFFECT — Subtle animated highlight on hero card
@@ -648,15 +660,21 @@ export default function Offers() {
             transition={{ duration: 0.4 }}
             className="mb-6 md:mb-8 bg-slate-50/90 dark:bg-[#0c1322]/90 border border-slate-200 dark:border-white/[0.06] rounded-2xl md:rounded-[1.25rem] px-4 md:px-5 py-3 md:py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
           >
-            <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4 md:gap-8">
+            <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4 md:gap-8 overflow-x-auto">
               {[
-                { label: "Amount", value: `₹${leadData.loanAmount.toLocaleString("en-IN")}` },
+                { label: "Requested Amount", value: `₹${leadData.loanAmount.toLocaleString("en-IN")}` },
                 { label: "CIBIL", value: `${leadData.cibilScore}` },
-                { label: "Income", value: `₹${(leadData.monthlyIncome || 50000).toLocaleString("en-IN")}` },
+                { label: "Requested Tenure", value: leadData.loanTenure ? `${leadData.loanTenure} yrs` : "—" },
+                { label: "Product", value: PRODUCT_TYPE_LABELS[leadData.productType] || leadData.productType },
+                // Property value is only meaningful for property-backed loans --
+                // showing it for a personal/business/auto loan would be noise.
+                ...(["HOME_LOAN", "LAP"].includes(leadData.productType) && leadData.propertyValue
+                  ? [{ label: "Property Value", value: `₹${leadData.propertyValue.toLocaleString("en-IN")}` }]
+                  : []),
               ].map((s, i) => (
-                <div key={i}>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40">{s.label}</p>
-                  <p className="text-[13px] md:text-sm font-bold text-foreground tabular-nums">{s.value}</p>
+                <div key={i} className="shrink-0">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 whitespace-nowrap">{s.label}</p>
+                  <p className="text-[13px] md:text-sm font-bold text-foreground tabular-nums whitespace-nowrap">{s.value}</p>
                 </div>
               ))}
             </div>
