@@ -54,6 +54,14 @@ interface BankComparisonCardProps {
    * independent of isRecommended, which reflects the highest-eligible-amount
    * ranking and can be a different card. */
   isLowestEmi?: boolean;
+  /** False when this lender's FOIR/LTV cap forces a loan smaller than what
+   * was requested -- its EMI then sits on a different (smaller) principal
+   * than every fully-funded card, so it must never be compared against them
+   * via emiDiffFromHero/totalDiffFromHero (those are 0 for such offers). */
+  isFullyFunded?: boolean;
+  /** The applicant's originally requested loan amount, used only to render
+   * the funding-shortfall badge when isFullyFunded is false. */
+  requestedAmount?: number;
   rewards?: any[];
 }
 
@@ -71,6 +79,8 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   isGlobalLocking,
   isRecommended = false,
   isLowestEmi = false,
+  isFullyFunded = true,
+  requestedAmount,
   rewards = [],
 }: BankComparisonCardProps) {
   const navigate = useNavigate();
@@ -246,7 +256,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
               
               <div className="pb-0.5 flex flex-col justify-end">
-                {!isLowestEmi ? (
+                {!isFullyFunded ? (
+                  <>
+                    <p className="text-[11px] sm:text-xs font-bold whitespace-nowrap tracking-tight leading-none text-amber-600 dark:text-amber-400">
+                      Funds ₹{principalAmount.toLocaleString("en-IN")}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
+                      {requestedAmount ? `Below your ₹${requestedAmount.toLocaleString("en-IN")} request` : "Below requested amount"}
+                    </p>
+                  </>
+                ) : !isLowestEmi ? (
                   <>
                     <p
                       className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none"
@@ -323,7 +342,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   )}
                 </div>
               </div>
-              {emiDiffFromHero !== 0 && (
+              {!isFullyFunded ? (
+                <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
+                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight text-amber-600 dark:text-amber-400">
+                    Funds ₹{principalAmount.toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/70 font-semibold tabular-nums uppercase tracking-widest">
+                    {requestedAmount ? `of ₹${requestedAmount.toLocaleString("en-IN")} asked` : "below request"}
+                  </p>
+                </div>
+              ) : emiDiffFromHero !== 0 && (
                 <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
                   <p className="text-[11px] font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
                     {emiDiffFromHero > 0

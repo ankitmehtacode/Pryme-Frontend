@@ -58,6 +58,10 @@ interface BankOffer {
   requiredDocs: string[];
   bankKey: string;
   originalEngineResult?: any;
+  /** True when this lender funds the full requested amount. False when the
+   * loan is FOIR/LTV-capped below the request -- its EMI is then computed
+   * on a smaller principal and is not comparable to fully-funded offers. */
+  fullyFunded: boolean;
 }
 
 interface LeadDataPayload {
@@ -282,19 +286,39 @@ export default function Offers() {
         if (offer.maxLoanAmount > current.maxLoanAmount) bestByBank.set(offer.bankKey, offer);
         continue;
       }
-      if (emiOf(offer) < emiOf(current)) {
+      const offerEmi = emiOf(offer), currentEmi = emiOf(current);
+      if (offerEmi !== currentEmi) {
+        if (offerEmi < currentEmi) bestByBank.set(offer.bankKey, offer);
+        continue;
+      }
+      if (offer.interestRate < current.interestRate) {
         bestByBank.set(offer.bankKey, offer);
       }
     }
 
-    // Now sort the one-per-bank list for display: lowest EMI first (the
-    // actual cost the applicant pays), then highest eligible loan amount,
-    // then lowest processing fee as tiebreakers. This cross-lender ordering
-    // is unaffected by the per-bank selection above.
-    const uniqueOffers = Array.from(bestByBank.values()).sort((a, b) => {
+    // Rank in two tiers, not one flat EMI sort. A capped lender's EMI is
+    // only smaller because it's lending less money -- comparing it directly
+    // against a lender funding the full request makes the capped offer look
+    // like the "cheaper" deal when it's actually a worse one (same principle
+    // as the per-bank dedup above, generalized across lenders). Offers that
+    // fund the full requested amount always outrank capped ones; EMI is
+    // only a fair "cheapest" signal within a tier where the principal is
+    // the same basis.
+    const requestedAmount = leadData.loanAmount;
+    const allOffers = Array.from(bestByBank.values());
+    const fullyFundedOffers = allOffers.filter(o => o.principalAmount >= requestedAmount);
+    const cappedOffers = allOffers.filter(o => o.principalAmount < requestedAmount);
+
+    fullyFundedOffers.sort((a, b) => {
       const emiA = emiOf(a), emiB = emiOf(b);
       if (emiA !== emiB) {
         return emiA - emiB;
+      }
+      // Displayed EMI is rounded to the rupee, so two offers can tie on the
+      // number shown while charging genuinely different interest -- ROI is
+      // the ground-truth cost signal, so it breaks the tie before amount/fee.
+      if (a.interestRate !== b.interestRate) {
+        return a.interestRate - b.interestRate;
       }
       if (a.maxLoanAmount !== b.maxLoanAmount) {
         return b.maxLoanAmount - a.maxLoanAmount;
@@ -302,12 +326,30 @@ export default function Offers() {
       return a.processingFee - b.processingFee;
     });
 
+    // Capped offers can never win on EMI (it's structurally smaller), so
+    // rank them by how close they get to the actual ask instead. Same ROI
+    // tiebreak as the fully-funded tier for offers tied on both amount and
+    // displayed EMI.
+    cappedOffers.sort((a, b) => {
+      if (a.maxLoanAmount !== b.maxLoanAmount) {
+        return b.maxLoanAmount - a.maxLoanAmount;
+      }
+      const emiA = emiOf(a), emiB = emiOf(b);
+      if (emiA !== emiB) {
+        return emiA - emiB;
+      }
+      return a.interestRate - b.interestRate;
+    });
+
+    const uniqueOffers = [...fullyFundedOffers, ...cappedOffers];
+
     // Assign final approval odds based on overall rank
     return uniqueOffers.map((offer, idx) => {
       const nameHash = offer.bankName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
       return {
         ...offer,
-        approvalOdds: idx === 0 ? 98 : 85 + (nameHash % 13)
+        approvalOdds: idx === 0 ? 98 : 85 + (nameHash % 13),
+        fullyFunded: offer.principalAmount >= requestedAmount,
       };
     });
   }, [leadData]);
@@ -351,9 +393,16 @@ export default function Offers() {
   // independently from the ranking so the tag never claims something false.
   const lowestEmiOfferId = useMemo(() => {
     if (!dynamicOffers.length) return null;
-    let bestId = dynamicOffers[0].id;
+    // Only offers funding the full requested amount compete for "cheapest" --
+    // a capped offer's EMI is smaller purely because the loan is smaller, so
+    // it must never win this crown over a fully-funded offer. Fall back to
+    // the full list only if literally nothing funds the full request.
+    const pool = dynamicOffers.some(o => o.fullyFunded)
+      ? dynamicOffers.filter(o => o.fullyFunded)
+      : dynamicOffers;
+    let bestId = pool[0].id;
     let bestEmi = emis[bestId] ?? Infinity;
-    for (const o of dynamicOffers) {
+    for (const o of pool) {
       const e = emis[o.id];
       if (e != null && e < bestEmi) {
         bestEmi = e;
@@ -655,9 +704,15 @@ export default function Offers() {
                     // lowest EMI -- not against the #1 ranked (highest eligible
                     // amount) card -- so "+₹X/mo more" is always truthful even
                     // when the top-ranked lender isn't the cheapest one.
+                    // Capped offers are excluded entirely: their EMI sits on a
+                    // smaller principal than the lowest-EMI (fully-funded)
+                    // offer, so a raw diff would show a false "-₹X/mo less" --
+                    // BankComparisonCard renders a funding-shortfall badge for
+                    // these instead (see isFullyFunded).
                     const isLowestEmi = offer.id === lowestEmiOfferId;
-                    const emiDiffFromHero = isLowestEmi ? 0 : emi - (emis[lowestEmiOfferId || ""] || 0);
-                    const totalDiffFromHero = isLowestEmi ? 0 : totalRep - (totalRepayments[lowestEmiOfferId || ""] || 0);
+                    const showEmiDiff = !isLowestEmi && offer.fullyFunded;
+                    const emiDiffFromHero = showEmiDiff ? emi - (emis[lowestEmiOfferId || ""] || 0) : 0;
+                    const totalDiffFromHero = showEmiDiff ? totalRep - (totalRepayments[lowestEmiOfferId || ""] || 0) : 0;
                     const isExpanded = expandedCard === offer.id;
 
                     return (
@@ -676,6 +731,8 @@ export default function Offers() {
                         isGlobalLocking={isLocking !== null}
                         isRecommended={offer.interestRate === heroOffer.interestRate && offer.processingFee === heroOffer.processingFee}
                         isLowestEmi={isLowestEmi}
+                        isFullyFunded={offer.fullyFunded}
+                        requestedAmount={leadData.loanAmount}
                         rewards={productRewards}
                       />
                     );
