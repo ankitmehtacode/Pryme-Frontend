@@ -253,8 +253,6 @@ export default function Offers() {
       };
     });
 
-    // Sort mapped offers: lowest EMI first (the actual cost the applicant pays),
-    // then highest eligible loan amount, then lowest processing fee as tiebreakers.
     // EMI here mirrors the same derivation the `emis` memo below uses -- prefer
     // the engine's own proposedEmi (already computed on the capped/eligible
     // amount), falling back to a local calc only if the backend didn't return one.
@@ -264,7 +262,36 @@ export default function Offers() {
         ? Math.round(Number(backendEmi))
         : calcEMI(o.principalAmount, o.interestRate, o.effectiveTenureYears);
     };
-    const sortedOffers = mappedOffers.sort((a, b) => {
+
+    // Deduplicate WITHIN each bank first, before any cross-lender EMI sort.
+    // A bank can return several eligible products at once (e.g. one heavily
+    // amount-capped, one funding the full request) -- picking by lowest EMI
+    // here is misleading, since a tiny capped loan trivially has a tiny EMI
+    // even though it's the worse offer. The representative product for a
+    // bank is the one that gets the applicant closest to what they actually
+    // asked for (highest maxLoanAmount), with EMI/fee only as tiebreakers
+    // among products that offer the exact same amount.
+    const bestByBank = new Map<string, typeof mappedOffers[number]>();
+    for (const offer of mappedOffers) {
+      const current = bestByBank.get(offer.bankKey);
+      if (!current) {
+        bestByBank.set(offer.bankKey, offer);
+        continue;
+      }
+      if (offer.maxLoanAmount !== current.maxLoanAmount) {
+        if (offer.maxLoanAmount > current.maxLoanAmount) bestByBank.set(offer.bankKey, offer);
+        continue;
+      }
+      if (emiOf(offer) < emiOf(current)) {
+        bestByBank.set(offer.bankKey, offer);
+      }
+    }
+
+    // Now sort the one-per-bank list for display: lowest EMI first (the
+    // actual cost the applicant pays), then highest eligible loan amount,
+    // then lowest processing fee as tiebreakers. This cross-lender ordering
+    // is unaffected by the per-bank selection above.
+    const uniqueOffers = Array.from(bestByBank.values()).sort((a, b) => {
       const emiA = emiOf(a), emiB = emiOf(b);
       if (emiA !== emiB) {
         return emiA - emiB;
@@ -274,17 +301,6 @@ export default function Offers() {
       }
       return a.processingFee - b.processingFee;
     });
-
-    // Deduplicate: Keep only the single best offer for each unique bankKey
-    const seenBanks = new Set<string>();
-    const uniqueOffers: BankOffer[] = [];
-
-    for (const offer of sortedOffers) {
-      if (!seenBanks.has(offer.bankKey)) {
-        seenBanks.add(offer.bankKey);
-        uniqueOffers.push(offer);
-      }
-    }
 
     // Assign final approval odds based on overall rank
     return uniqueOffers.map((offer, idx) => {
