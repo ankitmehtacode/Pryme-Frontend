@@ -90,10 +90,9 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                   <SelectItem value="FATHER">Father</SelectItem>
                   <SelectItem value="MOTHER">Mother</SelectItem>
                   <SelectItem value="SON">Son</SelectItem>
-                  <SelectItem value="DAUGHTER">Daughter</SelectItem>
+                  <SelectItem value="DAUGHTER">Daughter(Unmarried)</SelectItem>
                   <SelectItem value="BROTHER">Brother</SelectItem>
-                  <SelectItem value="SISTER">Sister</SelectItem>
-                  <SelectItem value="OTHER">Other</SelectItem>
+                  <SelectItem value="SISTER">Sister(Unmarried)</SelectItem>
                 </StyledSelect>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
