@@ -85,6 +85,10 @@ export const AppRoutes = () => {
             APPLICATION LAYER (Native 1:1 Coordinates)
             ════════════════════════════════════════════════════════════ */}
         <Route path="/apply" element={<PageWrapper viewport="native"><Apply /></PageWrapper>} />
+        {/* Clean, bookmarkable entry points for the two live loan types
+            (replaces /apply?type=home|lap query strings) -- same page
+            component, LoanApplicationForm reads the :loanType path segment. */}
+        <Route path="/apply/:loanType" element={<PageWrapper viewport="native"><Apply /></PageWrapper>} />
         <Route path="/apply-direct" element={<PageWrapper viewport="native"><ApplyDirect /></PageWrapper>} />
         <Route path="/apply-direct/:bankId" element={<PageWrapper viewport="native"><ApplyDirect /></PageWrapper>} />
         <Route path="/auth" element={<PageWrapper viewport="native"><Auth /></PageWrapper>} />

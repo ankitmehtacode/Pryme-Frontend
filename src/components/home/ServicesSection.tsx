@@ -32,7 +32,7 @@ const ServicesSection = () => {
       description: "Make your dream home a reality with industry-best interest rates.",
       rate: "8.5%",
       maxAmount: "₹5 Crore",
-      href: "/apply?type=home",
+      href: "/apply/home-loan",
     },
     {
       icon: Building2,
@@ -40,7 +40,7 @@ const ServicesSection = () => {
       description: "Borrow against your property with competitive loan-to-value ratios.",
       rate: "9.5%",
       maxAmount: "₹3 Crore",
-      href: "/apply?type=lap",
+      href: "/apply/loan-against-property",
     },
   ];
 

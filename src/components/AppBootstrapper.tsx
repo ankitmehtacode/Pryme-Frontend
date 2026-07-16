@@ -49,10 +49,11 @@ export const AppBootstrapper = ({ children }: Props) => {
   // 🧠 ZERO-TRUST ROUTING: Redirect 401s to /auth (login) for protected routes
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
-      const isPublicRoute = PUBLIC_PATHS.some(path => 
-        location.pathname === path || 
+      const isPublicRoute = PUBLIC_PATHS.some(path =>
+        location.pathname === path ||
         location.pathname.startsWith("/blogs/") ||
-        location.pathname.startsWith("/apply-direct/")
+        location.pathname.startsWith("/apply-direct/") ||
+        location.pathname.startsWith("/apply/")
       );
       
       if (!isPublicRoute) {

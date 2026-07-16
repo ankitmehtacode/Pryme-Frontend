@@ -37,8 +37,8 @@ const CONTACT_PHONE = "+91 92432 94291";
 const CONTACT_PHONE_LINK = "tel:+919243294291";
 
 const productLinks = [
-  { href: "/apply?type=home", label: "Home Loans", icon: Home, description: "Make your dream home real" },
-  { href: "/apply?type=lap", label: "LAP", icon: Building2, description: "Borrow against your property" },
+  { href: "/apply/home-loan", label: "Home Loans", icon: Home, description: "Make your dream home real" },
+  { href: "/apply/loan-against-property", label: "LAP", icon: Building2, description: "Borrow against your property" },
   { href: "/coming-soon?type=auto", label: "Vehicle Loans", icon: Car, description: "Drive your dream today", disabled: true },
   { href: "/coming-soon?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs", disabled: true },
   { href: "/coming-soon?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth", disabled: true },

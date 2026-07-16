@@ -1,7 +1,7 @@
 import {
   useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import {
   User, Briefcase, CheckCircle2, LockKeyhole, ArrowRight,
   ChevronLeft, IndianRupee, Loader2, AlertCircle,
@@ -432,6 +432,7 @@ interface LoanApplicationFormProps {
 const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFormProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { loanType: loanTypeSlug } = useParams<{ loanType?: string }>();
   // Enforce atomic selectors for Zustand optimization
   const store: ApplicationStore = {
     // Stage navigation & Meta
@@ -476,18 +477,30 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
     isStageAccessible: useApplicationStore((s) => s.isStageAccessible),
   };
 
-  // ── Sync URL query parameters to store ────────────────────────────────────
+  // ── Sync URL path segment / query parameters to store ─────────────────────
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const typeParam = params.get("type");
+    // The /apply/:loanType path segment (clean, bookmarkable marketing links)
+    // takes priority over the legacy ?type= query param (still used by
+    // dynamic in-app links like OffersRewards.tsx that pass a
+    // just-computed product/amount, not a static nav entry).
+    const typeParam = loanTypeSlug || params.get("type");
     const amountParam = params.get("amount");
     const employmentParam = params.get("employment");
-    
+
     const currentState = useApplicationStore.getState();
     const reqUpdates: Partial<typeof currentState.loanRequirements> = {};
 
     if (typeParam) {
       const typeMap: Record<string, typeof store.loanRequirements.loanType> = {
+        // Clean path-segment slugs (/apply/home-loan, /apply/loan-against-property)
+        "home-loan": "HOME_LOAN",
+        "loan-against-property": "LAP",
+        "personal-loan": "PERSONAL_LOAN",
+        "business-loan": "BUSINESS_LOAN",
+        "auto-loan": "AUTO_LOAN",
+        "balance-transfer": "BT_TOP_UP",
+        // Legacy short codes, still used by ?type= query-string links
         personal: "PERSONAL_LOAN",
         business: "BUSINESS_LOAN",
         home: "HOME_LOAN",
@@ -497,7 +510,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         transfer: "BT_TOP_UP",
         bt_top_up: "BT_TOP_UP",
       };
-      
+
       const resolvedType = typeMap[typeParam.toLowerCase()];
       if (resolvedType && currentState.loanRequirements.loanType !== resolvedType) {
         reqUpdates.loanType = resolvedType;
@@ -528,7 +541,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         currentState.updateBasicKYC({ employmentType: resolvedEmp });
       }
     }
-  }, [location.search]);
+  }, [location.search, loanTypeSlug]);
 
   const [direction, setDirection] = useState(1);
   const errors = store.validationErrors;

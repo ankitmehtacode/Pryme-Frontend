@@ -37,8 +37,8 @@ const Footer = () => {
   };
 
   const productLinks = [
-    { label: "Home Loans", href: "/apply?type=home" },
-    { label: "LAP", href: "/apply?type=lap" },
+    { label: "Home Loans", href: "/apply/home-loan" },
+    { label: "LAP", href: "/apply/loan-against-property" },
     { label: "Vehicle Loans", href: "/coming-soon?type=auto" },
     { label: "Personal Loan", href: "/coming-soon?type=personal" },
     { label: "Business Loan", href: "/coming-soon?type=business" },
