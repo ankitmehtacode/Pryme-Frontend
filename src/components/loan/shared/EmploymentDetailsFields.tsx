@@ -326,9 +326,20 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                 const val = e.target.value === "" ? undefined : Math.max(0, Number(e.target.value));
                 // Professionals are always the "Service" GST margin bucket (see
                 // Apply.tsx's hardcoded businessType: "Service" for the SEP path).
+                //
+                // GST turnover is billing volume, not income -- it must never
+                // silently overwrite netMonthlyIncome once the applicant has
+                // already declared a real ITR-based income (netProfit). Without
+                // this guard, typing GST turnover after ITR income clobbers a
+                // correct, much higher income figure with a tiny margin-based
+                // estimate (e.g. ₹95,000/mo -> ₹1,000/mo on ₹1.2L turnover),
+                // which then falsely trips the EMI-vs-income sanity check.
+                const hasDeclaredItrIncome = fin.path === "PROFESSIONAL" && !!fin.data.netProfit;
                 onUpdateProfessional({
                   last12MonthsGstTurnover: val,
-                  netMonthlyIncome: val !== undefined ? Math.round((val * GST_MARGIN_BY_INDUSTRY.Service) / 12) : 0,
+                  ...(hasDeclaredItrIncome ? {} : {
+                    netMonthlyIncome: val !== undefined ? Math.round((val * GST_MARGIN_BY_INDUSTRY.Service) / 12) : 0,
+                  }),
                 });
               }}
               isValid={(fin.path === "PROFESSIONAL" ? (fin.data.last12MonthsGstTurnover ?? -1) : -1) >= 0}
@@ -478,11 +489,18 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   const val = Number(e.target.value);
                   const industry = fin.path === "SELF_EMPLOYED" ? (fin.data.industryType || "Service") : "Service";
                   const margin = GST_MARGIN_BY_INDUSTRY[industry] ?? GST_MARGIN_BY_INDUSTRY.Service;
+                  // GST turnover is billing volume, not income -- it must never
+                  // silently overwrite netMonthlyIncome once the applicant has
+                  // already declared a real ITR-based income (netProfit). Without
+                  // this guard, typing GST turnover after ITR income clobbers a
+                  // correct, much higher income figure with a tiny margin-based
+                  // estimate, which then falsely trips the EMI-vs-income check.
+                  const hasDeclaredItrIncome = fin.path === "SELF_EMPLOYED" && !!fin.data.netProfit;
                   onUpdateBusiness({
                     last12MonthsGstTurnover: val,
                     monthlyGSTTurnover: Math.round(val / 12),
-                    netMonthlyIncome: Math.round((val * margin) / 12),
-                    subType: val > 0 ? "GST_BASED" : "ITR_BASED"
+                    ...(hasDeclaredItrIncome ? {} : { netMonthlyIncome: Math.round((val * margin) / 12) }),
+                    subType: hasDeclaredItrIncome ? "ITR_BASED" : (val > 0 ? "GST_BASED" : "ITR_BASED")
                   });
                 }}
                 isValid={(fin.path === "SELF_EMPLOYED" ? fin.data.last12MonthsGstTurnover || 0 : 0) >= 0}
@@ -494,12 +512,14 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                 onValueChange={(v) => {
                   const turnover = fin.path === "SELF_EMPLOYED" ? (fin.data.last12MonthsGstTurnover || 0) : 0;
                   const margin = GST_MARGIN_BY_INDUSTRY[v] ?? GST_MARGIN_BY_INDUSTRY.Service;
+                  const hasDeclaredItrIncome = fin.path === "SELF_EMPLOYED" && !!fin.data.netProfit;
                   onUpdateBusiness({
                     industryType: v,
                     // Re-derive income from turnover when the industry (and thus margin)
                     // changes after turnover was already entered -- otherwise it stays
                     // stale at whatever margin was in effect when turnover was typed.
-                    ...(turnover > 0 ? { netMonthlyIncome: Math.round((turnover * margin) / 12) } : {}),
+                    // Same ITR-income guard as the turnover field above.
+                    ...(turnover > 0 && !hasDeclaredItrIncome ? { netMonthlyIncome: Math.round((turnover * margin) / 12) } : {}),
                   });
                 }}
                 placeholder="Select industry type"
