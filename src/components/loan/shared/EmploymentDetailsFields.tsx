@@ -24,16 +24,6 @@ export const GST_MARGIN_BY_INDUSTRY: Record<string, number> = {
   Manufacturing: 0.04,
 };
 
-const calculateVintageYears = (dateStr: string): number => {
-  if (!dateStr) return 0;
-  const regDate = new Date(dateStr);
-  if (isNaN(regDate.getTime())) return 0;
-  const diffTime = Date.now() - regDate.getTime();
-  if (diffTime < 0) return 0;
-  const diffYears = diffTime / (365.25 * 24 * 60 * 60 * 1000);
-  return Math.floor(diffYears);
-};
-
 const getInputValue = (val: any) => {
   if (val === undefined || val === null) return "";
   return val;
@@ -457,25 +447,14 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                 error={errors.businessName}
               />
               <ValidatedInput
-                label="GST Registration Date (Optional)"
-                type="date"
+                label="Business Vintage (Years)"
+                type="number"
+                placeholder="e.g. 8"
                 icon={Calendar}
-                value={fin.path === "SELF_EMPLOYED" ? (fin.data.gstRegistrationDate || "") : ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const dateVal = e.target.value;
-                  const years = calculateVintageYears(dateVal);
-                  onUpdateBusiness({
-                    gstRegistrationDate: dateVal,
-                    vintageYears: years
-                  });
-                }}
-                isValid={(() => {
-                  const regDateStr = fin.path === "SELF_EMPLOYED" ? fin.data.gstRegistrationDate : "";
-                  if (!regDateStr) return true; // optional — blank is valid
-                  const regDate = new Date(regDateStr);
-                  return !isNaN(regDate.getTime()) && regDate.getTime() <= Date.now();
-                })()}
-                error={errors.gstRegistrationDate}
+                value={fin.path === "SELF_EMPLOYED" ? (fin.data.vintageYears || "") : ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateBusiness({ vintageYears: Number(e.target.value) })}
+                isValid={(fin.path === "SELF_EMPLOYED" ? fin.data.vintageYears : 0) > 0}
+                error={errors.vintageYears}
               />
             </div>
           </div>
