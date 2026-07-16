@@ -88,14 +88,20 @@ export default function ApplyDirect() {
   const { bankId } = useParams<{ bankId: string }>();
   const navigate = useNavigate();
 
-  // Resolve bank based on URL (e.g. "bob-hl" -> "bob")
-  const getSelectedBank = (): BankDetails => {
-    if (!bankId) return BANKS_MAP.hdfc;
+  // Resolve bank based on URL (e.g. "bob-hl" -> "bob"). Returns null when
+  // there's genuinely no bank context (e.g. the "Request a Call Back" CTA
+  // on the zero-offers screen navigates here with no :bankId at all) --
+  // this must NOT silently default to a specific bank like HDFC, since
+  // that claims a relationship manager/branch for a lender the applicant
+  // was never actually matched with.
+  const getSelectedBank = (): BankDetails | null => {
+    if (!bankId) return null;
     const cleanId = bankId.toLowerCase().split("-")[0];
-    return BANKS_MAP[cleanId] || BANKS_MAP.hdfc;
+    return BANKS_MAP[cleanId] || null;
   };
 
   const selectedBank = getSelectedBank();
+  const hasSpecificBank = selectedBank !== null;
 
   // Retrieve user's pincode from sessionStorage or localStorage
   // Retrieve user's pincode from sessionStorage or localStorage
@@ -166,9 +172,9 @@ export default function ApplyDirect() {
   };
 
   // Calculate nearest branch address in Indore based on pincode
-  const getBranchAddress = (bankKey: string, pin: string): string => {
+  const getBranchAddress = (bank: BankDetails, pin: string): string => {
     const cleanPin = parseInt(pin.trim(), 10) || 452001;
-    const bankName = selectedBank.name;
+    const bankName = bank.name;
 
     // Zone 1: Rau / Outskirts (453331 or prefix 453)
     if (cleanPin === 453331 || pin.trim().startsWith("453")) {
@@ -190,7 +196,7 @@ export default function ApplyDirect() {
     return `${bankName}, MG Road Branch, Near GPO Square, Indore, MP - 452001`;
   };
 
-  const branchAddress = getBranchAddress(selectedBank.id, pincode);
+  const branchAddress = hasSpecificBank ? getBranchAddress(selectedBank, pincode) : null;
 
   const [formData, setFormData] = useState({
     fullName: localStorage.getItem("pryme_lead_name") || "",
@@ -248,8 +254,8 @@ export default function ApplyDirect() {
         loanAmount: 1000000,
         cibilScore: 750,
         monthlyIncome: 50000,
-        offerId: selectedBank.id,
-        loanPurpose: `Direct Apply Callback Request: time=${formData.preferredTime}, pincode=${pincode}, branch=${branchAddress}, msg=${formData.message}`
+        offerId: selectedBank?.id,
+        loanPurpose: `Direct Apply Callback Request: time=${formData.preferredTime}, pincode=${pincode}, branch=${branchAddress ?? "unassigned"}, msg=${formData.message}`
       });
 
       localStorage.setItem("pryme_lead_name", formData.fullName);
@@ -300,10 +306,12 @@ export default function ApplyDirect() {
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> Application Received!
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight leading-none">
-              Your Relationship Manager Details
+              {hasSpecificBank ? "Your Relationship Manager Details" : "We'll Call You Back"}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
-              Our representative will connect with you shortly to assist with your loan process.
+              {hasSpecificBank
+                ? "Our representative will connect with you shortly to assist with your loan process."
+                : "A PRYME loan specialist will review your profile and call you to discuss the best available options."}
             </p>
           </div>
 
@@ -318,11 +326,18 @@ export default function ApplyDirect() {
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-foreground leading-tight">Relationship Manager Details</h3>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Your dedicated relationship manager will guide you through the next steps.</p>
+                    <h3 className="text-base font-bold text-foreground leading-tight">
+                      {hasSpecificBank ? "Relationship Manager Details" : "Callback Request"}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {hasSpecificBank
+                        ? "Your dedicated relationship manager will guide you through the next steps."
+                        : "We couldn't confirm a specific lender for your profile yet -- our team will call to walk you through your options."}
+                    </p>
                   </div>
                 </div>
 
+                {hasSpecificBank ? (
                 <div className="space-y-4">
                   {/* Bank Name */}
                   <div className="flex items-center justify-between border-b border-dashed border-slate-100 dark:border-white/[0.04] pb-2.5">
@@ -381,6 +396,25 @@ export default function ApplyDirect() {
                     <span className="text-[11px] font-bold text-foreground text-right max-w-[220px] leading-relaxed uppercase">{branchAddress}</span>
                   </div>
                 </div>
+                ) : (
+                <div className="space-y-4">
+                  {/* Generic contact -- no fabricated bank/RM/branch when no lender was actually matched */}
+                  <div className="flex items-center justify-between border-b border-dashed border-slate-100 dark:border-white/[0.04] pb-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                        <Phone className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">PRYME Support</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-foreground font-mono">+91 92432 94291</span>
+                      <a href="tel:+919243294291" className="p-1 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:scale-105 transition-all">
+                        <Phone className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                )}
               </div>
 
               {/* Bottom Security Banner */}
@@ -521,7 +555,9 @@ export default function ApplyDirect() {
                     <div className="space-y-2">
                       <h2 className="text-xl font-bold text-foreground">Callback Request Received!</h2>
                       <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                        Your direct request has been logged. Aadesh Kothari from {selectedBank.name} branch will call you during your preferred time window.
+                        {hasSpecificBank
+                          ? `Your direct request has been logged. Aadesh Kothari from ${selectedBank.name} branch will call you during your preferred time window.`
+                          : "Your request has been logged. A PRYME loan specialist will call you during your preferred time window."}
                       </p>
                     </div>
 
