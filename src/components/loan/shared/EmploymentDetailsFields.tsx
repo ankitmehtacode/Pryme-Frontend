@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Building2, Landmark, IndianRupee, Calendar,
-  CreditCard, GraduationCap, Stethoscope, Scale,
+  CreditCard, GraduationCap, Stethoscope, Scale, PenTool,
   BriefcaseBusiness, FileText, Check
 } from "lucide-react";
 import { SelectItem } from "@/components/ui/select";
@@ -243,6 +243,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
               { value: "CS", label: "Company Secretary", icon: GraduationCap },
               { value: "DOCTOR", label: "Doctor", icon: Stethoscope },
               { value: "LAWYER", label: "Lawyer", icon: Scale },
+              { value: "ARCHITECT", label: "Architect", icon: PenTool },
             ]}
             value={fin.path === "PROFESSIONAL" ? fin.data.subType : null}
             onChange={(v) => onUpdateProfessional({ subType: v })}

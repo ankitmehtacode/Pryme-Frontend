@@ -35,7 +35,7 @@ export type EmploymentType = 'SALARIED' | 'PROFESSIONAL' | 'SELF_EMPLOYED';
 
 export type SalariedSubType = 'PRIVATE' | 'GOVERNMENT';
 
-export type ProfessionalSubType = 'CA' | 'CS' | 'DOCTOR' | 'LAWYER';
+export type ProfessionalSubType = 'CA' | 'CS' | 'DOCTOR' | 'LAWYER' | 'ARCHITECT';
 
 // Standard relationship set used by PolicyBazaar/BankBazaar-style aggregators
 // for co-applicant KYC -- most lenders' co-applicant eligibility is
@@ -70,6 +70,7 @@ export const PROFESSIONAL_LABELS: Record<ProfessionalSubType, string> = {
   CS: 'Company Secretary',
   DOCTOR: 'Doctor / Medical Practitioner',
   LAWYER: 'Advocate / Lawyer',
+  ARCHITECT: 'Architect',
 };
 
 export const BUSINESS_LABELS: Record<BusinessSubType, string> = {
