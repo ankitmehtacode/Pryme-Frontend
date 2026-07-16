@@ -999,7 +999,32 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
               income = finData.netMonthlyIncome || 0;
               emi = finData.existingEMI || 0;
            }
-           
+
+           // A co-applicant's income/EMI are part of the same household
+           // affordability picture -- without this, the check only ever
+           // looked at the primary applicant even though it renders right
+           // below the co-applicant section. Setting the co-applicant's own
+           // EMI to 0 had no effect on it, and their income (the whole
+           // point of adding one, per this form's own copy: "can increase
+           // your loan eligibility") was never being counted either.
+           const coApplicant = store.financialFootprint?.hasCoApplicant
+             ? store.financialFootprint?.coApplicantDetails
+             : null;
+           if (coApplicant) {
+             const coFin = coApplicant.financialDetails || {};
+             const coFinData = coFin.data || {};
+             if (coApplicant.employmentType === 'SALARIED' && coFin.path === 'SALARIED') {
+                income += coFinData.netMonthlySalary || 0;
+                emi += coFinData.existingEMI || 0;
+             } else if (coApplicant.employmentType === 'SELF_EMPLOYED' && coFin.path === 'SELF_EMPLOYED') {
+                income += coFinData.netMonthlyIncome || 0;
+                emi += coFinData.existingEMI || 0;
+             } else if (coApplicant.employmentType === 'PROFESSIONAL' && coFin.path === 'PROFESSIONAL') {
+                income += coFinData.netMonthlyIncome || 0;
+                emi += coFinData.existingEMI || 0;
+             }
+           }
+
            if (income > 0 && emi >= income) {
              return (
                <div className="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-sm font-medium flex items-center gap-3">
