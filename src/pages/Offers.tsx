@@ -481,7 +481,10 @@ export default function Offers() {
   if (!leadData) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
-        <Helmet><title>Exclusive Offers | PRYME Consulting</title></Helmet>
+        <Helmet>
+          <title>Exclusive Offers | PRYME Consulting</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <Header />
         <SmoothScroll>
           <main className="flex-1 pt-24 md:pt-32">
@@ -620,7 +623,10 @@ export default function Offers() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#080d1e] text-foreground flex flex-col font-sans selection:bg-primary/30">
-      <Helmet><title>Your Best Loan Option | PRYME</title></Helmet>
+      <Helmet>
+        <title>Your Best Loan Option | PRYME</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Header />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">

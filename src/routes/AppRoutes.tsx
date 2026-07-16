@@ -105,7 +105,11 @@ export const AppRoutes = () => {
           <Route path="/admin" element={<PageWrapper viewport="native"><AdminDashboard /></PageWrapper>} />
         </Route>
 
-        <Route path="/design-system" element={<PageWrapper viewport="native"><DesignSystemShowcase /></PageWrapper>} />
+        {/* Dev-only styleguide -- excluded from production builds entirely so it
+            never ships as a live, crawlable, shareable URL. */}
+        {import.meta.env.DEV && (
+          <Route path="/design-system" element={<PageWrapper viewport="native"><DesignSystemShowcase /></PageWrapper>} />
+        )}
         <Route path="*" element={<PageWrapper viewport="native"><NotFound /></PageWrapper>} />
 
 

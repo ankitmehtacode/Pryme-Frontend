@@ -272,6 +272,7 @@ const Profile = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>My Profile | PRYME Consulting</title>
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
       <Header />

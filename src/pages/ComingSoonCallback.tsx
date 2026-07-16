@@ -94,6 +94,7 @@ export default function ComingSoonCallback() {
     <div className="min-h-screen bg-slate-50/50 dark:bg-[#080d1e] flex flex-col relative overflow-hidden">
       <Helmet>
         <title>Coming Soon | Pryme</title>
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
       <Header />

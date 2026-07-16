@@ -17,6 +17,13 @@ const GrievanceRedressal = () => {
       <Helmet>
         <title>Grievance Redressal | PRYME Consulting</title>
         <meta name="description" content="Reach out to our Grievance Redressal Officer for any concerns or complaints." />
+        <meta property="og:title" content="Grievance Redressal | PRYME Consulting" />
+        <meta property="og:description" content="Reach out to our Grievance Redressal Officer for any concerns or complaints." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/grievance-redressal" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/grievance-redressal" />
       </Helmet>
       
       <Header />

@@ -582,7 +582,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <Helmet><title>Client Portal | PRYME Bank-Grade Solutions</title></Helmet>
+      <Helmet>
+        <title>Client Portal | PRYME Bank-Grade Solutions</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] selection:bg-primary/20">
         <Header />
 

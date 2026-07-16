@@ -14,6 +14,13 @@ const RewardsCalculatorPage = () => {
       <Helmet>
         <title>Rewards Calculator | PRYME Consulting</title>
         <meta name="description" content="Calculate your rewards and perks for your loan application." />
+        <meta property="og:title" content="Rewards Calculator | PRYME Consulting" />
+        <meta property="og:description" content="Calculate your rewards and perks for your loan application." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/rewards-calculator" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/rewards-calculator" />
       </Helmet>
       
       <Header />

@@ -670,7 +670,10 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <Helmet><title>PRYME Admin — Command Center</title></Helmet>
+      <Helmet>
+        <title>PRYME Admin — Command Center</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
 
       <div className="min-h-screen flex-1 flex bg-[#050508] font-sans text-slate-100 transition-colors duration-300">
 

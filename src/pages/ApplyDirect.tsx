@@ -276,6 +276,7 @@ export default function ApplyDirect() {
       <Helmet>
         <title>Relationship Manager | PRYME</title>
         <meta name="description" content="View your dedicated loan relationship manager details and request a direct callback." />
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
       <div className="min-h-screen bg-slate-50 dark:bg-[#070b13] flex flex-col font-sans transition-colors duration-300">

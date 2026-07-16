@@ -150,6 +150,13 @@ const Index = () => {
         <meta property="og:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
         <meta property="og:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech" />
+        <meta property="og:site_name" content="PRYME" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
+        <meta name="twitter:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
+        <meta name="twitter:image" content="https://www.gopryme.tech/og-image.png" />
         <link rel="canonical" href="https://www.gopryme.tech" />
       </Helmet>
 

@@ -16,6 +16,13 @@ const About = () => {
       <Helmet>
         <title>About Us | PRYME</title>
         <meta name="description" content="At PRYME, we help you compare loan options, understand your estimated eligibility, and choose the option that best fits your needs." />
+        <meta property="og:title" content="About Us | PRYME" />
+        <meta property="og:description" content="At PRYME, we help you compare loan options, understand your estimated eligibility, and choose the option that best fits your needs." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/about" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/about" />
       </Helmet>
       
       <Header />

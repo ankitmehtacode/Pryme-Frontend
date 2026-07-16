@@ -431,6 +431,7 @@ const Apply = () => {
       <Helmet>
         <title>Apply for Loans | PRYME Intelligent Aggregator</title>
         <meta name="description" content="Compare loan offers from top banks. Apply for personal, business, or home loans securely." />
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
       {showAuthGate && (

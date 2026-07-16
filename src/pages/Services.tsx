@@ -13,6 +13,13 @@ const Services = () => {
       <Helmet>
         <title>Our Services | PRYME Consulting</title>
         <meta name="description" content="Comprehensive loan comparison and financial matchmaking services." />
+        <meta property="og:title" content="Our Services | PRYME Consulting" />
+        <meta property="og:description" content="Comprehensive loan comparison and financial matchmaking services." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/services" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/services" />
       </Helmet>
       
       <Header />

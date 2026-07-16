@@ -5,11 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#0a0a0a" />
 
+    <!--
+      title is the only tag here safe to leave alongside react-helmet-async's
+      per-page tags -- the HTML spec treats <title> as a single unique slot,
+      so Helmet reliably replaces it on mount with no duplicate.
+
+      description/robots/canonical/og:*/twitter:* are deliberately NOT set
+      here. react-helmet-async only manages tags it renders itself -- it has
+      no awareness of tags baked into this static shell, so it ADDS its own
+      instead of replacing them. Every route already sets its own complete
+      Helmet block (see src/pages/*.tsx), so a static duplicate here doesn't
+      add a fallback, it adds a second, conflicting tag with the same
+      name/property that crawlers can pick over the correct per-page one
+      (confirmed live: /apply was shipping both "index, follow" AND
+      "noindex, nofollow" robots tags at once before this fix).
+    -->
     <title>PRYME | Bank-Grade Intelligent Loan Matchmaking</title>
-    <meta name="description" content="Experience transparent loan processing with 256-bit bank-grade security. Instant pre-approved limits from top-tier RBI compliant banks." />
     <meta name="author" content="PRYME Intelligence" />
     <meta name="keywords" content="personal loan, business loan, home loan, loan aggregator, RBI compliant, secure loan, PRYME" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
@@ -41,19 +54,6 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 
-    <link rel="canonical" href="https://www.gopryme.tech" />
-
-    <meta property="og:title" content="PRYME - Secure Loan Matchmaking" />
-    <meta property="og:description" content="Enter your details once. Let our algorithm scan 15+ top-tier banks to fetch your pre-approved limits." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.gopryme.tech" />
-    <meta property="og:site_name" content="PRYME" />
-    <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PRYME - Secure Loan Matchmaking" />
-    <meta name="twitter:description" content="Bank-grade security for your financial future. Apply online instantly." />
-    <meta name="twitter:image" content="https://www.gopryme.tech/og-image.png" />
   </head>
 
   <body class="bg-[#0a0a0a] text-white overflow-x-hidden">

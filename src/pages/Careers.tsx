@@ -116,6 +116,13 @@ export default function Careers() {
       <Helmet>
         <title>Careers | PRYME</title>
         <meta name="description" content="Join PRYME and help build the future of lending." />
+        <meta property="og:title" content="Careers | PRYME" />
+        <meta property="og:description" content="Join PRYME and help build the future of lending." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/careers" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/careers" />
       </Helmet>
       
       <SmoothScroll>

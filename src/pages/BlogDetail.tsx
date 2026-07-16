@@ -25,6 +25,14 @@ const BlogDetail = () => {
 
   const shareUrl = window.location.href;
   const shareTitle = blog.title;
+  const canonicalUrl = `https://www.gopryme.tech/blogs/${blog.slug}`;
+  // Meta descriptions must be distinct from the title -- derive a plain-text
+  // excerpt from the article body instead of repeating the headline.
+  const excerpt = blog.content
+    .replace(/[*_#>`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 155);
 
   const shareOnFacebook = () => {
     window.open(
@@ -54,7 +62,17 @@ const BlogDetail = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
       <Helmet>
         <title>{blog.title} | PRYME Insights</title>
-        <meta name="description" content={blog.title} />
+        <meta name="description" content={excerpt} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={blog.title} />
+        <meta property="og:description" content={excerpt} />
+        <meta property="og:image" content={blog.img} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={blog.title} />
+        <meta name="twitter:description" content={excerpt} />
+        <meta name="twitter:image" content={blog.img} />
       </Helmet>
       
       <Header />

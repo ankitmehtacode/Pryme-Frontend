@@ -184,6 +184,13 @@ const Faq = () => {
       <Helmet>
         <title>Frequently Asked Questions | PRYME</title>
         <meta name="description" content="Find answers to all your queries regarding loan eligibility, bank comparison, data security, and applications on PRYME." />
+        <meta property="og:title" content="Frequently Asked Questions | PRYME" />
+        <meta property="og:description" content="Find answers to all your queries regarding loan eligibility, bank comparison, data security, and applications on PRYME." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.gopryme.tech/faq" />
+        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://www.gopryme.tech/faq" />
       </Helmet>
 
       <SmoothScroll>

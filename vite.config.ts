@@ -27,6 +27,21 @@ export default defineConfig({
       }
     }
   },
+  // `vite preview` does NOT inherit `server.proxy` -- it needs its own. This
+  // matters beyond local `npm run preview` testing: scripts/prerender.js
+  // drives a headless browser against the preview server post-build, and
+  // without this, any page that fetches data on load (e.g. the homepage's
+  // testimonials) would prerender with empty/broken content.
+  preview: {
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://187.127.138.20',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
   plugins: [react()],
   resolve: {
     alias: {
