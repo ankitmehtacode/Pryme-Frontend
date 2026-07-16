@@ -738,7 +738,6 @@ export default function Offers() {
                         isRecommended={offer.interestRate === heroOffer.interestRate && offer.processingFee === heroOffer.processingFee}
                         isLowestEmi={isLowestEmi}
                         isFullyFunded={offer.fullyFunded}
-                        requestedAmount={leadData.loanAmount}
                         rewards={productRewards}
                       />
                     );

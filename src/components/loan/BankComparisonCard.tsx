@@ -59,9 +59,6 @@ interface BankComparisonCardProps {
    * than every fully-funded card, so it must never be compared against them
    * via emiDiffFromHero/totalDiffFromHero (those are 0 for such offers). */
   isFullyFunded?: boolean;
-  /** The applicant's originally requested loan amount, used only to render
-   * the funding-shortfall badge when isFullyFunded is false. */
-  requestedAmount?: number;
   rewards?: any[];
 }
 
@@ -80,7 +77,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   isRecommended = false,
   isLowestEmi = false,
   isFullyFunded = true,
-  requestedAmount,
   rewards = [],
 }: BankComparisonCardProps) {
   const navigate = useNavigate();
@@ -255,14 +251,18 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 </p>
               </div>
               
-              <div className="pb-0.5 flex flex-col justify-end">
+              <div className="pb-0.5 flex flex-col justify-end min-w-0">
                 {!isFullyFunded ? (
                   <>
-                    <p className="text-[11px] sm:text-xs font-bold whitespace-nowrap tracking-tight leading-none text-amber-600 dark:text-amber-400">
-                      Funds ₹{principalAmount.toLocaleString("en-IN")}
+                    <p className="text-[11px] sm:text-xs font-bold truncate tracking-tight leading-none text-amber-600 dark:text-amber-400" title={`Funds ₹${Math.round(principalAmount).toLocaleString("en-IN")}`}>
+                      Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
                     </p>
+                    {/* The exact requested amount is already shown in the page's
+                        sticky summary bar -- restating it here is redundant and,
+                        at large loan amounts, was long enough to overflow this
+                        fixed-width grid column into the Interest/Tenure chips. */}
                     <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
-                      {requestedAmount ? `Below your ₹${requestedAmount.toLocaleString("en-IN")} request` : "Below requested amount"}
+                      Below your request
                     </p>
                   </>
                 ) : !isLowestEmi ? (
@@ -343,12 +343,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 </div>
               </div>
               {!isFullyFunded ? (
-                <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
-                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight text-amber-600 dark:text-amber-400">
-                    Funds ₹{principalAmount.toLocaleString("en-IN")}
+                <div className="mt-2 flex items-center justify-between gap-2 bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
+                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight truncate text-amber-600 dark:text-amber-400">
+                    Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
                   </p>
-                  <p className="text-[9px] text-muted-foreground/70 font-semibold tabular-nums uppercase tracking-widest">
-                    {requestedAmount ? `of ₹${requestedAmount.toLocaleString("en-IN")} asked` : "below request"}
+                  <p className="text-[9px] text-muted-foreground/70 font-semibold uppercase tracking-widest shrink-0">
+                    below request
                   </p>
                 </div>
               ) : emiDiffFromHero !== 0 && (
