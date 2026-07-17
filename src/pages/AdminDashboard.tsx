@@ -299,7 +299,9 @@ const AdminDashboard = () => {
       const res = await PrymeAPI.getAdminUsers();
       return Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
     },
-    enabled: activeTab === "overview" || activeTab === "users" || activeTab === "company"
+    // "applications" needs this too -- teamMembers (derived from allUsers below)
+    // populates the Assignment dropdown on the CRM/Applications tab.
+    enabled: activeTab === "overview" || activeTab === "users" || activeTab === "company" || activeTab === "applications"
   });
 
   // 🧠 ARCHITECTURAL SPLIT: Customers vs Team Members
