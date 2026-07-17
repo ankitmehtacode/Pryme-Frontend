@@ -183,10 +183,10 @@ const OffersDisclaimerModal = ({ open, onOpenChange }: { open: boolean; onOpenCh
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
             <DialogPrimitive.Title className="text-base md:text-lg font-heading font-bold text-foreground tracking-tight leading-tight">
-              Before You Continue
+              Good to Know ✅
             </DialogPrimitive.Title>
             <DialogPrimitive.Description className="text-[11px] text-muted-foreground mt-0.5">
-              Please review these terms
+              A few important points about your loan estimates.
             </DialogPrimitive.Description>
           </div>
           <DialogPrimitive.Close className="p-1.5 rounded-full text-muted-foreground/70 hover:bg-white/60 dark:hover:bg-white/[0.06] hover:text-foreground transition-colors shrink-0">
