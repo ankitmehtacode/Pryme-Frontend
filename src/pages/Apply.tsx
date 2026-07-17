@@ -313,6 +313,7 @@ const Apply = () => {
         // effectiveIncome computation.
         coApplicantMonthlyIncome: coApplicantIncome || null,
         existingEmiTotal: data.eligibleExistingEmi || 0,
+        maturingLoanEmi: data.maturingLoanEmi || 0,
         businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
         workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
         idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),

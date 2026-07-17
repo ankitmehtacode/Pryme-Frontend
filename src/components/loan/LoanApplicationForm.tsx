@@ -839,6 +839,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         isAbove50Lakhs: Boolean(fp?.isAbove50Lakhs ?? false),
         hasExistingLoan: (Number((fin?.data as any)?.existingEMI ?? 0) > 0) || Boolean((fp as any)?.hasExistingLoan ?? false),
         eligibleExistingEmi: Number((fin?.data as any)?.existingEMI ?? 0),
+        maturingLoanEmi: Number((fin?.data as any)?.maturingLoanEMI ?? 0),
         // ITR years filed is real, reported data -- always forward it when the
         // applicant provided it. The old logic here guessed whether the applicant
         // was "ITR_BASED" or "GST_BASED" and silently zeroed this out (sent null)
