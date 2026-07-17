@@ -838,10 +838,7 @@ const AdminDashboard = () => {
 
 
                 {activeTab === "users" && (
-                  <UsersTab 
-                    users={users} isSuperAdmin={isSuperAdmin} 
-                    authUser={authUser} roleMutation={roleMutation} 
-                  />
+                  <UsersTab users={users} />
                 )}
 
                 {activeTab === "company" && (
