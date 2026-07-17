@@ -237,7 +237,8 @@ export interface LoanRequirements {
   // Home Loan / LAP
   propertyIdentified?: boolean;
   propertyType?: PropertyType;
-  propertyCategory?: 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL'; // for LAP
+  propertyCategory?: 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL'; // for LAP
+  businessPropertyCategory?: 'COMMERCIAL' | 'INDUSTRIAL'; // Business Loan, and mirrors propertyCategory for LAP
   propertyValue?: number;
   propertyCity?: string;
 

@@ -82,7 +82,7 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
     }
   }
 
-  if (lr.loanType === 'BUSINESS_LOAN' || (lr.loanType === 'LAP' && lr.propertyCategory === 'COMMERCIAL_INDUSTRIAL')) {
+  if (lr.loanType === 'BUSINESS_LOAN' || (lr.loanType === 'LAP' && (lr.propertyCategory === 'COMMERCIAL' || lr.propertyCategory === 'INDUSTRIAL'))) {
     if (lr.loanType === 'BUSINESS_LOAN' && !lr.propertyType) errors.propertyType = "Select a property type";
     if (!lr.businessPropertyCategory) errors.businessPropertyCategory = "Select a business property category";
   }

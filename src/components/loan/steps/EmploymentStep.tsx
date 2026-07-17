@@ -106,11 +106,22 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     <StyledSelect
                       label="Type of Property"
                       value={store.loanRequirements.propertyCategory || ""}
-                      onValueChange={(v) => store.updateLoanRequirements({ propertyCategory: v as 'RESIDENTIAL' | 'COMMERCIAL_INDUSTRIAL', propertyType: undefined, businessPropertyCategory: undefined })}
+                      onValueChange={(v) => {
+                        const category = v as 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL';
+                        store.updateLoanRequirements({
+                          propertyCategory: category,
+                          propertyType: undefined,
+                          // Commercial/Industrial is now selected directly at this tier, so
+                          // businessPropertyCategory mirrors it immediately -- no separate
+                          // "Business Property Category" step needed for LAP anymore.
+                          businessPropertyCategory: category === 'RESIDENTIAL' ? undefined : category,
+                        });
+                      }}
                       placeholder="Select category"
                     >
                       <SelectItem value="RESIDENTIAL" className="cursor-pointer">Residential</SelectItem>
-                      <SelectItem value="COMMERCIAL_INDUSTRIAL" className="cursor-pointer">Commercial & Industrial</SelectItem>
+                      <SelectItem value="COMMERCIAL" className="cursor-pointer">Commercial</SelectItem>
+                      <SelectItem value="INDUSTRIAL" className="cursor-pointer">Industrial</SelectItem>
                     </StyledSelect>
                   )}
 
@@ -127,17 +138,22 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
                     </StyledSelect>
                   )}
 
-                  {((store.loanRequirements.loanType === "LAP" && store.loanRequirements.propertyCategory === "COMMERCIAL_INDUSTRIAL") || store.loanRequirements.loanType === "BUSINESS_LOAN") && (
+                  {((store.loanRequirements.loanType === "LAP" && (store.loanRequirements.propertyCategory === "COMMERCIAL" || store.loanRequirements.propertyCategory === "INDUSTRIAL")) || store.loanRequirements.loanType === "BUSINESS_LOAN") && (
                     <>
-                      <StyledSelect
-                        label={store.loanRequirements.loanType === "BUSINESS_LOAN" ? "Type of Property" : "Business Property Category"}
-                        value={store.loanRequirements.businessPropertyCategory || ""}
-                        onValueChange={(v) => store.updateLoanRequirements({ businessPropertyCategory: v as 'COMMERCIAL' | 'INDUSTRIAL', propertyType: undefined })}
-                        placeholder="Select category"
-                      >
-                        <SelectItem value="COMMERCIAL" className="cursor-pointer">Commercial</SelectItem>
-                        <SelectItem value="INDUSTRIAL" className="cursor-pointer">Industrial</SelectItem>
-                      </StyledSelect>
+                      {/* LAP already selected Commercial/Industrial in the "Type of Property"
+                          tier above (which mirrors it into businessPropertyCategory), so this
+                          selector is only needed for Business Loan, which has no earlier tier. */}
+                      {store.loanRequirements.loanType === "BUSINESS_LOAN" && (
+                        <StyledSelect
+                          label="Type of Property"
+                          value={store.loanRequirements.businessPropertyCategory || ""}
+                          onValueChange={(v) => store.updateLoanRequirements({ businessPropertyCategory: v as 'COMMERCIAL' | 'INDUSTRIAL', propertyType: undefined })}
+                          placeholder="Select category"
+                        >
+                          <SelectItem value="COMMERCIAL" className="cursor-pointer">Commercial</SelectItem>
+                          <SelectItem value="INDUSTRIAL" className="cursor-pointer">Industrial</SelectItem>
+                        </StyledSelect>
+                      )}
 
                       {store.loanRequirements.businessPropertyCategory === "COMMERCIAL" && (
                         <StyledSelect
