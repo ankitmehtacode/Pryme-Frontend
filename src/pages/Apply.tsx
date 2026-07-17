@@ -200,6 +200,20 @@ const Apply = () => {
               : 0)
         : 0;
 
+      // ── CO-APPLICANT EMI: unlike income (which is resolved via different
+      // surrogate formulas per employment path and so must be combined on the
+      // backend, see above), existingEMI/maturingLoanEMI are the same flat
+      // field across every path -- combine them client-side into a single
+      // household total. Without this, the co-applicant's income raises
+      // effectiveIncome (and the FOIR band it's selected against) but their
+      // own debt burden never reduces it back down.
+      const coApplicantExistingEmi = data.hasCoApplicant && coApplicantFin
+        ? Number(coApplicantFin.data?.existingEMI || 0)
+        : 0;
+      const coApplicantMaturingLoanEmi = data.hasCoApplicant && coApplicantFin
+        ? Number(coApplicantFin.data?.maturingLoanEMI || 0)
+        : 0;
+
       // ── BUG-3 FIX: Compute age from DOB instead of hardcoding 35 ──
       let computedAge = 35;
       if (data.dob) {
@@ -312,8 +326,11 @@ const Apply = () => {
         // backend (not blended in here) -- see EligibilityEngineService's
         // effectiveIncome computation.
         coApplicantMonthlyIncome: coApplicantIncome || null,
-        existingEmiTotal: data.eligibleExistingEmi || 0,
-        maturingLoanEmi: data.maturingLoanEmi || 0,
+        // Household total -- primary applicant's own EMI + co-applicant's,
+        // deducted from computedIncome * FOIR on the backend (i.e. after FOIR
+        // is applied, not before -- see calculateMaxEligibleAmount).
+        existingEmiTotal: (data.eligibleExistingEmi || 0) + coApplicantExistingEmi,
+        maturingLoanEmi: (data.maturingLoanEmi || 0) + coApplicantMaturingLoanEmi,
         businessAgeYears: data.businessVintageYears || data.totalPracticeYears || 0,
         workExpYears: data.totalExperienceYears || data.totalPracticeYears || 0,
         idempotencyKey: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
