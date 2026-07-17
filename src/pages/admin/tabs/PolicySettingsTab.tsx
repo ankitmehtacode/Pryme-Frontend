@@ -111,7 +111,7 @@ export const PolicySettingsTab = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full min-h-[70vh] gap-6 p-6">
+    <div className="flex flex-col md:flex-row min-h-[70vh] gap-6 p-6">
       {/* LEFT COLUMN: Entity Selector */}
       <div className="w-full md:w-1/3 flex flex-col gap-4 border-r border-[#103783]/20 pr-6">
         <div className="flex items-center gap-2 pb-4 border-b border-[#103783]/20">
@@ -124,7 +124,7 @@ export const PolicySettingsTab = () => {
             <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
           </div>
         ) : (
-          <div className="flex flex-col gap-2 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
+          <div className="flex flex-col gap-2 pr-2">
             {entities?.map((entity) => (
               <button
                 key={entity.id}
@@ -174,7 +174,7 @@ export const PolicySettingsTab = () => {
                 </AlertDescription>
               </Alert>
             ) : (
-              <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
+              <div className="grid grid-cols-1 gap-4 pr-2">
                 {fieldDefinitions?.map((meta) => (
                   <PolicyFieldEditor
                     key={meta.fieldKey}
