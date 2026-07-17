@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import api, { PrymeAPI } from "@/lib/api";
+import { useApplicationStore } from "@/store/applicationStore";
 
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
@@ -36,11 +37,20 @@ export default function ProgressiveContinuationForm({
 }: ProgressiveContinuationFormProps) {
   const [currentStep, setCurrentStep] = useState<1 | 2>(1); // 1 = Footprint, 2 = Vault
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const store = useApplicationStore();
+
   // State for Footprint
+  // 🧠 SINGLE SOURCE OF TRUTH: pre-fill from financialDetails.data.existingEMI --
+  // the same field the eligibility engine already used to compute the offer being
+  // completed here. Without this, a user who already entered their EMI on the
+  // main application form gets asked again on a differently-labeled field that
+  // used to only write to admin metadata, silently diverging from what the
+  // shown offer was actually calculated with.
   const [formData, setFormData] = useState({
     panNumber: "",
-    monthlyEMI: "",
+    monthlyEMI: store.financialDetails?.data?.existingEMI != null
+      ? String(store.financialDetails.data.existingEMI)
+      : "",
     existingBank: "",
   });
 
@@ -68,6 +78,18 @@ export default function ProgressiveContinuationForm({
     if (!validateStep1()) return;
     setIsSubmitting(true);
 
+    const emiValue = Number(formData.monthlyEMI) || 0;
+
+    // 🧠 SINGLE SOURCE OF TRUTH: write any confirmed/edited EMI back into the
+    // same financialDetails.data.existingEMI field the main form writes to,
+    // so this is never a second, divergent copy of the same fact -- whichever
+    // screen it was last entered/edited on, later reads (e.g. a future
+    // eligibility re-check in this session) see the same number.
+    const path = store.financialDetails?.path;
+    if (path === 'SALARIED') store.updateSalariedDetails({ existingEMI: emiValue });
+    else if (path === 'PROFESSIONAL') store.updateProfessionalDetails({ existingEMI: emiValue });
+    else if (path === 'SELF_EMPLOYED') store.updateBusinessDetails({ existingEMI: emiValue });
+
     // 🧠 PIPELINE FIX: Persist the continuation form fields into the application's
     // metadata JSONB column so they appear in the Admin Dashboard drawer.
     // Without this, PAN, Existing Bank, and Monthly EMI are captured in UI but never saved.
@@ -77,7 +99,7 @@ export default function ProgressiveContinuationForm({
           metadata: {
             panNumber: formData.panNumber,
             existingBank: formData.existingBank,
-            monthlyEMI: Number(formData.monthlyEMI) || 0,
+            monthlyEMI: emiValue,
           }
         });
       } catch (err) {

@@ -20,6 +20,7 @@ import { cn, buildCleanMetadata } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import applicationBannerImg from "@/assets/images/application-banner-isometric.png";
+import { useApplicationStore } from "@/store/applicationStore";
 
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
@@ -93,7 +94,8 @@ const getStatusConfig = (status: string) => {
 const Dashboard: React.FC = () => {
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
-  
+  const store = useApplicationStore();
+
   const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [viewState, setViewState] = useState<ViewState>("LOADING");
@@ -172,6 +174,13 @@ const Dashboard: React.FC = () => {
             if (progress === 0 || progress < 50) setCurrentStage(1);
             else setCurrentStage(2);
             
+            // 🧠 SINGLE SOURCE OF TRUTH: fall back to financialDetails.data.existingEMI
+            // (the same field the eligibility engine already used) when this application
+            // has no saved monthlyEMI yet -- so this never becomes a second, divergent
+            // place asking for a fact already collected on the main application form.
+            const storeEmi = store.financialDetails?.data?.existingEMI;
+            const emiFallback = storeEmi != null ? String(storeEmi) : "";
+
             if (primaryApp.metadata) {
               let parsedMeta: Partial<DashboardFormData> = {};
               if (typeof primaryApp.metadata === "string") {
@@ -183,15 +192,17 @@ const Dashboard: React.FC = () => {
               } else if (typeof primaryApp.metadata === "object") {
                 parsedMeta = primaryApp.metadata;
               }
-              setFormData(prev => ({ 
-                ...prev, 
+              setFormData(prev => ({
+                ...prev,
                 ...parsedMeta,
+                monthlyEMI: parsedMeta.monthlyEMI || emiFallback,
                 requestedAmount: parsedMeta.requestedAmount || String(primaryApp.requestedAmount || ""),
                 tenure: parsedMeta.tenure || ""
               }));
             } else {
               setFormData(prev => ({
                 ...prev,
+                monthlyEMI: emiFallback,
                 requestedAmount: String(primaryApp.requestedAmount || ""),
               }));
             }
@@ -389,6 +400,15 @@ const Dashboard: React.FC = () => {
         // Cleanup old synthetic data
         localStorage.removeItem("pryme_pending_application");
       }
+
+      // 🧠 SINGLE SOURCE OF TRUTH: keep financialDetails.data.existingEMI (the field
+      // eligibility computations read) in sync with whatever's being saved here --
+      // same reasoning as the pre-fill above, in the write direction.
+      const financialPath = store.financialDetails?.path;
+      const emiValue = Number(formData.monthlyEMI) || 0;
+      if (financialPath === 'SALARIED') store.updateSalariedDetails({ existingEMI: emiValue });
+      else if (financialPath === 'PROFESSIONAL') store.updateProfessionalDetails({ existingEMI: emiValue });
+      else if (financialPath === 'SELF_EMPLOYED') store.updateBusinessDetails({ existingEMI: emiValue });
 
       const patchData: Record<string, any> = {
          metadata: buildCleanMetadata(formData),
