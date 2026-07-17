@@ -97,7 +97,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
     if (!isAutoPlaying || !isInView) return;
     const interval = setInterval(() => {
       setPage((prevPage) => [prevPage[0] + 1, 1]);
-    }, 7000);
+    }, 3500);
     return () => clearInterval(interval);
   }, [isAutoPlaying, isInView]);
 
