@@ -4,8 +4,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { PrymeAPI } from "@/lib/api";
-import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck, AlertCircle } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, ShieldAlert, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck, AlertCircle, X } from "lucide-react";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -166,6 +167,65 @@ const SkeletonCard = ({ isHero, delay }: { isHero?: boolean; delay: number }) =>
 );
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// OFFERS DISCLAIMER MODAL — Glassmorphic legal notice shown once per session
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const OffersDisclaimerModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
+  <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+      <DialogPrimitive.Content
+        className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 max-h-[85vh] flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0d1527]/85 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+      >
+        <div className="px-6 md:px-7 pt-6 md:pt-7 pb-4 border-b border-white/30 dark:border-white/[0.06] flex items-start gap-3.5 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-50/80 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0 pt-0.5">
+            <DialogPrimitive.Title className="text-base md:text-lg font-heading font-bold text-foreground tracking-tight leading-tight">
+              Before You Continue
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Description className="text-[11px] text-muted-foreground mt-0.5">
+              Please review these terms
+            </DialogPrimitive.Description>
+          </div>
+          <DialogPrimitive.Close className="p-1.5 rounded-full text-muted-foreground/70 hover:bg-white/60 dark:hover:bg-white/[0.06] hover:text-foreground transition-colors shrink-0">
+            <X className="w-4 h-4" />
+          </DialogPrimitive.Close>
+        </div>
+
+        <div className="px-6 md:px-7 py-5 space-y-5 overflow-y-auto">
+          <div>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary dark:text-[#9BAFD9] mb-2">
+              Disclaimer
+            </h3>
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              Loan eligibility, EMI, interest rates, and offers displayed are indicative and based on the information provided by you. For Home Loans and Loan Against Property (LAP), the final loan amount depends on the property's valuation, which is assessed by the lender based on the applicable Market Value, Government Guideline/Circle/Ready Reckoner Value, or the lower of the two, as per the lender's internal policy. Final approval, loan amount, interest rate, tenure, and applicable charges are subject to the respective lender's credit assessment and lending policies.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary dark:text-[#9BAFD9] mb-2">
+              Eligibility Engine Notice
+            </h3>
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              PRYME's Eligibility Engine uses proprietary calculations and lender policy mapping to estimate your eligibility. These estimates are designed to improve lender matching but should not be construed as a confirmation of loan approval.
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 md:px-7 py-5 border-t border-white/30 dark:border-white/[0.06] shrink-0">
+          <DialogPrimitive.Close asChild>
+            <Button className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm">
+              I Understand
+            </Button>
+          </DialogPrimitive.Close>
+        </div>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  </DialogPrimitive.Root>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -186,6 +246,20 @@ export default function Offers() {
   const [isLocking, setIsLocking] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  // Show the eligibility/valuation disclaimer once per browser session, only
+  // once real offers are on screen (not on the skeleton or zero-offers state).
+  useEffect(() => {
+    if (leadData && !showSkeleton && !sessionStorage.getItem("pryme_offers_disclaimer_seen")) {
+      setShowDisclaimer(true);
+    }
+  }, [leadData, showSkeleton]);
+
+  const handleDisclaimerChange = useCallback((open: boolean) => {
+    setShowDisclaimer(open);
+    if (!open) sessionStorage.setItem("pryme_offers_disclaimer_seen", "1");
+  }, []);
 
   useEffect(() => {
     if (leadData) {
@@ -640,6 +714,7 @@ export default function Offers() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />
+      <OffersDisclaimerModal open={showDisclaimer} onOpenChange={handleDisclaimerChange} />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">
         {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero CPU rasterization */}
