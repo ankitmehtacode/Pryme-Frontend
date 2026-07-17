@@ -64,14 +64,14 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
     if (!d.subType) errors.subType = "Select your profession";
     if (!d.practiceName || d.practiceName.trim().length < 2) errors.practiceName = "Enter your practice/firm name";
     if (d.practiceYears < 0) errors.practiceYears = "Enter valid practice vintage";
-    if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";
+    if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000/month (₹1,20,000/year)";
   }
 
   if (emp === "SELF_EMPLOYED" && fin.path === "SELF_EMPLOYED") {
     const d = fin.data;
     if (!d.businessName || d.businessName.trim().length < 2) errors.businessName = "Enter your business name";
     if (typeof d.vintageYears !== 'number' || d.vintageYears < 0) errors.vintageYears = "Enter valid business vintage";
-    if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000";
+    if (!d.netMonthlyIncome || d.netMonthlyIncome < 10000) errors.netMonthlyIncome = "Minimum income is ₹10,000/month (₹1,20,000/year)";
   }
 
   const lr = store.loanRequirements || {};

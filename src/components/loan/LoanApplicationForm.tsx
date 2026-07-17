@@ -982,7 +982,20 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
         
         
-        {/* Income vs EMI Logic Validation */}
+        {/* Income vs EMI Logic Validation -- SALARIED only. For PROFESSIONAL/
+            SELF_EMPLOYED, this compared EMI against the plain ITR-derived
+            income (netMonthlyIncome), but the backend's eligibility engine
+            independently tries SEP/GST/CPM_SEP surrogate lanes that often
+            resolve to a much higher income (a lender-specific
+            grossReceipts x multiplier or turnover x margin formula) --
+            an applicant's existing obligation can legitimately be serviced
+            under one of those surrogates even when plain ITR income alone
+            looks insufficient. Replicating the backend's lender-specific
+            multiplier tables here would just create a second, driftable
+            source of truth, so surrogate cases are left to the backend's
+            own (correct, authoritative) FOIR check instead. SALARIED has
+            no surrogate ambiguity -- salary is salary -- so it keeps this
+            early client-side check. */}
         {(() => {
            let income = 0;
            let emi = 0;
@@ -992,21 +1005,13 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
            if (empType === 'SALARIED' && fin.path === 'SALARIED') {
               income = finData.netMonthlySalary || 0;
               emi = finData.existingEMI || 0;
-           } else if (empType === 'SELF_EMPLOYED' && fin.path === 'SELF_EMPLOYED') {
-              income = finData.netMonthlyIncome || 0;
-              emi = finData.existingEMI || 0;
-           } else if (empType === 'PROFESSIONAL' && fin.path === 'PROFESSIONAL') {
-              income = finData.netMonthlyIncome || 0;
-              emi = finData.existingEMI || 0;
            }
 
            // A co-applicant's income/EMI are part of the same household
            // affordability picture -- without this, the check only ever
            // looked at the primary applicant even though it renders right
-           // below the co-applicant section. Setting the co-applicant's own
-           // EMI to 0 had no effect on it, and their income (the whole
-           // point of adding one, per this form's own copy: "can increase
-           // your loan eligibility") was never being counted either.
+           // below the co-applicant section. Same SALARIED-only scope as
+           // above applies to the co-applicant's own employment path.
            const coApplicant = store.financialFootprint?.hasCoApplicant
              ? store.financialFootprint?.coApplicantDetails
              : null;
@@ -1015,12 +1020,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
              const coFinData = coFin.data || {};
              if (coApplicant.employmentType === 'SALARIED' && coFin.path === 'SALARIED') {
                 income += coFinData.netMonthlySalary || 0;
-                emi += coFinData.existingEMI || 0;
-             } else if (coApplicant.employmentType === 'SELF_EMPLOYED' && coFin.path === 'SELF_EMPLOYED') {
-                income += coFinData.netMonthlyIncome || 0;
-                emi += coFinData.existingEMI || 0;
-             } else if (coApplicant.employmentType === 'PROFESSIONAL' && coFin.path === 'PROFESSIONAL') {
-                income += coFinData.netMonthlyIncome || 0;
                 emi += coFinData.existingEMI || 0;
              }
            }
