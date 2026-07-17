@@ -58,12 +58,23 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const [activeSubSection, setActiveSubSection] = useState<SubSection>("rules");
   const [ruleSearchQuery, setRuleSearchQuery] = useState("");
   const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
+  const [ruleBankFilter, setRuleBankFilter] = useState<string>("all");
+
+  const uniqueRuleBanks = useMemo(() => {
+    const names = (eligibilityRules || [])
+      .map((rule: any) => rule?.bankName)
+      .filter((name: unknown): name is string => typeof name === "string" && name.length > 0);
+    return Array.from(new Set(names)).sort();
+  }, [eligibilityRules]);
 
   const searchFilteredRules = useMemo(() => {
     const list = filteredEligibilityRules || [];
     const q = (searchQuery || ruleSearchQuery).toLowerCase().trim();
-    if (!q) return list;
-    return list.filter((rule: any) =>
+    const bankFiltered = ruleBankFilter === "all"
+      ? list
+      : list.filter((rule: any) => rule?.bankName === ruleBankFilter);
+    if (!q) return bankFiltered;
+    return bankFiltered.filter((rule: any) =>
       rule && (
         (rule.bankName?.toLowerCase() ?? "").includes(q) ||
         (rule.productCode?.toLowerCase() ?? "").includes(q) ||
@@ -72,7 +83,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         (rule.conditions?.toLowerCase() ?? "").includes(q)
       )
     );
-  }, [filteredEligibilityRules, ruleSearchQuery, searchQuery]);
+  }, [filteredEligibilityRules, ruleSearchQuery, searchQuery, ruleBankFilter]);
 
   const subSections: { id: SubSection; label: string; icon: React.ElementType; count: number }[] = [
     { id: "rules", label: "Engine Rules", icon: Zap, count: eligibilityRules?.length || 0 },
@@ -141,6 +152,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   className="pl-8 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs focus:bg-white/[0.08] focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all w-48 text-white placeholder:text-slate-600"
                 />
               </div>
+              <Select value={ruleBankFilter} onValueChange={setRuleBankFilter}>
+                <SelectTrigger className="w-[150px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
+                  <SelectValue placeholder="All Banks" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white max-h-72">
+                  <SelectItem value="all" className="text-xs">All Banks ({uniqueRuleBanks.length})</SelectItem>
+                  {uniqueRuleBanks.map((bank) => (
+                    <SelectItem key={bank} value={bank} className="text-xs">{bank}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Select value={ruleStatusFilter} onValueChange={(v: any) => setRuleStatusFilter(v)}>
                 <SelectTrigger className="w-[130px] h-8 bg-white/[0.04] border-white/[0.08] text-white text-xs focus:ring-blue-500/50 outline-none">
                   <SelectValue />
@@ -153,26 +175,31 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               </Select>
               <Button
                 onClick={() => {
-                  if (eligibilityRules.length === 0) {
+                  // Export exactly what's currently filtered on screen (search
+                  // query, status, and bank) -- previously this always dumped
+                  // every rule regardless of any filter the admin had applied,
+                  // so "Download Matrix" never matched what was visible.
+                  const rowsToExport = searchFilteredRules;
+                  if (rowsToExport.length === 0) {
                     toast.error("No data to export.");
                     return;
                   }
-                  
+
                   // Extract all unique headers across all rules
                   const allKeys = new Set<string>();
-                  eligibilityRules.forEach(rule => {
+                  rowsToExport.forEach(rule => {
                     Object.keys(rule).forEach(key => allKeys.add(key));
                   });
-                  
+
                   // Array of headers
                   const headers = Array.from(allKeys);
-                  
+
                   // Build JSON array for Excel
-                  const dataToExport = eligibilityRules.map(rule => {
+                  const dataToExport = rowsToExport.map(rule => {
                     const row: Record<string, any> = {};
                     headers.forEach(header => {
                       const value = rule[header];
-                      
+
                       // Handle null, undefined, objects (like JSON arrays/objects)
                       if (value === null || value === undefined) {
                         row[header] = "";
@@ -184,16 +211,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                     });
                     return row;
                   });
-                  
+
                   // Create workbook and worksheet
                   const worksheet = XLSX.utils.json_to_sheet(dataToExport, { header: headers });
                   const workbook = XLSX.utils.book_new();
                   XLSX.utils.book_append_sheet(workbook, worksheet, "Policy Matrix");
-                  
-                  // Download Excel file
-                  XLSX.writeFile(workbook, `policy_matrix_export_${new Date().toISOString().split('T')[0]}.xlsx`);
-                  
-                  toast.success(`Exported ${eligibilityRules.length} rules to Excel.`);
+
+                  // Download Excel file -- filename reflects the bank filter when one is active
+                  const bankSuffix = ruleBankFilter !== "all" ? `_${ruleBankFilter.replace(/\s+/g, "_")}` : "";
+                  XLSX.writeFile(workbook, `policy_matrix_export${bankSuffix}_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+                  toast.success(`Exported ${rowsToExport.length} rules to Excel.`);
                 }}
                 variant="outline"
                 className="border-white/10 text-slate-300 hover:bg-white/5 hover:text-white shadow-none whitespace-nowrap h-9"
