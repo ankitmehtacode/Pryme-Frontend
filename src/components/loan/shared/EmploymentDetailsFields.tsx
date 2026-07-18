@@ -348,10 +348,6 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
 
           {loanType === 'LAP' || loanType === 'HOME_LOAN' ? (
             <div className="mt-6 p-4 rounded-xl border border-[#DDA35D]/30 bg-[#FDFBF7] dark:bg-[#DDA35D]/5 space-y-4">
-              <h4 className="text-xs font-bold text-[#DDA35D] uppercase tracking-widest flex items-center gap-1">
-                <IndianRupee className="w-3.5 h-3.5" /> P&L Normalisation (Property Loan)
-              </h4>
-
               <ValidatedInput
                 label="Annual Depreciation Add-back (₹)"
                 formatAsCurrency
@@ -630,10 +626,6 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   className="overflow-hidden"
                 >
                   <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
-                      <IndianRupee className="w-3.5 h-3.5" />
-                      P&amp;L Normalisation (Property Loan)
-                    </p>
                     <ValidatedInput
                       label="Annual Depreciation Add-back (₹)"
                       formatAsCurrency

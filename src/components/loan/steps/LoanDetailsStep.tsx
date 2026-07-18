@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2, Wallet, Briefcase, Car, RefreshCw } from "lucide-react";
+import { IndianRupee, Landmark, Calendar, CreditCard, Edit2, Home, Building2 } from "lucide-react";
 import { useApplicationStore } from "@/store/applicationStore";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -9,12 +9,8 @@ import type { LoanType } from "@/lib/applicationTypes";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
 
 const PRODUCT_OPTIONS = [
-  { value: "PERSONAL_LOAN", label: "Personal Loan", icon: Wallet, disabled: true },
-  { value: "BUSINESS_LOAN", label: "Business Loan", icon: Briefcase, disabled: true },
   { value: "HOME_LOAN", label: "Home Loan", icon: Home },
   { value: "LAP", label: "Loan Against Property", icon: Building2 },
-  { value: "AUTO_LOAN", label: "Auto Loan", icon: Car, disabled: true },
-  { value: "BT_TOP_UP", label: "BT|Top Up", icon: RefreshCw, disabled: true },
 ];
 
 /** Loan types that require property valuation for LTV calculations */
@@ -72,13 +68,10 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
           {PRODUCT_OPTIONS.map((opt) => {
             const OptIcon = opt.icon;
             return (
-              <SelectItem key={opt.value} value={opt.value} disabled={opt.disabled} className={cn(opt.disabled && "opacity-50 grayscale")}>
-                <span className="flex items-center justify-between w-full min-w-[200px]">
-                  <span className="flex items-center gap-2">
-                    <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60 select-item-icon" />
-                    {opt.label}
-                  </span>
-                  {opt.disabled && <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ml-2">Soon</span>}
+              <SelectItem key={opt.value} value={opt.value}>
+                <span className="flex items-center gap-2">
+                  <OptIcon className="w-3.5 h-3.5 text-muted-foreground/60 select-item-icon" />
+                  {opt.label}
                 </span>
               </SelectItem>
             );
