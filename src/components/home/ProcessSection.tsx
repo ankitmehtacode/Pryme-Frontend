@@ -20,13 +20,13 @@ const steps = [
     icon: Zap, 
     num: "03",
     title: "Smart Matching", 
-    desc: "Get pre-approved offers from multiple banking partners tailored to your profile.",
+    desc: "Get offers from multiple banking partners tailored to your profile.",
   },
   { 
     icon: Banknote, 
     num: "04",
     title: "Rapid Disbursal", 
-    desc: "Choose your best offer and receive funds — often within 48 hours.",
+    desc: "Choose your best offer and receive funds.",
   }
 ];
 
