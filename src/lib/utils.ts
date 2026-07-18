@@ -128,6 +128,7 @@ export function buildCleanMetadata(formData: any): Record<string, any> {
     cibilScore: formData.cibilScore,
     monthlyIncome: applicantIncome + coApplicantIncome, // Adds co-applicant income perfectly
     monthlyEMI: formData.eligibleExistingEmi || formData.monthlyEMI || 0,
+    maturingLoanEmi: formData.maturingLoanEmi || undefined,
     hasCoApplicant: formData.hasCoApplicant ? "Yes" : "No",
     coApplicantIncome: coApplicantIncome > 0 ? coApplicantIncome : undefined,
     

@@ -107,37 +107,19 @@ const Apply = () => {
 
     // 2. 🧠 SILENT DATABASE INGESTION: Hit Java PublicLeadController BEFORE comparison
     try {
+      // Forward the ENTIRE form payload (not a hand-picked subset) so
+      // buildCleanMetadata() -- which already knows how to pick the right
+      // fields per financialPath (netProfit, annualGrossReceipts,
+      // last12MonthsGstTurnover, estimatedPropertyValue, etc.) -- actually
+      // sees them. A prior hand-curated whitelist here silently dropped
+      // ~20 fields (property value, self-employed/professional income
+      // figures, co-applicant details, maturing EMI...) before they ever
+      // reached buildCleanMetadata, leaving Raw Inquiries' detail drawer
+      // showing far fewer fields than the applicant actually submitted.
       const leadRes = await PrymeAPI.submitLead({
+        ...data,
         fullName: leadName,
         phone: leadPhone,
-        productType: data.productType,
-        loanAmount: data.loanAmount,
-        cibilScore: data.cibilScore,
-        monthlyIncome: data.monthlyIncome,
-        // 🧠 PIPELINE FIX: Forward ALL form fields so the metadata JSON blob
-        // in the Lead table is fully populated. Without these, the Admin Dashboard
-        // shows empty fields for Company Name, Designation, Gross Salary, etc.
-        email: data.email,
-        panCard: data.panCard,
-        dob: data.dob,
-        city: data.city,
-        state: data.state,
-        pinCode: data.pinCode,
-        employmentType: data.employmentType,
-        financialPath: data.financialPath,
-        occupation: data.occupation,
-        companyName: data.companyName,
-        designation: data.designation,
-        officialEmail: data.officialEmail,
-        grossSalary: data.grossSalary,
-        totalExperienceYears: data.totalExperienceYears,
-        businessVintageYears: data.businessVintageYears,
-        loanPurpose: data.loanPurpose,
-        propertyType: data.propertyType,
-        hasCoApplicant: data.hasCoApplicant,
-        existingBank: data.existingBank,
-        eligibleExistingEmi: data.eligibleExistingEmi,
-        itrYearsAvailable: data.itrYearsAvailable,
       });
 
       // 3. CAPTURE THE UUID FOR THE GATEKEEPER ELEVATION
