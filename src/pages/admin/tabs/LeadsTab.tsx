@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Loader2, Briefcase, IndianRupee, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface LeadsTabProps {
   isLoadingLeads: boolean;
@@ -133,7 +133,12 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                             </SelectTrigger>
                             <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
                               <SelectItem value="NEW" className="text-xs">NEW</SelectItem>
-                              <SelectItem value="CONTACTED" className="text-xs">CONTACTED</SelectItem>
+                              <SelectGroup>
+                                <SelectLabel className="text-[10px] text-slate-500 uppercase tracking-wider pl-8">Contacted</SelectLabel>
+                                <SelectItem value="FOLLOW_UP_PENDING" className="text-xs">Follow Up Pending</SelectItem>
+                                <SelectItem value="REMINDER" className="text-xs">Reminder</SelectItem>
+                                <SelectItem value="FOLLOW_UP_DONE" className="text-xs">Follow Up Done</SelectItem>
+                              </SelectGroup>
                               <SelectItem value="REJECTED" className="text-xs">REJECTED</SelectItem>
                             </SelectContent>
                           </Select>

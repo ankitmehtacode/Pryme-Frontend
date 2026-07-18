@@ -677,12 +677,17 @@ const AdminDashboard = () => {
       PROCESSING: "bg-blue-700/15 text-blue-400 border-blue-700/25",
       APPROVED: "bg-blue-500/15 text-blue-400 border-blue-500/25",
       REJECTED: "bg-red-500/15 text-red-400 border-red-500/25",
+      CONTACTED: "bg-cyan-500/15 text-cyan-400 border-cyan-500/25",
+      FOLLOW_UP_PENDING: "bg-orange-500/15 text-orange-400 border-orange-500/25",
+      REMINDER: "bg-purple-500/15 text-purple-400 border-purple-500/25",
+      FOLLOW_UP_DONE: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+      CONVERTED: "bg-emerald-600/15 text-emerald-400 border-emerald-600/25",
     };
     return map[status?.toUpperCase()] || "bg-white/[0.06] text-slate-300 border-white/[0.08]";
   };
 
   const StatusBadge = ({ status }: { status: string }) => (
-    <span className={cn("inline-flex items-center rounded-md px-2 py-1 text-[10px] uppercase tracking-wider font-semibold border", getStatusColor(status))}>{status}</span>
+    <span className={cn("inline-flex items-center rounded-md px-2 py-1 text-[10px] uppercase tracking-wider font-semibold border", getStatusColor(status))}>{status?.replace(/_/g, " ")}</span>
   );
 
   if (isLoading) {
