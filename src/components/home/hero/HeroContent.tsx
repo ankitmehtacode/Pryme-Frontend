@@ -62,7 +62,7 @@ export const HeroContent: React.FC<HeroContentProps> = ({ isInView = true, onAct
           maxInlineSize: "43ch"
         }}
       >
-        DISCOVER LOAN OFFERS YOU ARE ACTUALLY ELIGIBLE FROM 15+ LEADING BANKS WITHOUT IMPACTING YOUR CREDIT SCORE.
+        Discover loan offers you are actually eligible from 15+ leading banks without impacting your credit score.
       </motion.p>
 
       {/* Trust Badges Row */}
