@@ -179,10 +179,10 @@ const PrepaymentCalculator = ({
                   onWheel={(e) => e.currentTarget.blur()}
                   className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   min={100000}
-                  max={10000000}
+                  max={500000000}
                 />
               </div>
-              <Slider max={10000000} min={100000} step={50000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              <Slider max={500000000} min={100000} step={100000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
             </div>
 
             {/* Interest Rate */}
@@ -236,10 +236,10 @@ const PrepaymentCalculator = ({
                       onWheel={(e) => e.currentTarget.blur()}
                       className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       min={10000}
-                      max={Math.min(loanAmount, 5000000)}
+                      max={loanAmount}
                     />
                   </div>
-                  <Slider max={Math.min(loanAmount, 5000000)} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+                  <Slider max={loanAmount} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
                 </div>
 
                 {/* Tenure Saved ring — fills the space below the slider */}
