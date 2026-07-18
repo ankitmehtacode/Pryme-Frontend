@@ -138,11 +138,6 @@ const FAQS = [
     a: "Eligibility is an estimate based on available information. Final approval is determined by the lender after verification."
   },
   {
-    category: "security",
-    q: "Can I compare loans without sharing my mobile number?",
-    a: "Yes. PRYME is designed to let you explore options with minimal information before proceeding."
-  },
-  {
     category: "general",
     q: "How is PRYME different from other loan comparison platforms?",
     a: "PRYME focuses on transparency, privacy, zero spam, and real eligibility-based loan matching."
