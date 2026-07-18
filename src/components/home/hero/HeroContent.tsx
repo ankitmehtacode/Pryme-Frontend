@@ -62,7 +62,7 @@ export const HeroContent: React.FC<HeroContentProps> = ({ isInView = true, onAct
           maxInlineSize: "43ch"
         }}
       >
-        Get matched with the best loan offers from 15+ banks based on your real eligibility — without harming your credit score.
+        DISCOVER LOAN OFFERS YOU ARE ACTUALLY ELIGIBLE FROM 15+ LEADING BANKS WITHOUT IMPACTING YOUR CREDIT SCORE.
       </motion.p>
 
       {/* Trust Badges Row */}
