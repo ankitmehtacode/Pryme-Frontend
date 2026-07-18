@@ -19,6 +19,48 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, numberToIndianWords } from "@/lib/utils";
 import { PrymeAPI } from "@/lib/api";
+import rewardLedTv32 from "@/assets/rewards/reward-led-tv-32.png";
+import rewardLedTvSmart32 from "@/assets/rewards/reward-led-tv-smart-32.png";
+import rewardVacuumCleaner from "@/assets/rewards/reward-vacuum-cleaner.png";
+import rewardAirConditioner from "@/assets/rewards/reward-air-conditioner.png";
+import rewardLaptop from "@/assets/rewards/reward-laptop.png";
+import rewardIphone15 from "@/assets/rewards/reward-iphone-15.png";
+import rewardIphone16 from "@/assets/rewards/reward-iphone-16.png";
+import rewardAirFryer from "@/assets/rewards/reward-air-fryer.png";
+import rewardMicrowaveOven from "@/assets/rewards/reward-microwave-oven.png";
+import rewardHandSteamer from "@/assets/rewards/reward-hand-steamer.png";
+import rewardMixerSet from "@/assets/rewards/reward-mixer-set.png";
+import rewardRefrigerator from "@/assets/rewards/reward-refrigerator.png";
+import rewardWashingMachine from "@/assets/rewards/reward-washing-machine.png";
+import rewardSmartphone from "@/assets/rewards/reward-smartphone.png";
+import rewardPfWaiver50 from "@/assets/rewards/reward-pf-waiver-50.png";
+import rewardPfWaiver100 from "@/assets/rewards/reward-pf-waiver-100.png";
+
+// Real product photos, keyed by the EXACT trimmed-uppercase reward text as it
+// appears in product_rewards (including the sheet's own spelling, e.g. the
+// "REFRIDGERATOR" typo) -- must match DerivedRewardItem.key's normalization
+// exactly or the lookup silently misses and falls back to the icon. Items
+// with no supplied photo (e.g. "42\" LED TV") fall back gracefully.
+const REWARD_IMAGE_BY_KEY: Record<string, string> = {
+  [`32" LED TV`]: rewardLedTv32,
+  [`32" SMART LED TV`]: rewardLedTvSmart32,
+  "VACCUM CLEANER": rewardVacuumCleaner,
+  "AIR CONDITIONER": rewardAirConditioner,
+  "LAPTOP": rewardLaptop,
+  "IPHONE 15": rewardIphone15,
+  "IPHONE 16": rewardIphone16,
+  "AIR FRYER": rewardAirFryer,
+  "MICROWAVE OVEN": rewardMicrowaveOven,
+  "HAND STEAMER": rewardHandSteamer,
+  "MIXER SET": rewardMixerSet,
+  "REFRIDGERATOR": rewardRefrigerator,
+  "REFRIGERATOR": rewardRefrigerator,
+  "TOP LOAD FULLY AUTOMATIC WASHING MACHINE": rewardWashingMachine,
+  "TOP LOAD SEMI AUTOMATIC WASHING MACHINE": rewardWashingMachine,
+  "SMART PHONE": rewardSmartphone,
+  "50% PF WAIVER": rewardPfWaiver50,
+  "100% PF WAIVER": rewardPfWaiver100,
+};
 
 // Real product_rewards row shape (see AdminProductRewardController / PublicProductRewardController)
 interface ProductRewardRow {
@@ -486,6 +528,7 @@ const OffersRewards = () => {
                     const isSelected = selectedReward === item.key;
                     const theme = item.kind === "pf_waiver" ? PF_WAIVER_THEME : CARD_THEMES[i % CARD_THEMES.length];
                     const Icon = item.kind === "pf_waiver" ? Percent : PackageCheck;
+                    const photo = REWARD_IMAGE_BY_KEY[item.key];
 
                     return (
                       <div
@@ -496,13 +539,19 @@ const OffersRewards = () => {
                         )}
                       >
                         {/* Worth / availability badge */}
-                        <span className={cn("absolute top-3 right-3 text-[9px] font-extrabold uppercase tracking-wider px-2 py-1 rounded-full border", theme)}>
+                        <span className={cn("absolute top-3 right-3 text-[9px] font-extrabold uppercase tracking-wider px-2 py-1 rounded-full border z-10", theme)}>
                           {item.worth || `${item.bankCount} ${item.bankCount === 1 ? "Bank" : "Banks"}`}
                         </span>
 
-                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 border", theme)}>
-                          <Icon className="w-6 h-6" />
-                        </div>
+                        {photo ? (
+                          <div className="w-full h-28 rounded-xl overflow-hidden mb-3 bg-slate-50 dark:bg-white/[0.03]">
+                            <img src={photo} alt={item.label} className="w-full h-full object-contain p-1.5" />
+                          </div>
+                        ) : (
+                          <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 border", theme)}>
+                            <Icon className="w-6 h-6" />
+                          </div>
+                        )}
 
                         <h4
                           className="font-extrabold text-sm text-[#0a1530] dark:text-white leading-snug tracking-tight mb-1"
