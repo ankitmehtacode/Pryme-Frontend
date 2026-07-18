@@ -8,7 +8,8 @@ import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
   ({ label, error, isValid, icon: Icon, className: _className, formatAsCurrency, type, value, onChange, ...props }, ref) => {
-    const words = formatAsCurrency ? numberToIndianWords(Number(value)) : "";
+    const isEmpty = value === "" || value === undefined || value === null;
+    const words = formatAsCurrency && !isEmpty ? numberToIndianWords(Number(value)) : "";
     const handleChange = formatAsCurrency
       ? (e: React.ChangeEvent<HTMLInputElement>) => {
           const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
@@ -29,7 +30,7 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
             ref={ref}
             type={formatAsCurrency ? "text" : type}
             inputMode={formatAsCurrency ? "numeric" : undefined}
-            value={formatAsCurrency ? formatIndianCommas(Number(value)) : value}
+            value={formatAsCurrency ? (isEmpty ? "" : formatIndianCommas(Number(value))) : value}
             onChange={handleChange}
             {...props}
             className={cn(
