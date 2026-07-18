@@ -1,31 +1,24 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Gift,
   Percent,
-  Tag,
   Sparkles,
-  Briefcase,
   User,
-  UserCheck,
+  IndianRupee,
+  CheckCircle2,
+  Lock,
   ShieldCheck,
   Clock,
   ArrowRight,
   ArrowLeft,
-  ChevronDown
+  ChevronDown,
+  Landmark,
+  PackageCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, numberToIndianWords } from "@/lib/utils";
 import { PrymeAPI } from "@/lib/api";
-import loyaltyGiftImg from "@/assets/loyalty-gift.png";
-
-interface Offer {
-  id: string;
-  type: "discount" | "cashback" | "reward" | "gift";
-  title: string;
-  bank?: string;
-  validTill?: string;
-}
 
 // Real product_rewards row shape (see AdminProductRewardController / PublicProductRewardController)
 interface ProductRewardRow {
@@ -41,6 +34,26 @@ interface ProductRewardRow {
   reward2?: string;
   pfWaiver?: string;
 }
+
+// A reward *item* deduplicated across every matched bank -- e.g. if 8 banks
+// all offer "32\" LED TV", that's one selectable card, not 8. Derived fresh
+// from real product_rewards rows on every calculate; never hardcoded.
+interface DerivedRewardItem {
+  key: string;           // trimmed-uppercase, used for dedup + selection identity
+  label: string;         // raw sheet text, unchanged casing/spelling
+  kind: "product" | "pf_waiver";
+  bankCount: number;     // how many distinct matched banks offer this
+  worth?: string;        // "Up to 50%" -- parsed from real pf_waiver text, product items get none (no fabricated pricing)
+}
+
+const CARD_THEMES = [
+  "text-blue-600 bg-blue-500/10 border-blue-500/20",
+  "text-purple-600 bg-purple-500/10 border-purple-500/20",
+  "text-amber-600 bg-amber-500/10 border-amber-500/20",
+  "text-rose-600 bg-rose-500/10 border-rose-500/20",
+  "text-cyan-600 bg-cyan-500/10 border-cyan-500/20",
+];
+const PF_WAIVER_THEME = "text-emerald-600 bg-emerald-500/10 border-emerald-500/20";
 
 const products = [
   { id: "personal", label: "Personal Loan" },
@@ -72,6 +85,8 @@ const EMPLOYMENT_TO_REWARD_TYPE: Record<string, string> = {
 };
 
 const OffersRewards = () => {
+  const navigate = useNavigate();
+
   // Form State
   const [loanAmount, setLoanAmount] = useState<number | "">("");
   const [loanProduct, setLoanProduct] = useState<string>("");
@@ -80,7 +95,8 @@ const OffersRewards = () => {
 
   // Navigation Step State
   const [step, setStep] = useState<"form" | "results">("form");
-  const [calculatedOffers, setCalculatedOffers] = useState<Offer[]>([]);
+  const [rewardItems, setRewardItems] = useState<DerivedRewardItem[]>([]);
+  const [selectedReward, setSelectedReward] = useState<string | null>(null);
 
   // Real reward data, fetched once from the public catalogue
   const [rewardRows, setRewardRows] = useState<ProductRewardRow[]>([]);
@@ -139,47 +155,43 @@ const OffersRewards = () => {
       return true;
     });
 
-    // One card per matching lender, deduplicated by bank (a lender could in
-    // theory have more than one row matching the same bracket).
-    const seenBanks = new Set<string>();
-    const generatedOffers: Offer[] = [];
+    // Deduplicate by the actual reward TEXT across every matched bank, not
+    // by bank -- the user picks a reward (TV, vacuum, PF waiver...), not a
+    // lender, on this screen. Exact-match dedup deliberately does NOT fuzzy-
+    // merge near-duplicate spellings already present in the real sheet data
+    // (e.g. "REFRIDGERATOR" vs "REFRIGERATOR") -- the sheet is source of
+    // truth, not something this UI silently "corrects".
+    const itemMap = new Map<string, { label: string; kind: "product" | "pf_waiver"; banks: Set<string> }>();
+    const addItem = (raw: string | undefined, bank: string, kind: "product" | "pf_waiver") => {
+      const trimmed = raw?.trim();
+      if (!trimmed) return;
+      const key = trimmed.toUpperCase();
+      if (!itemMap.has(key)) itemMap.set(key, { label: trimmed, kind, banks: new Set() });
+      itemMap.get(key)!.banks.add(bank);
+    };
     for (const r of matches) {
-      if (seenBanks.has(r.bank)) continue;
-      seenBanks.add(r.bank);
-
-      // All three reward categories (item 1, item 2, PF waiver) shown as one
-      // line separated by "/" rather than splitting the physical items with
-      // "+" and demoting the PF waiver to a separate pill.
-      const items = [r.reward1, r.reward2, r.pfWaiver].filter(Boolean);
-      generatedOffers.push({
-        id: r.id,
-        type: items.length > 0 ? "gift" : "discount",
-        title: items.length > 0 ? items.join(" / ") : "Special Offer",
-        bank: r.bank,
-        validTill: "Ongoing",
-      });
+      addItem(r.reward1, r.bank, "product");
+      addItem(r.reward2, r.bank, "product");
+      addItem(r.pfWaiver, r.bank, "pf_waiver");
     }
 
-    setCalculatedOffers(generatedOffers);
+    const items: DerivedRewardItem[] = Array.from(itemMap.entries()).map(([key, v]) => {
+      const pctMatch = v.kind === "pf_waiver" ? v.label.match(/(\d+)\s*%/) : null;
+      return {
+        key,
+        label: v.label,
+        kind: v.kind,
+        bankCount: v.banks.size,
+        worth: pctMatch ? `Up to ${pctMatch[1]}%` : undefined,
+      };
+    }).sort((a, b) => {
+      if (a.kind !== b.kind) return a.kind === "product" ? -1 : 1;
+      return b.bankCount - a.bankCount;
+    });
+
+    setRewardItems(items);
+    setSelectedReward(null);
     setStep("results");
-  };
-
-  const getOfferIcon = (type: Offer["type"]) => {
-    switch (type) {
-      case "discount": return Percent;
-      case "cashback": return Tag;
-      case "gift": return Gift;
-      case "reward": return Sparkles;
-    }
-  };
-
-  const getOfferStyling = (type: Offer["type"]) => {
-    switch (type) {
-      case "discount": return "text-[#103783] bg-[#103783]/10 border-[#103783]/20 shadow-[0_0_15px_rgba(16,55,131,0.05)]";
-      case "cashback": return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]";
-      case "gift": return "text-amber-500 bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]";
-      case "reward": return "text-blue-500 bg-blue-500/10 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.05)]";
-    }
   };
 
   return (
@@ -405,9 +417,9 @@ const OffersRewards = () => {
             transition={{ duration: 0.4 }}
           >
             {/* ────────────── RESULTS HEADER ────────────── */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-100 dark:border-[#103783]/10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 dark:border-[#103783]/10">
               <div>
-                <button 
+                <button
                   onClick={() => setStep("form")}
                   className="inline-flex items-center gap-1 text-[#103783] hover:text-[#0c2a66] text-xs font-extrabold uppercase tracking-widest mb-3 transition-colors"
                 >
@@ -417,27 +429,35 @@ const OffersRewards = () => {
                 <h2 className="text-3xl font-extrabold text-[#0a1530] dark:text-white tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
                   Your Exciting Rewards
                 </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider mt-1">
-                  Matched Offers based on your profile
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold mt-1">
+                  Choose your favorite reward on successful loan disbursal
                 </p>
               </div>
 
-              {/* Quick Summary Badge */}
-              <div className="bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl px-4 py-3 shrink-0 flex items-center gap-4">
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Loan Request</p>
-                  <p className="text-sm font-extrabold text-[#0a1530] dark:text-white">₹{formatInputCurrency(loanAmount)}</p>
+              {/* Quick Summary Badges */}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl px-4 py-2.5 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#103783]/10 flex items-center justify-center shrink-0">
+                    <IndianRupee className="w-4 h-4 text-[#103783]" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Loan Request</p>
+                    <p className="text-sm font-extrabold text-[#0a1530] dark:text-white">₹{formatInputCurrency(loanAmount)}</p>
+                  </div>
                 </div>
-                <div className="w-px h-8 bg-slate-200 dark:bg-[#103783]/20" />
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Profile</p>
-                  <p className="text-sm font-extrabold text-[#0a1530] dark:text-white capitalize">{employmentType.replace("-", " ")}</p>
+                <div className="bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl px-4 py-2.5 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#103783]/10 flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4 text-[#103783]" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Profile</p>
+                    <p className="text-sm font-extrabold text-[#0a1530] dark:text-white capitalize">{employmentType.replace("-", " ")}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* ────────────── RESULTS GRID ────────────── */}
-            {calculatedOffers.length === 0 ? (
+            {rewardItems.length === 0 ? (
               <div className="text-center py-16 px-6 bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl">
                 <Gift className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                 <p className="text-sm font-bold text-[#0a1530] dark:text-white mb-1">No rewards currently available for this profile</p>
@@ -448,50 +468,103 @@ const OffersRewards = () => {
                 </p>
               </div>
             ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {calculatedOffers.map((offer) => {
-                const Icon = getOfferIcon(offer.type);
-                const styling = getOfferStyling(offer.type);
+              <>
+                {/* ────────────── REWARD PICKER ────────────── */}
+                <div className="text-center mb-6">
+                  <p className="flex items-center justify-center gap-2 text-base font-extrabold text-[#0a1530] dark:text-white">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    Pick any one reward you love
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                    All rewards are delivered after successful loan disbursal
+                  </p>
+                </div>
 
-                return (
-                  <div
-                    key={offer.id}
-                    className="group relative bg-white dark:bg-[#0c1829] border border-slate-200/70 dark:border-[#103783]/15 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    {/* Brand accent bar — consistent with the bank-card left stripe used elsewhere on the site */}
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#103783] to-[#1e56c7]" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                  {rewardItems.map((item, i) => {
+                    const isSelected = selectedReward === item.key;
+                    const theme = item.kind === "pf_waiver" ? PF_WAIVER_THEME : CARD_THEMES[i % CARD_THEMES.length];
+                    const Icon = item.kind === "pf_waiver" ? Percent : PackageCheck;
 
-                    <div className="pl-4 pr-3.5 py-3.5">
-                      {/* Header: icon + bank name */}
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-transform duration-300 group-hover:scale-110", styling)}>
-                          <Icon className="w-3.5 h-3.5" />
-                        </div>
-                        <span
-                          className="text-[10px] font-extrabold uppercase tracking-wide text-[#103783] dark:text-[#3b82f6] truncate"
-                          title={offer.bank}
-                        >
-                          {offer.bank}
-                        </span>
-                      </div>
-
-                      {/* Reward headline */}
-                      <h4
-                        className="font-extrabold text-[13px] text-[#0a1530] dark:text-white leading-snug tracking-tight line-clamp-2 min-h-[2.4em]"
-                        style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
-                        title={offer.title}
+                    return (
+                      <div
+                        key={item.key}
+                        className={cn(
+                          "relative bg-white dark:bg-[#0c1829] border-2 rounded-2xl p-5 text-center transition-all duration-300",
+                          isSelected ? "border-[#103783] shadow-lg shadow-[#103783]/10" : "border-slate-200/70 dark:border-[#103783]/15 hover:border-slate-300 dark:hover:border-[#103783]/30"
+                        )}
                       >
-                        {offer.title}
-                      </h4>
+                        {/* Worth / availability badge */}
+                        <span className={cn("absolute top-3 right-3 text-[9px] font-extrabold uppercase tracking-wider px-2 py-1 rounded-full border", theme)}>
+                          {item.worth || `${item.bankCount} ${item.bankCount === 1 ? "Bank" : "Banks"}`}
+                        </span>
+
+                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 border", theme)}>
+                          <Icon className="w-6 h-6" />
+                        </div>
+
+                        <h4
+                          className="font-extrabold text-sm text-[#0a1530] dark:text-white leading-snug tracking-tight mb-1"
+                          style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}
+                          title={item.label}
+                        >
+                          {item.label}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mb-4">
+                          {item.kind === "pf_waiver"
+                            ? "Save more on your processing fees"
+                            : `Offered by ${item.bankCount} participating ${item.bankCount === 1 ? "bank" : "banks"}`}
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedReward(item.key)}
+                          className={cn(
+                            "w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold border transition-all",
+                            isSelected
+                              ? "bg-[#103783] border-[#103783] text-white"
+                              : "bg-white dark:bg-transparent border-slate-200 dark:border-[#103783]/20 text-[#103783] dark:text-[#3b82f6] hover:bg-[#103783]/5"
+                          )}
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {isSelected ? "Selected" : "Select Reward"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* ────────────── HOW IT WORKS ────────────── */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-5 bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-[#103783]/20 rounded-2xl">
+                  <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <p className="sm:col-span-3 text-xs font-extrabold text-[#0a1530] dark:text-white uppercase tracking-wider mb-1">How it works?</p>
+                    {[
+                      { icon: CheckCircle2, text: "Get your loan approved" },
+                      { icon: Landmark, text: "Loan gets disbursed" },
+                      { icon: Gift, text: "You receive your chosen reward" },
+                    ].map((s, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-[#103783]/10 flex items-center justify-center shrink-0">
+                          <s.icon className="w-4 h-4 text-[#103783]" />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{s.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                    <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[11px] font-extrabold text-[#0a1530] dark:text-white">100% Safe & Assured</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Rewards are delivered securely to your doorstep.</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </>
             )}
 
-            {/* Back action below results */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 pt-6 border-t border-slate-100 dark:border-[#103783]/10">
+            {/* Footer actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => setStep("form")}
                 className="w-full sm:w-auto bg-slate-50 border border-slate-200 dark:bg-white/[0.02] dark:border-[#103783]/20 hover:bg-slate-100 hover:border-slate-300 dark:hover:bg-white/[0.05] active:scale-[0.99] text-[#0a1530] dark:text-white px-6 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
@@ -500,13 +573,21 @@ const OffersRewards = () => {
                 Recalculate Rewards
               </button>
 
-              <Link
-                to={`/apply?amount=${loanAmount}&type=${loanProduct}&employment=${employmentType}`}
-                className="w-full sm:w-auto bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] text-white px-6 py-3 rounded-xl text-xs font-bold shadow-lg shadow-[#103783]/20 transition-all flex items-center justify-center gap-2"
+              <button
+                type="button"
+                disabled={!selectedReward}
+                onClick={() => navigate(`/apply?amount=${loanAmount}&type=${loanProduct}&employment=${employmentType}`)}
+                className="w-full sm:w-auto bg-[#103783] hover:bg-[#0c2a66] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#103783] text-white px-6 py-3 rounded-xl text-xs font-bold shadow-lg shadow-[#103783]/20 transition-all flex items-center justify-center gap-2"
               >
-                Apply for Loan Now
+                Proceed to Loan Offers
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
+            </div>
+
+            {/* Privacy note */}
+            <div className="flex items-center justify-center gap-1.5 mt-4 text-slate-400 text-[10px] font-medium">
+              <Lock className="w-3.5 h-3.5 text-emerald-500" />
+              <span>We respect your privacy. Your information is safe with us.</span>
             </div>
           </motion.div>
         )}
