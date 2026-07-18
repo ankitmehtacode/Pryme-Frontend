@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Shield, Lock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Shield, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { products as loanProducts } from "../ProductSelectorGrid";
 import { HeroBadges } from "./HeroBadges";
@@ -24,14 +24,13 @@ export const HeroContent: React.FC<HeroContentProps> = ({ isInView = true, onAct
         className="hidden md:flex items-center gap-1.5 mb-1 md:mb-1 opacity-75"
       >
         {[
-          { text: "RBI COMPLIANT", icon: Shield },
-          { text: "ISO 27001 CERTIFIED", icon: Lock },
+          { text: "RBI GUIDELINE ALIGNED", icon: Shield },
           { text: "256-BIT ENCRYPTION", icon: ShieldCheck }
         ].map((badge, i) => (
           <span key={i} className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-wider text-[#103783]/70">
             <badge.icon className="w-2.5 h-2.5 text-[#103783]/60" />
             {badge.text}
-            {i < 2 && <span className="text-slate-300/60 ml-0.5">•</span>}
+            {i < 1 && <span className="text-slate-300/60 ml-0.5">•</span>}
           </span>
         ))}
       </motion.div>
