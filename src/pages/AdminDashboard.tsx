@@ -10,7 +10,7 @@ import {
   Percent, ExternalLink, Shield, Link as LinkIcon,
   X, Loader2, MessageCircle, FileCheck, History,
   Sparkles, LayoutList, Wallet, ArrowUpRight, UserPlus,
-  Trash2, Upload, Download
+  Trash2, Upload, Download, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -46,6 +46,7 @@ const BanksTab = lazy(() => import("./admin/tabs/BanksTab"));
 const UsersTab = lazy(() => import("./admin/tabs/UsersTab"));
 const CompanyTab = lazy(() => import("./admin/tabs/CompanyTab"));
 const MarketingTab = lazy(() => import("./admin/tabs/MarketingTab"));
+const ProductRewardTab = lazy(() => import("./admin/tabs/ProductRewardTab"));
 const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
 
 const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
@@ -667,6 +668,7 @@ const AdminDashboard = () => {
     { id: "users", label: "User Directory", icon: Users }, { id: "company", label: "Company Team", icon: ShieldCheck },
     { id: "banks", label: "Partner Integrations", icon: Building2 },
     { id: "marketing", label: "Marketing & Offers", icon: Percent },
+    { id: "productRewards", label: "Product Reward", icon: Gift },
     { id: "settings", label: "Policy Matrix", icon: Settings },
   ];
 
@@ -853,6 +855,10 @@ const AdminDashboard = () => {
 
                 {activeTab === "marketing" && (
                   <MarketingTab />
+                )}
+
+                {activeTab === "productRewards" && (
+                  <ProductRewardTab />
                 )}
 
                 {activeTab === "settings" && (
