@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Users, Building2, Star } from "lucide-react";
+import { Users, Building2, Smile } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
 const MiniCountUp = ({ to, prefix = "", suffix = "", formatComma = false }: { to: number, prefix?: string, suffix?: string, formatComma?: boolean }) => {
@@ -44,13 +44,13 @@ export const HeroMetrics = () => {
       {/* ── MOBILE metrics: compact inline row ── */}
       <div className="md:hidden flex items-center justify-start gap-3 mt-2 pt-2 border-t border-slate-100/60">
         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0a1530]">
-          <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-          4.8
+          <Smile className="w-3 h-3 text-amber-400 fill-amber-400/30" />
+          100%
         </span>
         <span className="w-px h-3 bg-slate-200" />
-        <span className="text-[10px] font-bold text-[#0a1530]">10k+ Users</span>
+        <span className="text-[10px] font-bold text-[#0a1530]">1k+ Users</span>
         <span className="w-px h-3 bg-slate-200" />
-        <span className="text-[10px] font-bold text-[#0a1530]">₹500Cr+ Loans</span>
+        <span className="text-[10px] font-bold text-[#0a1530]">₹250Cr+ Loans</span>
       </div>
 
       {/* ── DESKTOP metrics: super-compact horizontal stack with vertically stacked values and descriptions ── */}
@@ -67,9 +67,9 @@ export const HeroMetrics = () => {
           </div>
           <div className="flex flex-col items-start leading-none">
             <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-              <MiniCountUp to={10000} suffix="+" formatComma={true} />
+              <MiniCountUp to={1000} suffix="+" formatComma={true} />
             </p>
-            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Customers Trusted</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Trusted Customer</p>
           </div>
         </div>
 
@@ -80,22 +80,22 @@ export const HeroMetrics = () => {
           </div>
           <div className="flex flex-col items-start leading-none">
             <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-              <MiniCountUp to={500} prefix="₹" suffix="+ Cr" />
+              <MiniCountUp to={250} prefix="₹" suffix="+ Cr" />
             </p>
-            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Loans Facilitated</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Loan Facilitated</p>
           </div>
         </div>
 
         {/* Metric 3: Rating */}
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="w-5.5 h-5.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+            <Smile className="w-3 h-3 text-amber-400 fill-amber-400/30" />
           </div>
           <div className="flex flex-col items-start leading-none">
             <p className="text-xs font-extrabold text-[#0a1530] tracking-tight" style={{ fontFamily: '"Transducer", "Space Grotesk", system-ui, sans-serif' }}>
-              4.8/5
+              100%
             </p>
-            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Customer Rating</p>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5 whitespace-nowrap">Happy Customer</p>
           </div>
         </div>
       </motion.div>
