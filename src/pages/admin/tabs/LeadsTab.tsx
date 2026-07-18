@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { Loader2, Briefcase, IndianRupee } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, Briefcase, IndianRupee, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -37,7 +37,16 @@ const formatEmploymentType = (raw: string | undefined): string => {
   return map[raw.toUpperCase()] || raw.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 };
 
+// Humanizes a metadata key exactly like the CRM Pipeline's "Application Form
+// Details" drawer does (AdminDashboard.tsx's selectedApp.metadata grid), so
+// Raw Inquiries shows the same style of full form dump.
+const humanizeKey = (key: string): string =>
+  key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
+
 export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating }) => {
+  const [selectedLead, setSelectedLead] = useState<any | null>(null);
+  const selectedMeta = selectedLead ? parseMetadata(selectedLead.metadata) : {};
+
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
       <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
@@ -71,7 +80,8 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                     <motion.tr
                       key={lead.id}
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="hover:bg-white/[0.03] transition-colors"
+                      onClick={() => setSelectedLead(lead)}
+                      className="hover:bg-white/[0.03] transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4 align-top">
                         <p className="font-mono text-xs text-slate-400">{lead.id}</p>
@@ -107,7 +117,7 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                           <span className="text-xs text-slate-600 italic">—</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 align-top">
+                      <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
                         {lead.status === "CONVERTED" ? (
                           <StatusBadge status={lead.status} />
                         ) : (
@@ -137,6 +147,58 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
           </tbody>
         </table>
       </div>
+
+      {/* ── Lead Details Drawer — mirrors CRM Pipeline's (AdminDashboard.tsx
+          selectedApp) drawer: same layout, same full metadata dump, so a raw
+          inquiry shows every form field exactly like an elevated application does. */}
+      {selectedLead && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-all">
+          <div className="w-[500px] bg-[#0a0a10] h-full shadow-2xl flex flex-col animate-in slide-in-from-right border-l border-white/[0.06]">
+            <div className="p-6 border-b border-white/[0.06] flex items-start justify-between bg-[#0d0d14]">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-xl font-semibold text-white font-mono">{selectedLead.id}</h2>
+                  <StatusBadge status={selectedLead.status || "NEW"} />
+                </div>
+                <p className="text-sm text-slate-500">Captured: {new Date(selectedLead.createdAt).toLocaleString()}</p>
+              </div>
+              <button
+                onClick={() => setSelectedLead(null)}
+                className="p-2 bg-white/[0.06] rounded-full border border-white/[0.08] hover:bg-white/[0.1] active:scale-95 transition-all"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            <div className="p-6 flex-1 overflow-y-auto bg-[#0a0a10] space-y-4">
+              <div className="p-5 border border-white/[0.06] rounded-xl grid grid-cols-2 gap-6 bg-white/[0.02]">
+                <div><p className="text-xs text-slate-500 mb-1">Loan Amount</p><p className="font-semibold text-white">{formatCurrency(selectedLead.loanAmount)}</p></div>
+                <div><p className="text-xs text-slate-500 mb-1">Loan Type</p><p className="font-semibold text-white uppercase">{selectedLead.loanType}</p></div>
+                <div><p className="text-xs text-slate-500 mb-1">Applicant Name</p><p className="font-semibold text-white truncate">{selectedLead.userName || "Anonymous"}</p></div>
+                <div><p className="text-xs text-slate-500 mb-1">Phone</p><p className="font-semibold text-white truncate">{selectedLead.phone || "—"}</p></div>
+              </div>
+
+              {Object.keys(selectedMeta).length > 0 ? (
+                <div className="p-5 border border-white/[0.06] rounded-xl bg-white/[0.02]">
+                  <h4 className="text-sm font-medium text-slate-300 mb-4 border-b border-white/[0.06] pb-2">Application Form Details</h4>
+                  <div className="grid grid-cols-2 gap-6">
+                    {Object.entries(selectedMeta).map(([key, value]) => (
+                      <div key={key}>
+                        <p className="text-xs text-slate-500 mb-1">{humanizeKey(key)}</p>
+                        <p className="font-semibold text-white truncate">{String(value)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 border border-white/[0.06] rounded-xl bg-white/[0.02] text-center text-sm text-slate-500">
+                  No additional form details captured for this inquiry.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
