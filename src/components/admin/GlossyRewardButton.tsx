@@ -41,7 +41,7 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
       <img
         src={premiumButtonImg}
         alt="Apply with Pryme"
-        className="w-full h-full object-cover object-top drop-shadow-md"
+        className="w-full h-full object-contain drop-shadow-md"
         style={{ filter: filterStyle }}
       />
     </div>
