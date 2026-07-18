@@ -384,11 +384,14 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 to the rest of the card's top row, whenever that banner is shown. */}
             <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col xl:flex-row xl:flex-wrap items-center xl:justify-end gap-3 xl:gap-2.5">
               {matchingReward?.buttonDesign ? (
-                <GlossyRewardButton 
+                // No height class here -- GlossyRewardButton derives its own
+                // height from the image's real aspect ratio; forcing h-12/
+                // h-11 here is exactly what cropped (then shrank) it before.
+                <GlossyRewardButton
                   colorScheme={matchingReward.buttonDesign}
                   onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                   disabled={isGlobalLocking && !isLocking}
-                  className="w-full xl:w-[175px] h-12 xl:h-11 flex justify-center items-center"
+                  className="w-full xl:w-[175px]"
                 />
               ) : (
                 <Button
