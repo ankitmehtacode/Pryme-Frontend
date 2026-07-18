@@ -180,11 +180,25 @@ const AdminDashboard = () => {
   const [crmView, setCrmView] = useState<"list" | "kanban">("list");
   const [leadFilter, setLeadFilter] = useState<"all" | "queue">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  // Set right before setActiveTab() by handleOverviewNavigate so the reset
+  // effect below can carry a search term across the tab switch instead of
+  // wiping it -- read-once, cleared immediately after consumption.
+  const pendingOverviewSearchRef = useRef<string | null>(null);
 
   // 🧠 Reset search query when switching workspace tabs to keep search context scoped
   useEffect(() => {
-    setSearchQuery("");
+    setSearchQuery(pendingOverviewSearchRef.current ?? "");
+    pendingOverviewSearchRef.current = null;
   }, [activeTab]);
+
+  // Analytics Overview cards/chart are read-only summaries of data that lives
+  // on other tabs -- clicking one should jump straight to that tab (and, for
+  // the per-loan-type Portfolio Mix segments, pre-filter the CRM Pipeline
+  // search to that loan type) rather than dead-ending on the overview.
+  const handleOverviewNavigate = (tabId: string, searchTerm?: string) => {
+    pendingOverviewSearchRef.current = searchTerm ?? null;
+    setActiveTab(tabId);
+  };
 
   useEffect(() => {
     // Failsafe to prevent body background color showing as white/light-grey
@@ -596,6 +610,7 @@ const AdminDashboard = () => {
     const colors = ["#103783", "#3b82f6", "#10b981", "#f59e0b", "#ec4899"];
     return Object.entries(counts).map(([name, count], idx) => ({
       name,
+      count,
       value: Math.round((count / applications.length) * 100),
       color: colors[idx % colors.length]
     }));
@@ -799,7 +814,7 @@ const AdminDashboard = () => {
               {/* MAIN CONTENT AREA */}
               <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-blue-500 animate-spin" /></div>}>
                 {activeTab === "overview" && (
-                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} applications={applications} />
+                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} applications={applications} onNavigate={handleOverviewNavigate} />
                 )}
 
                 {activeTab === "applications" && (

@@ -15,6 +15,10 @@ interface OverviewTabProps {
   formatCurrency: (val: number) => string;
   portfolioData: any[];
   applications?: any[];
+  // Jumps to another sidebar tab, optionally pre-filling that tab's search
+  // with a term (used by Portfolio Mix segments to pre-filter the CRM
+  // Pipeline down to one loan type).
+  onNavigate?: (tabId: string, searchTerm?: string) => void;
 }
 
 // ── Trend Time Ranges ────────────────────────────────────────────────────
@@ -56,7 +60,7 @@ const TrendTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency, portfolioData, applications = [] }) => {
+export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency, portfolioData, applications = [], onNavigate }) => {
   const [trendRange, setTrendRange] = useState<TrendRange>("30d");
 
   // ── Aggregate applications into daily time-series ──────────────────────
@@ -146,16 +150,24 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
       {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-blue-500/20 to-blue-500/0" },
-          { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0" },
-          { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-blue-700/20 to-blue-700/0" },
-          { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0" }
+          { label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
+          { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
+          { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-blue-700/20 to-blue-700/0", tab: "applications" },
+          { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0", tab: "users" }
         ].map((metric, i) => (
-          <div key={i} className="relative bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group cursor-default overflow-hidden">
+          <button
+            key={i}
+            type="button"
+            onClick={() => onNavigate?.(metric.tab)}
+            className="relative bg-[#0d0d14] p-5 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden text-left w-full"
+          >
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${metric.glow} rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-            <div className="flex justify-between items-start mb-4 relative z-10"><div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-blue-500/30 group-hover:bg-blue-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" /></div></div>
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-blue-500/30 group-hover:bg-blue-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" /></div>
+              <ArrowUpRight className="w-4 h-4 text-slate-700 opacity-0 group-hover:opacity-100 group-hover:text-blue-400 transition-all duration-300 relative z-10" />
+            </div>
             <p className="text-sm font-medium text-slate-500 relative z-10">{metric.label}</p><p className="text-2xl font-semibold text-white mt-1 relative z-10">{metric.value}</p>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -289,14 +301,16 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
                   outerRadius={80}
                   paddingAngle={4}
                   dataKey="value"
-                  label={({ name, value, cx, cy, midAngle, outerRadius: oR }) => {
+                  cursor="pointer"
+                  onClick={(entry: any) => onNavigate?.("applications", entry.name)}
+                  label={({ name, value, count, cx, cy, midAngle, outerRadius: oR }: any) => {
                     const RADIAN = Math.PI / 180;
                     const radius = oR + 18;
                     const x = cx + radius * Math.cos(-midAngle * RADIAN);
                     const y = cy + radius * Math.sin(-midAngle * RADIAN);
                     return (
                       <text x={x} y={y} textAnchor={x > cx ? "start" : "end"} dominantBaseline="central" fill="#94a3b8" fontSize={11} fontWeight={500}>
-                        {value}%
+                        {count} ({value}%)
                       </text>
                     );
                   }}
@@ -307,7 +321,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
                 <RechartsTooltip
                   contentStyle={{ backgroundColor: '#111118', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#e2e8f0', fontSize: '12px' }}
                   itemStyle={{ color: '#e2e8f0' }}
-                  formatter={(value: any, name: any) => [`${value}%`, name]}
+                  formatter={(value: any, name: any, props: any) => [`${props.payload.count} (${value}%)`, name]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -319,11 +333,16 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
           {portfolioData.length > 0 && (
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-white/[0.04]">
               {portfolioData.map((entry, i) => (
-                <div key={i} className="flex items-center gap-1.5">
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onNavigate?.("applications", entry.name)}
+                  className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                >
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                   <span className="text-xs text-slate-400">{entry.name}</span>
-                  <span className="text-xs text-slate-600">({entry.value}%)</span>
-                </div>
+                  <span className="text-xs text-slate-600">{entry.count} ({entry.value}%)</span>
+                </button>
               ))}
             </div>
           )}
