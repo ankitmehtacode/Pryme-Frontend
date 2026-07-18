@@ -67,7 +67,7 @@ export default function TrustMonologue() {
       icon: Trash2,
       title: "Zero Retention Policy",
       description: "No traces left behind",
-      tooltip: "We permanently erase your data after every single visit. No sneaky databases or marketing lists.",
+      tooltip: "We permanently delete your data after 30 days of your account deletion.",
     },
     {
       icon: EyeOff,
