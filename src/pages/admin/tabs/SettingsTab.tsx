@@ -60,12 +60,21 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
   const [ruleBankFilter, setRuleBankFilter] = useState<string>("all");
 
+  // Must read filteredEligibilityRules (AdminDashboard's RESOLVED bankName --
+  // falls back to the linked product's lenderName when the raw DB column is
+  // empty, which it is for almost every bulk-seeded rule) rather than the
+  // raw eligibilityRules prop. Using the raw list here previously meant the
+  // dropdown only ever offered the handful of banks whose bankName happened
+  // to be set directly in the DB (manually-created rules), AND that its
+  // options didn't match the resolved names searchFilteredRules below
+  // actually filters against -- so selecting a bank could show "No active
+  // rules" even when that bank plainly had rules in the table.
   const uniqueRuleBanks = useMemo(() => {
-    const names = (eligibilityRules || [])
+    const names = (filteredEligibilityRules || [])
       .map((rule: any) => rule?.bankName)
       .filter((name: unknown): name is string => typeof name === "string" && name.length > 0);
     return Array.from(new Set(names)).sort();
-  }, [eligibilityRules]);
+  }, [filteredEligibilityRules]);
 
   const searchFilteredRules = useMemo(() => {
     const list = filteredEligibilityRules || [];
