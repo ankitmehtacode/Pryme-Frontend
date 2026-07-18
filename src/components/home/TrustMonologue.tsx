@@ -59,9 +59,9 @@ export default function TrustMonologue() {
   const securityFeatures = [
     {
       icon: Lock,
-      title: "No Data Stored",
-      description: "We don't keep your info",
-      tooltip: "We only hold your details while matching you with banks. Once done, everything is wiped clean immediately.",
+      title: "Privacy First",
+      description: "Used only for your loan",
+      tooltip: "Your information is collected only for loan processing and related services. We never sell your data.",
     },
     {
       icon: Trash2,
