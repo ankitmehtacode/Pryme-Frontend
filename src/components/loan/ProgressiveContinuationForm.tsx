@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import api, { PrymeAPI } from "@/lib/api";
 import { useApplicationStore } from "@/store/applicationStore";
+import { formatIndianCommas, numberToIndianWords } from "@/lib/utils";
 
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
@@ -209,14 +210,18 @@ export default function ProgressiveContinuationForm({
               </div>
               <div className="space-y-1 inline-block w-full md:col-span-2">
                 <Label htmlFor="monthlyEMI" className="text-xs font-bold tracking-wide uppercase text-slate-500 ml-1">Total Existing Monthly EMIs</Label>
-                <Input 
-                  id="monthlyEMI" 
-                  type="number"
-                  value={formData.monthlyEMI} 
-                  onChange={(e) => handleInputChange("monthlyEMI", e.target.value)} 
-                  placeholder="0" 
-                  className="bg-background border-border focus:border-primary/50 h-12 rounded-xl mb-6" 
+                <Input
+                  id="monthlyEMI"
+                  type="text"
+                  inputMode="numeric"
+                  value={formatIndianCommas(Number(formData.monthlyEMI)) || ""}
+                  onChange={(e) => handleInputChange("monthlyEMI", e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="0"
+                  className="bg-background border-border focus:border-primary/50 h-12 rounded-xl mb-1"
                 />
+                {Number(formData.monthlyEMI) > 0 && (
+                  <p className="text-[10px] font-semibold text-primary/60 ml-1 mb-5">{numberToIndianWords(Number(formData.monthlyEMI))}</p>
+                )}
               </div>
             </div>
 

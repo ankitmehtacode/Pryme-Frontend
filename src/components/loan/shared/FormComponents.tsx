@@ -2,50 +2,67 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, formatIndianCommas, numberToIndianWords } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
-  ({ label, error, isValid, icon: Icon, className: _className, ...props }, ref) => (
-    <div className="relative group w-full">
-      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
-      <div className="relative">
-        {Icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-            <Icon className="w-4 h-4 text-muted-foreground/50" />
+  ({ label, error, isValid, icon: Icon, className: _className, formatAsCurrency, type, value, onChange, ...props }, ref) => {
+    const words = formatAsCurrency ? numberToIndianWords(Number(value)) : "";
+    const handleChange = formatAsCurrency
+      ? (e: React.ChangeEvent<HTMLInputElement>) => {
+          const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+          onChange?.({ target: { value: digitsOnly } } as React.ChangeEvent<HTMLInputElement>);
+        }
+      : onChange;
+
+    return (
+      <div className="relative group w-full">
+        <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
+        <div className="relative">
+          {Icon && (
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+              <Icon className="w-4 h-4 text-muted-foreground/50" />
+            </div>
+          )}
+          <Input
+            ref={ref}
+            type={formatAsCurrency ? "text" : type}
+            inputMode={formatAsCurrency ? "numeric" : undefined}
+            value={formatAsCurrency ? formatIndianCommas(Number(value)) : value}
+            onChange={handleChange}
+            {...props}
+            className={cn(
+              "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl h-14 px-4 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
+              Icon && "pl-11",
+              error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
+              isValid && !error && "border-primary/20 dark:border-[#103783]/20"
+            )}
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {error && (
+              <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+                <XCircle className="w-4 h-4 text-red-500/80" />
+              </motion.div>
+            )}
+            {isValid && !error && (
+              <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+                <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#103783]" />
+              </motion.div>
+            )}
           </div>
-        )}
-        <Input
-          ref={ref}
-          {...props}
-          className={cn(
-            "w-full bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.06] rounded-xl h-14 px-4 text-sm font-medium text-foreground outline-none transition-all duration-200 group-hover:border-primary/20 dark:group-hover:border-white/15 focus:border-primary/60 dark:focus:border-[#103783]/50 focus:ring-2 focus:ring-inset focus:ring-primary/10 dark:focus:ring-[#103783]/10",
-            Icon && "pl-11",
-            error && "border-red-500/30 focus:ring-red-500/10 focus:border-red-500/50",
-            isValid && !error && "border-primary/20 dark:border-[#103783]/20"
-          )}
-        />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          {error && (
-            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
-              <XCircle className="w-4 h-4 text-red-500/80" />
-            </motion.div>
-          )}
-          {isValid && !error && (
-            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
-              <CheckCircle2 className="w-4 h-4 text-primary dark:text-[#103783]" />
-            </motion.div>
-          )}
         </div>
+        {words && (
+          <p className="text-[10px] font-semibold text-primary/60 dark:text-[#103783]/60 ml-1 mt-1">{words}</p>
+        )}
+        {error && (
+          <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-red-400 font-medium ml-1 flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" /> {error}
+          </motion.p>
+        )}
       </div>
-      {error && (
-        <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-red-400 font-medium ml-1 flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" /> {error}
-        </motion.p>
-      )}
-    </div>
-  )
+    );
+  }
 );
 ValidatedInput.displayName = "ValidatedInput";
 

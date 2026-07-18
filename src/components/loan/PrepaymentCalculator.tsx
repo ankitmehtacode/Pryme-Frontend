@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
+import { cn, formatIndianCommas, numberToIndianWords } from "@/lib/utils";
 
 interface PrepaymentCalculatorProps {
   showTerminology?: boolean;
@@ -173,16 +173,18 @@ const PrepaymentCalculator = ({
               <div className="flex justify-between items-center mb-1.5 gap-2">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding Loan Amount (₹)</label>
                 <input
-                  type="number"
-                  value={loanAmount}
-                  onChange={(e) => setLoanAmount(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={formatIndianCommas(loanAmount)}
+                  onChange={(e) => setLoanAmount(Number(e.target.value.replace(/[^0-9]/g, "")))}
                   onWheel={(e) => e.currentTarget.blur()}
                   className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                  min={100000}
-                  max={500000000}
                 />
               </div>
               <Slider max={500000000} min={100000} step={100000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              {loanAmount > 0 && (
+                <p className="text-[9px] font-bold text-emerald-700/70 dark:text-emerald-400/70 uppercase tracking-wider text-right mt-1">{numberToIndianWords(loanAmount)}</p>
+              )}
             </div>
 
             {/* Interest Rate */}
@@ -230,16 +232,18 @@ const PrepaymentCalculator = ({
                   <div className="flex justify-between items-center mb-1.5 gap-2">
                     <label className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest block">Lump Sum Amount (₹)</label>
                     <input
-                      type="number"
-                      value={prepaymentAmount}
-                      onChange={(e) => setPrepaymentAmount(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatIndianCommas(prepaymentAmount)}
+                      onChange={(e) => setPrepaymentAmount(Number(e.target.value.replace(/[^0-9]/g, "")))}
                       onWheel={(e) => e.currentTarget.blur()}
                       className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      min={10000}
-                      max={loanAmount}
                     />
                   </div>
                   <Slider max={loanAmount} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+                  {prepaymentAmount > 0 && (
+                    <p className="text-[9px] font-bold text-emerald-700/70 dark:text-emerald-400/70 uppercase tracking-wider text-right mt-1">{numberToIndianWords(prepaymentAmount)}</p>
+                  )}
                 </div>
 
                 {/* Tenure Saved ring — fills the space below the slider */}

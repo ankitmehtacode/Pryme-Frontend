@@ -88,7 +88,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <ValidatedInput
             label="Loan Amount (₹)"
-            type="number"
+            formatAsCurrency
             placeholder="500000"
             icon={IndianRupee}
             value={loanRequirements.loanAmount || ""}
@@ -141,7 +141,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
                 <div className="grid grid-cols-1 gap-5">
                   <ValidatedInput
                     label="Property Value (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="e.g. 7500000"
                     icon={Home}
                     value={loanRequirements.propertyValue || ""}

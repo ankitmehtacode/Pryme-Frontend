@@ -24,6 +24,57 @@ export function formatIndianCurrency(value: number): string {
   return `₹${rounded.toLocaleString("en-IN")}`;
 }
 
+/**
+ * Formats a rupee amount with Indian digit grouping for display inside an
+ * input while the user types (e.g. 2000000 -> "20,00,000").
+ */
+export function formatIndianCommas(value: number): string {
+  if (value == null || isNaN(value)) return "";
+  return new Intl.NumberFormat("en-IN").format(Math.round(value));
+}
+
+const ONES = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+  "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+const TENS = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+function twoDigitWords(n: number): string {
+  if (n < 20) return ONES[n];
+  return TENS[Math.floor(n / 10)] + (n % 10 ? ` ${ONES[n % 10]}` : "");
+}
+
+function threeDigitWords(n: number): string {
+  if (n >= 100) {
+    return `${ONES[Math.floor(n / 100)]} Hundred${n % 100 ? ` ${twoDigitWords(n % 100)}` : ""}`;
+  }
+  return twoDigitWords(n);
+}
+
+/**
+ * Converts a rupee amount to its Indian numbering-system words (Lakh/Crore),
+ * e.g. 2000000 -> "Twenty Lakh", 12500000 -> "One Crore Twenty Five Lakh".
+ * Returns "" for zero/invalid so callers can hide the caption entirely.
+ */
+export function numberToIndianWords(value: number): string {
+  if (value == null || isNaN(value) || value <= 0) return "";
+  let num = Math.round(Math.abs(value));
+
+  const crore = Math.floor(num / 1e7);
+  num %= 1e7;
+  const lakh = Math.floor(num / 1e5);
+  num %= 1e5;
+  const thousand = Math.floor(num / 1e3);
+  num %= 1e3;
+  const hundred = num;
+
+  const parts: string[] = [];
+  if (crore) parts.push(`${threeDigitWords(crore)} Crore`);
+  if (lakh) parts.push(`${twoDigitWords(lakh)} Lakh`);
+  if (thousand) parts.push(`${twoDigitWords(thousand)} Thousand`);
+  if (hundred) parts.push(threeDigitWords(hundred));
+
+  return parts.join(" ");
+}
+
 export function generateSafeUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     return window.crypto.randomUUID();

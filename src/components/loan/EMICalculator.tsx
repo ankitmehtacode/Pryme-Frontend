@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Calculator, Info, ChevronDown } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
+import { cn, formatIndianCommas, numberToIndianWords } from "@/lib/utils";
 
 interface EMICalculatorProps {
   loanAmount?: number;
@@ -96,14 +96,13 @@ const EMICalculator = ({
             <div className="p-2.5 md:px-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-lg border border-transparent shadow-none transition-all">
               <div className="flex justify-between items-center mb-2 gap-2">
                 <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount (₹)</label>
-                <input 
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formatIndianCommas(amount)}
+                  onChange={(e) => setAmount(Number(e.target.value.replace(/[^0-9]/g, "")))}
                   onWheel={(e) => e.currentTarget.blur()}
                   className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-primary"
-                  max={500000000}
-                  min={100000}
                 />
               </div>
               <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={500000000} step={100000} className="cursor-pointer py-1" />
@@ -111,6 +110,9 @@ const EMICalculator = ({
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹50 Cr</span>
               </div>
+              {amount > 0 && (
+                <p className="text-[9px] font-bold text-primary/70 dark:text-[#103783]/70 uppercase tracking-wider text-right mt-1">{numberToIndianWords(amount)}</p>
+              )}
             </div>
 
             {/* Rate Slider */}

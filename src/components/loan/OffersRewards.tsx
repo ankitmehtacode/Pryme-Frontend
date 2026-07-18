@@ -15,7 +15,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, numberToIndianWords } from "@/lib/utils";
 import { PrymeAPI } from "@/lib/api";
 import loyaltyGiftImg from "@/assets/loyalty-gift.png";
 
@@ -238,6 +238,11 @@ const OffersRewards = () => {
                     <span className="text-[9px] font-semibold text-slate-400 block">
                       Enter amount between ₹1,00,000 - ₹5,00,000,000
                     </span>
+                    {loanAmount !== "" && Number(loanAmount) > 0 && (
+                      <span className="text-[10px] font-bold text-[#103783]/70 dark:text-[#3b82f6]/70 block">
+                        {numberToIndianWords(Number(loanAmount))}
+                      </span>
+                    )}
                   </div>
 
                   {/* Dropdown: Loan Product */}

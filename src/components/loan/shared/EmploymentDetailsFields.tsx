@@ -128,7 +128,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <ValidatedInput
               label="Gross Monthly Income (₹)"
-              type="number"
+              formatAsCurrency
               placeholder="100000"
               icon={IndianRupee}
               value={fin.path === "SALARIED" ? (fin.data.grossSalary || "") : ""}
@@ -137,7 +137,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             />
             <ValidatedInput
               label="Net Monthly Income (₹)"
-              type="number"
+              formatAsCurrency
               placeholder="85000"
               icon={IndianRupee}
               value={fin.path === "SALARIED" ? (fin.data.netMonthlySalary || "") : ""}
@@ -175,7 +175,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
 
           <ValidatedInput
             label="Total Monthly EMI across all loans (₹)"
-            type="number"
+            formatAsCurrency
             placeholder="e.g. 45000"
             icon={CreditCard}
             value={getInputValue(fin.path === "SALARIED" ? fin.data.existingEMI : null)}
@@ -200,7 +200,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   </p>
                   <ValidatedInput
                     label="EMI of loans closing in next 12 months (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="e.g. 15000 (or 0 if none)"
                     icon={IndianRupee}
                     value={getInputValue(fin.path === "SALARIED" ? fin.data.maturingLoanEMI : null)}
@@ -281,7 +281,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <ValidatedInput
               label="Annual Gross Receipts (Yearly, ₹ as per itr)"
-              type="number"
+              formatAsCurrency
               placeholder="e.g. 3600000"
               icon={IndianRupee}
               value={fin.path === "PROFESSIONAL" ? (fin.data.annualGrossReceipts || "") : ""}
@@ -290,7 +290,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             />
             <ValidatedInput
               label="Professional Income as per ITR (Yearly, ₹)"
-              type="number"
+              formatAsCurrency
               placeholder="e.g. 500000"
               icon={IndianRupee}
               value={fin.path === "PROFESSIONAL" ? (fin.data.netProfit || "") : ""}
@@ -318,7 +318,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             </StyledSelect>
             <ValidatedInput
               label="Last 12 Months GST Turnover (₹)"
-              type="number"
+              formatAsCurrency
               placeholder="e.g. 6000000"
               icon={IndianRupee}
               value={fin.path === "PROFESSIONAL" ? (fin.data.last12MonthsGstTurnover ?? "") : ""}
@@ -354,7 +354,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
 
               <ValidatedInput
                 label="Annual Depreciation Add-back (₹)"
-                type="number"
+                formatAsCurrency
                 placeholder="e.g. 240000 — from P&L / Balance Sheet"
                 icon={IndianRupee}
                 value={fin.path === "PROFESSIONAL" && fin.data.annualDepreciation !== undefined ? fin.data.annualDepreciation : ""}
@@ -390,7 +390,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
 
           <ValidatedInput
             label="Total Monthly EMI across all loans (₹)"
-            type="number"
+            formatAsCurrency
             placeholder="e.g. 45000"
             icon={CreditCard}
             value={getInputValue(fin.path === "PROFESSIONAL" ? fin.data.existingEMI : null)}
@@ -415,7 +415,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   </p>
                   <ValidatedInput
                     label="EMI of loans closing in next 12 months (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="e.g. 15000 (or 0 if none)"
                     icon={IndianRupee}
                     value={getInputValue(fin.path === "PROFESSIONAL" ? fin.data.maturingLoanEMI : null)}
@@ -481,7 +481,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <ValidatedInput
                 label="Last 12 Months GST Turnover (₹)"
-                type="number"
+                formatAsCurrency
                 placeholder="e.g. 6000000"
                 icon={IndianRupee}
                 value={fin.path === "SELF_EMPLOYED" ? (fin.data.last12MonthsGstTurnover || "") : ""}
@@ -543,7 +543,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <ValidatedInput
                 label="Annual Turnover (Yearly, ₹)"
-                type="number"
+                formatAsCurrency
                 placeholder="5000000"
                 icon={IndianRupee}
                 value={fin.path === "SELF_EMPLOYED" ? (fin.data.annualTurnover || "") : ""}
@@ -558,7 +558,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
               />
               <ValidatedInput
                 label="Business Income as per ITR (Yearly, ₹)"
-                type="number"
+                formatAsCurrency
                 placeholder="e.g. 500000"
                 icon={IndianRupee}
                 value={fin.path === "SELF_EMPLOYED" ? (fin.data.netProfit || "") : ""}
@@ -601,7 +601,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <ValidatedInput
                     label="On Road Price of Vehicle (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="1050000"
                     icon={IndianRupee}
                     value={vehicleOnRoadPrice || ""}
@@ -610,7 +610,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   />
                   <ValidatedInput
                     label="Quotation of Vehicle (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="850000"
                     icon={IndianRupee}
                     value={vehicleQuotationPrice || ""}
@@ -636,7 +636,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                     </p>
                     <ValidatedInput
                       label="Annual Depreciation Add-back (₹)"
-                      type="number"
+                      formatAsCurrency
                       placeholder="e.g. 240000 — from P&L / Balance Sheet"
                       icon={IndianRupee}
                       value={fin.path === "SELF_EMPLOYED" ? (fin.data.depreciation || "") : ""}
@@ -684,7 +684,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
 
           <ValidatedInput
             label="Total Monthly EMI across all loans (₹)"
-            type="number"
+            formatAsCurrency
             placeholder="e.g. 45000"
             icon={CreditCard}
             value={getInputValue(fin.path === "SELF_EMPLOYED" ? fin.data.existingEMI : null)}
@@ -709,7 +709,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   </p>
                   <ValidatedInput
                     label="EMI of loans closing in next 12 months (₹)"
-                    type="number"
+                    formatAsCurrency
                     placeholder="e.g. 15000 (or 0 if none)"
                     icon={IndianRupee}
                     value={getInputValue(fin.path === "SELF_EMPLOYED" ? fin.data.maturingLoanEMI : null)}
