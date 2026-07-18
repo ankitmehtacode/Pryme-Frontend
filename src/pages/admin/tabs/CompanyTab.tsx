@@ -1,7 +1,7 @@
 import React from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, formatISTDate } from "@/lib/utils";
 import { ConfirmAction } from "@/components/ui/confirm-action";
 
 interface CompanyTabProps {
@@ -85,7 +85,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
                     )}>{u.role.replace('_', ' ')}</span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+                <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? formatISTDate(u.createdAt) : '—'}</td>
                 <td className="px-6 py-4 text-slate-300 font-mono text-xs font-semibold">{u.employeeId || '—'}</td>
                 <td className="px-6 py-4 text-right">
                   {canDelete && (

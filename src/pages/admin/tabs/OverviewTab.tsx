@@ -40,7 +40,7 @@ const getDaysAgo = (days: number) => {
 
 const formatShortDate = (dateStr: string) => {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
 };
 
 // ── Custom Tooltip ───────────────────────────────────────────────────────
@@ -230,7 +230,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
                     axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
                     tickFormatter={(v) => {
                       const d = new Date(v);
-                      return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+                      return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
                     }}
                     interval={trendRange === "7d" ? 0 : trendRange === "30d" ? 4 : trendRange === "90d" ? 13 : "preserveStartEnd"}
                   />

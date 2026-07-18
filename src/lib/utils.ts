@@ -15,6 +15,41 @@ export function cn(...inputs: ClassValue[]) {
  * (e.g. 4000000 -> "₹40 L", 12500000 -> "₹1.25 Cr"), rounding away any
  * paise so loan-amount figures never render with stray decimals.
  */
+// All timestamps in the admin CRM and elsewhere on the site are shown in
+// IST regardless of the viewer's own machine/browser timezone -- previously
+// bare `.toLocaleString()`/`.toLocaleDateString()` calls rendered in
+// whichever timezone the browser was set to, so two admins in different
+// timezones would see different times for the same event.
+const IST_TIMEZONE = "Asia/Kolkata";
+
+/** Full date + time in IST, e.g. "18/07/2026, 16:33:24". */
+export function formatISTDateTime(value: string | number | Date): string {
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("en-IN", {
+    timeZone: IST_TIMEZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
+/** Short date in IST, e.g. "18 Jul 2026". */
+export function formatISTDate(value: string | number | Date): string {
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", {
+    timeZone: IST_TIMEZONE,
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export function formatIndianCurrency(value: number): string {
   if (value == null || isNaN(value)) return "₹0";
   const rounded = Math.round(value);

@@ -13,7 +13,7 @@ import {
   Trash2, Upload, Download, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, formatISTDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
@@ -947,7 +947,7 @@ const AdminDashboard = () => {
             <div className="p-6 border-b border-white/[0.06] flex items-start justify-between bg-[#0d0d14]">
               <div>
                 <div className="flex items-center gap-2 mb-1"><h2 className="text-xl font-semibold text-white font-mono">{selectedApp.applicationId}</h2><StatusBadge status={selectedApp.status} /></div>
-                <p className="text-sm text-slate-500">Applied: {new Date(selectedApp.createdAt).toLocaleDateString()}</p>
+                <p className="text-sm text-slate-500">Applied: {formatISTDate(selectedApp.createdAt)}</p>
               </div>
               <button onClick={() => setSelectedApp(null)} className="p-2 bg-white/[0.06] rounded-full border border-white/[0.08] hover:bg-white/[0.1] active:scale-95 transition-all"><X className="w-4 h-4 text-white" /></button>
             </div>

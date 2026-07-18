@@ -1,4 +1,5 @@
 import React from "react";
+import { formatISTDate } from "@/lib/utils";
 
 interface UsersTabProps {
   users: any[];
@@ -39,7 +40,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ users }) => {
                 <td className="px-6 py-4 text-slate-300 font-mono text-xs font-semibold">{u.customerId || '—'}</td>
                 <td className="px-6 py-4 text-slate-400 text-xs">{u.email}</td>
                 <td className="px-6 py-4 text-slate-500 text-xs">{u.city ? `${u.city}, ${u.state || ''}` : '—'}</td>
-                <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+                <td className="px-6 py-4 text-slate-500 text-xs">{u.createdAt ? formatISTDate(u.createdAt) : '—'}</td>
               </tr>
             ))
           )}

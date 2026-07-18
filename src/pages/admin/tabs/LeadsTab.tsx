@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Loader2, Briefcase, IndianRupee, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatISTDateTime } from "@/lib/utils";
 
 interface LeadsTabProps {
   isLoadingLeads: boolean;
@@ -85,7 +86,7 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                     >
                       <td className="px-6 py-4 align-top">
                         <p className="font-mono text-xs text-slate-400">{lead.id}</p>
-                        <p className="text-[10px] text-slate-500 mt-1">{new Date(lead.createdAt).toLocaleString()}</p>
+                        <p className="text-[10px] text-slate-500 mt-1">{formatISTDateTime(lead.createdAt)}</p>
                       </td>
                       <td className="px-6 py-4 align-top">
                         <p className="font-medium text-white">{lead.userName || 'Anonymous'}</p>
@@ -165,7 +166,7 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                   <h2 className="text-xl font-semibold text-white font-mono">{selectedLead.id}</h2>
                   <StatusBadge status={selectedLead.status || "NEW"} />
                 </div>
-                <p className="text-sm text-slate-500">Captured: {new Date(selectedLead.createdAt).toLocaleString()}</p>
+                <p className="text-sm text-slate-500">Captured: {formatISTDateTime(selectedLead.createdAt)}</p>
               </div>
               <button
                 onClick={() => setSelectedLead(null)}
