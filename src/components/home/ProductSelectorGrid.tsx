@@ -25,7 +25,7 @@ export const products = [
     id: "home",
     label: "HOME LOAN",
     image: product3,
-    tag: "PRE-APPROVED",
+    tag: "LOWEST INTEREST",
     href: "/apply/home-loan",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -49,7 +49,7 @@ export const products = [
     id: "transfer",
     label: "BALANCE TRANSFER | TOP UP",
     image: product6,
-    tag: "COMING SOON",
+    tag: "REDUCED EMI",
     href: "/coming-soon?type=transfer",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -61,7 +61,7 @@ export const products = [
     id: "personal",
     label: "PERSONAL LOAN",
     image: product2,
-    tag: "COMING SOON",
+    tag: "FAST PROCESSING",
     href: "/coming-soon?type=personal",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -73,7 +73,7 @@ export const products = [
     id: "business",
     label: "BUSINESS LOAN",
     image: product4,
-    tag: "COMING SOON",
+    tag: "FAST PROCESSING",
     href: "/coming-soon?type=business",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -85,7 +85,7 @@ export const products = [
     id: "auto",
     label: "AUTO LOAN",
     image: product1,
-    tag: "COMING SOON",
+    tag: "INSTANT FUNDING",
     href: "/coming-soon?type=auto",
     accent: "217, 91%, 60%",
     bg: "transparent",
@@ -138,7 +138,7 @@ const ProductSelectorGrid = memo(() => {
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-widest border border-primary/20">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Explore More Products
+            Explore Products
           </span>
         </motion.div>
       </div>
