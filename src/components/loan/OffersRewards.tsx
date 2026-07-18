@@ -544,8 +544,8 @@ const OffersRewards = () => {
                         </span>
 
                         {photo ? (
-                          <div className="w-full h-28 rounded-xl overflow-hidden mb-3 bg-slate-50 dark:bg-white/[0.03]">
-                            <img src={photo} alt={item.label} className="w-full h-full object-contain p-1.5" />
+                          <div className="w-full h-40 rounded-xl overflow-hidden mb-3 bg-slate-50 dark:bg-white/[0.03]">
+                            <img src={photo} alt={item.label} className="w-full h-full object-contain p-2" />
                           </div>
                         ) : (
                           <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 border", theme)}>
