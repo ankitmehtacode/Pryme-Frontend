@@ -180,6 +180,11 @@ const AdminDashboard = () => {
   const [crmView, setCrmView] = useState<"list" | "kanban">("list");
   const [leadFilter, setLeadFilter] = useState<"all" | "queue">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  // CRM Pipeline filter bar (ApplicationsTab) -- orthogonal to leadFilter/search,
+  // combined with AND logic in filteredApplications below.
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [loanTypeFilter, setLoanTypeFilter] = useState<string>("ALL");
+  const [dateRangeFilter, setDateRangeFilter] = useState<"all" | "today" | "7d" | "30d" | "90d">("all");
   // Set right before setActiveTab() by handleOverviewNavigate so the reset
   // effect below can carry a search term across the tab switch instead of
   // wiping it -- read-once, cleared immediately after consumption.
@@ -578,14 +583,28 @@ const AdminDashboard = () => {
     };
   }, [applications, users]);
 
+  // Loan types actually present in the data -- keeps the filter dropdown
+  // honest instead of hardcoding a list that can drift from real records.
+  const loanTypeOptions = useMemo(() => {
+    const types = new Set<string>();
+    applications.forEach((a: any) => { if (a.loanType) types.add(a.loanType.toUpperCase()); });
+    return Array.from(types).sort();
+  }, [applications]);
+
+  const dateRangeCutoff = useMemo(() => {
+    if (dateRangeFilter === "all") return null;
+    const d = new Date();
+    if (dateRangeFilter === "today") { d.setHours(0, 0, 0, 0); return d; }
+    const daysBack = dateRangeFilter === "7d" ? 7 : dateRangeFilter === "30d" ? 30 : 90;
+    d.setDate(d.getDate() - daysBack);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [dateRangeFilter]);
+
   const filteredApplications = useMemo(() => {
+    const searchStr = searchQuery.toLowerCase().trim();
     return applications.filter((app: any) => {
-      const searchStr = searchQuery.toLowerCase().trim();
-      if (!searchStr) {
-        const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignedTo !== null && app.assignedTo !== undefined);
-        return matchesQueue;
-      }
-      const matchesSearch =
+      const matchesSearch = !searchStr ||
         app.applicationId?.toLowerCase().includes(searchStr) ||
         app.loanType?.toLowerCase().includes(searchStr) ||
         app.applicant?.name?.toLowerCase().includes(searchStr) ||
@@ -594,9 +613,13 @@ const AdminDashboard = () => {
         app.applicant?.phoneNumber?.toLowerCase().includes(searchStr);
 
       const matchesQueue = leadFilter === "all" || (leadFilter === "queue" && app.assignedTo !== null && app.assignedTo !== undefined);
-      return matchesSearch && matchesQueue;
+      const matchesStatus = statusFilter === "ALL" || app.status?.toUpperCase() === statusFilter;
+      const matchesLoanType = loanTypeFilter === "ALL" || app.loanType?.toUpperCase() === loanTypeFilter;
+      const matchesDate = !dateRangeCutoff || (app.createdAt && new Date(app.createdAt) >= dateRangeCutoff);
+
+      return matchesSearch && matchesQueue && matchesStatus && matchesLoanType && matchesDate;
     });
-  }, [applications, searchQuery, leadFilter]);
+  }, [applications, searchQuery, leadFilter, statusFilter, loanTypeFilter, dateRangeCutoff]);
 
   // 🧠 DYNAMIC CHARTS: Calculates portfolio share mathematically from DB rows
   const portfolioData = useMemo(() => {
@@ -818,7 +841,7 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === "applications" && (
-                  <ApplicationsTab 
+                  <ApplicationsTab
                     leadFilter={leadFilter} setLeadFilter={setLeadFilter}
                     crmView={crmView} setCrmView={setCrmView}
                     statusMutation={statusMutation} assignMutation={assignMutation}
@@ -826,6 +849,11 @@ const AdminDashboard = () => {
                     setSelectedApp={setSelectedApp} formatCurrency={formatCurrency}
                     getNextStage={getNextStage} teamMembers={teamMembers}
                     StatusBadge={StatusBadge} isEmployee={isEmployee}
+                    statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+                    loanTypeFilter={loanTypeFilter} setLoanTypeFilter={setLoanTypeFilter}
+                    loanTypeOptions={loanTypeOptions}
+                    dateRangeFilter={dateRangeFilter} setDateRangeFilter={setDateRangeFilter}
+                    totalApplicationsCount={applications.length}
                   />
                 )}
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loader2, LayoutList, LayoutGrid, Activity } from "lucide-react";
+import { Loader2, LayoutList, LayoutGrid, Activity, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +8,16 @@ import {
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+
+type DateRangeFilter = "all" | "today" | "7d" | "30d" | "90d";
+
+const DATE_RANGE_OPTIONS: { label: string; value: DateRangeFilter }[] = [
+  { label: "All Time", value: "all" },
+  { label: "Today", value: "today" },
+  { label: "7D", value: "7d" },
+  { label: "30D", value: "30d" },
+  { label: "90D", value: "90d" },
+];
 
 interface ApplicationsTabProps {
   leadFilter: "all" | "queue";
@@ -24,13 +34,30 @@ interface ApplicationsTabProps {
   teamMembers: any[];
   StatusBadge: React.FC<{ status: string }>;
   isEmployee: boolean;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  loanTypeFilter: string;
+  setLoanTypeFilter: (loanType: string) => void;
+  loanTypeOptions: string[];
+  dateRangeFilter: DateRangeFilter;
+  setDateRangeFilter: (range: DateRangeFilter) => void;
+  totalApplicationsCount: number;
 }
 
 export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
   leadFilter, setLeadFilter, crmView, setCrmView, statusMutation, assignMutation,
   filteredApplications, pipelineStages, setSelectedApp, formatCurrency,
-  teamMembers, StatusBadge, isEmployee
+  teamMembers, StatusBadge, isEmployee,
+  statusFilter, setStatusFilter, loanTypeFilter, setLoanTypeFilter, loanTypeOptions,
+  dateRangeFilter, setDateRangeFilter, totalApplicationsCount
 }) => {
+  const hasActiveFilters = statusFilter !== "ALL" || loanTypeFilter !== "ALL" || dateRangeFilter !== "all" || leadFilter !== "all";
+  const clearFilters = () => {
+    setStatusFilter("ALL");
+    setLoanTypeFilter("ALL");
+    setDateRangeFilter("all");
+    setLeadFilter("all");
+  };
   // 🧠 Confirmation state: holds the pending action until user confirms
   const [pendingAction, setPendingAction] = useState<{
     type: "status" | "assign";
@@ -61,6 +88,63 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
           <button onClick={() => setCrmView("list")} className={cn("p-1.5 rounded-md transition-all", crmView === "list" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutList className="w-4 h-4" /></button>
           <button onClick={() => setCrmView("kanban")} className={cn("p-1.5 rounded-md transition-all", crmView === "kanban" ? "bg-white/[0.1] shadow-sm text-white scale-105" : "text-slate-500 hover:text-white")}><LayoutGrid className="w-4 h-4" /></button>
         </div>
+      </div>
+
+      {/* Filter Bar — status / loan type / date range, combined with search + queue toggle above */}
+      <div className="px-4 py-3 border-b border-white/[0.06] bg-white/[0.01] flex flex-wrap items-center gap-2">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[150px] h-8 text-xs font-medium bg-white/[0.04] border-white/[0.08] text-slate-300 outline-none focus:ring-blue-500/50">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+            <SelectItem value="ALL" className="text-xs">All Statuses</SelectItem>
+            {pipelineStages.map((stage) => (
+              <SelectItem key={stage} value={stage} className="text-xs">{stage}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={loanTypeFilter} onValueChange={setLoanTypeFilter}>
+          <SelectTrigger className="w-[160px] h-8 text-xs font-medium bg-white/[0.04] border-white/[0.08] text-slate-300 outline-none focus:ring-blue-500/50">
+            <SelectValue placeholder="Loan Type" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+            <SelectItem value="ALL" className="text-xs">All Loan Types</SelectItem>
+            {loanTypeOptions.map((type) => (
+              <SelectItem key={type} value={type} className="text-xs">{type}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-0.5 border border-white/[0.06]">
+          {DATE_RANGE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDateRangeFilter(opt.value)}
+              className={cn(
+                "px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200",
+                dateRangeFilter === opt.value
+                  ? "bg-blue-500/20 text-blue-400 shadow-sm shadow-blue-500/10"
+                  : "text-slate-500 hover:text-slate-300"
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-red-400 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" /> Clear Filters
+          </button>
+        )}
+
+        <span className="ml-auto text-xs text-slate-500 font-medium">
+          Showing <span className="text-slate-300">{filteredApplications.length}</span> of {totalApplicationsCount}
+        </span>
       </div>
 
       {/* VIEW 1: List View */}
