@@ -322,6 +322,11 @@ const Apply = () => {
         propertyValue: data.estimatedPropertyValue || data.propertyValue || data.loanAmount * 1.5 || 0,
         requestedTenureMonths: (data.loanTenure || 5) * 12,
         monthlyIncome: applicantIncome,
+        // Pre-tax salary (SALARIED only, see EmploymentDetailsFields.tsx).
+        // Used as the minIncome-check fallback, and as the income base for
+        // Bandhan Bank/HDFC HL's Salaried FOIR formula (Gross Salary x FOIR)
+        // -- see EligibilityEngineService.isGrossSalaryFoirLender.
+        grossMonthlyIncome: data.financialPath === "SALARIED" ? (data.grossSalary || null) : null,
         // Added to the primary applicant's surrogate-resolved income on the
         // backend (not blended in here) -- see EligibilityEngineService's
         // effectiveIncome computation.
