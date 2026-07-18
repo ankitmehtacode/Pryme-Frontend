@@ -493,8 +493,14 @@ export const PrymeAPI = {
   /** Admin: List active sessions for a user — GET /api/v1/auth/sessions/{userId} */
   getActiveSessions: async (userId: string) => fetchWithAuth(`/auth/sessions/${userId}`, { method: "GET" }),
 
-  /** Admin: Eligibility Engine Rules CRUD — /api/v1/admin/eligibility-rules */
-  getEligibilityRules: async () => fetchWithAuth("/admin/eligibility-rules", { method: "GET" }),
+  /** Admin: Eligibility Engine Rules CRUD — /api/v1/admin/eligibility-rules.
+   * size=1000: the endpoint's @PageableDefault caps at 100 rows (sorted by
+   * id DESC), which silently truncated this admin view to only the most
+   * recently created rules across every lender -- e.g. Yes Bank's rows
+   * happened to have the highest IDs, so the Policy Matrix showed only Yes
+   * Bank while every other lender's rules existed in the DB but never
+   * loaded. Same fix pattern as getAdminProducts below. */
+  getEligibilityRules: async () => fetchWithAuth("/admin/eligibility-rules?size=1000", { method: "GET" }),
   createEligibilityRule: async (data: any) =>
     fetchWithAuth("/admin/eligibility-rules", { method: "POST", body: JSON.stringify(data) }),
   updateEligibilityRule: async (id: string | number, data: any) =>
