@@ -136,10 +136,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
     ? (matchingReward.rewardText || [matchingReward.reward1, matchingReward.reward2, matchingReward.pfWaiver].filter(Boolean).join(" • "))
     : "";
 
-  const RewardIcon = matchingReward?.iconType === "GIFT" ? Gift : 
-                     matchingReward?.iconType === "SMARTPHONE" ? Smartphone : 
-                     matchingReward?.iconType === "CAR" ? Car : 
+  const RewardIcon = matchingReward?.iconType === "GIFT" ? Gift :
+                     matchingReward?.iconType === "SMARTPHONE" ? Smartphone :
+                     matchingReward?.iconType === "CAR" ? Car :
                      matchingReward?.iconType === "DISCOUNT" ? Tag : Gift;
+
+  // Processing fee in ₹ -- hoisted here so both the top-row metric chip and
+  // the expandable cost-breakdown panel below use the exact same figure.
+  const pfAmount = offer.processingFee >= 100
+    ? Math.round(offer.processingFee)
+    : Math.round(principalAmount * offer.processingFee / 100);
 
   return (
     <motion.div
@@ -186,7 +192,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
         <div className="pl-5 pr-5 py-5 md:pl-8 md:pr-6 md:py-6">
           {/* ── Main Grid ───────────────────────────── */}
-          <div className="flex flex-col xl:grid xl:grid-cols-[220px_240px_160px_minmax(0,1fr)] 2xl:grid-cols-[245px_260px_180px_minmax(0,1fr)] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
+          <div className="flex flex-col xl:grid xl:grid-cols-[200px_210px_300px_minmax(0,1fr)] 2xl:grid-cols-[220px_230px_340px_minmax(0,1fr)] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
             
             {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
             <div className="flex items-start justify-between w-full xl:w-auto">
@@ -298,20 +304,39 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
             </div>
 
-            {/* ── Metrics Chips ────────────────────────────── */}
-            <div className="hidden xl:flex items-center gap-2 2xl:gap-3">
-              {[
-                { label: "Interest", value: `${offer.interestRate}%` },
-                { label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
-              ].map((m, i) => (
-                <div
-                  key={i}
-                  className="w-[74px] 2xl:w-[84px] py-2 2xl:py-2.5 text-center rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15] shrink-0"
-                >
-                  <p className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-none mb-1.5 whitespace-nowrap">{m.label}</p>
-                  <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight whitespace-nowrap">{m.value}</p>
-                </div>
-              ))}
+            {/* ── Metrics Chips + Cost Breakdown Toggle ────────── */}
+            <div className="hidden xl:flex xl:flex-col gap-2">
+              <div className="flex items-center gap-1.5 2xl:gap-2">
+                {[
+                  { label: "Interest", value: `${offer.interestRate}%` },
+                  { label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
+                  { label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                ].map((m, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 min-w-0 py-2 2xl:py-2.5 px-1 text-center rounded-[1rem] bg-slate-50/95 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/[0.08] shadow-sm transition-all duration-300 group-hover:bg-white dark:group-hover:bg-white/[0.08] group-hover:shadow-md group-hover:border-slate-300 dark:group-hover:border-white/[0.15]"
+                  >
+                    <p className="text-[8px] 2xl:text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 leading-tight mb-1.5">{m.label}</p>
+                    <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums leading-none tracking-tight whitespace-nowrap">{m.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => onToggleExpand(offer.id)}
+                className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl border transition-all duration-300 group/toggle
+                  ${isExpanded
+                    ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
+                    : 'bg-slate-50/80 dark:bg-white/[0.03] border-slate-200/70 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15]'
+                  }`}
+                style={isExpanded ? { color: brand } : undefined}
+                title="View complete cost breakdown"
+              >
+                <span className="text-[9px] 2xl:text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 group-hover/toggle:text-foreground transition-colors">
+                  Complete Cost Break Down
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
             </div>
 
             {/* ── Mobile Premium Metrics Board ────────────────────────────── */}
@@ -432,20 +457,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               >
                 Apply Directly <ExternalLink className="w-3.5 h-3.5" />
               </button>
-
-              {/* Desktop Chevron */}
-              <button
-                onClick={() => onToggleExpand(offer.id)}
-                className={`hidden xl:flex ml-2 p-2.5 rounded-xl transition-all duration-300 border shrink-0 shadow-sm
-                  ${isExpanded
-                    ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
-                    : 'bg-slate-50 dark:bg-transparent border-slate-200 dark:border-transparent hover:bg-white hover:border-slate-300'
-                  }`}
-                style={isExpanded ? { color: brand } : { color: 'var(--muted-foreground)' }}
-                title="View requirements"
-              >
-                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-              </button>
             </div>
           </div>
         </div>
@@ -525,11 +536,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     if (!isNaN(n)) return `₹${Math.round(n).toLocaleString("en-IN")}`;
                     return s;
                   };
-
-                  // Processing fee in ₹
-                  const pfAmount = offer.processingFee >= 100
-                    ? Math.round(offer.processingFee)
-                    : Math.round(principalAmount * offer.processingFee / 100);
 
                   const loginFeeNum = toNumeric(er?.loginFee);
                   const stampDutyNum = toNumeric(er?.stampDuty);
