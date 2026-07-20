@@ -47,9 +47,10 @@ const humanizeKey = (key: string): string =>
 export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating }) => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const selectedMeta = selectedLead ? parseMetadata(selectedLead.metadata) : {};
-  // source/rejectionReason get their own dedicated callout above, so they're
+  // Callback fields get their own dedicated callout above, so they're
   // excluded here to avoid showing the same info twice.
-  const formDetailEntries = Object.entries(selectedMeta).filter(([key]) => key !== "source" && key !== "rejectionReason");
+  const CALLBACK_META_KEYS = new Set(["callbackRequested", "callbackRequestedAt", "rejectionReason"]);
+  const formDetailEntries = Object.entries(selectedMeta).filter(([key]) => !CALLBACK_META_KEYS.has(key));
 
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
@@ -90,9 +91,9 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                       <td className="px-6 py-4 align-top">
                         <p className="font-mono text-xs text-slate-400">{lead.id}</p>
                         <p className="text-[10px] text-slate-500 mt-1">{formatISTDateTime(lead.createdAt)}</p>
-                        {meta.source === "REJECTED_OFFER" && (
-                          <span className="text-[9px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded uppercase inline-block mt-1.5">
-                            Rejected Offer
+                        {meta.callbackRequested && (
+                          <span className="text-[9px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded uppercase inline-block mt-1.5">
+                            Requested a Callback
                           </span>
                         )}
                       </td>
@@ -173,9 +174,9 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-semibold text-white font-mono">{selectedLead.id}</h2>
                   <StatusBadge status={selectedLead.status || "NEW"} />
-                  {selectedMeta.source === "REJECTED_OFFER" && (
-                    <span className="text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded uppercase">
-                      Rejected Offer
+                  {selectedMeta.callbackRequested && (
+                    <span className="text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded uppercase">
+                      Requested a Callback
                     </span>
                   )}
                 </div>
@@ -197,11 +198,14 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                 <div><p className="text-xs text-slate-500 mb-1">Phone</p><p className="font-semibold text-white truncate">{selectedLead.phone || "—"}</p></div>
               </div>
 
-              {selectedMeta.source === "REJECTED_OFFER" && (
-                <div className="p-5 border border-red-500/20 rounded-xl bg-red-500/5">
-                  <h4 className="text-sm font-medium text-red-400 mb-2">Callback Requested After Rejection</h4>
+              {selectedMeta.callbackRequested && (
+                <div className="p-5 border border-blue-500/20 rounded-xl bg-blue-500/5">
+                  <h4 className="text-sm font-medium text-blue-400 mb-2">Callback Requested</h4>
+                  {selectedMeta.callbackRequestedAt && (
+                    <p className="text-[10px] text-slate-500 mb-2">{formatISTDateTime(selectedMeta.callbackRequestedAt)}</p>
+                  )}
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    {selectedMeta.rejectionReason || "Applicant did not meet standard eligibility criteria."}
+                    {selectedMeta.rejectionReason || "Applicant asked to be contacted about this application."}
                   </p>
                 </div>
               )}

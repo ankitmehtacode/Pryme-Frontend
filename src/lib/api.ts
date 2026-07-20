@@ -279,6 +279,15 @@ export const PrymeAPI = {
     });
   },
 
+  // Tags the already-captured lead (see submitLead above) as having asked for
+  // a callback -- e.g. from the "No Offers Found" screen -- instead of
+  // creating a second, duplicate lead with re-typed/stubbed data.
+  requestCallback: async (leadId: string, rejectionReason?: string) =>
+    fetchWithAuth(`/public/leads/${leadId}/callback-request`, {
+      method: "PATCH",
+      body: JSON.stringify({ rejectionReason }),
+    }),
+
   // 🧠 CLOSED-LOOP FIX: Backend ElevationController is at /api/v1/applications/elevate
   elevateLead: async (leadId: string, userId: string, selectedBank?: string) => fetchWithAuth(`/applications/elevate`, { method: "POST", body: JSON.stringify({ leadId, userId, selectedBank }) }),
   getApplications: async () => fetchWithAuth("/admin/applications", { method: "GET" }),

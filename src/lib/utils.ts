@@ -146,11 +146,6 @@ export function buildCleanMetadata(formData: any): Record<string, any> {
     : 0;
   
   const base = {
-    // Lead origin — lets the CRM flag callbacks that came from a rejected
-    // offer instead of a fresh inquiry (see Offers.tsx zero-offer screen).
-    source: formData.source,
-    rejectionReason: formData.rejectionReason,
-
     // Core identity
     email: formData.email || formData.officialEmail,
     panNumber: formData.panCard || formData.panNumber,

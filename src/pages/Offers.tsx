@@ -247,6 +247,28 @@ export default function Offers() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [callbackStatus, setCallbackStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
+
+  // Consent-style callback request for the zero-offers screen -- tags the
+  // lead that was already silently captured pre-eligibility (Apply.tsx) as
+  // wanting a callback, instead of sending the applicant to a separate
+  // re-entry form that created a second, stub-data lead in the CRM.
+  const handleRequestCallback = useCallback(async (rejectionReasons: string[]) => {
+    const pendingLeadId = localStorage.getItem("pryme_pending_lead_id");
+    if (!pendingLeadId) {
+      setCallbackStatus("error");
+      toast({ title: "Couldn't submit request", description: "Please refresh and try applying again.", variant: "destructive" });
+      return;
+    }
+    setCallbackStatus("submitting");
+    try {
+      await PrymeAPI.requestCallback(pendingLeadId, rejectionReasons.join("; "));
+      setCallbackStatus("done");
+    } catch {
+      setCallbackStatus("error");
+      toast({ title: "Couldn't submit request", description: "Please try again in a moment.", variant: "destructive" });
+    }
+  }, []);
 
   // Show the eligibility/valuation disclaimer once per browser session, only
   // once real offers are on screen (not on the skeleton or zero-offers state).
@@ -692,12 +714,19 @@ export default function Offers() {
             </ul>
           </div>
 
-          <Button
-            onClick={() => navigate("/apply-direct", { state: { source: "REJECTED_OFFER", rejectionReasons: rawViolations } })}
-            className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading"
-          >
-            Request a Call back
-          </Button>
+          {callbackStatus === "done" ? (
+            <div className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+              <CheckCircle2 className="w-4 h-4" /> Callback Requested — We'll reach out shortly
+            </div>
+          ) : (
+            <Button
+              onClick={() => handleRequestCallback(rawViolations)}
+              disabled={callbackStatus === "submitting"}
+              className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading"
+            >
+              {callbackStatus === "submitting" ? "Submitting..." : "Request a Call back"}
+            </Button>
+          )}
         </div>
       </div>
     );
