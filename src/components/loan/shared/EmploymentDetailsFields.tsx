@@ -142,8 +142,8 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
               icon={IndianRupee}
               value={fin.path === "SALARIED" ? (fin.data.netMonthlySalary || "") : ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateSalaried({ netMonthlySalary: Number(e.target.value) })}
-              isValid={(fin.path === "SALARIED" ? fin.data.netMonthlySalary : 0) >= 10000}
-              error={errors.netMonthlySalary}
+              isValid={(fin.path === "SALARIED" ? fin.data.netMonthlySalary : 0) >= 10000 && (fin.path !== "SALARIED" || !fin.data.grossSalary || fin.data.netMonthlySalary <= fin.data.grossSalary)}
+              error={errors.netMonthlySalary || (fin.path === "SALARIED" && fin.data.grossSalary && fin.data.netMonthlySalary > fin.data.grossSalary ? "Net income cannot exceed gross income" : undefined)}
             />
           </div>
 

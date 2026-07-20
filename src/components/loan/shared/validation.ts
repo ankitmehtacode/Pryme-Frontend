@@ -55,6 +55,7 @@ export function validateStage2(store: StoreSnapshot): ValidationErrors {
     if (!d.companyName || d.companyName.trim().length < 2) errors.companyName = "Enter your company name";
     if (!d.designation || d.designation.trim().length < 2) errors.designation = "Enter your designation";
     if (!d.netMonthlySalary || d.netMonthlySalary < 10000) errors.netMonthlySalary = "Minimum salary is ₹10,000";
+    else if (d.grossSalary && d.netMonthlySalary > d.grossSalary) errors.netMonthlySalary = "Net income cannot exceed gross income";
     if (typeof d.totalExperienceYears !== 'number' || d.totalExperienceYears < 0) errors.totalExperienceYears = "Enter valid experience";
     if (typeof d.currentCompanyYears !== 'number' || d.currentCompanyYears < 0) errors.currentCompanyYears = "Enter valid current experience";
   }
