@@ -2,11 +2,11 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
-  FileText, Search, CheckCircle, CreditCard, Clock,
+  FileText, Search, CheckCircle, Clock,
   AlertCircle, Building2, TrendingUp, Activity,
   ShieldCheck, ChevronRight, ArrowRight, Wallet,
   UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X,
-  User, Briefcase, Lock, Mail, Users, Award, Building, Calendar, MapPin, Check, Plus, Phone, Landmark, Coins
+  User, Briefcase, Lock, Mail, Users, Award, Check, Plus, Phone, Landmark, Coins
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -14,13 +14,13 @@ import Footer from "@/components/layout/Footer";
 import { PageShell, Surface, Stack, Inline, Container, Section, SplitLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn, buildCleanMetadata, formatISTDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import applicationBannerImg from "@/assets/images/application-banner-isometric.png";
 import { useApplicationStore } from "@/store/applicationStore";
+import { CustomerLoanInformationStep } from "@/components/loan/steps/CustomerLoanInformationStep";
 
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
@@ -264,7 +264,25 @@ const Dashboard: React.FC = () => {
       clearTimeout(unlockTimer);
     };
   }, [user, authLoading, isAdmin, navigate]);
-  
+
+  // 🧠 Stage 1 ("Customer & Loan Information") shows PAN/DOB/City/PIN as
+  // frozen, already-collected data -- fill formData's copy of them from the
+  // applicationStore (the real source, populated earlier in Apply.tsx) when
+  // there's no backend-saved value yet, so handleNextStage's existing
+  // validation still passes without asking the applicant to re-type them.
+  useEffect(() => {
+    if (viewState !== "FUNNEL") return;
+    const kyc = store.basicKYC;
+    if (!kyc.panNumber && !kyc.dateOfBirth && !kyc.city && !kyc.pinCode) return;
+    setFormData(prev => ({
+      ...prev,
+      panNumber: prev.panNumber || kyc.panNumber || "",
+      dob: prev.dob || kyc.dateOfBirth || "",
+      currentCity: prev.currentCity || kyc.city || "",
+      pinCode: prev.pinCode || kyc.pinCode || "",
+    }));
+  }, [viewState, store.basicKYC]);
+
   const { docGroups } = useMemo(() => {
     if (!activeApplication && viewState !== "FUNNEL") return { docGroups: [] };
     
@@ -312,10 +330,6 @@ const Dashboard: React.FC = () => {
       }))
     };
   }, [activeApplication, viewState]);
-
-  const handleInputChange = useCallback((field: keyof DashboardFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
 
   const validateCurrentStage = useCallback((): boolean => {
     switch (currentStage) {
@@ -715,44 +729,15 @@ const Dashboard: React.FC = () => {
                           <Stack gap="var(--space-4)" className="relative z-10">
                             <div className="flex justify-between items-start border-b border-slate-100 pb-3">
                               <div>
-                                <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">1. Identity & Location</h2>
-                                <p className="text-sm text-slate-500 font-medium mt-1">Let's start with some basic information to verify your identity.</p>
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">1. Customer & Loan Information</h2>
+                                <p className="text-sm text-slate-500 font-medium mt-1">Please review your details and provide any additional information to help us find the best loan offers for you.</p>
                               </div>
                             </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <Stack gap="var(--space-2)">
-                                <Label htmlFor="panNumber" className="text-xs font-bold uppercase tracking-wider text-slate-500">PAN Number *</Label>
-                                <div className="relative">
-                                  <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
-                                  <Input id="panNumber" value={formData.panNumber} onChange={(e) => handleInputChange("panNumber", e.target.value)} placeholder="ABCDE1234F" className="pl-12 h-11 text-sm uppercase border-slate-200 bg-slate-50 rounded-xl font-medium" maxLength={10} />
-                                </div>
-                              </Stack>
-                              
-                              <Stack gap="var(--space-2)">
-                                <Label htmlFor="dob" className="text-xs font-bold uppercase tracking-wider text-slate-500">Date of Birth *</Label>
-                                <div className="relative">
-                                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
-                                  <Input id="dob" type="date" value={formData.dob} onChange={(e) => handleInputChange("dob", e.target.value)} className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
-                                </div>
-                              </Stack>
-                              
-                              <Stack gap="var(--space-2)">
-                                <Label htmlFor="currentCity" className="text-xs font-bold uppercase tracking-wider text-slate-500">Current City *</Label>
-                                <div className="relative">
-                                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
-                                  <Input id="currentCity" value={formData.currentCity} onChange={(e) => handleInputChange("currentCity", e.target.value)} placeholder="Indore" className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
-                                </div>
-                              </Stack>
-                              
-                              <Stack gap="var(--space-2)">
-                                <Label htmlFor="pinCode" className="text-xs font-bold uppercase tracking-wider text-slate-500">Pin Code *</Label>
-                                <div className="relative">
-                                  <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none" />
-                                  <Input id="pinCode" value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value.replace(/\\D/g, ''))} placeholder="453200" maxLength={6} className="pl-12 h-11 text-sm border-slate-200 bg-slate-50 rounded-xl font-medium" />
-                                </div>
-                              </Stack>
-                            </div>
+
+                            <CustomerLoanInformationStep
+                              applicationId={activeApplication?.applicationId?.startsWith("pending-") ? undefined : activeApplication?.applicationId}
+                              existingCoApplicantPhotoUrl={activeApplication?.documents?.find(d => d.name === "Co-Applicant Photo" || d.docType === "Co-Applicant Photo")?.url}
+                            />
 
                             <div className="bg-blue-50/40 border border-blue-100/50 p-4 rounded-xl flex gap-3 items-center text-blue-700">
                               <Lock className="w-4 h-4 shrink-0" />

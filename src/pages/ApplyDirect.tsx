@@ -40,13 +40,13 @@ import idfcLogo from "@/assets/idfc.png";
 import idbiLogo from "@/assets/idbi-bank.png";
 import tataLogo from "@/assets/tata-capital.png";
 
-interface BankDetails {
+export interface BankDetails {
   id: string;
   name: string;
   logo: string;
 }
 
-const BANKS_MAP: Record<string, BankDetails> = {
+export const BANKS_MAP: Record<string, BankDetails> = {
   hdfc: { id: "hdfc", name: "HDFC BANK", logo: hdfcLogo },
   sbi: { id: "sbi", name: "State Bank of India", logo: sbiLogo },
   icici: { id: "icici", name: "ICICI BANK", logo: iciciLogo },
@@ -67,6 +67,14 @@ const BANKS_MAP: Record<string, BankDetails> = {
   // active products than any other lender, so this was firing constantly.
   lt: { id: "lt", name: "L&T FINANCE", logo: ltLogo },
   indusind: { id: "indusind", name: "INDUSIND BANK", logo: indusindLogo }
+};
+
+// Bank offers carry a display name (e.g. Offers.tsx's offer.bankName), not a
+// BANKS_MAP id -- case-insensitive lookup against BankDetails.name instead.
+export const findBankLogoByName = (bankName: string | null | undefined): string | undefined => {
+  if (!bankName) return undefined;
+  const normalized = bankName.trim().toLowerCase();
+  return Object.values(BANKS_MAP).find(b => b.name.toLowerCase() === normalized)?.logo;
 };
 
 // Backend's LeadService.normalizeLoanType only strips a trailing "_loan"

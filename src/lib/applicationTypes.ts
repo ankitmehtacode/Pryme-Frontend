@@ -100,9 +100,39 @@ export const STAGE_LABELS: Record<StageNumber, string> = {
   5: 'Review & Submit',
 };
 
+// ─── PERSONAL PROFILE (Customer & Loan Information review screen) ───────────
+// None of this existed in the original progressive-profiling funnel — it's
+// collected on the post-elevation "Customer & Loan Information" review step
+// (Dashboard.tsx Stage 1), for both the primary applicant (BasicKYC) and the
+// co-applicant (CoApplicantDetails), hence factored out as a shared shape.
+
+export type AddressOwnership = 'OWNED' | 'RENTED';
+
+export interface ReferenceContact {
+  name: string;
+  phone: string;
+}
+
+export interface PersonalProfileExtension {
+  religion?: string;
+  emailOfficial?: string;
+  motherName?: string;
+  maritalStatus?: string;
+  spouseName?: string;           // Only relevant when maritalStatus === 'Married'
+  qualification?: string;
+  numberOfDependents?: number;
+
+  currentAddress?: string;
+  currentAddressType?: AddressOwnership;
+  permanentAddress?: string;
+  permanentAddressType?: AddressOwnership;
+
+  references?: [ReferenceContact, ReferenceContact];
+}
+
 // ─── BASIC KYC (Stage 1 — Always Collected) ─────────────────────────────────
 
-export interface BasicKYC {
+export interface BasicKYC extends PersonalProfileExtension {
   fullName: string;
   mobileNumber: string;
   mobileVerified: boolean;
@@ -123,6 +153,12 @@ export interface BasicKYC {
 
 export type CompanyType = 'PROPRIETORSHIP' | 'PARTNERSHIP' | 'LLP' | 'PRIVATE_LIMITED' | 'PUBLIC_LIMITED_LISTED' | 'PUBLIC_LIMITED_UNLISTED' | 'OTHER';
 
+// Display-only, for the Customer & Loan Information review screen — distinct
+// from SalariedSubType (PRIVATE/GOVERNMENT) above, which the eligibility
+// engine matches products/FOIR/ROI/PF rows against and must not change.
+export type EmployerCategory = 'PRIVATE' | 'PUBLIC' | 'GOVERNMENT';
+export type ModeOfWork = 'REMOTE' | 'ONSITE' | 'HYBRID';
+
 export interface SalariedDetails {
   subType: SalariedSubType;
   companyType?: CompanyType;
@@ -137,6 +173,13 @@ export interface SalariedDetails {
   hasExistingLoans: boolean;
   existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
+
+  // Customer & Loan Information review screen additions (never collected
+  // during the original application funnel)
+  employerCategory?: EmployerCategory;
+  modeOfWork?: ModeOfWork;
+  officeAddress?: string;
+  rentalIncome?: number;
 }
 
 // ─── PROFESSIONAL FINANCIALS ────────────────────────────────────────────────
@@ -162,7 +205,19 @@ export interface ProfessionalDetails {
   hasExistingLoans: boolean;
   existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
+
+  // Customer & Loan Information review screen addition — nested
+  // specialization, only meaningful when subType is 'DOCTOR' or 'LAWYER'
+  // (see PROFESSION_SUB_SPECIALTIES below)
+  professionSubSpecialty?: string;
 }
+
+// Sub-specialty options for the Customer & Loan Information review screen's
+// nested profession dropdown — only DOCTOR and LAWYER (Advocate) have one.
+export const PROFESSION_SUB_SPECIALTIES: Partial<Record<ProfessionalSubType, string[]>> = {
+  DOCTOR: ['MBBS', 'BHMS', 'BAMS', 'BUMS', 'BDS', 'B.V.Sc & AH'],
+  LAWYER: ['Criminal', 'Civil', 'Other'],
+};
 
 // ─── SELF-EMPLOYED / BUSINESS FINANCIALS ────────────────────────────────────
 
@@ -206,6 +261,9 @@ export interface BusinessDetails {
   hasExistingLoans: boolean;
   existingEMI?: number;           // Total monthly EMI burden (Step A)
   maturingLoanEMI?: number;      // EMI of loans finishing in next 12 months (Step B)
+
+  // Customer & Loan Information review screen addition
+  natureOfWork?: string;
 }
 
 // ─── DISCRIMINATED FINANCIAL DETAILS UNION ──────────────────────────────────
@@ -245,14 +303,24 @@ export interface LoanRequirements {
   // Auto Loan
   vehicleOnRoadPrice?: number;    // On-road price of vehicle (ex-showroom + RTO + insurance)
   vehicleQuotationPrice?: number; // Dealer quotation / proforma invoice price
+
+  // Set once an offer is locked (Offers.tsx handleUnlock) so the Customer &
+  // Loan Information review screen can render the selected bank's logo —
+  // persisted here (not just localStorage) since it must survive navigation.
+  selectedBankName?: string;
 }
 
-export interface CoApplicantDetails {
+export interface CoApplicantDetails extends PersonalProfileExtension {
   fullName: string;
   mobileNumber: string;
   relationship: CoApplicantRelationship | '';
   dateOfBirth: string;
   pinCode: string;
+  // Never collected during the original CoApplicantStep.tsx flow (only
+  // pinCode was) — new, editable on the Customer & Loan Information screen.
+  state?: string;
+  city?: string;
+  email?: string;
   employmentType: EmploymentType | null;
   /** @deprecated superseded by financialDetails — kept for session hydration compat */
   companyName: string;

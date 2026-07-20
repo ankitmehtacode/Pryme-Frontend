@@ -18,6 +18,7 @@ import { toast } from "@/hooks/use-toast";
 import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { formatIndianCurrency } from "@/lib/utils";
+import { useApplicationStore } from "@/store/applicationStore";
 
 import hdfcLogo from "@/assets/hdfc.png";
 import iciciLogo from "@/assets/icici.png";
@@ -549,6 +550,10 @@ export default function Offers() {
     setIsLocking(offer.id);
     try {
       localStorage.setItem("pryme_target_bank", offer.bankName);
+      // Also persist to the (sessionStorage-backed) applicationStore so the
+      // Customer & Loan Information review screen can render this bank's
+      // logo -- localStorage's copy gets deleted after a single read.
+      useApplicationStore.getState().updateLoanRequirements({ selectedBankName: offer.bankName });
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // 🧠 AUTH-AWARE ROUTING FIX: If the user is already authenticated,

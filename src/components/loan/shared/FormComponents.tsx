@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, formatIndianCommas, numberToIndianWords } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Lock } from "lucide-react";
 
 export const ValidatedInput = React.forwardRef<HTMLInputElement, any>(
   ({ label, error, isValid, icon: Icon, className: _className, formatAsCurrency, type, value, onChange, ...props }, ref) => {
@@ -137,6 +137,43 @@ export const PillSelector = <T extends string>({
     </div>
   </div>
 );
+
+// Static, non-interactive display for data already collected earlier in the
+// application (Customer & Loan Information review screen) — visually matches
+// ValidatedInput's chrome (label, icon, height/radius) but reads as locked
+// rather than editable, and never mutates state.
+export const FrozenField = ({
+  label, icon: Icon, value, formatAsCurrency
+}: {
+  label: string; icon?: any; value: string | number | null | undefined; formatAsCurrency?: boolean;
+}) => {
+  const isEmpty = value === "" || value === undefined || value === null;
+  const displayValue = isEmpty
+    ? "—"
+    : formatAsCurrency
+      ? `₹${formatIndianCommas(Number(value))}`
+      : String(value);
+
+  return (
+    <div className="w-full">
+      <Label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80 dark:text-[#103783]/80 ml-1 mb-1 block">{label}</Label>
+      <div
+        className={cn(
+          "relative w-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] rounded-xl h-14 px-4 flex items-center text-sm font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed",
+          Icon && "pl-11"
+        )}
+      >
+        {Icon && (
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Icon className="w-4 h-4 text-slate-400/70" />
+          </div>
+        )}
+        <span className="truncate">{displayValue}</span>
+        <Lock className="w-3.5 h-3.5 text-slate-400/60 ml-auto shrink-0" />
+      </div>
+    </div>
+  );
+};
 
 export const ToggleSwitch = ({
   label, description, icon: Icon, checked, onChange
