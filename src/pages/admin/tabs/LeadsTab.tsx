@@ -47,6 +47,9 @@ const humanizeKey = (key: string): string =>
 export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating }) => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const selectedMeta = selectedLead ? parseMetadata(selectedLead.metadata) : {};
+  // source/rejectionReason get their own dedicated callout above, so they're
+  // excluded here to avoid showing the same info twice.
+  const formDetailEntries = Object.entries(selectedMeta).filter(([key]) => key !== "source" && key !== "rejectionReason");
 
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
@@ -87,6 +90,11 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                       <td className="px-6 py-4 align-top">
                         <p className="font-mono text-xs text-slate-400">{lead.id}</p>
                         <p className="text-[10px] text-slate-500 mt-1">{formatISTDateTime(lead.createdAt)}</p>
+                        {meta.source === "REJECTED_OFFER" && (
+                          <span className="text-[9px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded uppercase inline-block mt-1.5">
+                            Rejected Offer
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4 align-top">
                         <p className="font-medium text-white">{lead.userName || 'Anonymous'}</p>
@@ -165,6 +173,11 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-semibold text-white font-mono">{selectedLead.id}</h2>
                   <StatusBadge status={selectedLead.status || "NEW"} />
+                  {selectedMeta.source === "REJECTED_OFFER" && (
+                    <span className="text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded uppercase">
+                      Rejected Offer
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-slate-500">Captured: {formatISTDateTime(selectedLead.createdAt)}</p>
               </div>
@@ -184,11 +197,20 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                 <div><p className="text-xs text-slate-500 mb-1">Phone</p><p className="font-semibold text-white truncate">{selectedLead.phone || "—"}</p></div>
               </div>
 
-              {Object.keys(selectedMeta).length > 0 ? (
+              {selectedMeta.source === "REJECTED_OFFER" && (
+                <div className="p-5 border border-red-500/20 rounded-xl bg-red-500/5">
+                  <h4 className="text-sm font-medium text-red-400 mb-2">Callback Requested After Rejection</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {selectedMeta.rejectionReason || "Applicant did not meet standard eligibility criteria."}
+                  </p>
+                </div>
+              )}
+
+              {formDetailEntries.length > 0 ? (
                 <div className="p-5 border border-white/[0.06] rounded-xl bg-white/[0.02]">
                   <h4 className="text-sm font-medium text-slate-300 mb-4 border-b border-white/[0.06] pb-2">Application Form Details</h4>
                   <div className="grid grid-cols-2 gap-6">
-                    {Object.entries(selectedMeta).map(([key, value]) => (
+                    {formDetailEntries.map(([key, value]) => (
                       <div key={key}>
                         <p className="text-xs text-slate-500 mb-1">{humanizeKey(key)}</p>
                         <p className="font-semibold text-white truncate">{String(value)}</p>

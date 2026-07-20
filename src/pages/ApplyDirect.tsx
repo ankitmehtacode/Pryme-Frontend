@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -87,6 +87,13 @@ const LOAN_TYPE_LABEL_TO_CODE: Record<string, string> = {
 export default function ApplyDirect() {
   const { bankId } = useParams<{ bankId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Set by Offers.tsx's zero-offer screen when the "Request a Call back" CTA
+  // is the one shown after a rejection, so the resulting lead can be flagged
+  // in the CRM's Raw Inquiries view instead of looking like a fresh inquiry.
+  const rejectionContext = location.state as { source?: string; rejectionReasons?: string[] } | null;
+  const isRejectedOfferCallback = rejectionContext?.source === "REJECTED_OFFER";
 
   // Resolve bank based on URL (e.g. "bob-hl" -> "bob"). Returns null when
   // there's genuinely no bank context (e.g. the "Request a Call Back" CTA
@@ -255,7 +262,9 @@ export default function ApplyDirect() {
         cibilScore: 750,
         monthlyIncome: 50000,
         offerId: selectedBank?.id,
-        loanPurpose: `Direct Apply Callback Request: time=${formData.preferredTime}, pincode=${pincode}, branch=${branchAddress ?? "unassigned"}, msg=${formData.message}`
+        loanPurpose: `Direct Apply Callback Request: time=${formData.preferredTime}, pincode=${pincode}, branch=${branchAddress ?? "unassigned"}, msg=${formData.message}`,
+        source: isRejectedOfferCallback ? "REJECTED_OFFER" : undefined,
+        rejectionReason: isRejectedOfferCallback ? rejectionContext?.rejectionReasons?.join("; ") : undefined
       });
 
       localStorage.setItem("pryme_lead_name", formData.fullName);

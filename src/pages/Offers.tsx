@@ -692,7 +692,10 @@ export default function Offers() {
             </ul>
           </div>
 
-          <Button onClick={() => navigate("/apply-direct")} className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading">
+          <Button
+            onClick={() => navigate("/apply-direct", { state: { source: "REJECTED_OFFER", rejectionReasons: rawViolations } })}
+            className="w-full h-12 bg-primary/90 hover:bg-primary text-white font-medium shadow-sm transition-all text-base rounded-xl font-heading"
+          >
             Request a Call back
           </Button>
         </div>
