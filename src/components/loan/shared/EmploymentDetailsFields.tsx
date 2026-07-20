@@ -232,7 +232,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
               { value: "CA", label: "Chartered Accountant", icon: GraduationCap },
               { value: "CS", label: "Company Secretary", icon: GraduationCap },
               { value: "DOCTOR", label: "Doctor", icon: Stethoscope },
-              { value: "LAWYER", label: "Lawyer", icon: Scale },
+              { value: "LAWYER", label: "Advocate", icon: Scale },
               { value: "ARCHITECT", label: "Architect", icon: PenTool },
             ]}
             value={fin.path === "PROFESSIONAL" ? fin.data.subType : null}

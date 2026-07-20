@@ -69,7 +69,7 @@ export const PROFESSIONAL_LABELS: Record<ProfessionalSubType, string> = {
   CA: 'Chartered Accountant',
   CS: 'Company Secretary',
   DOCTOR: 'Doctor / Medical Practitioner',
-  LAWYER: 'Advocate / Lawyer',
+  LAWYER: 'Advocate',
   ARCHITECT: 'Architect',
 };
 
