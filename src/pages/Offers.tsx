@@ -226,6 +226,46 @@ const OffersDisclaimerModal = ({ open, onOpenChange }: { open: boolean; onOpenCh
   </DialogPrimitive.Root>
 );
 
+const ApplyConfirmationModal = ({
+  open, onOpenChange, onContinue,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onContinue: () => void;
+}) => (
+  <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+      <DialogPrimitive.Content
+        className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/90 dark:bg-[#0d1527]/90 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+      >
+        <div className="px-6 md:px-7 pt-7 pb-2 flex flex-col items-center text-center">
+          <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
+            <CheckCircle2 className="w-7 h-7" />
+          </div>
+          <DialogPrimitive.Title className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight leading-tight">
+            Thanks for applying!
+          </DialogPrimitive.Title>
+          <DialogPrimitive.Description className="text-sm text-muted-foreground mt-2.5 leading-relaxed">
+            We've received your request. Our team will analyse your application and connect with you very soon.
+          </DialogPrimitive.Description>
+        </div>
+
+        <div className="px-6 md:px-7 pt-5 pb-6 flex flex-col gap-3">
+          <Button onClick={onContinue} className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm">
+            Login / Create Account to Fast-Track
+          </Button>
+          <DialogPrimitive.Close asChild>
+            <button className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
+              I'll do this later
+            </button>
+          </DialogPrimitive.Close>
+        </div>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  </DialogPrimitive.Root>
+);
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -248,6 +288,7 @@ export default function Offers() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showApplyConfirmation, setShowApplyConfirmation] = useState(false);
   const [callbackStatus, setCallbackStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
 
   // Consent-style callback request for the zero-offers screen -- tags the
@@ -563,11 +604,11 @@ export default function Offers() {
         toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Redirecting to your dashboard.` });
         navigate("/dashboard", { state: { selectedBank: offer.bankName, leadData } });
       } else {
-        toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Create your account to track it.` });
-        // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
-        // Read from the actual source of truth where Apply.tsx:116 saved it.
-        const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
-        navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
+        // Confirm the application was received and let the user choose when
+        // to log in/create an account to fast-track it, instead of yanking
+        // them straight to /auth before they've seen any confirmation.
+        setShowApplyConfirmation(true);
+        setIsLocking(null);
       }
     } catch {
       toast({ title: "Connection Error", description: "Please try again.", variant: "destructive" });
@@ -575,6 +616,14 @@ export default function Offers() {
       throw new Error("API Gateway routing failed"); // Throw so the error boundary can catch it
     }
   }, [leadData, isAuthenticated, navigate]);
+
+  const handleApplyConfirmationContinue = useCallback(() => {
+    setShowApplyConfirmation(false);
+    // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
+    // Read from the actual source of truth where Apply.tsx:116 saved it.
+    const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
+    navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
+  }, [navigate]);
 
   const handleToggleExpand = useCallback((id: string) => {
     setExpandedCard(prev => prev === id ? null : id);
@@ -752,6 +801,7 @@ export default function Offers() {
       </Helmet>
       <Header />
       <OffersDisclaimerModal open={showDisclaimer} onOpenChange={handleDisclaimerChange} />
+      <ApplyConfirmationModal open={showApplyConfirmation} onOpenChange={setShowApplyConfirmation} onContinue={handleApplyConfirmationContinue} />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">
         {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero CPU rasterization */}
