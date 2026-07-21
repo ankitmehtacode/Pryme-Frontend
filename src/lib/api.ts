@@ -374,7 +374,18 @@ export const PrymeAPI = {
 
   // 🧠 DOCUMENT VAULT: List all docs for an application
   getApplicationDocuments: async (applicationId: string) => fetchWithAuth(`/applications/${applicationId}/documents`, { method: "GET" }),
-  deleteApplicationDocument: async (applicationId: string, docType: string) => fetchWithAuth(`/documents/${applicationId}/${docType}`, { method: "DELETE" }),
+  // 🧠 fetchWithAuth throws rather than resolving to { error } -- wrap it so callers
+  // (Dashboard's handleRemoveDocument) get the real backend message (e.g. 404 "Document
+  // not found") instead of a bare throw that gets swallowed into a generic catch-all toast.
+  deleteApplicationDocument: async (applicationId: string, docType: string) => {
+    try {
+      const data = await fetchWithAuth(`/documents/${applicationId}/${docType}`, { method: "DELETE" });
+      return { data, error: null };
+    } catch (error: any) {
+      console.error("Document vault delete failed:", error);
+      return { data: null, error: { message: error.message || "Failed to remove document. Please try again." } };
+    }
+  },
   deleteDocument: async (documentId: string) => fetchWithAuth(`/documents/${documentId}`, { method: "DELETE" }),
 
   getMyApplications: async () => fetchWithAuth("/applications/me", { method: "GET" }),
