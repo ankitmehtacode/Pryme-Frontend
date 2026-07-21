@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  User, Calendar, MapPin, Building, Building2, CreditCard, Mail, Phone,
+  User, Calendar, MapPin, Building, Building2, CreditCard, Phone,
   Users, GraduationCap, IndianRupee, Briefcase, Landmark, Camera,
   Loader2, Percent, FileText, Stethoscope, Scale, Home, UserPlus
 } from "lucide-react";
@@ -229,12 +229,6 @@ function PersonalInfoSection({
         <StyledSelect label="Religion" icon={Users} value={data.religion} onValueChange={(v) => onUpdate({ religion: v })} placeholder="Select religion">
           {RELIGION_OPTIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
         </StyledSelect>
-        {isCoApplicant ? (
-          <ValidatedInput label="Email (Personal)" icon={Mail} type="email" value={data.email || ""} onChange={(e: any) => onUpdate({ email: e.target.value })} />
-        ) : (
-          <FrozenField label="Email (Personal)" icon={Mail} value={data.email} />
-        )}
-        <ValidatedInput label="Email (Work)" icon={Mail} type="email" value={data.emailOfficial || ""} onChange={(e: any) => onUpdate({ emailOfficial: e.target.value })} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
