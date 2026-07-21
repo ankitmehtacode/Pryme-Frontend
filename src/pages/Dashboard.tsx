@@ -1069,7 +1069,7 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
               >
-                <Surface className="aurora-gradient border-b border-[hsl(var(--border))] mb-[var(--space-lg)]">
+                <Surface className="relative overflow-hidden rounded-3xl border border-slate-200/60 shadow-sm bg-gradient-to-br from-white via-white to-blue-50/40 mb-[var(--space-md)]">
                   <Section spacing="lg">
                     <Container size="expanded">
                     <Inline justify="space-between" align="end" className="flex-col md:flex-row gap-[var(--space-4)]">
@@ -1077,18 +1077,20 @@ const Dashboard: React.FC = () => {
                         <h1 className="text-2xl md:text-3xl font-bold text-[hsl(var(--foreground))] mb-[var(--space-2)] tracking-tight">Client Portfolio</h1>
                         <p className="text-[hsl(var(--muted-foreground))] text-[length:var(--text-large)]">Real-time tracking for your active financial instruments.</p>
                       </motion.div>
-                      <Inline gap="var(--space-3)" align="center">
-                        {isAdmin && (
-                          <Button onClick={() => navigate("/admin")} variant="outline" className="border-[hsl(var(--border))]">
-                            <Building2 className="w-4 h-4 mr-2" /> Admin Core
-                          </Button>
-                        )}
-                        <Link to="/apply">
-                          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
-                            New Application <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </Link>
-                      </Inline>
+                      {viewState !== "EMPTY" && (
+                        <Inline gap="var(--space-3)" align="center">
+                          {isAdmin && (
+                            <Button onClick={() => navigate("/admin")} variant="outline" className="border-[hsl(var(--border))]">
+                              <Building2 className="w-4 h-4 mr-2" /> Admin Core
+                            </Button>
+                          )}
+                          <Link to="/apply">
+                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+                              New Application <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
+                        </Inline>
+                      )}
                     </Inline>
                     </Container>
                   </Section>
@@ -1097,15 +1099,45 @@ const Dashboard: React.FC = () => {
                 <Section spacing="none">
                   <Container size="expanded">
                   {viewState === "EMPTY" ? (
-                    <Surface className="text-center shadow-sm">
+                    <Surface className="relative overflow-hidden rounded-3xl border border-slate-200/60 shadow-lg shadow-slate-200/40 bg-gradient-to-br from-white via-white to-blue-50/30">
                       <Section spacing="2xl">
                         <Container size="full">
-                      <div className="w-20 h-20 bg-[hsl(var(--muted))]/60 rounded-full flex items-center justify-center mx-auto mb-[var(--space-6)] border border-[hsl(var(--border))]/50">
-                        <FileText className="w-8 h-8 text-[hsl(var(--muted-foreground))]" />
-                      </div>
-                      <h3 className="text-[length:var(--text-heading)] font-bold text-[hsl(var(--foreground))] mb-[var(--space-2)]">No Active Instruments</h3>
-                      <p className="text-[hsl(var(--muted-foreground))] mb-[var(--space-8)] max-w-md mx-auto">Your portfolio is empty. Click below to initiate a new loan application and explore our banking partners.</p>
-                      <Link to="/apply"><Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700 text-white">Initialize Application</Button></Link>
+                          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={spring}
+                              className="flex-1 text-center lg:text-left max-w-lg mx-auto lg:mx-0"
+                            >
+                              <Inline gap="var(--space-2)" align="center" className="text-blue-600 font-bold text-xs uppercase tracking-widest justify-center lg:justify-start mb-3">
+                                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                                Your Portfolio
+                              </Inline>
+                              <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3">No Active Instruments</h3>
+                              <p className="text-slate-500 font-medium leading-relaxed mb-8">
+                                Your portfolio is empty. Start a new application to explore offers from our banking partners and track it right here.
+                              </p>
+                              <Link to="/apply">
+                                <Button
+                                  size="lg"
+                                  className="h-12 px-8 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 rounded-xl transition-all hover:-translate-y-0.5"
+                                >
+                                  Initialize Application <ArrowRight className="w-4 h-4 ml-2" />
+                                </Button>
+                              </Link>
+                              <Inline gap="var(--space-2)" align="center" className="justify-center lg:justify-start mt-6 text-xs font-semibold text-slate-400">
+                                <Lock className="w-3.5 h-3.5" /> Takes less than 5 minutes &middot; 100% secure &amp; confidential
+                              </Inline>
+                            </motion.div>
+
+                            <div className="flex-1 flex justify-center lg:justify-end">
+                              <img
+                                src={applicationBannerImg}
+                                alt=""
+                                className="w-56 md:w-72 h-auto object-contain animate-float-medium drop-shadow-xl select-none pointer-events-none"
+                              />
+                            </div>
+                          </div>
                         </Container>
                       </Section>
                     </Surface>
