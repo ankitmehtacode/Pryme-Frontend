@@ -218,6 +218,8 @@ interface CibilTipsProps {
   calculatorHeight?: number;
 }
 
+const INITIAL_VISIBLE_TIPS = 6;
+
 const CibilTips = ({ calculatorHeight }: CibilTipsProps = {}) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [filter, setFilter] = useState<string>("all");
@@ -225,6 +227,13 @@ const CibilTips = ({ calculatorHeight }: CibilTipsProps = {}) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredTips = filter === "all" ? tips : tips.filter(t => t.category === filter);
+  // 🧠 showAll previously only affected the container's height animation --
+  // every tip was still rendered underneath, just clipped/scrollable. That
+  // meant "collapsed" showed however many tips fit calculatorHeight (or all
+  // of them, on pages like Apply.tsx that don't pass calculatorHeight at
+  // all) instead of a predictable, small number. Slice the actual list so
+  // collapsed always means "a handful", regardless of container height.
+  const visibleTips = showAll ? filteredTips : filteredTips.slice(0, INITIAL_VISIBLE_TIPS);
 
   const toggleTip = (index: number) => {
     setExpandedIndex(prev => (prev === index ? null : index));
@@ -328,7 +337,7 @@ const CibilTips = ({ calculatorHeight }: CibilTipsProps = {}) => {
         className="space-y-2 relative z-10 flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-4 pr-3 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border dark:[&::-webkit-scrollbar-thumb]:bg-white/10"
       >
         <AnimatePresence>
-          {filteredTips.map((tip, index) => {
+          {visibleTips.map((tip, index) => {
             const isExpanded = expandedIndex === index;
             const Icon = tip.icon;
             const colors = impactColors[tip.impactType];
@@ -440,14 +449,14 @@ const CibilTips = ({ calculatorHeight }: CibilTipsProps = {}) => {
         </AnimatePresence>
       </div>
 
-      {/* See All / Show Less button */}
-      {filteredTips.length > 3 && (
+      {/* View All / Show Less button */}
+      {filteredTips.length > INITIAL_VISIBLE_TIPS && (
         <div className="flex justify-center mt-3 mb-1 relative z-10">
           <button
             onClick={() => setShowAll(!showAll)}
             className="w-full sm:w-auto bg-primary/10 dark:bg-[#103783]/20 border border-primary/20 dark:border-[#103783]/40 hover:bg-primary/20 dark:hover:bg-[#103783]/30 text-primary dark:text-[#3876f2] font-bold text-[10px] md:text-xs px-6 py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
           >
-            <span>{showAll ? "See Less" : `See All Tips (+${filteredTips.length - 3})`}</span>
+            <span>{showAll ? "See Less" : `View All Tips (+${filteredTips.length - INITIAL_VISIBLE_TIPS})`}</span>
             <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", showAll && "rotate-180")} />
           </button>
         </div>
