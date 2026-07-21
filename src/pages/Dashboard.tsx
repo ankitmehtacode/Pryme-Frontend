@@ -4,9 +4,10 @@ import { Helmet } from "react-helmet-async";
 import {
   FileText, Search, CheckCircle, Clock,
   AlertCircle, Building2, TrendingUp, Activity,
-  ShieldCheck, ChevronRight, ArrowRight, Wallet,
+  ShieldCheck, ChevronRight, ChevronDown, ArrowRight, Wallet,
   UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X,
-  User, Briefcase, Lock, Mail, Users, Award, Check, Plus, Phone, Landmark, Coins
+  User, Briefcase, Lock, Mail, Users, Award, Check, Plus, Phone, Landmark, Coins,
+  CalendarDays, Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -15,6 +16,7 @@ import { PageShell, Surface, Stack, Inline, Container, Section, SplitLayout } fr
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn, buildCleanMetadata, formatISTDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -74,6 +76,9 @@ type ViewState = "LOADING" | "FUNNEL" | "DASHBOARD" | "EMPTY";
 
 const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 
+const formatINR = (value: number) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
+
 const getStatusConfig = (status: string) => {
   switch (status?.toUpperCase()) {
     case "SUBMITTED":
@@ -107,6 +112,7 @@ const Dashboard: React.FC = () => {
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
   const [dragOverDocId, setDragOverDocId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
 
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
@@ -755,48 +761,128 @@ const Dashboard: React.FC = () => {
                               </div>
                             </div>
                             
-                            {/* Summary Grid */}
-                            <div className="grid grid-cols-1 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                              <div>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Identity & Location</h4>
-                                <div className="space-y-1.5 text-xs">
-                                  <p><span className="text-slate-500">PAN:</span> <span className="font-bold text-slate-800">{formData.panNumber}</span></p>
-                                  <p><span className="text-slate-500">DOB:</span> <span className="font-bold text-slate-800">{formData.dob}</span></p>
-                                  <p><span className="text-slate-500">City:</span> <span className="font-bold text-slate-800">{formData.currentCity} ({formData.pinCode})</span></p>
+                            {/* Overall Progress */}
+                            {(() => {
+                              const totalDocsCount = docGroups.reduce((sum, g) => sum + g.docs.length, 0);
+                              const uploadedDocsCount = docGroups.reduce((sum, g) => sum + g.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length, 0);
+                              const overallPercent = totalDocsCount > 0 ? Math.round((uploadedDocsCount / totalDocsCount) * 100) : 0;
+                              return (
+                                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                                  <p className="text-sm font-semibold text-slate-500 mb-3">Overall Progress</p>
+                                  <div className="flex items-center gap-6">
+                                    <span className="text-4xl font-black text-blue-600 leading-none shrink-0">{overallPercent}%</span>
+                                    <Progress value={overallPercent} className="h-2 flex-1 bg-slate-100 [&>div]:bg-blue-600" />
+                                    <span className="text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">{uploadedDocsCount} / {totalDocsCount} Documents Uploaded</span>
+                                  </div>
+                                  <p className="text-xs font-medium text-slate-500 mt-2">{uploadedDocsCount} of {totalDocsCount} Uploaded</p>
                                 </div>
+                              );
+                            })()}
+
+                            {/* Loan Details (from previous step) */}
+                            <div className="bg-white border border-slate-100 rounded-2xl p-5">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Loan Details (from previous step)</p>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+                                {[
+                                  {
+                                    icon: Wallet,
+                                    label: "Loan Amount",
+                                    value: (Number(formData.requestedAmount) || activeApplication?.requestedAmount || store.loanRequirements?.loanAmount)
+                                      ? formatINR(Number(formData.requestedAmount) || activeApplication?.requestedAmount || store.loanRequirements?.loanAmount || 0)
+                                      : "—",
+                                  },
+                                  {
+                                    icon: CalendarDays,
+                                    label: "Tenure",
+                                    value: formData.tenure || store.loanRequirements?.tenureYears
+                                      ? `${formData.tenure || store.loanRequirements?.tenureYears} Years`
+                                      : "—",
+                                  },
+                                  {
+                                    icon: FileText,
+                                    label: "Loan Type",
+                                    value: activeApplication?.loanType || store.loanRequirements?.loanType || "—",
+                                  },
+                                  {
+                                    icon: Award,
+                                    label: "Credit Score",
+                                    value: store.loanRequirements?.cibilScore || "—",
+                                  },
+                                  {
+                                    icon: Home,
+                                    label: "Property Value",
+                                    value: (store.loanRequirements?.propertyValue || store.financialFootprint?.estimatedPropertyValue)
+                                      ? formatINR(store.loanRequirements?.propertyValue || store.financialFootprint?.estimatedPropertyValue || 0)
+                                      : "—",
+                                  },
+                                ].map((item) => (
+                                  <div key={item.label} className="flex flex-col gap-1.5 min-w-0">
+                                    <item.icon className="w-4 h-4 text-blue-500" />
+                                    <p className="text-[11px] text-slate-500 font-medium">{item.label}</p>
+                                    <p className="text-sm font-bold text-slate-800 truncate">{item.value}</p>
+                                  </div>
+                                ))}
                               </div>
                             </div>
 
                             {/* Documents Upload Section */}
                             <Stack gap="var(--space-4)">
-                              <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-blue-500" /> Required Documentation
-                              </h3>
-                              
-                              <Stack gap="var(--space-4)">
+                              <Inline justify="space-between" align="center">
+                                <Inline align="center" gap="var(--space-3)">
+                                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                                    <FileText className="w-5 h-5 text-orange-500" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-bold text-slate-800 text-base">Upload Documents</h3>
+                                    <p className="text-xs text-slate-500 font-medium">Upload the required documents to proceed.</p>
+                                  </div>
+                                </Inline>
+                                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full shrink-0">
+                                  {docGroups.reduce((sum, g) => sum + g.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length, 0)} Uploaded
+                                </span>
+                              </Inline>
+
+                              <Stack gap="var(--space-3)">
                                 {docGroups.map((group) => {
-                                  const categoryColors: Record<string, string> = {
-                                    "Identity Documents": "bg-blue-500",
-                                    "Income Documents": "bg-emerald-500",
-                                    "Property Documents": "bg-amber-500",
-                                    "Financial Documents": "bg-purple-500",
-                                    "Business Proof": "bg-indigo-500",
-                                    "Additional Documents": "bg-slate-500"
+                                  const categorySubtitles: Record<string, string> = {
+                                    "Identity Documents": "Upload identity-related documents",
+                                    "Income Documents": "Upload income-related documents",
+                                    "Property Documents": "Upload property-related documents",
+                                    "Financial Documents": "Upload financial-related documents",
+                                    "Business Proof": "Upload business-related documents",
+                                    "Additional Documents": "Upload any additional supporting documents"
                                   };
-                                  const badgeColor = categoryColors[group.displayName] || "bg-blue-500";
-                                  
+                                  const subtitle = categorySubtitles[group.displayName] || `Upload ${group.displayName.toLowerCase()}`;
+
                                   const totalDocs = group.docs.length;
                                   const securedDocs = group.docs.filter(d => uploadedDocs[d.id] || uploadedDocs[normalizeDocName(d.name)]).length;
+                                  const isOpen = !collapsedCategories[group.category];
 
                                   return (
-                                    <div key={group.category} className="relative pl-6">
-                                      <div className={`absolute left-0 top-0 bottom-0 w-1 ${badgeColor} rounded-full opacity-60`}></div>
-                                      <Inline justify="space-between" align="center" className="mb-2">
-                                        <h4 className="text-xs font-bold tracking-wider text-slate-500 uppercase">{group.displayName}</h4>
-                                        <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">{securedDocs} / {totalDocs} Uploaded</span>
-                                      </Inline>
-                                      
-                                      <Stack gap="var(--space-3)">
+                                    <Collapsible
+                                      key={group.category}
+                                      open={isOpen}
+                                      onOpenChange={(open) => setCollapsedCategories(prev => ({ ...prev, [group.category]: !open }))}
+                                      className="border border-slate-100 rounded-2xl overflow-hidden"
+                                    >
+                                      <CollapsibleTrigger className="w-full flex items-center justify-between gap-3 p-4 hover:bg-slate-50/60 transition-colors">
+                                        <Inline align="center" gap="var(--space-3)">
+                                          <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+                                            <FileText className="w-4 h-4 text-orange-500" />
+                                          </div>
+                                          <div className="text-left">
+                                            <h4 className="text-sm font-bold text-slate-800">{group.displayName}</h4>
+                                            <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+                                          </div>
+                                        </Inline>
+                                        <Inline align="center" gap="var(--space-3)" className="shrink-0">
+                                          <span className="text-xs font-semibold text-slate-500">{securedDocs} / {totalDocs} Uploaded</span>
+                                          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                                        </Inline>
+                                      </CollapsibleTrigger>
+
+                                      <CollapsibleContent>
+                                      <Stack gap="var(--space-3)" className="px-4 pb-4">
                                         {group.docs.map((doc) => {
                                           const isUploading = uploadingDocs[doc.id];
                                           const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
@@ -881,7 +967,8 @@ const Dashboard: React.FC = () => {
                                           );
                                         })}
                                       </Stack>
-                                    </div>
+                                      </CollapsibleContent>
+                                    </Collapsible>
                                   );
                                 })}
                               </Stack>
