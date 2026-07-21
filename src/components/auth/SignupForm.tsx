@@ -54,7 +54,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
           title: "Account Created",
           description: isAdminOrEmployee
             ? "Welcome to Pryme! Redirecting to admin dashboard..."
-            : "Welcome to Pryme! Redirecting to home page...",
+            : "Welcome to Pryme! Redirecting to your profile...",
         });
 
         if (from) {
@@ -62,7 +62,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         } else if (isAdminOrEmployee) {
           navigate("/admin", { replace: true });
         } else {
-          navigate("/", { replace: true });
+          navigate("/profile", { replace: true });
         }
       }
     }
@@ -117,7 +117,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         <div className="relative">
           <Input
             type={showPw ? "text" : "password"}
-            placeholder="••••••••"
+            placeholder="Create a password"
             className="h-11 rounded-xl px-3.5 text-sm"
             {...form.register("password")}
           />
@@ -135,7 +135,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         <div className="relative">
           <Input
             type={showConfirmPw ? "text" : "password"}
-            placeholder="••••••••"
+            placeholder="Re-enter your password"
             className="h-11 rounded-xl px-3.5 text-sm"
             {...form.register("confirmPassword")}
           />

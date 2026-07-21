@@ -60,15 +60,19 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
     // 🧠 GLOBAL INTERCEPTOR: The "Dead Session" Guillotine
     // ZERO localStorage. We dispatch a custom event that useAuth listens to.
-    // CRITICAL: Do NOT fire on boot-sequence endpoints. A 401 on /auth/me or
-    // /config/dictionaries during initial load is EXPECTED (user not logged in).
+    // CRITICAL: Do NOT fire on boot-sequence OR pre-auth endpoints. A 401 on
+    // /auth/me or /config/dictionaries during initial load is EXPECTED (user
+    // not logged in). A 401/403 on /auth/login, /auth/register, or /auth/google
+    // means "wrong credentials" -- there's no session yet to have expired --
+    // so it must fall through to the normal error-parsing block below and
+    // surface the backend's actual message instead of a hardcoded "Session
+    // expired" that shows on every failed login/signup attempt.
     // Firing pryme_auth_expired here causes a deadlock: useAuth wipes queries
     // mid-hydration, and the AppInitializer never resolves.
-    if (response.status === 401 || response.status === 403) {
-      const isBootEndpoint = endpoint.includes("/auth/me") || endpoint.includes("/config/");
-      if (!isBootEndpoint) {
-        window.dispatchEvent(new Event("pryme_auth_expired"));
-      }
+    const isPreAuthEndpoint = endpoint.includes("/auth/me") || endpoint.includes("/config/") ||
+      endpoint.includes("/auth/login") || endpoint.includes("/auth/register") || endpoint.includes("/auth/google");
+    if ((response.status === 401 || response.status === 403) && !isPreAuthEndpoint) {
+      window.dispatchEvent(new Event("pryme_auth_expired"));
       throw new Error("Session expired. Please sign in again.");
     }
 

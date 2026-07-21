@@ -112,7 +112,7 @@ export const LoginForm = ({ onForgotPassword, from, children }: LoginFormProps) 
         >
           <Input
             type={showPw ? "text" : "password"}
-            placeholder="••••••••"
+            placeholder="Enter your password"
             className={cn("h-11 rounded-xl px-3.5 text-sm", form.formState.errors.password ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : "")}
             {...form.register("password", {
               onChange: () => {

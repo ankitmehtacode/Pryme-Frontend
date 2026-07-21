@@ -94,7 +94,7 @@ export function AuthForms() {
         toast({
           title: "Welcome to Pryme",
           description: isNewUser
-            ? "Your account has been created successfully. Redirecting to home page..."
+            ? "Your account has been created successfully. Redirecting to your profile..."
             : "Successfully signed in with Google.",
         });
 
@@ -104,7 +104,7 @@ export function AuthForms() {
           navigate("/admin", { replace: true });
         } else {
           if (isNewUser) {
-            navigate("/", { replace: true });
+            navigate("/profile", { replace: true });
           } else {
             navigate("/dashboard", { replace: true });
           }
