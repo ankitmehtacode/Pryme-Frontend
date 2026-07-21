@@ -17,7 +17,7 @@ import {
   PROFESSION_SUB_SPECIALTIES,
 } from "@/lib/applicationTypes";
 import type {
-  ReferenceContact, EmployerCategory, ModeOfWork, AddressOwnership,
+  ReferenceContact, ModeOfWork, AddressOwnership,
   SalariedDetails, ProfessionalDetails, BusinessDetails, FinancialDetails,
 } from "@/lib/applicationTypes";
 
@@ -293,7 +293,7 @@ function OccupationSection({ financialDetails }: { financialDetails: FinancialDe
     return (
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <FrozenField label="Employer Type (Original)" icon={Briefcase} value={d.subType ? SALARIED_LABELS[d.subType] : undefined} />
+          <FrozenField label="Employer Type" icon={Briefcase} value={d.subType ? SALARIED_LABELS[d.subType] : undefined} />
           <FrozenField label="Company Name" icon={Building2} value={d.companyName} />
           <FrozenField label="Designation" icon={Briefcase} value={d.designation} />
         </div>
@@ -374,12 +374,6 @@ function OccupationNewFieldsSection({
     const d = financialDetails.data as SalariedDetails;
     return (
       <div className="space-y-5 pt-1">
-        <PillSelector<EmployerCategory>
-          label="Employer Type"
-          options={[{ value: "PRIVATE", label: "Private" }, { value: "PUBLIC", label: "Public" }, { value: "GOVERNMENT", label: "Government" }]}
-          value={d.employerCategory || null}
-          onChange={(v) => onUpdateSalaried({ employerCategory: v })}
-        />
         <PillSelector<ModeOfWork>
           label="Mode of Work"
           options={[{ value: "REMOTE", label: "Remote" }, { value: "ONSITE", label: "On-site" }, { value: "HYBRID", label: "Hybrid" }]}
