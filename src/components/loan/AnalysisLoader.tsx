@@ -307,12 +307,12 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="mt-12 flex items-center gap-8 md:gap-12 px-8 py-5 rounded-2xl border border-slate-200/60 dark:border-white/[0.04] bg-white/70 dark:bg-white/[0.02] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none backdrop-blur-md"
+              className="mt-12 w-full max-w-full flex flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:gap-x-8 md:gap-x-12 px-4 sm:px-8 py-4 sm:py-5 rounded-2xl border border-slate-200/60 dark:border-white/[0.04] bg-white/70 dark:bg-white/[0.02] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none backdrop-blur-md"
             >
               {[
                 { label: "CREDIT SCORE", value: data?.cibilScore ? String(data.cibilScore) : "—" },
-                { 
-                  label: "PRODUCT", 
+                {
+                  label: "PRODUCT",
                   value: (() => {
                     if (!data?.productType) return "—";
                     let t = data.productType.replace(/_/g, " ").toLowerCase();
@@ -327,11 +327,11 @@ const AnalysisLoader = ({ isVisible, onComplete, data }: AnalysisLoaderProps) =>
                 },
                 { label: "STATUS", value: "ENCRYPTED" },
               ].map((stat, i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 tracking-[0.2em] mb-1.5 uppercase whitespace-nowrap">
+                <div key={i} className="flex flex-col items-center min-w-0">
+                  <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-white/20 tracking-[0.1em] sm:tracking-[0.2em] mb-1.5 uppercase whitespace-nowrap">
                     {stat.label}
                   </p>
-                  <p className="text-sm font-bold text-slate-800 dark:text-white/60 tabular-nums whitespace-nowrap">
+                  <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white/60 tabular-nums whitespace-nowrap">
                     {stat.value}
                   </p>
                 </div>
