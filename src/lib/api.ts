@@ -298,7 +298,17 @@ export const PrymeAPI = {
   // 🧠 USER PROFILE MANAGEMENT
   getProfile: async () => fetchWithAuth("/users/profile", { method: "GET" }),
   updateProfile: async (data: any) => fetchWithAuth("/users/profile", { method: "PUT", body: JSON.stringify(data) }),
-  initiateAvatarUpload: async (contentType: string) => fetchWithAuth("/users/profile/avatar/initiate-upload", { method: "POST", body: JSON.stringify({ contentType }) }),
+  // 🧠 The backend returns a flat { uploadUrl, documentId, expiresAt } body (no `data`
+  // wrapper) -- wrap it here so callers can use the same { data, error } contract as
+  // uploadApplicationDocument instead of destructuring a field that never existed.
+  initiateAvatarUpload: async (contentType: string) => {
+    try {
+      const data = await fetchWithAuth("/users/profile/avatar/initiate-upload", { method: "POST", body: JSON.stringify({ contentType }) });
+      return { data, error: null };
+    } catch (error: any) {
+      return { data: null, error: { message: error.message || "Could not prepare the photo upload." } };
+    }
+  },
 
   verifyIdentityNumber: async (applicationId: string, idType: "PAN" | "AADHAR", idNumber: string) => fetchWithAuth("/documents/verify-id", { method: "POST", body: JSON.stringify({ applicationId, idType, idNumber }) }),
   

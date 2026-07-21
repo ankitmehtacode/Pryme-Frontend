@@ -138,14 +138,20 @@ function PhotoUploadPair({ applicationId, existingCoApplicantPhotoUrl }: { appli
   const handleApplicantUpload = async (file: File) => {
     setIsApplicantUploading(true);
     try {
-      const { data } = await PrymeAPI.initiateAvatarUpload(file.type);
-      if (!data?.uploadUrl) throw new Error("Could not get upload URL");
-      await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-      await PrymeAPI.updateProfile({ profilePictureUrl: data.documentId });
-      setApplicantPhotoUrl(data.documentId);
+      const { data, error } = await PrymeAPI.initiateAvatarUpload(file.type);
+      if (error || !data?.uploadUrl) throw new Error(error?.message || "Could not get upload URL");
+
+      const s3Response = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!s3Response.ok) throw new Error("Upload rejected by secure vault. Please try again.");
+
+      // 🧠 data.documentId is the raw S3 object key, not a viewable URL -- updateProfile's
+      // response re-resolves it into a presigned download URL (same as getProfile does on
+      // load), so use that for the preview instead of the raw key.
+      const updated: any = await PrymeAPI.updateProfile({ profilePictureUrl: data.documentId });
+      setApplicantPhotoUrl(updated?.profilePictureUrl || data.documentId);
       toast({ title: "Photo Updated", description: "Applicant photo has been saved." });
-    } catch {
-      toast({ title: "Upload Failed", description: "Could not upload the applicant's photo.", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Upload Failed", description: err?.message || "Could not upload the applicant's photo.", variant: "destructive" });
     } finally {
       setIsApplicantUploading(false);
     }
