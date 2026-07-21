@@ -746,11 +746,6 @@ const Dashboard: React.FC = () => {
                               applicationId={activeApplication?.applicationId?.startsWith("pending-") ? undefined : activeApplication?.applicationId}
                               existingCoApplicantPhotoUrl={activeApplication?.documents?.find(d => d.name === "Co-Applicant Photo" || d.docType === "Co-Applicant Photo")?.url}
                             />
-
-                            <div className="bg-blue-50/40 border border-blue-100/50 p-4 rounded-xl flex gap-3 items-center text-blue-700">
-                              <Lock className="w-4 h-4 shrink-0" />
-                              <span className="text-xs font-semibold">We use this information to fetch your credit profile securely.</span>
-                            </div>
                           </Stack>
                         )}
 
