@@ -93,12 +93,6 @@ const buildHomeLoanDocs = (empType: EmploymentType): DocumentItem[] => {
     { id: "hl_receipts", label: "Payment receipts", category: "Property" }
   );
 
-  // Additional
-  docs.push(
-    { id: "hl_existing_loan", label: "Existing loan statements (if any)", category: "Additional", optional: true },
-    { id: "hl_cc_stmt", label: "Credit card statements (if required)", category: "Additional", optional: true }
-  );
-
   return docs;
 };
 
@@ -142,12 +136,6 @@ const buildLAPDocs = (empType: EmploymentType): DocumentItem[] => {
     );
   }
 
-  // Additional
-  docs.push(
-    { id: "lap_existing_loan", label: "Existing loan statements (if any)", category: "Additional", optional: true },
-    { id: "lap_cc_stmt", label: "Credit card statements (if required)", category: "Additional", optional: true }
-  );
-
   return docs;
 };
 
@@ -181,10 +169,11 @@ const buildBusinessLoanDocs = (): DocumentItem[] => {
     { id: "bl_partnership", label: "Partnership Deed / MOA-AOA", category: "Business Proof", optional: true }
   );
 
-  // Additional
+  // Additional (for higher limits)
   docs.push(
-    { id: "bl_existing_loan", label: "Existing loan statements (if any)", category: "Additional", optional: true },
-    { id: "bl_cc_stmt", label: "Credit card statements (if required)", category: "Additional", optional: true }
+    { id: "bl_debtors_creditors", label: "Debtors & Creditors list", category: "Additional", optional: true },
+    { id: "bl_cma", label: "CMA data", category: "Additional", optional: true },
+    { id: "bl_provisional", label: "Provisional financials", category: "Additional", optional: true }
   );
 
   return docs;
