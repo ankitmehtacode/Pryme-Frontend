@@ -41,6 +41,7 @@ interface Application {
   status: string;
   loanType: string;
   requestedAmount: number;
+  declaredCibilScore?: number;
   completionPercentage: number;
   createdAt: string;
   assignee?: string;
@@ -780,50 +781,55 @@ const Dashboard: React.FC = () => {
                             })()}
 
                             {/* Loan Details (from previous step) */}
-                            <div className="bg-white border border-slate-100 rounded-2xl p-5">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Loan Details (from previous step)</p>
-                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
-                                {[
-                                  {
-                                    icon: Wallet,
-                                    label: "Loan Amount",
-                                    value: (Number(formData.requestedAmount) || activeApplication?.requestedAmount || store.loanRequirements?.loanAmount)
-                                      ? formatINR(Number(formData.requestedAmount) || activeApplication?.requestedAmount || store.loanRequirements?.loanAmount || 0)
-                                      : "—",
-                                  },
-                                  {
-                                    icon: CalendarDays,
-                                    label: "Tenure",
-                                    value: formData.tenure || store.loanRequirements?.tenureYears
-                                      ? `${formData.tenure || store.loanRequirements?.tenureYears} Years`
-                                      : "—",
-                                  },
-                                  {
-                                    icon: FileText,
-                                    label: "Loan Type",
-                                    value: activeApplication?.loanType || store.loanRequirements?.loanType || "—",
-                                  },
-                                  {
-                                    icon: Award,
-                                    label: "Credit Score",
-                                    value: store.loanRequirements?.cibilScore || "—",
-                                  },
-                                  {
-                                    icon: Home,
-                                    label: "Property Value",
-                                    value: (store.loanRequirements?.propertyValue || store.financialFootprint?.estimatedPropertyValue)
-                                      ? formatINR(store.loanRequirements?.propertyValue || store.financialFootprint?.estimatedPropertyValue || 0)
-                                      : "—",
-                                  },
-                                ].map((item) => (
-                                  <div key={item.label} className="flex flex-col gap-1.5 min-w-0">
-                                    <item.icon className="w-4 h-4 text-blue-500" />
-                                    <p className="text-[11px] text-slate-500 font-medium">{item.label}</p>
-                                    <p className="text-sm font-bold text-slate-800 truncate">{item.value}</p>
+                            {(() => {
+                              const appLoanAmount = Number(activeApplication?.requestedAmount) || 0;
+                              const appTenure = activeApplication?.metadata?.tenure;
+                              const appCibilScore = activeApplication?.declaredCibilScore;
+                              const appPropertyValue = Number(activeApplication?.metadata?.propertyValue) || 0;
+
+                              const loanDetails = [
+                                {
+                                  icon: Wallet,
+                                  label: "Loan Amount",
+                                  value: appLoanAmount > 0 ? formatINR(appLoanAmount) : "—",
+                                },
+                                {
+                                  icon: CalendarDays,
+                                  label: "Tenure",
+                                  value: appTenure ? `${appTenure} Years` : "—",
+                                },
+                                {
+                                  icon: FileText,
+                                  label: "Loan Type",
+                                  value: activeApplication?.loanType || "—",
+                                },
+                                {
+                                  icon: Award,
+                                  label: "Credit Score",
+                                  value: appCibilScore || "—",
+                                },
+                                {
+                                  icon: Home,
+                                  label: "Property Value",
+                                  value: appPropertyValue > 0 ? formatINR(appPropertyValue) : "—",
+                                },
+                              ];
+
+                              return (
+                                <div className="bg-white border border-slate-100 rounded-2xl p-5">
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Loan Details (from previous step)</p>
+                                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+                                    {loanDetails.map((item) => (
+                                      <div key={item.label} className="flex flex-col gap-1.5 min-w-0">
+                                        <item.icon className="w-4 h-4 text-blue-500" />
+                                        <p className="text-[11px] text-slate-500 font-medium">{item.label}</p>
+                                        <p className="text-sm font-bold text-slate-800 truncate">{item.value}</p>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
-                            </div>
+                                </div>
+                              );
+                            })()}
 
                             {/* Documents Upload Section */}
                             <Stack gap="var(--space-4)">
