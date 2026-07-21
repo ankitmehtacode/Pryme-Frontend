@@ -446,7 +446,6 @@ export function CustomerLoanInformationStep({
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <User className="w-4 h-4 text-primary" /> Applicant Information
         </h3>
-        <FrozenField label="PAN Number" icon={CreditCard} value={store.basicKYC.panNumber} />
         <PersonalInfoSection data={store.basicKYC} onUpdate={store.updateBasicKYC} />
 
         <h4 className="text-sm font-bold text-foreground flex items-center gap-2 pt-2">
