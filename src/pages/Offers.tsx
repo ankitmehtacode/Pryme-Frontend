@@ -785,7 +785,7 @@ export default function Offers() {
                   : []),
               ].map((s, i) => (
                 <div key={i} className="shrink-0 min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 whitespace-nowrap">{s.label}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 leading-tight md:whitespace-nowrap">{s.label}</p>
                   <p className="text-[13px] md:text-sm font-bold text-foreground tabular-nums truncate">{s.value}</p>
                 </div>
               ))}
