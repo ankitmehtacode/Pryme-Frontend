@@ -242,7 +242,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                     ? 'bg-slate-100 dark:bg-white/10 text-foreground'
                     : 'bg-transparent text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5'
                   }`}
-                title="View requirements"
+                title="View complete cost breakdown"
               >
                 <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
               </button>
@@ -367,6 +367,10 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   )}
                 </div>
               </div>
+              <div className="flex justify-between items-center pt-1">
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Processing Fees</p>
+                <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">₹{pfAmount.toLocaleString("en-IN")}</p>
+              </div>
               {!isFullyFunded ? (
                 <div className="mt-2 flex items-center justify-between gap-2 bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
                   <p className="text-[11px] font-extrabold tabular-nums tracking-tight truncate text-amber-600 dark:text-amber-400">
@@ -388,6 +392,21 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   </p>
                 </div>
               )}
+
+              <button
+                onClick={() => onToggleExpand(offer.id)}
+                className={`mt-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all duration-300
+                  ${isExpanded
+                    ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
+                    : 'bg-white dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08]'
+                  }`}
+                style={isExpanded ? { color: brand } : undefined}
+              >
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                  Complete Cost Break Down
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
             </div>
 
             {/* ── Amount Capping Info Banner (shown when requested > max eligible) ── */}
