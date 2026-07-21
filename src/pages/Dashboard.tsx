@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -339,35 +339,7 @@ const Dashboard: React.FC = () => {
     };
   }, [activeApplication, viewState]);
 
-  const validateCurrentStage = useCallback((): boolean => {
-    switch (currentStage) {
-      case 1:
-        if (!formData.panNumber || formData.panNumber.length !== 10) {
-          toast({ title: "Invalid PAN", description: "Please enter a valid 10-character PAN number.", variant: "destructive" });
-          return false;
-        }
-        if (!formData.dob) {
-          toast({ title: "Date of Birth Required", description: "Please provide your date of birth.", variant: "destructive" });
-          return false;
-        }
-        if (!formData.currentCity) {
-          toast({ title: "City Required", description: "Please enter your current city.", variant: "destructive" });
-          return false;
-        }
-        if (formData.pinCode.length < 6) {
-          toast({ title: "Invalid PIN Code", description: "Please enter a valid 6-digit PIN code.", variant: "destructive" });
-          return false;
-        }
-        break;
-      // Stages 2+ are document uploads, which have their own validation logic
-      default:
-        break;
-    }
-    return true;
-  }, [currentStage, formData]);
-
   const handleNextStage = async () => {
-    if (!validateCurrentStage()) return;
     if (!activeApplication) return;
     
     setIsSaving(true);
@@ -469,20 +441,6 @@ const Dashboard: React.FC = () => {
 
   const handleFinalSubmit = async () => {
     if (!activeApplication) return;
-    
-    // 🧠 STRICT SUBMISSION CHECK: Ensure all mandatory documents are marked as uploaded 
-    // Checks against both local ID and backend sanitized DocType format
-    const allRequiredDocs = docGroups.flatMap(group => group.docs).filter(d => d.required);
-    const missingDocs = allRequiredDocs.some(d => !uploadedDocs[d.id] && !uploadedDocs[normalizeDocName(d.name)]);
-
-    if (missingDocs) {
-      toast({ 
-        title: "Missing Documents", 
-        description: "Please upload all mandatory documents before submission.", 
-        variant: "destructive" 
-      });
-      return;
-    }
 
     setIsSaving(true);
 
