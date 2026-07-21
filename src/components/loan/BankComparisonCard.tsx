@@ -1,7 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info } from "lucide-react";
+import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 
@@ -180,13 +180,23 @@ export const BankComparisonCard = memo(function BankComparisonCard({
           }}
         />
 
-        {/* ── Top Promo Bar/Ribbon for Reward ── */}
+        {/* ── Top Promo Bar/Ribbon for Reward — tinted to this offer's brand colour ── */}
         {matchingReward && (
-          <div className="bg-purple-50/90 dark:bg-purple-950/20 border-b border-purple-100/80 dark:border-purple-900/30 px-5 py-2.5 md:px-8 flex items-center gap-2">
-            <RewardIcon className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-            <span className="text-[10px] md:text-[11px] font-extrabold text-purple-700 dark:text-purple-300 uppercase tracking-widest leading-none">
-              Exclusive Reward: {dynamicRewardText}
-            </span>
+          <div
+            className="border-b px-5 py-3 md:px-8 flex items-center gap-3"
+            style={{ backgroundColor: `${brand}0D`, borderColor: `${brand}26` }}
+          >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${brand}1A` }}>
+              <RewardIcon className="w-4 h-4" style={{ color: brand }} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest leading-none" style={{ color: brand }}>
+                Exclusive Reward
+              </p>
+              <p className="text-[11px] md:text-xs font-semibold leading-snug mt-1" style={{ color: brand }}>
+                {dynamicRewardText}
+              </p>
+            </div>
           </div>
         )}
 
@@ -194,58 +204,43 @@ export const BankComparisonCard = memo(function BankComparisonCard({
           {/* ── Main Grid ───────────────────────────── */}
           <div className="flex flex-col xl:grid xl:grid-cols-[200px_210px_300px_minmax(0,1fr)] 2xl:grid-cols-[220px_230px_340px_minmax(0,1fr)] xl:items-center gap-5 xl:gap-5 2xl:gap-6">
             
-            {/* ── Bank Identity & Mobile Chevron ────────────────────────────── */}
-            <div className="flex items-start justify-between w-full xl:w-auto">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden transition-all duration-500 group-hover:scale-105 group-hover:shadow-xl bg-white border border-slate-200 dark:border-white/[0.08]"
-                  style={{
-                    boxShadow: `0 4px 12px rgba(0,0,0,0.03)`,
-                    padding: offer.logoUrl && !logoError ? '4px' : '12px',
-                  }}
-                >
-                  {offer.logoUrl && !logoError ? (
-                    <img
-                      src={offer.logoUrl}
-                      alt={offer.bankName}
-                      className="w-full h-full object-contain"
-                      onError={() => setLogoError(true)}
-                    />
-                  ) : (
-                    <div 
-                      className="w-full h-full flex items-center justify-center rounded-xl text-xl sm:text-2xl font-black"
-                      style={{ 
-                        backgroundColor: `${offer.brandHex}15`, 
-                        color: offer.brandHex,
-                        border: `1px solid ${offer.brandHex}30` 
-                      }}
-                    >
-                      {offer.bankName ? offer.bankName.charAt(0).toUpperCase() : <Building2 className="w-6 h-6 opacity-50" />}
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex flex-col justify-center">
-                  {isRecommended && (
-                    <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
-                      <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
-                    </span>
-                  )}
-                  <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-tight">{offer.bankName}</h3>
-                </div>
-              </div>
-
-              {/* Mobile Chevron */}
-              <button
-                onClick={() => onToggleExpand(offer.id)}
-                className={`xl:hidden flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 shrink-0 mt-1
-                  ${isExpanded
-                    ? 'bg-slate-100 dark:bg-white/10 text-foreground'
-                    : 'bg-transparent text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5'
-                  }`}
-                title="View complete cost breakdown"
+            {/* ── Bank Identity ────────────────────────────── */}
+            <div className="flex items-center gap-4 w-full xl:w-auto">
+              <div
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden transition-all duration-500 group-hover:scale-105 group-hover:shadow-xl bg-white border border-slate-200 dark:border-white/[0.08]"
+                style={{
+                  boxShadow: `0 4px 12px rgba(0,0,0,0.03)`,
+                  padding: offer.logoUrl && !logoError ? '4px' : '12px',
+                }}
               >
-                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-              </button>
+                {offer.logoUrl && !logoError ? (
+                  <img
+                    src={offer.logoUrl}
+                    alt={offer.bankName}
+                    className="w-full h-full object-contain"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center rounded-xl text-xl sm:text-2xl font-black"
+                    style={{
+                      backgroundColor: `${offer.brandHex}15`,
+                      color: offer.brandHex,
+                      border: `1px solid ${offer.brandHex}30`
+                    }}
+                  >
+                    {offer.bankName ? offer.bankName.charAt(0).toUpperCase() : <Building2 className="w-6 h-6 opacity-50" />}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex flex-col justify-center">
+                {isRecommended && (
+                  <span className="inline-flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full w-fit border border-amber-100 dark:border-amber-500/20">
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" /> Recommended
+                  </span>
+                )}
+                <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-tight">{offer.bankName}</h3>
+              </div>
             </div>
 
             {/* ── EMI & Comparison Diff (Grouped for Perfect Alignment) ── */}
@@ -339,63 +334,83 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </button>
             </div>
 
-            {/* ── Mobile Premium Metrics Board ────────────────────────────── */}
-            <div className="xl:hidden w-full bg-slate-50/60 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/[0.05] rounded-[1.25rem] p-4 flex flex-col gap-3 shadow-inner">
-              <div className="flex justify-between items-end border-b border-slate-200/60 dark:border-white/[0.06] pb-3">
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70 mb-1">EMI</p>
+            {/* ── Mobile EMI + Metrics Board ────────────────────────────── */}
+            <div className="xl:hidden w-full flex flex-col gap-3">
+              <div className="flex items-start gap-3">
+                {/* EMI column -- same label/diff logic as the desktop EMI block above */}
+                <div className="flex-[0_0_38%] min-w-0">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-1">EMI</p>
                   <p className="text-[26px] font-black text-foreground tabular-nums leading-none tracking-tight">
-                    <span className="text-base text-muted-foreground/40 mr-0.5 font-bold">₹</span>{emi.toLocaleString("en-IN")}
+                    <span className="text-sm text-muted-foreground/40 mr-0.5 font-bold">₹</span>{emi.toLocaleString("en-IN")}
                   </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70 mb-1">Interest</p>
-                  <p className="text-xl font-extrabold text-foreground tabular-nums leading-none tracking-tight">{offer.interestRate}%</p>
-                </div>
-              </div>
-              <div className="flex justify-between items-center pt-1">
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Tenure</p>
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">{offer.effectiveTenureYears} yrs</p>
-                  {offer.requestedTenure && offer.effectiveTenureYears < offer.requestedTenure && (
-                    <div className="group relative flex items-center justify-center">
-                      <AlertCircle className="w-4 h-4 text-amber-500" />
-                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900 dark:bg-slate-800 text-slate-100 text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-                        Tenure clamped to {offer.effectiveTenureYears} years. The maximum tenure allowed by this product.
-                      </div>
-                    </div>
+                  {!isFullyFunded ? (
+                    <>
+                      <p className="text-[10px] font-bold tracking-tight leading-tight text-amber-600 dark:text-amber-400 mt-1.5">
+                        Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground/50 font-semibold leading-tight mt-0.5">Below your request</p>
+                    </>
+                  ) : !isLowestEmi ? (
+                    <>
+                      <p
+                        className="text-[10px] font-bold tabular-nums tracking-tight leading-tight mt-1.5"
+                        style={{ color: emiDiffFromHero > 0 ? '#ea580c' : emiDiffFromHero < 0 ? '#10b981' : '#64748b' }}
+                      >
+                        {emiDiffFromHero > 0
+                          ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
+                          : emiDiffFromHero < 0
+                            ? `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`
+                            : "Same EMI"}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground/50 font-semibold tabular-nums leading-tight mt-0.5">
+                        {totalDiffFromHero > 0
+                          ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
+                          : totalDiffFromHero < 0
+                            ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
+                            : "Same total"}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[10px] font-bold tracking-tight leading-tight text-emerald-600 dark:text-emerald-400 mt-1.5">Lowest EMI</p>
+                      <p className="text-[9px] text-muted-foreground/50 font-semibold leading-tight mt-0.5">Lowest total cost</p>
+                    </>
                   )}
                 </div>
-              </div>
-              <div className="flex justify-between items-center pt-1">
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">Processing Fees</p>
-                <p className="text-sm font-bold text-foreground bg-white dark:bg-white/[0.05] px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.05]">₹{pfAmount.toLocaleString("en-IN")}</p>
-              </div>
-              {!isFullyFunded ? (
-                <div className="mt-2 flex items-center justify-between gap-2 bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
-                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight truncate text-amber-600 dark:text-amber-400">
-                    Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-[9px] text-muted-foreground/70 font-semibold uppercase tracking-widest shrink-0">
-                    below request
-                  </p>
+
+                {/* Metrics box -- icon + label + value rows, tinted to this offer's brand colour */}
+                <div className="flex-1 min-w-0 bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] rounded-2xl p-3 flex flex-col gap-2.5">
+                  {[
+                    { icon: Percent, label: "Interest Rate", value: `${offer.interestRate}%` },
+                    { icon: Calendar, label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
+                    { icon: FileText, label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                  ].map((m, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="w-5 h-5 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${brand}1A` }}>
+                          <m.icon className="w-3 h-3" style={{ color: brand }} />
+                        </div>
+                        <span className="text-[10px] font-semibold text-muted-foreground truncate">{m.label}</span>
+                      </div>
+                      <span className="text-xs font-bold text-foreground tabular-nums whitespace-nowrap flex items-center gap-1">
+                        {m.value}
+                        {m.label === "Tenure" && offer.requestedTenure && offer.effectiveTenureYears < offer.requestedTenure && (
+                          <div className="group relative flex items-center justify-center">
+                            <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+                            <div className="absolute bottom-full right-0 mb-2 w-44 bg-slate-900 dark:bg-slate-800 text-slate-100 text-[10px] p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 normal-case font-normal">
+                              Tenure clamped to {offer.effectiveTenureYears} years. The maximum tenure allowed by this product.
+                            </div>
+                          </div>
+                        )}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ) : emiDiffFromHero !== 0 && (
-                <div className="mt-2 flex items-center justify-between bg-white dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/[0.05]">
-                  <p className="text-[11px] font-extrabold tabular-nums tracking-tight" style={{ color: emiDiffFromHero > 0 ? '#ea580c' : '#10b981' }}>
-                    {emiDiffFromHero > 0
-                      ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo`
-                      : `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo`}
-                  </p>
-                  <p className="text-[9px] text-muted-foreground/70 font-semibold tabular-nums uppercase tracking-widest">
-                    vs {heroBankName}
-                  </p>
-                </div>
-              )}
+              </div>
 
               <button
                 onClick={() => onToggleExpand(offer.id)}
-                className={`mt-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all duration-300
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all duration-300
                   ${isExpanded
                     ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20'
                     : 'bg-white dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08]'
@@ -419,14 +434,14 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
             )}
 
-            {/* ── CTAs (Mobile Stacked, Desktop Row/Col) ──────────────────────── */}
+            {/* ── CTAs (side-by-side on all breakpoints) ──────────────────────── */}
             {/* xl:row-start-1 pins this to the same grid row as bank identity/EMI/
                 metrics. Without it, the Amount Capping banner above (col-span-full,
                 placed between the metrics chips and this div in DOM order) can't fit
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col xl:flex-row xl:flex-wrap items-center xl:justify-end gap-3 xl:gap-2.5">
+            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-row flex-wrap items-center justify-center xl:justify-end gap-3 xl:gap-2.5">
               {matchingReward?.buttonDesign ? (
                 // No height class here -- GlossyRewardButton derives its own
                 // height from the image's real aspect ratio; forcing h-12/
@@ -435,13 +450,13 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   colorScheme={matchingReward.buttonDesign}
                   onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                   disabled={isGlobalLocking && !isLocking}
-                  className="w-full xl:w-[175px]"
+                  className="flex-1 xl:flex-none xl:w-[175px]"
                 />
               ) : (
                 <Button
                   onClick={handleApplyClick}
                   disabled={isGlobalLocking && !isLocking}
-                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 w-full xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
+                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 flex-1 xl:flex-none xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
                   style={{
                     background: localStatus === "resolved"
                       ? '#10b981'
@@ -471,7 +486,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="w-full xl:w-auto rounded-xl h-11 xl:h-11 px-4 text-xs font-bold transition-all border bg-transparent dark:bg-transparent border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5"
+                className="flex-1 xl:flex-none xl:w-auto rounded-xl h-12 xl:h-11 px-4 text-xs font-bold transition-all border bg-transparent dark:bg-transparent border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly <ExternalLink className="w-3.5 h-3.5" />
