@@ -27,6 +27,7 @@ import { CustomerLoanInformationStep } from "@/components/loan/steps/CustomerLoa
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
 import { getDocumentsForLoanType, groupDocumentsByCategory, ProductType, EmploymentType } from "@/lib/documentData";
+import { LOAN_TYPE_LABELS } from "@/lib/applicationTypes";
 
 // --- Types & Interfaces ---
 interface ApplicationDoc {
@@ -782,36 +783,43 @@ const Dashboard: React.FC = () => {
 
                             {/* Loan Details (from previous step) */}
                             {(() => {
-                              const appLoanAmount = Number(activeApplication?.requestedAmount) || 0;
-                              const appTenure = activeApplication?.metadata?.tenure;
-                              const appCibilScore = activeApplication?.declaredCibilScore;
-                              const appPropertyValue = Number(activeApplication?.metadata?.propertyValue) || 0;
+                              // 🧠 Same precedence as the formData hydration effect above:
+                              // the persisted application record wins when it has the field,
+                              // falling back to loanRequirements (the same store Stage 1's
+                              // own "Loan Details" bar in CustomerLoanInformationStep reads,
+                              // populated during the /apply intake and localStorage-persisted).
+                              const lr = store.loanRequirements;
+                              const loanAmount = Number(activeApplication?.requestedAmount) || Number(lr?.loanAmount) || 0;
+                              const tenureYears = Number(activeApplication?.metadata?.tenure) || Number(lr?.tenureYears) || 0;
+                              const cibilScore = activeApplication?.declaredCibilScore || lr?.cibilScore || 0;
+                              const propertyValue = Number(activeApplication?.metadata?.propertyValue) || Number(lr?.propertyValue) || 0;
+                              const loanTypeLabel = (lr?.loanType && LOAN_TYPE_LABELS[lr.loanType]) || activeApplication?.loanType || "—";
 
                               const loanDetails = [
                                 {
                                   icon: Wallet,
                                   label: "Loan Amount",
-                                  value: appLoanAmount > 0 ? formatINR(appLoanAmount) : "—",
+                                  value: loanAmount > 0 ? formatINR(loanAmount) : "—",
                                 },
                                 {
                                   icon: CalendarDays,
                                   label: "Tenure",
-                                  value: appTenure ? `${appTenure} Years` : "—",
+                                  value: tenureYears > 0 ? `${tenureYears} Years` : "—",
                                 },
                                 {
                                   icon: FileText,
                                   label: "Loan Type",
-                                  value: activeApplication?.loanType || "—",
+                                  value: loanTypeLabel,
                                 },
                                 {
                                   icon: Award,
                                   label: "Credit Score",
-                                  value: appCibilScore || "—",
+                                  value: cibilScore > 0 ? cibilScore : "—",
                                 },
                                 {
                                   icon: Home,
                                   label: "Property Value",
-                                  value: appPropertyValue > 0 ? formatINR(appPropertyValue) : "—",
+                                  value: propertyValue > 0 ? formatINR(propertyValue) : "—",
                                 },
                               ];
 
