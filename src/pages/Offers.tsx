@@ -898,23 +898,6 @@ export default function Offers() {
         </div>
       </main>
 
-      {/* ── Mobile Sticky CTA (thumb zone) ──────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 xl:hidden bg-white/95 dark:bg-[#0c1322]/98 border-t border-slate-200 dark:border-white/[0.06] px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-3 max-w-lg mx-auto">
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-foreground truncate">{heroOffer.bankName}</p>
-            <p className="text-[10px] text-muted-foreground tabular-nums">₹{(emis[heroOffer.id] || 0).toLocaleString("en-IN")}/mo</p>
-          </div>
-          <Button
-            onClick={() => handleUnlock(heroOffer)}
-            disabled={isLocking !== null}
-            className="rounded-xl h-11 px-6 bg-[#103783] text-white text-sm font-bold shadow-lg shadow-[#103783]/20 hover:bg-[#0c2a66]"
-          >
-            {isLocking ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4 mr-1.5" /> Unlock offer</>}
-          </Button>
-        </div>
-      </div>
-
       <Footer />
     </div>
   );
