@@ -191,7 +191,7 @@ const getStatusConfig = (status: string) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
+  const { user, isLoading: authLoading, isAdmin, isStaff } = useAuth();
   const navigate = useNavigate();
   const store = useApplicationStore();
 
@@ -275,7 +275,12 @@ const Dashboard: React.FC = () => {
         navigate("/auth?redirect=/dashboard", { replace: true });
         return;
       }
-      if (isAdmin) {
+      // 🧠 This was isAdmin (ADMIN/SUPER_ADMIN only), so an EMPLOYEE landing on
+      // /dashboard -- whether by direct URL, a bookmark, or the header menu's
+      // "Application Tracker" link -- fell straight through to the customer
+      // application-tracker experience instead of being sent to /admin like
+      // every other staff role already was.
+      if (isStaff) {
         navigate("/admin", { replace: true });
         return;
       }
@@ -363,7 +368,7 @@ const Dashboard: React.FC = () => {
       abortController.abort();
       clearTimeout(unlockTimer);
     };
-  }, [user, authLoading, isAdmin, navigate]);
+  }, [user, authLoading, isStaff, navigate]);
 
   // 🧠 Stage 1 ("Customer & Loan Information") shows PAN/DOB/City/PIN as
   // frozen, already-collected data -- fill formData's copy of them from the

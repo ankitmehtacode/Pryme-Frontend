@@ -61,7 +61,7 @@ const navLinks = [
 
 // --- Mobile Menu Component ---
 const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -131,7 +131,14 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           <div className="pt-4 border-t border-slate-100">
             {user ? (
               <div className="space-y-2">
-                <Link to="/dashboard" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50"><User className="w-4 h-4" /><span className="text-sm font-medium">Dashboard</span></Link>
+                {/* Staff (Employee/Admin/Super Admin) don't have loan
+                    applications of their own -- this always pointed at the
+                    customer /dashboard regardless of role. */}
+                {isStaff ? (
+                  <Link to="/admin" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50"><User className="w-4 h-4" /><span className="text-sm font-medium">Pryme Dashboard</span></Link>
+                ) : (
+                  <Link to="/dashboard" onClick={onClose} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50"><User className="w-4 h-4" /><span className="text-sm font-medium">Dashboard</span></Link>
+                )}
                 <button onClick={handleSignOut} className="flex items-center gap-3 p-3 rounded-lg text-red-600 hover:bg-red-50 w-full"><LogOut className="w-4 h-4" /><span className="text-sm font-medium">Sign Out</span></button>
               </div>
             ) : (
@@ -148,7 +155,7 @@ const MobileMenu = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 MobileMenu.displayName = "MobileMenu";
 
 // --- Profile Menu Component ---
-const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
+const ProfileMenu = memo(({ user, isStaff, signOut, navigate }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -228,17 +235,22 @@ const ProfileMenu = memo(({ user, isAdmin, signOut, navigate }: any) => {
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
+  // 🧠 Staff accounts (Employee/Admin/Super Admin) don't have loan
+  // applications of their own to track, and previously had no menu item
+  // pointing at /admin at all if they were an Employee (isAdmin excludes
+  // EMPLOYEE by design) -- so an employee's only visible link here was
+  // "Application Tracker", which took them straight to the customer
+  // dashboard with no way back to their actual workspace.
   const menuItems = useMemo(() => {
-    const items = [
-      { id: "dashboard", icon: Briefcase, label: "Application Tracker", href: "/dashboard" },
+    const items = isStaff
+      ? [{ id: "admin", icon: Settings, label: "Pryme Dashboard", href: "/admin" }]
+      : [{ id: "dashboard", icon: Briefcase, label: "Application Tracker", href: "/dashboard" }];
+    items.push(
       { id: "profile", icon: User, label: "My Profile", href: "/profile" },
       { id: "notifications", icon: Bell, label: "Notifications", href: "/notifications" },
-    ];
-    if (isAdmin) {
-      items.push({ id: "admin", icon: Settings, label: "Admin Console", href: "/admin" });
-    }
+    );
     return items;
-  }, [isAdmin]);
+  }, [isStaff]);
 
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -339,7 +351,7 @@ const Header = memo(() => {
   const [isHidden, setIsHidden] = useState(false);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -450,7 +462,7 @@ const Header = memo(() => {
           <div className="hidden lg:flex items-center gap-4">
             <a href={CONTACT_PHONE_LINK} className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-[#103783] transition-colors"><Phone className="w-4 h-4" /><span>{CONTACT_PHONE}</span></a>
             {user ? (
-              <ProfileMenu user={user} isAdmin={isAdmin} signOut={signOut} navigate={navigate} />
+              <ProfileMenu user={user} isStaff={isStaff} signOut={signOut} navigate={navigate} />
             ) : (
               <Link to="/auth" className="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-[#103783] bg-slate-50 hover:bg-[#103783]/5 border border-slate-200 hover:border-[#103783]/30 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">Log In</Link>
             )}

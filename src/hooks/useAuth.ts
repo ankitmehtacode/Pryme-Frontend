@@ -198,6 +198,11 @@ export const useAuth = () => {
     isLoading,
     isAuthenticated,
     isAdmin: user?.role === "ADMIN" || user?.role === "SUPER_ADMIN",
+    // Any of the three admin-panel roles -- distinct from isAdmin (which
+    // deliberately excludes EMPLOYEE for ADMIN-only UI like "Admin Core").
+    // Use this one for "does this account belong on the customer-facing
+    // /dashboard at all, or should it be on /admin" style checks.
+    isStaff: user?.role === "ADMIN" || user?.role === "SUPER_ADMIN" || user?.role === "EMPLOYEE",
     hasPermission,
     signIn,
     signUp,
