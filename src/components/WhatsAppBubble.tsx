@@ -28,7 +28,7 @@ const WhatsAppBubble = () => (
     whileTap={{ scale: 0.94 }}
     className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[60] flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/40 transition-shadow"
   >
-    <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20" />
+    <span className="hidden sm:block absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20" />
     <WhatsAppIcon />
   </motion.a>
 );
