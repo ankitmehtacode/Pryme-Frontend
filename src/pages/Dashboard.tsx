@@ -7,7 +7,7 @@ import {
   ShieldCheck, ChevronRight, ChevronDown, ArrowRight, Wallet,
   UploadCloud, CheckCircle2, Circle, Loader2, Edit2, Target, X,
   User, Briefcase, Lock, Mail, Users, Award, Check, Plus, Phone, Landmark, Coins,
-  CalendarDays, Home
+  CalendarDays, Home, Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/layout/Header";
@@ -18,6 +18,10 @@ import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { cn, buildCleanMetadata, formatISTDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -209,6 +213,13 @@ const Dashboard: React.FC = () => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
 
+  // Application deletion (withdrawal) -- `appPendingDeletion` drives a single
+  // shared confirmation dialog rendered once at the bottom of this component,
+  // rather than one AlertDialog per row, so it works the same whether
+  // triggered from the switcher dropdown or a Client Portfolio card.
+  const [appPendingDeletion, setAppPendingDeletion] = useState<Application | null>(null);
+  const [isDeletingApp, setIsDeletingApp] = useState<boolean>(false);
+
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
 
@@ -266,6 +277,46 @@ const Dashboard: React.FC = () => {
       tenure: parsedMeta.tenure || ""
     }));
   }, [store]);
+
+  // Withdraws (soft-deletes) an application -- DELETE /applications/{id}.
+  // The backend keeps the row and its audit trail, just excludes it from
+  // future /applications/me responses, so here we only need to drop it from
+  // local state and, if it was the active one, switch to whatever's left.
+  const handleDeleteApplication = async (app: Application) => {
+    setIsDeletingApp(true);
+    try {
+      // Synthetic client-only scaffold (see the "pending-" fallback in
+      // bootDashboard) was never persisted to the backend -- nothing to call.
+      if (!app.applicationId.startsWith("pending-")) {
+        await api.delete(`/applications/${app.applicationId}`);
+      }
+
+      toast({ title: "Application Deleted", description: `${formatLoanTypeLabel(app.loanType)} has been removed from your dashboard.` });
+
+      const remaining = myApplications.filter((a) => a.applicationId !== app.applicationId);
+      setMyApplications(remaining);
+
+      if (activeApplication?.applicationId === app.applicationId) {
+        if (remaining.length > 0) {
+          loadApplicationIntoFunnel(remaining[0], remaining);
+        } else {
+          setActiveApplication(null);
+          setViewState("EMPTY");
+        }
+      }
+
+      setAppPendingDeletion(null);
+    } catch (error: any) {
+      console.error("Delete Application Error:", error);
+      toast({
+        title: "Could Not Delete",
+        description: error.response?.data?.message || error.message || "Failed to delete the application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingApp(false);
+    }
+  };
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -768,12 +819,12 @@ const Dashboard: React.FC = () => {
                                     <DropdownMenuItem
                                       key={app.applicationId}
                                       onSelect={() => { if (!isActive) loadApplicationIntoFunnel(app, myApplications); }}
-                                      className="flex items-start gap-2.5 py-2.5 px-2.5 cursor-pointer"
+                                      className="flex items-start gap-2.5 py-2.5 px-2.5 cursor-pointer group"
                                     >
                                       <span className={cn("mt-1 w-3.5 h-3.5 shrink-0 flex items-center justify-center", isActive ? "text-blue-600" : "text-transparent")}>
                                         <Check className="w-3.5 h-3.5" />
                                       </span>
-                                      <span className="flex flex-col gap-1 min-w-0">
+                                      <span className="flex flex-col gap-1 min-w-0 flex-1">
                                         <span className="font-bold text-sm text-slate-900 truncate">
                                           {formatLoanTypeLabel(app.loanType)}
                                         </span>
@@ -786,6 +837,17 @@ const Dashboard: React.FC = () => {
                                           <span>{formatISTDate(app.createdAt)}</span>
                                         </span>
                                       </span>
+                                      <button
+                                        type="button"
+                                        // Stop the click from bubbling to the DropdownMenuItem's own
+                                        // select handler above -- otherwise clicking delete would also
+                                        // switch the active application before the confirm dialog opens.
+                                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setAppPendingDeletion(app); }}
+                                        className="mt-0.5 p-1 rounded-md text-slate-300 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                                        aria-label={`Delete ${formatLoanTypeLabel(app.loanType)} application`}
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
                                     </DropdownMenuItem>
                                   );
                                 })}
@@ -1348,6 +1410,13 @@ const Dashboard: React.FC = () => {
                                       <span className="flex items-center"><Edit2 className="w-4 h-4 mr-2" /> Update Information / Documents</span>
                                       <ChevronRight className="w-4 h-4" />
                                     </Button>
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-1"
+                                      onClick={() => setAppPendingDeletion(app)}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" /> Delete Application
+                                    </Button>
                                   </div>
                                 </Stack>
                               </div>
@@ -1366,6 +1435,37 @@ const Dashboard: React.FC = () => {
         </PageShell>
         <Footer />
       </div>
+
+      {/* Shared delete-application confirmation -- one dialog for both the
+          switcher dropdown and the Client Portfolio cards, driven by
+          `appPendingDeletion` rather than one AlertDialog instance per row. */}
+      <AlertDialog open={!!appPendingDeletion} onOpenChange={(open) => { if (!open && !isDeletingApp) setAppPendingDeletion(null); }}>
+        <AlertDialogContent className="rounded-2xl border-slate-200 max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900">Delete this application?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-500">
+              {appPendingDeletion && (
+                <>
+                  This will remove your <span className="font-semibold text-slate-700">{formatLoanTypeLabel(appPendingDeletion.loanType)}</span> application
+                  ({formatINR(appPendingDeletion.requestedAmount)}, started {formatISTDate(appPendingDeletion.createdAt)}) from your dashboard.
+                  This can't be undone from here -- contact support if you need it restored.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingApp} className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingApp}
+              onClick={(e) => { e.preventDefault(); if (appPendingDeletion) handleDeleteApplication(appPendingDeletion); }}
+              className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeletingApp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
