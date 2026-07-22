@@ -40,6 +40,7 @@ interface PersonalProfileHolder {
   maritalStatus?: string;
   spouseName?: string;
   qualification?: string;
+  qualificationOther?: string;
   numberOfDependents?: number;
   currentAddress?: string;
   currentAddressType?: AddressOwnership;
@@ -49,8 +50,8 @@ interface PersonalProfileHolder {
 }
 
 const emptyReferences: [ReferenceContact, ReferenceContact] = [
-  { name: "", phone: "" },
-  { name: "", phone: "" },
+  { name: "", phone: "", address: "" },
+  { name: "", phone: "", address: "" },
 ];
 
 // ─── Loan Details bar ────────────────────────────────────────────────────
@@ -262,10 +263,13 @@ function PersonalInfoSection({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <StyledSelect label="Qualification" icon={GraduationCap} value={data.qualification} onValueChange={(v) => onUpdate({ qualification: v })} placeholder="Select qualification">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <StyledSelect label="Qualification" icon={GraduationCap} value={data.qualification} onValueChange={(v) => onUpdate({ qualification: v, ...(v !== "Other" ? { qualificationOther: "" } : {}) })} placeholder="Select qualification">
           {QUALIFICATION_OPTIONS.map((q) => <SelectItem key={q} value={q}>{q}</SelectItem>)}
         </StyledSelect>
+        {data.qualification === "Other" && (
+          <ValidatedInput label="Please Specify" icon={GraduationCap} value={data.qualificationOther || ""} onChange={(e: any) => onUpdate({ qualificationOther: e.target.value })} />
+        )}
         <ValidatedInput
           label="No. of Dependents" icon={Users} type="number"
           value={data.numberOfDependents ?? ""}
@@ -274,11 +278,15 @@ function PersonalInfoSection({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="grid grid-cols-2 gap-3 md:col-span-2 md:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:col-span-2">
           <ValidatedInput label="Reference 1 Name" icon={UserPlus} value={refs[0].name} onChange={(e: any) => updateReference(0, { name: e.target.value })} />
           <ValidatedInput label="Reference 1 Phone" icon={Phone} value={refs[0].phone} onChange={(e: any) => updateReference(0, { phone: e.target.value })} />
+          <ValidatedInput label="Reference 1 Address" icon={Home} value={refs[0].address || ""} onChange={(e: any) => updateReference(0, { address: e.target.value })} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:col-span-2">
           <ValidatedInput label="Reference 2 Name" icon={UserPlus} value={refs[1].name} onChange={(e: any) => updateReference(1, { name: e.target.value })} />
           <ValidatedInput label="Reference 2 Phone" icon={Phone} value={refs[1].phone} onChange={(e: any) => updateReference(1, { phone: e.target.value })} />
+          <ValidatedInput label="Reference 2 Address" icon={Home} value={refs[1].address || ""} onChange={(e: any) => updateReference(1, { address: e.target.value })} />
         </div>
       </div>
     </div>
@@ -287,15 +295,22 @@ function PersonalInfoSection({
 
 // ─── Occupation section (reused for applicant + co-applicant) ────────────
 
-function OccupationSection({ financialDetails }: { financialDetails: FinancialDetails }) {
+function OccupationSection({
+  financialDetails, onUpdateSalaried,
+}: {
+  financialDetails: FinancialDetails;
+  onUpdateSalaried?: (data: Partial<SalariedDetails>) => void;
+}) {
   if (financialDetails.path === "SALARIED") {
     const d = financialDetails.data as SalariedDetails;
     return (
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <FrozenField label="Employer Type" icon={Briefcase} value={d.subType ? SALARIED_LABELS[d.subType] : undefined} />
-          <FrozenField label="Company Name" icon={Building2} value={d.companyName} />
-          <FrozenField label="Designation" icon={Briefcase} value={d.designation} />
+          <StyledSelect label="Employer Type" icon={Briefcase} value={d.subType} onValueChange={(v) => onUpdateSalaried?.({ subType: v as SalariedDetails["subType"] })} placeholder="Select employer type">
+            {(Object.keys(SALARIED_LABELS) as SalariedDetails["subType"][]).map((s) => <SelectItem key={s} value={s}>{SALARIED_LABELS[s]}</SelectItem>)}
+          </StyledSelect>
+          <ValidatedInput label="Company Name" icon={Building2} value={d.companyName || ""} onChange={(e: any) => onUpdateSalaried?.({ companyName: e.target.value })} />
+          <ValidatedInput label="Designation" icon={Briefcase} value={d.designation || ""} onChange={(e: any) => onUpdateSalaried?.({ designation: e.target.value })} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <FrozenField label="Gross Monthly Income" icon={IndianRupee} value={d.grossSalary} formatAsCurrency />
@@ -439,7 +454,7 @@ export function CustomerLoanInformationStep({
         <h4 className="text-sm font-bold text-foreground flex items-center gap-2 pt-2">
           <Briefcase className="w-4 h-4 text-primary" /> Occupation
         </h4>
-        <OccupationSection financialDetails={store.financialDetails} />
+        <OccupationSection financialDetails={store.financialDetails} onUpdateSalaried={store.updateSalariedDetails} />
         <OccupationNewFieldsSection
           financialDetails={store.financialDetails}
           onUpdateSalaried={store.updateSalariedDetails}
@@ -458,7 +473,7 @@ export function CustomerLoanInformationStep({
           <h4 className="text-sm font-bold text-foreground flex items-center gap-2 pt-2">
             <Briefcase className="w-4 h-4 text-primary" /> Occupation
           </h4>
-          <OccupationSection financialDetails={coApplicant.financialDetails} />
+          <OccupationSection financialDetails={coApplicant.financialDetails} onUpdateSalaried={store.updateCoApplicantSalariedDetails} />
           <OccupationNewFieldsSection
             financialDetails={coApplicant.financialDetails}
             onUpdateSalaried={store.updateCoApplicantSalariedDetails}

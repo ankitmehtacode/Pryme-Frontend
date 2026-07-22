@@ -111,6 +111,7 @@ export type AddressOwnership = 'OWNED' | 'RENTED';
 export interface ReferenceContact {
   name: string;
   phone: string;
+  address?: string;
 }
 
 export interface PersonalProfileExtension {
@@ -120,6 +121,7 @@ export interface PersonalProfileExtension {
   maritalStatus?: string;
   spouseName?: string;           // Only relevant when maritalStatus === 'Married'
   qualification?: string;
+  qualificationOther?: string;   // Only relevant when qualification === 'Other'
   numberOfDependents?: number;
 
   currentAddress?: string;
