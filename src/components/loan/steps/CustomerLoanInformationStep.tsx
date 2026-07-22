@@ -7,6 +7,7 @@ import {
 import { SelectItem } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { PrymeAPI } from "@/lib/api";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 import { useApplicationStore } from "@/store/applicationStore";
 import { findBankLogoByName } from "@/pages/ApplyDirect";
 import {
@@ -249,7 +250,11 @@ function PersonalInfoSection({
     <div className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <SmartField label="Full Name" icon={User} value={data.fullName} onChange={(v) => onUpdate({ fullName: v })} />
-        <SmartField label="Date of Birth" icon={Calendar} value={data.dateOfBirth} type="date" onChange={(v) => onUpdate({ dateOfBirth: v })} />
+        <SmartField
+          label="Date of Birth" icon={Calendar} type="date" value={data.dateOfBirth}
+          displayValue={data.dateOfBirth ? formatDateDDMMYYYY(data.dateOfBirth) : undefined}
+          onChange={(v) => onUpdate({ dateOfBirth: v })}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

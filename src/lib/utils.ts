@@ -50,6 +50,21 @@ export function formatISTDate(value: string | number | Date): string {
   });
 }
 
+/**
+ * Formats a plain "YYYY-MM-DD" date string (e.g. dateOfBirth, which has no
+ * time-of-day meaning) as "DD-MM-YYYY". Pure string reformatting rather than
+ * `new Date()` + toLocaleDateString -- a birthdate shouldn't go through any
+ * timezone conversion at all, so this avoids that class of off-by-one-day risk
+ * entirely instead of just avoiding it for IST specifically.
+ */
+export function formatDateDDMMYYYY(value?: string | null): string {
+  if (!value) return "—";
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return `${day}-${month}-${year}`;
+}
+
 export function formatIndianCurrency(value: number): string {
   if (value == null || isNaN(value)) return "₹0";
   const rounded = Math.round(value);
