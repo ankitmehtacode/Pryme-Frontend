@@ -27,7 +27,32 @@ import { CustomerLoanInformationStep } from "@/components/loan/steps/CustomerLoa
 // 🧠 ARCHITECTURE IMPORTS
 import api, { PrymeAPI } from "@/lib/api";
 import { getDocumentsForLoanType, groupDocumentsByCategory, ProductType, EmploymentType } from "@/lib/documentData";
-import { LOAN_TYPE_LABELS } from "@/lib/applicationTypes";
+import { LOAN_TYPE_LABELS, type ApplicationStore } from "@/lib/applicationTypes";
+
+// 🧠 THE FIX: useApplicationStore is a sessionStorage-persisted Zustand store,
+// designed for the single continuous /apply wizard session. CustomerLoanInformationStep
+// (Stage 1 of this page) reads and writes it exclusively -- but a returning user
+// hits this page in a brand-new browser session, where the store is back to its
+// empty defaults, and none of it was ever sent to the backend by handleNextStage
+// (which only PATCHed the separate, narrower `formData` shape as metadata).
+// So every field that went through the store silently reset on next login.
+//
+// Fix: persist the store's own shape losslessly as a nested `storeSnapshot` key
+// inside the same metadata blob (the backend entity's own comment already
+// anticipates exactly this: "Maps React's dynamic Funnel Zustand store directly
+// into a highly efficient JSONB column"), and rehydrate it on boot. No new flat
+// field-mapping convention to invent or keep in sync -- the store's own types are
+// already the schema, and JSON round-trips them exactly.
+type ApplicationStoreSnapshot = Partial<Pick<ApplicationStore, "basicKYC" | "financialDetails" | "loanRequirements" | "financialFootprint">>;
+
+function hydrateStoreFromSnapshot(store: ApplicationStore, snapshot: unknown) {
+  if (!snapshot || typeof snapshot !== "object") return;
+  const snap = snapshot as ApplicationStoreSnapshot;
+  if (snap.basicKYC) store.updateBasicKYC(snap.basicKYC);
+  if (snap.loanRequirements) store.updateLoanRequirements(snap.loanRequirements);
+  if (snap.financialFootprint) store.updateFinancialFootprint(snap.financialFootprint);
+  if (snap.financialDetails?.path) store.updateFinancialDetails(snap.financialDetails);
+}
 
 // --- Types & Interfaces ---
 interface ApplicationDoc {
@@ -190,7 +215,7 @@ const Dashboard: React.FC = () => {
             const emiFallback = storeEmi != null ? String(storeEmi) : "";
 
             if (primaryApp.metadata) {
-              let parsedMeta: Partial<DashboardFormData> = {};
+              let parsedMeta: Partial<DashboardFormData> & { storeSnapshot?: unknown } = {};
               if (typeof primaryApp.metadata === "string") {
                 try {
                   parsedMeta = JSON.parse(primaryApp.metadata);
@@ -207,6 +232,9 @@ const Dashboard: React.FC = () => {
                 requestedAmount: parsedMeta.requestedAmount || String(primaryApp.requestedAmount || ""),
                 tenure: parsedMeta.tenure || ""
               }));
+              // Restore the personal/occupation/loan-detail fields that live in
+              // useApplicationStore -- see hydrateStoreFromSnapshot above.
+              hydrateStoreFromSnapshot(store, parsedMeta.storeSnapshot);
             } else {
               setFormData(prev => ({
                 ...prev,
@@ -404,8 +432,20 @@ const Dashboard: React.FC = () => {
       else if (financialPath === 'PROFESSIONAL') store.updateProfessionalDetails({ existingEMI: emiValue });
       else if (financialPath === 'SELF_EMPLOYED') store.updateBusinessDetails({ existingEMI: emiValue });
 
+      // 🧠 Read via getState() rather than the closed-over `store` so this
+      // reflects the existingEMI sync just above, which mutates the global
+      // store synchronously -- the component-scoped `store` snapshot from
+      // this render wouldn't include it.
+      const freshStore = useApplicationStore.getState();
+      const storeSnapshot: ApplicationStoreSnapshot = {
+        basicKYC: freshStore.basicKYC,
+        financialDetails: freshStore.financialDetails,
+        loanRequirements: freshStore.loanRequirements,
+        financialFootprint: freshStore.financialFootprint,
+      };
+
       const patchData: Record<string, any> = {
-         metadata: buildCleanMetadata(formData),
+         metadata: { ...buildCleanMetadata(formData), storeSnapshot },
          completionPercentage: newProgress
       };
 
