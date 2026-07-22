@@ -53,7 +53,7 @@ const ScrollToTop = memo(() => {
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.92 }}
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 group outline-none"
+          className="fixed bottom-24 right-5 sm:right-6 z-50 group outline-none"
           aria-label="Scroll to top"
         >
           {/* Pill-shaped sleek button — CRED-inspired elevated glassmorphism */}

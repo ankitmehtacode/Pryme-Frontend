@@ -4,6 +4,7 @@ import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { SplashOverlay } from "@/components/SplashOverlay";
 import { PageTransitionLoader } from "@/components/PageTransitionLoader";
 import { AppRoutes } from "@/routes/AppRoutes";
+import WhatsAppBubble from "@/components/WhatsAppBubble";
 
 const App = () => (
   <AppProviders>
@@ -14,6 +15,7 @@ const App = () => (
         <Suspense fallback={<PageTransitionLoader />}>
           <AppRoutes />
         </Suspense>
+        <WhatsAppBubble />
       </div>
     </AppErrorBoundary>
   </AppProviders>
