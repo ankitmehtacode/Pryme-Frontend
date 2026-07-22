@@ -25,6 +25,48 @@ const MARITAL_STATUS_OPTIONS = ["Single", "Married", "Divorced", "Widowed"];
 const RELIGION_OPTIONS = ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Parsi", "Other"];
 const QUALIFICATION_OPTIONS = ["Undergraduate", "Graduate", "Postgraduate", "Doctorate", "Other"];
 
+const isFieldEmpty = (v: unknown) => v === "" || v === undefined || v === null;
+
+// A field locks (read-only, matches FrozenField's chrome) only once it
+// actually holds a value carried over from the application form. An empty
+// field -- one the form never collected -- renders as a normal editable
+// input instead of a permanently "—" locked box with no way to fill it in.
+function SmartField({
+  label, icon, value, displayValue, onChange, formatAsCurrency, type,
+}: {
+  label: string; icon?: any; value: string | number | undefined | null; displayValue?: string;
+  onChange: (value: string) => void; formatAsCurrency?: boolean; type?: string;
+}) {
+  if (!isFieldEmpty(value)) {
+    return <FrozenField label={label} icon={icon} value={displayValue ?? value} formatAsCurrency={formatAsCurrency} />;
+  }
+  return (
+    <ValidatedInput
+      label={label} icon={icon} type={type} formatAsCurrency={formatAsCurrency}
+      value={value ?? ""} onChange={(e: any) => onChange(e.target.value)}
+    />
+  );
+}
+
+// Same idea as SmartField, but for select-style fields -- shows the frozen
+// display value (already resolved to its label by the caller) when filled,
+// or the live picker when empty.
+function SmartSelectField({
+  label, icon, value, displayValue, onValueChange, placeholder, children,
+}: {
+  label: string; icon?: any; value: string | undefined; displayValue?: string;
+  onValueChange: (value: string) => void; placeholder: string; children: React.ReactNode;
+}) {
+  if (!isFieldEmpty(value)) {
+    return <FrozenField label={label} icon={icon} value={displayValue ?? value} />;
+  }
+  return (
+    <StyledSelect label={label} icon={icon} value={value} onValueChange={onValueChange} placeholder={placeholder}>
+      {children}
+    </StyledSelect>
+  );
+}
+
 // Shared shape both BasicKYC and CoApplicantDetails satisfy structurally —
 // lets one PersonalInfoSection serve both without a generic.
 interface PersonalProfileHolder {
@@ -191,11 +233,10 @@ function PhotoUploadPair({ applicationId, existingCoApplicantPhotoUrl }: { appli
 // ─── Personal Information section (reused for applicant + co-applicant) ──
 
 function PersonalInfoSection({
-  data, onUpdate, isCoApplicant,
+  data, onUpdate,
 }: {
   data: PersonalProfileHolder;
   onUpdate: (patch: Partial<PersonalProfileHolder>) => void;
-  isCoApplicant?: boolean;
 }) {
   const refs = data.references || emptyReferences;
   const updateReference = (idx: 0 | 1, patch: Partial<ReferenceContact>) => {
@@ -207,23 +248,14 @@ function PersonalInfoSection({
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <FrozenField label="Full Name" icon={User} value={data.fullName} />
-        <FrozenField label="Date of Birth" icon={Calendar} value={data.dateOfBirth} />
+        <SmartField label="Full Name" icon={User} value={data.fullName} onChange={(v) => onUpdate({ fullName: v })} />
+        <SmartField label="Date of Birth" icon={Calendar} value={data.dateOfBirth} type="date" onChange={(v) => onUpdate({ dateOfBirth: v })} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {isCoApplicant ? (
-          <>
-            <ValidatedInput label="State" icon={MapPin} value={data.state || ""} onChange={(e: any) => onUpdate({ state: e.target.value })} />
-            <ValidatedInput label="City" icon={Building} value={data.city || ""} onChange={(e: any) => onUpdate({ city: e.target.value })} />
-          </>
-        ) : (
-          <>
-            <FrozenField label="State" icon={MapPin} value={data.state} />
-            <FrozenField label="City" icon={Building} value={data.city} />
-          </>
-        )}
-        <FrozenField label="PIN Code" icon={MapPin} value={data.pinCode} />
+        <SmartField label="State" icon={MapPin} value={data.state} onChange={(v) => onUpdate({ state: v })} />
+        <SmartField label="City" icon={Building} value={data.city} onChange={(v) => onUpdate({ city: v })} />
+        <SmartField label="PIN Code" icon={MapPin} value={data.pinCode} onChange={(v) => onUpdate({ pinCode: v })} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -296,33 +328,46 @@ function PersonalInfoSection({
 // ─── Occupation section (reused for applicant + co-applicant) ────────────
 
 function OccupationSection({
-  financialDetails, onUpdateSalaried,
+  financialDetails, onUpdateSalaried, onUpdateProfessional, onUpdateBusiness,
 }: {
   financialDetails: FinancialDetails;
   onUpdateSalaried?: (data: Partial<SalariedDetails>) => void;
+  onUpdateProfessional?: (data: Partial<ProfessionalDetails>) => void;
+  onUpdateBusiness?: (data: Partial<BusinessDetails>) => void;
 }) {
   if (financialDetails.path === "SALARIED") {
     const d = financialDetails.data as SalariedDetails;
     return (
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <StyledSelect label="Employer Type" icon={Briefcase} value={d.subType} onValueChange={(v) => onUpdateSalaried?.({ subType: v as SalariedDetails["subType"] })} placeholder="Select employer type">
+          <SmartSelectField
+            label="Employer Type" icon={Briefcase} value={d.subType} displayValue={d.subType ? SALARIED_LABELS[d.subType] : undefined}
+            onValueChange={(v) => onUpdateSalaried?.({ subType: v as SalariedDetails["subType"] })} placeholder="Select employer type"
+          >
             {(Object.keys(SALARIED_LABELS) as SalariedDetails["subType"][]).map((s) => <SelectItem key={s} value={s}>{SALARIED_LABELS[s]}</SelectItem>)}
-          </StyledSelect>
-          <ValidatedInput label="Company Name" icon={Building2} value={d.companyName || ""} onChange={(e: any) => onUpdateSalaried?.({ companyName: e.target.value })} />
-          <ValidatedInput label="Designation" icon={Briefcase} value={d.designation || ""} onChange={(e: any) => onUpdateSalaried?.({ designation: e.target.value })} />
+          </SmartSelectField>
+          <SmartField label="Company Name" icon={Building2} value={d.companyName} onChange={(v) => onUpdateSalaried?.({ companyName: v })} />
+          <SmartField label="Designation" icon={Briefcase} value={d.designation} onChange={(v) => onUpdateSalaried?.({ designation: v })} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Gross Monthly Income" icon={IndianRupee} value={d.grossSalary} formatAsCurrency />
-          <FrozenField label="Net Monthly Income" icon={IndianRupee} value={d.netMonthlySalary} formatAsCurrency />
+          <SmartField label="Gross Monthly Income" icon={IndianRupee} value={d.grossSalary} formatAsCurrency onChange={(v) => onUpdateSalaried?.({ grossSalary: v === "" ? undefined : Number(v) })} />
+          <SmartField label="Net Monthly Income" icon={IndianRupee} value={d.netMonthlySalary} formatAsCurrency onChange={(v) => onUpdateSalaried?.({ netMonthlySalary: v === "" ? undefined : Number(v) })} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Current Experience" icon={Calendar} value={d.currentCompanyYears ? `${d.currentCompanyYears} yrs` : undefined} />
-          <FrozenField label="Total Experience" icon={Calendar} value={d.totalExperienceYears ? `${d.totalExperienceYears} yrs` : undefined} />
+          <SmartField
+            label="Current Experience" icon={Calendar} type="number" value={d.currentCompanyYears}
+            displayValue={d.currentCompanyYears ? `${d.currentCompanyYears} yrs` : undefined}
+            onChange={(v) => onUpdateSalaried?.({ currentCompanyYears: v === "" ? undefined : Number(v) })}
+          />
+          <SmartField
+            label="Total Experience" icon={Calendar} type="number" value={d.totalExperienceYears}
+            displayValue={d.totalExperienceYears ? `${d.totalExperienceYears} yrs` : undefined}
+            onChange={(v) => onUpdateSalaried?.({ totalExperienceYears: v === "" ? undefined : Number(v) })}
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency />
-          <FrozenField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency />
+          <SmartField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency onChange={(v) => onUpdateSalaried?.({ existingEMI: v === "" ? undefined : Number(v) })} />
+          <SmartField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency onChange={(v) => onUpdateSalaried?.({ maturingLoanEMI: v === "" ? undefined : Number(v) })} />
         </div>
       </div>
     );
@@ -330,20 +375,30 @@ function OccupationSection({
 
   if (financialDetails.path === "PROFESSIONAL") {
     const d = financialDetails.data as ProfessionalDetails;
+    // Displayed/edited as an annual figure, but stored monthly -- convert both ways.
+    const annualIncome = d.netMonthlyIncome ? d.netMonthlyIncome * 12 : undefined;
     return (
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Profession" icon={Scale} value={d.subType ? PROFESSIONAL_LABELS[d.subType] : undefined} />
-          <FrozenField label="Practice / Firm Name" icon={Building2} value={d.practiceName} />
+          <SmartSelectField
+            label="Profession" icon={Scale} value={d.subType} displayValue={d.subType ? PROFESSIONAL_LABELS[d.subType] : undefined}
+            onValueChange={(v) => onUpdateProfessional?.({ subType: v as ProfessionalDetails["subType"] })} placeholder="Select profession"
+          >
+            {(Object.keys(PROFESSIONAL_LABELS) as ProfessionalDetails["subType"][]).map((s) => <SelectItem key={s} value={s}>{PROFESSIONAL_LABELS[s]}</SelectItem>)}
+          </SmartSelectField>
+          <SmartField label="Practice / Firm Name" icon={Building2} value={d.practiceName} onChange={(v) => onUpdateProfessional?.({ practiceName: v })} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Annual Gross Receipts" icon={IndianRupee} value={d.annualGrossReceipts} formatAsCurrency />
-          <FrozenField label="Annual Income (As Per ITR)" icon={IndianRupee} value={d.netMonthlyIncome ? d.netMonthlyIncome * 12 : undefined} formatAsCurrency />
+          <SmartField label="Annual Gross Receipts" icon={IndianRupee} value={d.annualGrossReceipts} formatAsCurrency onChange={(v) => onUpdateProfessional?.({ annualGrossReceipts: v === "" ? undefined : Number(v) })} />
+          <SmartField
+            label="Annual Income (As Per ITR)" icon={IndianRupee} value={annualIncome} formatAsCurrency
+            onChange={(v) => onUpdateProfessional?.({ netMonthlyIncome: v === "" ? undefined : Number(v) / 12 })}
+          />
         </div>
-        <FrozenField label="Current Office Address" icon={Home} value={d.practiceAddress} />
+        <SmartField label="Current Office Address" icon={Home} value={d.practiceAddress} onChange={(v) => onUpdateProfessional?.({ practiceAddress: v })} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency />
-          <FrozenField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency />
+          <SmartField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency onChange={(v) => onUpdateProfessional?.({ existingEMI: v === "" ? undefined : Number(v) })} />
+          <SmartField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency onChange={(v) => onUpdateProfessional?.({ maturingLoanEMI: v === "" ? undefined : Number(v) })} />
         </div>
       </div>
     );
@@ -354,17 +409,21 @@ function OccupationSection({
     return (
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Business Domain" icon={Landmark} value={d.industryType} />
-          <FrozenField label="Business Vintage" icon={Calendar} value={d.vintageYears ? `${d.vintageYears} yrs` : undefined} />
+          <SmartField label="Business Domain" icon={Landmark} value={d.industryType} onChange={(v) => onUpdateBusiness?.({ industryType: v })} />
+          <SmartField
+            label="Business Vintage" icon={Calendar} type="number" value={d.vintageYears}
+            displayValue={d.vintageYears ? `${d.vintageYears} yrs` : undefined}
+            onChange={(v) => onUpdateBusiness?.({ vintageYears: v === "" ? undefined : Number(v) })}
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Annual Income (As Per ITR)" icon={IndianRupee} value={d.netProfit} formatAsCurrency />
-          <FrozenField label="Total GST Turnover (Last 12 Months)" icon={Percent} value={d.last12MonthsGstTurnover} formatAsCurrency />
+          <SmartField label="Annual Income (As Per ITR)" icon={IndianRupee} value={d.netProfit} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ netProfit: v === "" ? undefined : Number(v) })} />
+          <SmartField label="Total GST Turnover (Last 12 Months)" icon={Percent} value={d.last12MonthsGstTurnover} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ last12MonthsGstTurnover: v === "" ? undefined : Number(v) })} />
         </div>
-        <FrozenField label="Annual Turnover" icon={IndianRupee} value={d.annualTurnover} formatAsCurrency />
+        <SmartField label="Annual Turnover" icon={IndianRupee} value={d.annualTurnover} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ annualTurnover: v === "" ? undefined : Number(v) })} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <FrozenField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency />
-          <FrozenField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency />
+          <SmartField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ existingEMI: v === "" ? undefined : Number(v) })} />
+          <SmartField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ maturingLoanEMI: v === "" ? undefined : Number(v) })} />
         </div>
       </div>
     );
@@ -454,7 +513,12 @@ export function CustomerLoanInformationStep({
         <h4 className="text-sm font-bold text-foreground flex items-center gap-2 pt-2">
           <Briefcase className="w-4 h-4 text-primary" /> Occupation
         </h4>
-        <OccupationSection financialDetails={store.financialDetails} onUpdateSalaried={store.updateSalariedDetails} />
+        <OccupationSection
+          financialDetails={store.financialDetails}
+          onUpdateSalaried={store.updateSalariedDetails}
+          onUpdateProfessional={store.updateProfessionalDetails}
+          onUpdateBusiness={store.updateBusinessDetails}
+        />
         <OccupationNewFieldsSection
           financialDetails={store.financialDetails}
           onUpdateSalaried={store.updateSalariedDetails}
@@ -468,12 +532,17 @@ export function CustomerLoanInformationStep({
           <h3 className="text-base font-bold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" /> Co-Applicant Information
           </h3>
-          <PersonalInfoSection data={coApplicant} onUpdate={store.updateCoApplicantDetails} isCoApplicant />
+          <PersonalInfoSection data={coApplicant} onUpdate={store.updateCoApplicantDetails} />
 
           <h4 className="text-sm font-bold text-foreground flex items-center gap-2 pt-2">
             <Briefcase className="w-4 h-4 text-primary" /> Occupation
           </h4>
-          <OccupationSection financialDetails={coApplicant.financialDetails} onUpdateSalaried={store.updateCoApplicantSalariedDetails} />
+          <OccupationSection
+            financialDetails={coApplicant.financialDetails}
+            onUpdateSalaried={store.updateCoApplicantSalariedDetails}
+            onUpdateProfessional={store.updateCoApplicantProfessionalDetails}
+            onUpdateBusiness={store.updateCoApplicantBusinessDetails}
+          />
           <OccupationNewFieldsSection
             financialDetails={coApplicant.financialDetails}
             onUpdateSalaried={store.updateCoApplicantSalariedDetails}
