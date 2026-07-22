@@ -101,6 +101,7 @@ const emptyReferences: [ReferenceContact, ReferenceContact] = [
 
 function LoanDetailsBar() {
   const loanRequirements = useApplicationStore((s) => s.loanRequirements);
+  const updateLoanRequirements = useApplicationStore((s) => s.updateLoanRequirements);
   const bankLogo = findBankLogoByName(loanRequirements.selectedBankName);
 
   return (
@@ -112,10 +113,30 @@ function LoanDetailsBar() {
         )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <FrozenField label="Loan Amount" icon={IndianRupee} value={loanRequirements.loanAmount} formatAsCurrency />
-        <FrozenField label="Tenure" icon={Calendar} value={loanRequirements.tenureYears ? `${loanRequirements.tenureYears} yrs` : undefined} />
-        <FrozenField label="Credit Score" icon={CreditCard} value={loanRequirements.cibilScore || undefined} />
-        <FrozenField label="Property Value" icon={Home} value={loanRequirements.propertyValue} formatAsCurrency />
+        {/* loanAmount/tenureYears/cibilScore default to 0 (not undefined) in
+            the store, so 0 is coerced to undefined here -- otherwise an
+            unset field would render as a locked "₹0"/"0 yrs" dead end. */}
+        <SmartField
+          label="Loan Amount" icon={IndianRupee} formatAsCurrency
+          value={loanRequirements.loanAmount || undefined}
+          onChange={(v) => updateLoanRequirements({ loanAmount: v === "" ? undefined : Number(v) })}
+        />
+        <SmartField
+          label="Tenure" icon={Calendar} type="number"
+          value={loanRequirements.tenureYears || undefined}
+          displayValue={loanRequirements.tenureYears ? `${loanRequirements.tenureYears} yrs` : undefined}
+          onChange={(v) => updateLoanRequirements({ tenureYears: v === "" ? undefined : Number(v) })}
+        />
+        <SmartField
+          label="Credit Score" icon={CreditCard} type="number"
+          value={loanRequirements.cibilScore || undefined}
+          onChange={(v) => updateLoanRequirements({ cibilScore: v === "" ? undefined : Number(v) })}
+        />
+        <SmartField
+          label="Property Value" icon={Home} formatAsCurrency
+          value={loanRequirements.propertyValue || undefined}
+          onChange={(v) => updateLoanRequirements({ propertyValue: v === "" ? undefined : Number(v) })}
+        />
       </div>
     </div>
   );
