@@ -1318,6 +1318,13 @@ const Dashboard: React.FC = () => {
                                       onClick={() => {
                                         setActiveApplication(app);
                                         // 🧠 SILICON VALLEY FEATURE: Re-hydrate the form allowing post-submission edits
+                                        // loadApplicationDataIntoStore populates the Zustand store
+                                        // (basicKYC/loanRequirements/financialDetails/financialFootprint) --
+                                        // CustomerLoanInformationStep reads from the store, not from
+                                        // `formData`, so without this call every field rendered blank
+                                        // for any application at 100% completion (the only ones that
+                                        // reach this button).
+                                        loadApplicationDataIntoStore(store, app, myApplications);
                                         if (app.metadata) {
                                           try {
                                             const parsedMeta = typeof app.metadata === "string" ? JSON.parse(app.metadata) : app.metadata;
