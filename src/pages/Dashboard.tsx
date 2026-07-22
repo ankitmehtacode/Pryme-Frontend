@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { cn, buildCleanMetadata, formatISTDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -729,31 +730,70 @@ const Dashboard: React.FC = () => {
                         </h1>
                       </div>
 
-                      {/* Application picker -- only shown once there's more than one
-                          in-progress application to choose between. */}
-                      {myApplications.filter(a => (a.completionPercentage || 0) < 100).length > 1 && (
-                        <div className="flex flex-wrap gap-2 mb-4 relative z-10">
-                          {myApplications
-                            .filter(a => (a.completionPercentage || 0) < 100)
-                            .map((app) => {
-                              const isActive = activeApplication?.applicationId === app.applicationId;
-                              return (
-                                <button
-                                  key={app.applicationId}
-                                  onClick={() => { if (!isActive) loadApplicationIntoFunnel(app, myApplications); }}
-                                  className={cn(
-                                    "px-3.5 py-2 rounded-xl text-xs font-bold border transition-all",
-                                    isActive
-                                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                                      : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600"
-                                  )}
-                                >
-                                  {formatLoanTypeLabel(app.loanType)}
+                      {/* Application switcher -- only shown once there's more than one
+                          in-progress application to choose between. A dropdown rather than
+                          a pill row: pills labeled only by loan type render identically for
+                          two applications of the same type, giving no way to tell them apart
+                          or see which is actually selected. The dropdown disambiguates each
+                          entry with a status badge, amount, and date, and only the chosen
+                          application's funnel renders below -- selecting one is the only
+                          thing that changes what's on screen. */}
+                      {(() => {
+                        const inProgressApps = myApplications.filter(a => (a.completionPercentage || 0) < 100);
+                        if (inProgressApps.length <= 1) return null;
+                        const activeStatus = activeApplication ? getStatusConfig(activeApplication.status) : null;
+                        return (
+                          <div className="mb-4 relative z-10">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="flex items-center justify-between gap-3 w-full sm:w-auto sm:min-w-[280px] px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition-colors text-left">
+                                  <span className="flex items-center gap-2 min-w-0">
+                                    <span className="font-bold text-sm text-slate-900 truncate">
+                                      {activeApplication ? formatLoanTypeLabel(activeApplication.loanType) : "Select application"}
+                                    </span>
+                                    {activeStatus && (
+                                      <span className={cn("px-1.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wide shrink-0", activeStatus.color)}>
+                                        {activeStatus.label}
+                                      </span>
+                                    )}
+                                  </span>
+                                  <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
                                 </button>
-                              );
-                            })}
-                        </div>
-                      )}
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start" className="w-[300px]">
+                                {inProgressApps.map((app) => {
+                                  const isActive = activeApplication?.applicationId === app.applicationId;
+                                  const statusConfig = getStatusConfig(app.status);
+                                  return (
+                                    <DropdownMenuItem
+                                      key={app.applicationId}
+                                      onSelect={() => { if (!isActive) loadApplicationIntoFunnel(app, myApplications); }}
+                                      className="flex items-start gap-2.5 py-2.5 px-2.5 cursor-pointer"
+                                    >
+                                      <span className={cn("mt-1 w-3.5 h-3.5 shrink-0 flex items-center justify-center", isActive ? "text-blue-600" : "text-transparent")}>
+                                        <Check className="w-3.5 h-3.5" />
+                                      </span>
+                                      <span className="flex flex-col gap-1 min-w-0">
+                                        <span className="font-bold text-sm text-slate-900 truncate">
+                                          {formatLoanTypeLabel(app.loanType)}
+                                        </span>
+                                        <span className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
+                                          <span className={cn("px-1.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wide", statusConfig.color)}>
+                                            {statusConfig.label}
+                                          </span>
+                                          <span>{formatINR(app.requestedAmount)}</span>
+                                          <span className="text-slate-300">·</span>
+                                          <span>{formatISTDate(app.createdAt)}</span>
+                                        </span>
+                                      </span>
+                                    </DropdownMenuItem>
+                                  );
+                                })}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        );
+                      })()}
                   <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     <SplitLayout.Media className="lg:col-span-3 sticky top-6 lg:border-r lg:border-slate-100 lg:pr-6">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Application Steps</h3>
