@@ -44,7 +44,15 @@ import rewardPfWaiver100 from "@/assets/rewards/reward-pf-waiver-100.png";
 const REWARD_IMAGE_BY_KEY: Record<string, string> = {
   [`32" LED TV`]: rewardLedTv32,
   [`32" SMART LED TV`]: rewardLedTvSmart32,
+  // V89 resync (2026-07-22 sheet) dropped the inch-mark spelling for these
+  // three and renamed the old 42" tier to 43" -- same physical items, no
+  // dedicated 43" asset exists so it reuses the closest (32" smart) photo
+  // rather than falling back to the generic icon.
+  "32 INCH LED TV": rewardLedTv32,
+  "32 INCH SMART LED TV": rewardLedTvSmart32,
+  "43 INCH SMART LED TV": rewardLedTvSmart32,
   "VACCUM CLEANER": rewardVacuumCleaner,
+  "VACUUM CLEANER": rewardVacuumCleaner,
   "AIR CONDITIONER": rewardAirConditioner,
   "LAPTOP": rewardLaptop,
   "IPHONE 15": rewardIphone15,
