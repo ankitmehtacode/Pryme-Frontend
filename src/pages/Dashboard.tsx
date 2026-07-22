@@ -45,13 +45,66 @@ import { LOAN_TYPE_LABELS, type ApplicationStore } from "@/lib/applicationTypes"
 // already the schema, and JSON round-trips them exactly.
 type ApplicationStoreSnapshot = Partial<Pick<ApplicationStore, "basicKYC" | "financialDetails" | "loanRequirements" | "financialFootprint">>;
 
-function hydrateStoreFromSnapshot(store: ApplicationStore, snapshot: unknown) {
-  if (!snapshot || typeof snapshot !== "object") return;
-  const snap = snapshot as ApplicationStoreSnapshot;
-  if (snap.basicKYC) store.updateBasicKYC(snap.basicKYC);
-  if (snap.loanRequirements) store.updateLoanRequirements(snap.loanRequirements);
-  if (snap.financialFootprint) store.updateFinancialFootprint(snap.financialFootprint);
-  if (snap.financialDetails?.path) store.updateFinancialDetails(snap.financialDetails);
+// 🧠 MULTI-APPLICATION INDEPENDENCE: a user can now have several applications
+// in flight at once (e.g. Home Loan + Loan Against Property). They share ONE
+// global store, so switching which application is active has to (a) carry
+// forward facts about the APPLICANT -- basicKYC, financialDetails,
+// financialFootprint: identity, income, employment, co-applicant -- since
+// those don't change per product and re-asking for them would be absurd,
+// while (b) never leaking one application's loan-specific data
+// (amount/tenure/property/purpose/selected bank) into a different one.
+// loanRequirements is therefore hard-reset to defaults on every switch
+// before the target application's own saved values (if any) are layered
+// back on top -- updateLoanRequirements merges rather than replaces, so
+// every field (including the optional property/vehicle ones) has to be
+// listed explicitly or a stale value from the previous application would
+// silently survive the merge.
+const BLANK_LOAN_REQUIREMENTS: ApplicationStore["loanRequirements"] = {
+  loanType: "" as ApplicationStore["loanRequirements"]["loanType"],
+  loanAmount: 0,
+  tenureYears: 0,
+  purpose: "",
+  cibilScore: 0,
+  propertyIdentified: undefined,
+  propertyType: undefined,
+  propertyCategory: undefined,
+  businessPropertyCategory: undefined,
+  propertyValue: undefined,
+  propertyCity: undefined,
+  vehicleOnRoadPrice: undefined,
+  vehicleQuotationPrice: undefined,
+  selectedBankName: undefined,
+};
+
+function parseStoreSnapshot(app: Application): ApplicationStoreSnapshot | undefined {
+  if (!app.metadata) return undefined;
+  const meta = typeof app.metadata === "string"
+    ? (() => { try { return JSON.parse(app.metadata as string); } catch { return undefined; } })()
+    : app.metadata;
+  return meta?.storeSnapshot as ApplicationStoreSnapshot | undefined;
+}
+
+function loadApplicationDataIntoStore(store: ApplicationStore, targetApp: Application, allApps: Application[]) {
+  const targetSnapshot = parseStoreSnapshot(targetApp);
+  const hasCommonData = (s?: ApplicationStoreSnapshot) => !!(s?.basicKYC || s?.financialDetails?.path);
+
+  // Prefer this application's own saved common data; if it doesn't have any
+  // yet (e.g. just created for a second product), fall back to the first
+  // other application that does -- "information already filled in" carries
+  // over instead of being re-asked.
+  const commonSource = hasCommonData(targetSnapshot)
+    ? targetSnapshot
+    : allApps
+        .filter((a) => a.applicationId !== targetApp.applicationId)
+        .map(parseStoreSnapshot)
+        .find(hasCommonData);
+
+  if (commonSource?.basicKYC) store.updateBasicKYC(commonSource.basicKYC);
+  if (commonSource?.financialFootprint) store.updateFinancialFootprint(commonSource.financialFootprint);
+  if (commonSource?.financialDetails?.path) store.updateFinancialDetails(commonSource.financialDetails);
+
+  store.updateLoanRequirements(BLANK_LOAN_REQUIREMENTS);
+  if (targetSnapshot?.loanRequirements) store.updateLoanRequirements(targetSnapshot.loanRequirements);
 }
 
 // --- Types & Interfaces ---
@@ -106,6 +159,20 @@ const spring = { stiffness: 120, damping: 28, mass: 0.8 };
 const formatINR = (value: number) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
 
+// Same defensive substring normalization Apply.tsx's findApplicationForCurrentProduct
+// and the docGroups loanType handling elsewhere in this file already use --
+// app.loanType isn't returned in one consistent format everywhere.
+const formatLoanTypeLabel = (raw?: string) => {
+  const s = String(raw || "").toLowerCase();
+  if (s.includes("business")) return "Business Loan";
+  if (s.includes("home")) return "Home Loan";
+  if (s.includes("lap") || s.includes("property")) return "Loan Against Property";
+  if (s.includes("education")) return "Education Loan";
+  if (s.includes("auto") || s.includes("car")) return "Auto Loan";
+  if (s.includes("personal")) return "Personal Loan";
+  return raw || "Loan";
+};
+
 const getStatusConfig = (status: string) => {
   switch (status?.toUpperCase()) {
     case "SUBMITTED":
@@ -146,6 +213,58 @@ const Dashboard: React.FC = () => {
 
   // 🧠 SMART NORMALIZER: Aligns React frontend names with Java Backend Sanitized Names
   const normalizeDocName = (name: string) => name.trim().toUpperCase().replace(/\s+/g, '_');
+
+  // Switches the funnel to a specific application -- used on initial boot AND
+  // by the application picker below. Documents/stage are a hard replace (each
+  // application's own, never merged with another's); personal/employment data
+  // carries over via loadApplicationDataIntoStore, loan-specific data resets.
+  const loadApplicationIntoFunnel = useCallback((targetApp: Application, allApps: Application[]) => {
+    setActiveApplication(targetApp);
+
+    const loadedDocs: Record<string, boolean> = {};
+    (targetApp.documents || []).forEach((d) => {
+      if (d.docType) loadedDocs[d.docType] = true;
+    });
+    setUploadedDocs(loadedDocs);
+
+    const progress = targetApp.completionPercentage || 0;
+    if (progress >= 100) {
+      setViewState("DASHBOARD");
+      return;
+    }
+
+    setViewState("FUNNEL");
+    setCurrentStage(progress === 0 || progress < 50 ? 1 : 2);
+
+    loadApplicationDataIntoStore(store, targetApp, allApps);
+
+    // 🧠 SINGLE SOURCE OF TRUTH: fall back to financialDetails.data.existingEMI
+    // (the same field the eligibility engine already used) when this application
+    // has no saved monthlyEMI yet -- read AFTER the store load above so this
+    // reflects the application just switched to, not whichever was active before.
+    const storeEmi = useApplicationStore.getState().financialDetails?.data?.existingEMI;
+    const emiFallback = storeEmi != null ? String(storeEmi) : "";
+
+    let parsedMeta: Partial<DashboardFormData> = {};
+    if (targetApp.metadata) {
+      if (typeof targetApp.metadata === "string") {
+        try {
+          parsedMeta = JSON.parse(targetApp.metadata);
+        } catch (e) {
+          console.error("Failed to parse metadata", e);
+        }
+      } else if (typeof targetApp.metadata === "object") {
+        parsedMeta = targetApp.metadata;
+      }
+    }
+    setFormData(prev => ({
+      ...prev,
+      ...parsedMeta,
+      monthlyEMI: parsedMeta.monthlyEMI || emiFallback,
+      requestedAmount: parsedMeta.requestedAmount || String(targetApp.requestedAmount || ""),
+      tenure: parsedMeta.tenure || ""
+    }));
+  }, [store]);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -189,62 +308,7 @@ const Dashboard: React.FC = () => {
         setMyApplications(apps);
 
         if (apps.length > 0) {
-          const primaryApp = apps[0]; 
-          setActiveApplication(primaryApp);
-          const progress = primaryApp.completionPercentage || 0;
-          
-          // 🧠 TITANIUM HYDRATION: Safe checking for uploaded documents
-          if (primaryApp.documents && primaryApp.documents.length > 0) {
-            const loadedDocs: Record<string, boolean> = {};
-            primaryApp.documents.forEach((d) => {
-              if (d.docType) loadedDocs[d.docType] = true;
-            });
-            setUploadedDocs(loadedDocs);
-          }
-
-          if (progress < 100) {
-            setViewState("FUNNEL");
-            if (progress === 0 || progress < 50) setCurrentStage(1);
-            else setCurrentStage(2);
-            
-            // 🧠 SINGLE SOURCE OF TRUTH: fall back to financialDetails.data.existingEMI
-            // (the same field the eligibility engine already used) when this application
-            // has no saved monthlyEMI yet -- so this never becomes a second, divergent
-            // place asking for a fact already collected on the main application form.
-            const storeEmi = store.financialDetails?.data?.existingEMI;
-            const emiFallback = storeEmi != null ? String(storeEmi) : "";
-
-            if (primaryApp.metadata) {
-              let parsedMeta: Partial<DashboardFormData> & { storeSnapshot?: unknown } = {};
-              if (typeof primaryApp.metadata === "string") {
-                try {
-                  parsedMeta = JSON.parse(primaryApp.metadata);
-                } catch (e) {
-                  console.error("Failed to parse metadata", e);
-                }
-              } else if (typeof primaryApp.metadata === "object") {
-                parsedMeta = primaryApp.metadata;
-              }
-              setFormData(prev => ({
-                ...prev,
-                ...parsedMeta,
-                monthlyEMI: parsedMeta.monthlyEMI || emiFallback,
-                requestedAmount: parsedMeta.requestedAmount || String(primaryApp.requestedAmount || ""),
-                tenure: parsedMeta.tenure || ""
-              }));
-              // Restore the personal/occupation/loan-detail fields that live in
-              // useApplicationStore -- see hydrateStoreFromSnapshot above.
-              hydrateStoreFromSnapshot(store, parsedMeta.storeSnapshot);
-            } else {
-              setFormData(prev => ({
-                ...prev,
-                monthlyEMI: emiFallback,
-                requestedAmount: String(primaryApp.requestedAmount || ""),
-              }));
-            }
-          } else {
-            setViewState("DASHBOARD");
-          }
+          loadApplicationIntoFunnel(apps[0], apps);
         } else {
           // 🧠 RELAY FIX: If there's a cached pending application from the /apply flow,
           // scaffold a synthetic FUNNEL so the user sees the form immediately instead of
@@ -659,6 +723,32 @@ const Dashboard: React.FC = () => {
                           Let's get you funded
                         </h1>
                       </div>
+
+                      {/* Application picker -- only shown once there's more than one
+                          in-progress application to choose between. */}
+                      {myApplications.filter(a => (a.completionPercentage || 0) < 100).length > 1 && (
+                        <div className="flex flex-wrap gap-2 mb-4 relative z-10">
+                          {myApplications
+                            .filter(a => (a.completionPercentage || 0) < 100)
+                            .map((app) => {
+                              const isActive = activeApplication?.applicationId === app.applicationId;
+                              return (
+                                <button
+                                  key={app.applicationId}
+                                  onClick={() => { if (!isActive) loadApplicationIntoFunnel(app, myApplications); }}
+                                  className={cn(
+                                    "px-3.5 py-2 rounded-xl text-xs font-bold border transition-all",
+                                    isActive
+                                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                                      : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600"
+                                  )}
+                                >
+                                  {formatLoanTypeLabel(app.loanType)}
+                                </button>
+                              );
+                            })}
+                        </div>
+                      )}
                   <SplitLayout className="grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     <SplitLayout.Media className="lg:col-span-3 sticky top-6 lg:border-r lg:border-slate-100 lg:pr-6">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Application Steps</h3>
