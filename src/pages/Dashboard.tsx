@@ -81,16 +81,20 @@ const BLANK_LOAN_REQUIREMENTS: ApplicationStore["loanRequirements"] = {
   selectedBankName: undefined,
 };
 
-function parseStoreSnapshot(app: Application): ApplicationStoreSnapshot | undefined {
+function parseMetadata(app: Application): Record<string, any> | undefined {
   if (!app.metadata) return undefined;
-  const meta = typeof app.metadata === "string"
+  return typeof app.metadata === "string"
     ? (() => { try { return JSON.parse(app.metadata as string); } catch { return undefined; } })()
     : app.metadata;
-  return meta?.storeSnapshot as ApplicationStoreSnapshot | undefined;
+}
+
+function parseStoreSnapshot(app: Application): ApplicationStoreSnapshot | undefined {
+  return parseMetadata(app)?.storeSnapshot as ApplicationStoreSnapshot | undefined;
 }
 
 function loadApplicationDataIntoStore(store: ApplicationStore, targetApp: Application, allApps: Application[]) {
   const targetSnapshot = parseStoreSnapshot(targetApp);
+  const targetMetadata = parseMetadata(targetApp);
   const hasCommonData = (s?: ApplicationStoreSnapshot) => !!(s?.basicKYC || s?.financialDetails?.path);
 
   // Prefer this application's own saved common data; if it doesn't have any
@@ -123,7 +127,21 @@ function loadApplicationDataIntoStore(store: ApplicationStore, targetApp: Applic
   store.updateLoanRequirements({
     loanAmount: targetSnapshot?.loanRequirements?.loanAmount || targetApp.requestedAmount || undefined,
     cibilScore: targetSnapshot?.loanRequirements?.cibilScore || targetApp.declaredCibilScore || undefined,
+    // Applications that came from the original apply wizard (elevated from a
+    // lead, never touched this funnel's own Save & Continue) carry
+    // propertyValue/tenure as FLAT top-level metadata keys instead -- written
+    // by buildCleanMetadata during the wizard's initial lead submission,
+    // never nested under storeSnapshot.loanRequirements like this funnel
+    // writes them. Same data, different key path; fall back to it.
+    propertyValue: targetSnapshot?.loanRequirements?.propertyValue || numberOrUndefined(targetMetadata?.propertyValue),
+    tenureYears: targetSnapshot?.loanRequirements?.tenureYears || numberOrUndefined(targetMetadata?.tenure),
   });
+}
+
+function numberOrUndefined(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const n = Number(value);
+  return Number.isNaN(n) ? undefined : n;
 }
 
 // --- Types & Interfaces ---

@@ -184,6 +184,11 @@ export function buildCleanMetadata(formData: any): Record<string, any> {
     
     // Loan details
     loanPurpose: formData.loanPurpose,
+    // Was silently dropped -- LoanApplicationForm computes `loanTenure` (the
+    // wizard's field name) and Dashboard's own form state uses `tenure`, but
+    // neither was ever read here, so tenure never reached the backend at all
+    // for any application, regardless of which flow created it.
+    tenure: formData.loanTenure || formData.tenure || undefined,
     propertyType: formData.propertyType,
     propertyValue: formData.estimatedPropertyValue || formData.propertyValue || undefined,
     propertyIdentified: formData.propertyIdentified ? "Yes" : "No",
