@@ -110,6 +110,20 @@ function loadApplicationDataIntoStore(store: ApplicationStore, targetApp: Applic
 
   store.updateLoanRequirements(BLANK_LOAN_REQUIREMENTS);
   if (targetSnapshot?.loanRequirements) store.updateLoanRequirements(targetSnapshot.loanRequirements);
+
+  // 🧠 loanRequirements.loanAmount/cibilScore only ever come from this
+  // client-authored JSON snapshot, which is written solely by this funnel's
+  // "Save & Continue" (handleNextStage). Any application that reached its
+  // current status without ever passing through that -- admin-approved,
+  // elevated straight from a lead, etc. -- has a correct requestedAmount/
+  // declaredCibilScore on the backend record itself but nothing in the
+  // snapshot, so the Loan Details bar rendered blank even though the
+  // application genuinely has this data. Fall back to those authoritative
+  // columns whenever the snapshot didn't provide them.
+  store.updateLoanRequirements({
+    loanAmount: targetSnapshot?.loanRequirements?.loanAmount || targetApp.requestedAmount || undefined,
+    cibilScore: targetSnapshot?.loanRequirements?.cibilScore || targetApp.declaredCibilScore || undefined,
+  });
 }
 
 // --- Types & Interfaces ---
