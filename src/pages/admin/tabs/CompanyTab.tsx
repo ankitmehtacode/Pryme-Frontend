@@ -1,8 +1,9 @@
-import React from "react";
-import { Loader2, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, Trash2, UserPlus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, formatISTDate } from "@/lib/utils";
 import { ConfirmAction } from "@/components/ui/confirm-action";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface CompanyTabProps {
   teamMembers: any[];
@@ -10,14 +11,104 @@ interface CompanyTabProps {
   authUser: any;
   roleMutation: any;
   deleteUserMutation: any;
+  createEmployeeMutation: any;
 }
 
-export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmin, authUser, roleMutation, deleteUserMutation }) => {
+const emptyForm = { fullName: "", email: "", password: "" };
+
+function CreateEmployeeDialog({ open, onOpenChange, createEmployeeMutation }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  createEmployeeMutation: any;
+}) {
+  const [form, setForm] = useState(emptyForm);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createEmployeeMutation.mutate(form, {
+      onSuccess: () => {
+        setForm(emptyForm);
+        onOpenChange(false);
+      },
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(next) => { if (!createEmployeeMutation.isPending) onOpenChange(next); }}>
+      <DialogContent className="bg-[#0d0d14] border-white/[0.08] text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-white">Add Employee</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-400">Full Name</label>
+            <input
+              required
+              value={form.fullName}
+              onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
+              className="w-full h-10 rounded-lg bg-white/[0.04] border border-white/[0.08] px-3 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30"
+              placeholder="Jane Doe"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-400">Email</label>
+            <input
+              required
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              className="w-full h-10 rounded-lg bg-white/[0.04] border border-white/[0.08] px-3 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30"
+              placeholder="jane@pryme.tech"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-400">Password</label>
+            <input
+              required
+              type="password"
+              minLength={8}
+              value={form.password}
+              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              className="w-full h-10 rounded-lg bg-white/[0.04] border border-white/[0.08] px-3 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30"
+              placeholder="At least 8 characters"
+            />
+          </div>
+          <p className="text-[11px] text-slate-500">
+            This account is created directly with Employee access -- no separate sign-up needed. Share the email and password with them securely.
+          </p>
+          <button
+            type="submit"
+            disabled={createEmployeeMutation.isPending}
+            className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {createEmployeeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+            {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
+          </button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmin, authUser, roleMutation, deleteUserMutation, createEmployeeMutation }) => {
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const canCreate = isSuperAdmin || authUser?.role === "ADMIN";
+
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
       <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] shrink-0 rounded-t-2xl">
-        <h3 className="font-semibold text-white">Team Members</h3>
-        <span className="text-xs text-slate-500 font-medium">{teamMembers.length} team members{!isSuperAdmin && " • Role changes require SUPER_ADMIN"}</span>
+        <div>
+          <h3 className="font-semibold text-white">Team Members</h3>
+          <span className="text-xs text-slate-500 font-medium">{teamMembers.length} team members{!isSuperAdmin && " • Role changes require SUPER_ADMIN"}</span>
+        </div>
+        {canCreate && (
+          <button
+            onClick={() => setShowCreateDialog(true)}
+            className="h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+          >
+            <UserPlus className="w-3.5 h-3.5" /> Add Employee
+          </button>
+        )}
       </div>
       {(roleMutation.isPending || deleteUserMutation.isPending) && (
         <div className="px-6 py-2 bg-blue-500/10 border-b border-blue-500/20 flex items-center gap-2 text-xs text-blue-400 font-medium">
@@ -117,6 +208,13 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({ teamMembers, isSuperAdmi
         </tbody>
       </table>
       </div>
+      {canCreate && (
+        <CreateEmployeeDialog
+          open={showCreateDialog}
+          onOpenChange={setShowCreateDialog}
+          createEmployeeMutation={createEmployeeMutation}
+        />
+      )}
     </div>
   );
 };

@@ -511,6 +511,10 @@ export const PrymeAPI = {
   /** Admin: User Directory — GET /api/v1/admin/users */
   getAdminUsers: async () => fetchWithAuth("/admin/users", { method: "GET" }),
 
+  /** Admin: Create an employee account directly (email + password set by the admin) — POST /api/v1/admin/users (ADMIN/SUPER_ADMIN only) */
+  createEmployee: async (data: { fullName: string; email: string; password: string }) =>
+    fetchWithAuth("/admin/users", { method: "POST", body: JSON.stringify(data) }),
+
   /** Admin: Update user role — PATCH /api/v1/admin/users/{userId}/role (SUPER_ADMIN only) */
   updateUserRole: async (userId: string, role: string) =>
     fetchWithAuth(`/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),

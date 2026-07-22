@@ -352,6 +352,19 @@ const AdminDashboard = () => {
     }
   });
 
+  // 🧠 CREATE EMPLOYEE MUTATION: Wired to POST /admin/users -- direct
+  // provisioning (admin sets the email/password), not the public signup flow.
+  const createEmployeeMutation = useMutation({
+    mutationFn: (data: { fullName: string; email: string; password: string }) => PrymeAPI.createEmployee(data),
+    onSuccess: () => {
+      toast.success("Employee account created.");
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create employee.");
+    }
+  });
+
   // ==========================================
   // POLICY ENGINE UI STATES
   // ==========================================
@@ -894,10 +907,11 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === "company" && (
-                  <CompanyTab 
-                    teamMembers={teamMembers} isSuperAdmin={isSuperAdmin} 
-                    authUser={authUser} roleMutation={roleMutation} 
+                  <CompanyTab
+                    teamMembers={teamMembers} isSuperAdmin={isSuperAdmin}
+                    authUser={authUser} roleMutation={roleMutation}
                     deleteUserMutation={deleteUserMutation}
+                    createEmployeeMutation={createEmployeeMutation}
                   />
                 )}
 
