@@ -372,6 +372,38 @@ const Apply = () => {
     navigate(`/apply-direct/${bankId}`);
   };
 
+  // Normalizes a raw loan-type string (however the backend/engine returns it --
+  // "HOME_LOAN", "home", "Home Loan", ...) down to a stable bucket, so
+  // applications for different products can be told apart reliably. Mirrors
+  // the same defensive substring matching Dashboard.tsx already uses for the
+  // same reason (loanType casing/format isn't consistent everywhere).
+  const normalizeProductBucket = (raw?: string | null): string => {
+    const s = String(raw || "").toLowerCase();
+    if (s.includes("business")) return "business";
+    if (s.includes("home")) return "home";
+    if (s.includes("lap") || s.includes("property")) return "lap";
+    if (s.includes("education")) return "education";
+    if (s.includes("auto") || s.includes("car")) return "auto";
+    if (s.includes("personal")) return "personal";
+    return s;
+  };
+
+  // Recovery-path helper: an elevation call can fail (network blip, lead
+  // already converted, etc.) after the applicant has already filled out the
+  // form for a specific product. Blindly grabbing myApps[0] here -- the
+  // user's FIRST application ever, regardless of product -- would silently
+  // misattach a Home Loan continuation onto an unrelated Personal Loan
+  // application (or vice versa) for anyone who already has one on file. Only
+  // reattach to an existing application when it's genuinely for the SAME
+  // product being applied for right now; the caller leaves activeApplicationId
+  // unset otherwise, so Dashboard's existing JIT-recovery path (recreating the
+  // application from the cached pending payload) creates a fresh,
+  // correctly-typed one instead of corrupting an unrelated record.
+  const findApplicationForCurrentProduct = (myApps: any[]): any | undefined => {
+    const targetBucket = normalizeProductBucket(applicationData?.productType);
+    return myApps.find((app) => normalizeProductBucket(app?.loanType) === targetBucket);
+  };
+
   // 🧠 THE CORE GATEWAY: Pushes intent -> Auth -> Inline Progressive Continuation
   const handleApplyWithPyrme = async (bankId: string) => {
     const bank = bankOffers.find(b => b.id === bankId);
@@ -408,18 +440,18 @@ const Apply = () => {
           console.error("Lead elevation failed:", error);
           try {
             const myApps = await PrymeAPI.getMyApplications();
-            if (myApps && myApps.length > 0) {
-              setActiveApplicationId(myApps[0].applicationId);
-            }
+            const existingApp = findApplicationForCurrentProduct(myApps || []);
+            if (existingApp) setActiveApplicationId(existingApp.applicationId);
           } catch (e) { /* ignore */ }
         }
       } else {
-        // No lead? Check if they already have an application
+        // No lead? Only reattach to an application already on file for this
+        // SAME product -- a different product leaves activeApplicationId
+        // unset so a genuinely new application gets created for it instead.
         try {
           const myApps = await PrymeAPI.getMyApplications();
-          if (myApps && myApps.length > 0) {
-            setActiveApplicationId(myApps[0].applicationId);
-          }
+          const existingApp = findApplicationForCurrentProduct(myApps || []);
+          if (existingApp) setActiveApplicationId(existingApp.applicationId);
         } catch (e) { /* ignore */ }
       }
     }
