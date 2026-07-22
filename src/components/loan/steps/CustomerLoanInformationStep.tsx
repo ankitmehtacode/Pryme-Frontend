@@ -110,7 +110,7 @@ function LoanDetailsBar() {
           <img src={bankLogo} alt={loanRequirements.selectedBankName} className="h-8 object-contain shrink-0" />
         )}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <FrozenField label="Loan Amount" icon={IndianRupee} value={loanRequirements.loanAmount} formatAsCurrency />
         <FrozenField label="Tenure" icon={Calendar} value={loanRequirements.tenureYears ? `${loanRequirements.tenureYears} yrs` : undefined} />
         <FrozenField label="Credit Score" icon={CreditCard} value={loanRequirements.cibilScore || undefined} />
