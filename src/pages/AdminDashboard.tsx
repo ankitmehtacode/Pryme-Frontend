@@ -51,6 +51,14 @@ const SettingsTab = lazy(() => import("./admin/tabs/SettingsTab"));
 
 const isHighImpact = (key: string) => ["foirAllowed", "ltvAllowed", "FOIR Allowed"].includes(key);
 
+// Sidebar identity card previously hardcoded "Super Admin" regardless of who
+// was actually logged in -- an Employee or Admin saw the same wrong label.
+const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: "Super Admin",
+  ADMIN: "Admin",
+  EMPLOYEE: "Employee",
+};
+
 // MOCK_METADATA_DB removed (using dynamic backend definitions)
 
 // 🧠 DOCUMENT VAULT PANEL: Inline sub-component to fetch & display KYC docs from the backend
@@ -718,6 +726,13 @@ const AdminDashboard = () => {
   const isSuperAdmin = authUser?.role === "SUPER_ADMIN";
   const isEmployee = authUser?.role === "EMPLOYEE";
 
+  // 🧠 EMPLOYEE surface restriction: an employee's job is working their
+  // assigned leads/applications, not company-wide analytics, the full
+  // customer directory, reward/pricing config, or the eligibility rules
+  // engine -- those stay ADMIN/SUPER_ADMIN only. This is a UI-level
+  // convenience filter; the actual security boundary is each endpoint's own
+  // @PreAuthorize on the backend, unaffected by what's shown in this list.
+  const employeeHiddenTabIds = new Set(["overview", "users", "productRewards", "settings"]);
   const sidebarItems = [
     { id: "overview", label: "Analytics Overview", icon: BarChart3 }, { id: "applications", label: "CRM Pipeline", icon: LayoutGrid },
     { id: "leads", label: "Raw Inquiries", icon: LayoutList },
@@ -726,7 +741,7 @@ const AdminDashboard = () => {
     { id: "marketing", label: "Marketing & Offers", icon: Percent },
     { id: "productRewards", label: "Product Reward", icon: Gift },
     { id: "settings", label: "Policy Matrix", icon: Settings },
-  ];
+  ].filter((item) => !isEmployee || !employeeHiddenTabIds.has(item.id));
 
   return (
     <>
@@ -756,8 +771,13 @@ const AdminDashboard = () => {
           </div>
           <div className="p-4 border-t border-white/[0.06]">
             <div className="flex items-center gap-3 px-3 py-2 mb-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-800/10 flex items-center justify-center border border-blue-500/30"><span className="text-xs font-semibold text-blue-400">AD</span></div>
-              <div className="flex-1 text-left"><p className="text-sm font-semibold text-white truncate">Super Admin</p></div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-800/10 flex items-center justify-center border border-blue-500/30 shrink-0">
+                <span className="text-xs font-semibold text-blue-400">{(authUser?.name || "TM").substring(0, 2).toUpperCase()}</span>
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-sm font-semibold text-white truncate">{authUser?.name || "Team Member"}</p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider truncate">{ROLE_LABELS[authUser?.role as string] || authUser?.role}</p>
+              </div>
             </div>
             <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors active:scale-[0.97]"><LogOut className="w-4 h-4" /> Sign Out</button>
           </div>
