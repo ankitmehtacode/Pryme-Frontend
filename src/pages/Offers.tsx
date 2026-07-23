@@ -1,18 +1,15 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { PrymeAPI } from "@/lib/api";
-import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, ShieldAlert, Sparkles, TrendingUp, Users, Zap, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Gift, Clock, Star, BadgeCheck, AlertCircle, X } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, ShieldCheck, ShieldAlert, Users, Building2, ChevronRight, Lock, Loader2, ArrowLeft, ExternalLink, Clock, Star, BadgeCheck, AlertCircle, X } from "lucide-react";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import SmoothScroll from "@/components/SmoothScroll";
-import ScrollReveal from "@/components/ui/ScrollReveal";
-import OffersMarquee from "@/components/home/OffersMarquee";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { BankComparisonCard, BankOfferDTO } from "@/components/loan/BankComparisonCard";
@@ -640,61 +637,14 @@ export default function Offers() {
   // SCENARIO A: PUBLIC PAGE (no lead data — direct URL navigation)
   // ═══════════════════════════════════════════════════════════════════════
 
+  // Landing on /offers directly (no application in progress -- no leadData)
+  // used to show a fully hardcoded "Premium Incentives" marketing page with
+  // fabricated bank deals (HDFC/Standard Chartered offers that were never
+  // real, backed by no API call). Deleted per request -- this route only
+  // makes sense as a results page for someone who actually applied, so it
+  // now sends them to start an application instead of showing fake content.
   if (!leadData) {
-    return (
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#080d1e]">
-        <Helmet>
-          <title>Exclusive Offers | PRYME Consulting</title>
-          <meta name="robots" content="noindex, nofollow" />
-        </Helmet>
-        <Header />
-        <SmoothScroll>
-          <main className="flex-1 pt-24 md:pt-32">
-            <section className="pb-24">
-              <ScrollReveal direction="up">
-                <div className="container mx-auto px-4 max-w-4xl text-center mb-16">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-medium uppercase tracking-widest mb-6 border border-primary/20">
-                    <Gift className="w-4 h-4" /> Member Perks
-                  </span>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-8 tracking-tight">
-                    Premium <span className="text-primary italic">Incentives</span>
-                  </h1>
-                  <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed font-light">
-                    Our scale allows us to negotiate exclusive rates and zero-processing fee deals that you won't find on bank websites.
-                  </p>
-                </div>
-              </ScrollReveal>
-              <div className="py-12 bg-white/30 dark:bg-white/[0.02] backdrop-blur-sm border-y border-white/30 dark:border-white/[0.06] mb-20"><OffersMarquee /></div>
-              <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                  {[
-                    { icon: Zap, title: "Zero Processing Fees", bank: "HDFC Bank Special", text: "Available for Home Loans above ₹50L.", color: "from-blue-500/10 to-blue-600/10" },
-                    { icon: Sparkles, title: "0.25% ROI Reduction", bank: "Standard Chartered", text: "Exclusive for PRYME customers with CIBIL > 800.", color: "from-blue-500/10 to-blue-800/10" },
-                    { icon: Gift, title: "₹5000 Amazon Voucher", bank: "Personal Loan Perk", text: "Get rewarded on first disbursement through our platform.", color: "from-amber-500/10 to-amber-600/10" },
-                    { icon: TrendingUp, title: "Double Rewards Points", bank: "Credit Card Offer", text: "2x points on all digital spends for 90 days.", color: "from-blue-700/10 to-blue-800/10" },
-                  ].map((offer, i) => (
-                    <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                      <div className={`p-8 rounded-[2.5rem] bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm ${offer.color} border border-white/40 dark:border-white/[0.08] flex flex-col md:flex-row gap-8 items-center transition-all hover:scale-[1.02] hover:shadow-lg`}>
-                        <div className="w-24 h-24 rounded-3xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-sm flex items-center justify-center shrink-0 shadow-lg border border-white/40 dark:border-white/[0.1]">
-                          <offer.icon className="w-10 h-10 text-primary" />
-                        </div>
-                        <div className="text-center md:text-left flex-1">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 mb-2 block">{offer.bank}</span>
-                          <h3 className="text-2xl font-semibold text-foreground mb-3">{offer.title}</h3>
-                          <p className="text-slate-600 dark:text-slate-400 mb-6">{offer.text}</p>
-                          <Button onClick={() => navigate('/apply')} className="rounded-xl h-12 px-8 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20">Claim Deal</Button>
-                        </div>
-                      </div>
-                    </ScrollReveal>
-                  ))}
-                </div>
-              </div>
-            </section>
-          </main>
-          <Footer />
-        </SmoothScroll>
-      </div>
-    );
+    return <Navigate to="/apply" replace />;
   }
 
   // ═══════════════════════════════════════════════════════════════════════
