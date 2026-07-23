@@ -598,10 +598,10 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   ];
 
                   const feeRows = [
-                    { label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                    { label: "Processing Fees(Inclusive of GST)", value: `₹${pfAmount.toLocaleString("en-IN")}` },
                     { label: "Login Fees", value: fmt(er?.loginFee) },
                     { label: "Stamp Duty", value: fmt(er?.stampDuty) },
-                    { label: "Other Charges", value: otherChargesDisplay },
+                    { label: "Other Charges(approx.)", value: otherChargesDisplay },
                   ];
 
                   return (
