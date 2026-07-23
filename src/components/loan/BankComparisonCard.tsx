@@ -1,8 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, ArrowRight, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Building2, TrendingUp, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
 import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
@@ -442,54 +441,35 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
             <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-row flex-wrap items-center justify-center xl:justify-end gap-3 xl:gap-2.5">
-              {matchingReward?.buttonDesign ? (
-                // No height class here -- GlossyRewardButton derives its own
-                // height from the image's real aspect ratio; forcing h-12/
-                // h-11 here is exactly what cropped (then shrank) it before.
-                <GlossyRewardButton
-                  colorScheme={matchingReward.buttonDesign}
-                  onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
-                  disabled={isGlobalLocking && !isLocking}
-                  className="flex-1 xl:flex-none xl:w-[175px]"
-                />
-              ) : (
-                <Button
-                  onClick={handleApplyClick}
-                  disabled={isGlobalLocking && !isLocking}
-                  className="rounded-xl h-12 xl:h-11 px-4 sm:px-5 text-sm font-extrabold transition-all duration-300 flex-1 xl:flex-none xl:w-[175px] border-0 shadow-lg shadow-black/5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group/btn relative overflow-hidden"
-                  style={{
-                    background: localStatus === "resolved"
-                      ? '#10b981'
-                      : isRecommended
-                        ? '#eab308'
-                        : '#0f172a',
-                    color: localStatus === "resolved"
-                      ? 'white'
-                      : isRecommended
-                        ? '#0f172a'
-                        : 'white',
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                  {localStatus === "resolved" ? (
-                    <span className="relative z-10 flex items-center justify-center whitespace-nowrap">Applied <CheckCircle2 className="w-4 h-4 ml-1.5" /></span>
-                  ) : isLocking ? (
-                    <Loader2 className="relative z-10 w-4 h-4 animate-spin hidden xl:block mx-auto" />
-                  ) : (
-                    <span className="relative z-10 flex items-center justify-center w-full whitespace-nowrap">
-                      Apply with Pryme 
-                      <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover/btn:translate-x-1" />
+              {/* Apply with Pryme -- always the premium glossy design now,
+                  regardless of whether a reward matched this offer. The
+                  image has no room for loading/applied states itself, so
+                  those render as an opaque overlay on top instead. */}
+              <GlossyRewardButton
+                colorScheme={matchingReward?.buttonDesign || "ocean-blue"}
+                onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
+                disabled={isGlobalLocking && !isLocking}
+                className="flex-1 xl:flex-none xl:w-[175px]"
+                overlay={
+                  localStatus === "resolved" ? (
+                    <span className="flex items-center gap-1.5 text-white font-extrabold text-sm whitespace-nowrap">
+                      Applied <CheckCircle2 className="w-4 h-4" />
                     </span>
-                  )}
-                </Button>
-              )}
+                  ) : isLocking ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : undefined
+                }
+              />
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="flex-1 xl:flex-none xl:w-auto rounded-xl h-12 xl:h-11 px-4 text-xs font-bold transition-all border bg-transparent dark:bg-transparent border-slate-200 dark:border-white/[0.1] text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-foreground hover:border-slate-300 flex items-center justify-center gap-1.5"
+                className="flex-1 xl:flex-none xl:w-auto rounded-full h-12 xl:h-11 px-5 text-sm font-bold transition-all border-2 bg-transparent border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 flex items-center justify-center gap-2"
                 title={`Apply directly on ${offer.bankName} website`}
               >
-                Apply Directly <ExternalLink className="w-3.5 h-3.5" />
+                Apply Directly
+                <span className="w-5 h-5 rounded-md border-2 border-current flex items-center justify-center shrink-0">
+                  <ExternalLink className="w-3 h-3" />
+                </span>
               </button>
             </div>
           </div>

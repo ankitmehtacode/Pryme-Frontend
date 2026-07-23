@@ -6,6 +6,10 @@ interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   colorScheme?: 'ocean-blue' | 'sunset-gradient' | 'deep-navy' | 'teal-gradient' | 'emerald-glow' | 'neon-cyber' | 'midnight-purple' | 'minimal-mono' | 'golden-prestige' | 'crimson-red' | string;
   className?: string;
   disabled?: boolean;
+  // Optional state overlay (loading spinner, "Applied" checkmark, etc.) --
+  // the underlying image has no way to show these itself, so this renders
+  // on top with its own opaque backing to fully cover the baked-in label.
+  overlay?: React.ReactNode;
 }
 
 const colorFilters: Record<string, string> = {
@@ -38,6 +42,7 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   colorScheme = "ocean-blue",
   className,
   disabled,
+  overlay,
   ...props
 }) => {
   const filterStyle = colorFilters[colorScheme] || colorFilters["ocean-blue"];
@@ -57,6 +62,11 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
         className="w-full h-full rounded-xl drop-shadow-md"
         style={{ filter: filterStyle }}
       />
+      {overlay && (
+        <div className="absolute inset-0 rounded-xl bg-[#0a1530]/85 flex items-center justify-center">
+          {overlay}
+        </div>
+      )}
     </div>
   );
 };
