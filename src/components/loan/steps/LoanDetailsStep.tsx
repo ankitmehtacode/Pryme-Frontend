@@ -93,7 +93,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
             type="number"
             placeholder="5"
             icon={Calendar}
-            value={loanRequirements.tenureYears}
+            value={loanRequirements.tenureYears || ""}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ tenureYears: parseInt(e.target.value) || 0 })}
             onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             isValid={
