@@ -732,7 +732,7 @@ const AdminDashboard = () => {
   // engine -- those stay ADMIN/SUPER_ADMIN only. This is a UI-level
   // convenience filter; the actual security boundary is each endpoint's own
   // @PreAuthorize on the backend, unaffected by what's shown in this list.
-  const employeeHiddenTabIds = new Set(["overview", "users", "productRewards", "settings"]);
+  const employeeHiddenTabIds = new Set(["overview", "users", "productRewards", "settings", "banks", "marketing"]);
   const sidebarItems = [
     { id: "overview", label: "Analytics Overview", icon: BarChart3 }, { id: "applications", label: "CRM Pipeline", icon: LayoutGrid },
     { id: "leads", label: "Raw Inquiries", icon: LayoutList },
