@@ -271,6 +271,16 @@ const Dashboard: React.FC = () => {
     });
     setUploadedDocs(loadedDocs);
 
+    // 🧠 Must run before the 100%-completion early return below, not after --
+    // otherwise a completed application's Applicant Information silently
+    // renders blank the moment the user reaches it via initial boot or the
+    // switcher dropdown (both call this function), since CustomerLoanInformationStep
+    // reads only from this store, never from `targetApp` directly. The
+    // "Update Information / Documents" button already worked around this by
+    // calling loadApplicationDataIntoStore itself before switching views --
+    // this fixes it at the source instead of relying on every caller to know that.
+    loadApplicationDataIntoStore(store, targetApp, allApps);
+
     const progress = targetApp.completionPercentage || 0;
     if (progress >= 100) {
       setViewState("DASHBOARD");
@@ -279,8 +289,6 @@ const Dashboard: React.FC = () => {
 
     setViewState("FUNNEL");
     setCurrentStage(progress === 0 || progress < 50 ? 1 : 2);
-
-    loadApplicationDataIntoStore(store, targetApp, allApps);
 
     // 🧠 SINGLE SOURCE OF TRUTH: fall back to financialDetails.data.existingEMI
     // (the same field the eligibility engine already used) when this application
