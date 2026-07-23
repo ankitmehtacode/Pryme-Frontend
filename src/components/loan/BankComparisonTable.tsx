@@ -160,7 +160,7 @@ const BankComparisonTable = ({
                   <GlossyRewardButton
                     colorScheme="ocean-blue"
                     onClick={() => onApplyWithPyrme(offer.id)}
-                    className="flex-1 max-w-[175px]"
+                    className="flex-1 max-w-[210px]"
                   />
 
                   <button

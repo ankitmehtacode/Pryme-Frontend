@@ -449,7 +449,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 colorScheme={matchingReward?.buttonDesign || "ocean-blue"}
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
-                className="flex-1 xl:flex-none xl:w-[175px]"
+                className="flex-1 xl:flex-none xl:w-[210px]"
                 overlay={
                   localStatus === "resolved" ? (
                     <span className="flex items-center gap-1.5 text-white font-extrabold text-sm whitespace-nowrap">
