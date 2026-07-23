@@ -1,49 +1,32 @@
 import React from 'react';
-import { ArrowRight, Gift } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import prymeLogo from '../../assets/pryme-logo.png';
+import prymeLogo from '../../assets/Pryme2.svg';
+import pillArt from '../../assets/apply-with-pryme-pill.png';
 
 interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
-  colorScheme?: 'ocean-blue' | 'sunset-gradient' | 'deep-navy' | 'teal-gradient' | 'emerald-glow' | 'neon-cyber' | 'midnight-purple' | 'minimal-mono' | 'golden-prestige' | 'crimson-red' | string;
   className?: string;
   disabled?: boolean;
   // Optional state overlay (loading spinner, "Applied" checkmark, etc.)
   overlay?: React.ReactNode;
-  // The gold "REWARDS" corner ribbon -- on by default to match the
-  // always-premium button decision, but callers can turn it off for an
-  // offer that genuinely has no matching reward rather than imply one exists.
+  // The gold "REWARDS" ribbon is baked into pillArt (left cap art) -- turn
+  // this off for an offer that genuinely has no matching reward rather than
+  // imply one exists. Falls back to a plain gradient pill with no art.
   showRewardsRibbon?: boolean;
 }
 
-// Real background gradients per scheme (was a hue-rotate filter over a
-// baked PNG before -- replaced because that image's canvas was mostly empty
-// padding around a small pill, plus a dangling pendant/chain the design
-// reference never had, so it rendered as a tiny cramped graphic at any
-// container width the two callers actually use). Names kept for
-// compatibility with existing colorScheme values passed from reward data.
-const gradients: Record<string, string> = {
-  "ocean-blue": "linear-gradient(135deg, #0a1f4d 0%, #123a8a 55%, #1e56c7 100%)",
-  "sunset-gradient": "linear-gradient(135deg, #7c2d12 0%, #c2410c 55%, #f97316 100%)",
-  "deep-navy": "linear-gradient(135deg, #050b1f 0%, #0a1530 55%, #103783 100%)",
-  "teal-gradient": "linear-gradient(135deg, #063a3a 0%, #0f6b66 55%, #14b8a6 100%)",
-  "emerald-glow": "linear-gradient(135deg, #052e1f 0%, #0d6b3f 55%, #10b981 100%)",
-  "neon-cyber": "linear-gradient(135deg, #052a3a 0%, #0891b2 55%, #22d3ee 100%)",
-  "midnight-purple": "linear-gradient(135deg, #1e1147 0%, #4c1d95 55%, #7c3aed 100%)",
-  "minimal-mono": "linear-gradient(135deg, #1e293b 0%, #334155 55%, #64748b 100%)",
-  "golden-prestige": "linear-gradient(135deg, #78350f 0%, #b45309 55%, #eab308 100%)",
-  "crimson-red": "linear-gradient(135deg, #450a0a 0%, #991b1b 55%, #dc2626 100%)",
-};
+// Vertical gradient sampled from pillArt's own pill body so the CSS-filled
+// remainder of the pill (right of the fixed-width left-cap art) blends
+// seamlessly into it at any button width.
+const pillGradient = 'linear-gradient(to bottom, #002ee2 0%, #00129f 100%)';
 
 export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
-  colorScheme = "ocean-blue",
   className,
   disabled,
   overlay,
   showRewardsRibbon = true,
   ...props
 }) => {
-  const background = gradients[colorScheme] || gradients["ocean-blue"];
-
   return (
     <div
       className={cn(
@@ -51,12 +34,25 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
         disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.03]",
         className
       )}
-      style={{ background }}
+      style={{
+        backgroundImage: showRewardsRibbon ? `url(${pillArt}), ${pillGradient}` : pillGradient,
+        backgroundRepeat: 'no-repeat, no-repeat',
+        backgroundPosition: 'left center, left center',
+        backgroundSize: 'auto 100%, 100% 100%',
+      }}
       {...props}
     >
-      <div className="flex items-center justify-between gap-2 w-full h-full px-4 md:px-5">
+      <div className={cn(
+        "flex items-center justify-between gap-2 w-full h-full pr-4 md:pr-5",
+        // Left padding clears the ribbon -- despite the ribbon art's own
+        // bounding box being much wider, its diagonal has already swept
+        // left of this vertical band by the time it reaches the logo/text's
+        // height, so a small offset (matching the pre-image CSS ribbon) is
+        // enough; measured directly off the source design.
+        showRewardsRibbon ? "pl-8 md:pl-9" : "pl-4 md:pl-5"
+      )}>
         <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
-          <img src={prymeLogo} alt="" className="h-5 md:h-6 w-auto object-contain brightness-0 invert shrink-0" />
+          <img src={prymeLogo} alt="" className="h-4 md:h-[18px] w-auto object-contain brightness-0 invert shrink-0" />
           <span className="text-white font-extrabold text-sm md:text-base whitespace-nowrap truncate">
             Apply with Pryme
           </span>
@@ -65,14 +61,6 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
           <ArrowRight className="w-4 h-4 text-white" />
         </span>
       </div>
-
-      {showRewardsRibbon && (
-        <div className="absolute -top-1 -left-1 w-16 h-16 overflow-hidden rounded-tl-full pointer-events-none">
-          <div className="absolute top-[14px] left-[-22px] w-[100px] rotate-[-45deg] bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-amber-900 text-[8px] font-extrabold text-center py-[3px] shadow-md flex items-center justify-center gap-1 tracking-wide">
-            <Gift className="w-2.5 h-2.5 shrink-0" /> REWARDS
-          </div>
-        </div>
-      )}
 
       {overlay && (
         <div className="absolute inset-0 rounded-full bg-[#0a1530]/85 flex items-center justify-center">

@@ -446,7 +446,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   image has no room for loading/applied states itself, so
                   those render as an opaque overlay on top instead. */}
               <GlossyRewardButton
-                colorScheme={matchingReward?.buttonDesign || "ocean-blue"}
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
                 className="flex-1 xl:flex-none xl:w-[210px]"

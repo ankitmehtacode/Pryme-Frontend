@@ -158,7 +158,6 @@ const BankComparisonTable = ({
                       (fixed aspect-ratio image) -- capped to match the other
                       button's h-12 height, same constraint BankComparisonCard.tsx uses. */}
                   <GlossyRewardButton
-                    colorScheme="ocean-blue"
                     onClick={() => onApplyWithPyrme(offer.id)}
                     className="flex-1 max-w-[210px]"
                   />

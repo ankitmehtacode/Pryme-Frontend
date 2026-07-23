@@ -5,20 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { PrymeAPI } from "@/lib/api";
-import { cn } from "@/lib/utils";
-
-export const BUTTON_DESIGNS: Record<string, { label: string; className: string }> = {
-  "ocean-blue": { label: "Ocean Blue", className: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30" },
-  "sunset-gradient": { label: "Sunset Gradient", className: "bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white shadow-lg shadow-orange-500/30" },
-  "deep-navy": { label: "Deep Navy", className: "bg-blue-900 hover:bg-blue-950 text-white shadow-lg shadow-blue-900/30" },
-  "teal-gradient": { label: "Teal Gradient", className: "bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white shadow-lg shadow-teal-500/30" },
-  "emerald-glow": { label: "Emerald Glow", className: "bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]" },
-  "neon-cyber": { label: "Neon Cyber", className: "bg-[#12121a] hover:bg-[#1a1a24] text-cyan-400 border border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)]" },
-  "midnight-purple": { label: "Midnight Purple", className: "bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white shadow-lg shadow-purple-600/30" },
-  "minimal-mono": { label: "Minimal Mono", className: "bg-black hover:bg-zinc-800 text-white border border-white/10 shadow-xl" },
-  "golden-prestige": { label: "Golden Prestige", className: "bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white shadow-lg shadow-amber-500/30" },
-  "crimson-red": { label: "Crimson Red", className: "bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-700 hover:to-rose-600 text-white shadow-lg shadow-red-500/30" },
-};
 
 interface ProductRewardFormData {
   id?: string;
@@ -365,28 +351,6 @@ export const ProductRewardTab: React.FC = () => {
                     className="w-full bg-black/40 border border-white/10 rounded-md py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-400">Button Design</label>
-                <Select
-                  value={rewardFormData.buttonDesign}
-                  onValueChange={(val) => setRewardFormData({ ...rewardFormData, buttonDesign: val })}
-                >
-                  <SelectTrigger className="w-full bg-black/40 border-white/10 text-white">
-                    <SelectValue placeholder="Select Button Design" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#12121a] border-white/10 max-h-60">
-                    {Object.entries(BUTTON_DESIGNS).map(([key, design]) => (
-                      <SelectItem key={key} value={key} className="text-white focus:bg-white/10">
-                        <div className="flex items-center gap-3">
-                          <div className={cn("w-4 h-4 rounded-full", design.className.split("hover:")[0])} />
-                          <span>{design.label}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="pt-4 flex gap-3">
