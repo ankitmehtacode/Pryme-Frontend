@@ -152,11 +152,10 @@ const BankComparisonTable = ({
                 </div>
 
                 {/* Call To Action Buttons -- same premium glossy design as
-                    BankComparisonCard.tsx's Offers page cards. */}
+                    BankComparisonCard.tsx's Offers page cards. Both buttons
+                    share the same flex-1/max-w-[210px] so they stay equal
+                    width, not just equal height. */}
                 <div className="flex items-center gap-3">
-                  {/* GlossyRewardButton's height derives purely from its width
-                      (fixed aspect-ratio image) -- capped to match the other
-                      button's h-12 height, same constraint BankComparisonCard.tsx uses. */}
                   <GlossyRewardButton
                     onClick={() => onApplyWithPyrme(offer.id)}
                     className="flex-1 max-w-[210px]"
@@ -164,12 +163,12 @@ const BankComparisonTable = ({
 
                   <button
                     onClick={() => onApplyDirect(offer.id)}
-                    className="flex-none h-12 md:h-[52px] px-4 rounded-full border-2 border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors flex items-center justify-center gap-2 text-sm font-bold"
+                    className="flex-1 max-w-[210px] h-12 md:h-[52px] px-4 rounded-full border-2 border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors flex items-center justify-center gap-2 text-base font-extrabold"
                     title="Apply directly on bank website"
                   >
                     Apply Directly
-                    <span className="w-5 h-5 rounded-md border-2 border-current flex items-center justify-center shrink-0">
-                      <ExternalLink className="w-3 h-3" />
+                    <span className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center shrink-0">
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </span>
                   </button>
                 </div>

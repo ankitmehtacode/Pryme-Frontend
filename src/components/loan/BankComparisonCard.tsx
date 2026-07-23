@@ -249,60 +249,58 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
             </div>
 
-            {/* ── EMI & Comparison Diff (Grouped for Perfect Alignment) ── */}
-            <div className="hidden xl:flex items-end gap-3.5 min-h-[44px]">
-              <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">EMI</p>
-                <p className="text-2xl sm:text-[26px] font-extrabold text-foreground tabular-nums leading-none tracking-tight">
-                  <span className="text-sm sm:text-base text-muted-foreground/50 mr-0.5">₹</span>{emi.toLocaleString("en-IN")}
-                </p>
-              </div>
-              
-              <div className="pb-0.5 flex flex-col justify-end min-w-0">
-                {!isFullyFunded ? (
-                  <>
-                    <p className="text-[11px] sm:text-xs font-bold truncate tracking-tight leading-none text-amber-600 dark:text-amber-400" title={`Funds ₹${Math.round(principalAmount).toLocaleString("en-IN")}`}>
-                      Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
-                    </p>
-                    {/* The exact requested amount is already shown in the page's
-                        sticky summary bar -- restating it here is redundant and,
-                        at large loan amounts, was long enough to overflow this
-                        fixed-width grid column into the Interest/Tenure chips. */}
-                    <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
-                      Below your request
-                    </p>
-                  </>
-                ) : !isLowestEmi ? (
-                  <>
-                    <p
-                      className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none"
-                      style={{ color: emiDiffFromHero > 0 ? '#ea580c' : emiDiffFromHero < 0 ? '#10b981' : '#64748b' }}
-                    >
-                      {emiDiffFromHero > 0
-                        ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
-                        : emiDiffFromHero < 0
-                          ? `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`
-                          : `Same EMI`}
-                    </p>
-                    <p className="text-[9px] text-muted-foreground/50 font-semibold tabular-nums whitespace-nowrap leading-none mt-1">
-                      {totalDiffFromHero > 0
-                        ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
-                        : totalDiffFromHero < 0
-                          ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
-                          : "Same total"}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-[11px] sm:text-xs font-bold whitespace-nowrap tracking-tight leading-none text-emerald-600 dark:text-emerald-400">
-                      Lowest EMI
-                    </p>
-                    <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
-                      Lowest total cost
-                    </p>
-                  </>
-                )}
-              </div>
+            {/* ── EMI & Comparison Diff ── */}
+            {/* Stacked vertically (EMI, then the Funds/diff line below it)
+                rather than side-by-side: at 210-230px this grid column can't
+                fit a large EMI figure and a full "Funds ₹XX,XX,XXX" amount on
+                one line without squeezing the latter down to a truncated
+                ellipsis. Stacking gives each line the full column width, same
+                pattern already used in the mobile block below. */}
+            <div className="hidden xl:flex flex-col justify-center min-h-[44px] min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">EMI</p>
+              <p className="text-2xl sm:text-[26px] font-extrabold text-foreground tabular-nums leading-none tracking-tight">
+                <span className="text-sm sm:text-base text-muted-foreground/50 mr-0.5">₹</span>{emi.toLocaleString("en-IN")}
+              </p>
+
+              {!isFullyFunded ? (
+                <>
+                  <p className="text-[11px] sm:text-xs font-bold tracking-tight leading-none text-amber-600 dark:text-amber-400 mt-1.5">
+                    Funds ₹{Math.round(principalAmount).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
+                    Below your request
+                  </p>
+                </>
+              ) : !isLowestEmi ? (
+                <>
+                  <p
+                    className="text-[11px] sm:text-xs font-bold tabular-nums whitespace-nowrap tracking-tight leading-none mt-1.5"
+                    style={{ color: emiDiffFromHero > 0 ? '#ea580c' : emiDiffFromHero < 0 ? '#10b981' : '#64748b' }}
+                  >
+                    {emiDiffFromHero > 0
+                      ? `+₹${emiDiffFromHero.toLocaleString("en-IN")}/mo more`
+                      : emiDiffFromHero < 0
+                        ? `-₹${Math.abs(emiDiffFromHero).toLocaleString("en-IN")}/mo less`
+                        : `Same EMI`}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/50 font-semibold tabular-nums whitespace-nowrap leading-none mt-1">
+                    {totalDiffFromHero > 0
+                      ? `₹${totalDiffFromHero.toLocaleString("en-IN")} extra total`
+                      : totalDiffFromHero < 0
+                        ? `₹${Math.abs(totalDiffFromHero).toLocaleString("en-IN")} less total`
+                        : "Same total"}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[11px] sm:text-xs font-bold whitespace-nowrap tracking-tight leading-none text-emerald-600 dark:text-emerald-400 mt-1.5">
+                    Lowest EMI
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/50 font-semibold whitespace-nowrap leading-none mt-1">
+                    Lowest total cost
+                  </p>
+                </>
+              )}
             </div>
 
             {/* ── Metrics Chips + Cost Breakdown Toggle ────────── */}
@@ -469,12 +467,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="flex-1 xl:flex-none xl:w-auto rounded-full h-12 md:h-[52px] px-5 text-sm font-bold transition-all border-2 bg-transparent border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 flex items-center justify-center gap-2"
+                className="flex-1 xl:flex-none xl:w-[210px] rounded-full h-12 md:h-[52px] px-4 text-base font-extrabold transition-all border-2 bg-transparent border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 flex items-center justify-center gap-2"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly
-                <span className="w-5 h-5 rounded-md border-2 border-current flex items-center justify-center shrink-0">
-                  <ExternalLink className="w-3 h-3" />
+                <span className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center shrink-0">
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </span>
               </button>
             </div>

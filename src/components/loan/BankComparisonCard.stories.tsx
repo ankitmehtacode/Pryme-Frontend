@@ -67,6 +67,32 @@ export const Default: Story = {
   ),
 };
 
+export const BelowRequest: Story = {
+  render: () => (
+    <MemoryRouter>
+      <div style={{ maxWidth: 1200, padding: 24, background: "#f8fafc" }}>
+        <BankComparisonCard
+          offer={offer}
+          emi={48000}
+          totalRepayment={11520000}
+          emiDiffFromHero={0}
+          totalDiffFromHero={0}
+          heroBankName="Aditya Birla Finance Limited"
+          principalAmount={5738858}
+          isExpanded={false}
+          onToggleExpand={() => {}}
+          onApply={async () => {}}
+          isGlobalLocking={false}
+          isRecommended
+          isLowestEmi={false}
+          isFullyFunded={false}
+          rewards={rewards}
+        />
+      </div>
+    </MemoryRouter>
+  ),
+};
+
 export const Expanded: Story = {
   render: () => (
     <MemoryRouter>
