@@ -236,7 +236,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({ isOpen, on
                   { value: "LOAN_AGAINST_PROPERTY", label: "Loan Against Property (LAP)" },
                   { value: "BUSINESS_LOAN", label: "Business Loan (BL)" },
                   { value: "PERSONAL_LOAN", label: "Personal Loan (PL)" },
-                  { value: "BT_TOP_UP", label: "BT|Top Up (BT)" },
+                  { value: "BT_TOP_UP", label: "Loan Transfer|Top Up (BT)" },
                 ]} />
                 <FieldSelect label="Entity Status" name="active" value={formData.active ? "true" : "false"} onChange={handleChange} options={[
                   { value: "true", label: "● Active" },

@@ -42,7 +42,7 @@ const productLinks = [
   { href: "/coming-soon?type=auto", label: "Auto Loans", icon: Car, description: "Drive your dream today" },
   { href: "/coming-soon?type=personal", label: "Personal Loan", icon: Wallet, description: "Quick approval, minimal docs" },
   { href: "/coming-soon?type=business", label: "Business Loan", icon: Briefcase, description: "Fuel your business growth" },
-  { href: "/coming-soon?type=transfer", label: "BT|Top Up", icon: RefreshCw, description: "Balance transfer & top up" },
+  { href: "/coming-soon?type=transfer", label: "Loan Transfer|Top Up", icon: RefreshCw, description: "Balance transfer & top up" },
 ];
 
 const toolLinks = [

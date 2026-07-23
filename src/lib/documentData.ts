@@ -4,7 +4,7 @@
    Loan Type × Employment Category
    ══════════════════════════════════════════════════════ */
 
-export type ProductType = "Home Loan" | "LAP" | "Business Loan" | "Personal Loan" | "Auto Loan" | "BT|Top Up";
+export type ProductType = "Home Loan" | "LAP" | "Business Loan" | "Personal Loan" | "Auto Loan" | "Loan Transfer|Top Up";
 
 export type EmploymentType = "Salaried" | "SEP" | "SENP";
 
@@ -44,7 +44,7 @@ export const getDocumentsForLoanType = (
       return buildPersonalLoanDocs(empType);
     case "Auto Loan":
       return buildAutoLoanDocs(empType);
-    case "BT|Top Up":
+    case "Loan Transfer|Top Up":
       return buildHomeLoanDocs(empType);
     default:
       return [];

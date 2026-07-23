@@ -19,7 +19,7 @@ const FALLBACK_DICTIONARIES: DictionaryMap = {
     { value: "BUSINESS_LOAN", label: "Business Loan" },
     { value: "PERSONAL_LOAN", label: "Personal Loan" },
     { value: "AUTO_LOAN", label: "Auto Loan" },
-    { value: "BT_TOP_UP", label: "BT|Top Up" },
+    { value: "BT_TOP_UP", label: "Loan Transfer|Top Up" },
   ],
   bankList: [
     { value: "HDFC", label: "HDFC Bank" },

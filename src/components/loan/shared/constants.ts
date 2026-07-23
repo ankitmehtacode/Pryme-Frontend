@@ -93,5 +93,5 @@ export const PRODUCT_OPTIONS: { value: LoanType; label: string; icon: any }[] = 
   { value: "HOME_LOAN", label: "Home Loan", icon: Home },
   { value: "LAP", label: "Loan Against Property", icon: Building2 },
   { value: "AUTO_LOAN", label: "Auto Loan", icon: Car },
-  { value: "BT_TOP_UP", label: "BT|Top Up", icon: RefreshCw },
+  { value: "BT_TOP_UP", label: "Loan Transfer|Top Up", icon: RefreshCw },
 ];

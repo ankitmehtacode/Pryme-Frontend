@@ -508,7 +508,7 @@ const Dashboard: React.FC = () => {
       if (s === "PERSONAL_LOAN" || s === "PERSONAL") return "Personal Loan";
       if (s === "BUSINESS_LOAN" || s === "BUSINESS") return "Business Loan";
       if (s === "AUTO_LOAN" || s === "CAR_LOAN" || s === "AUTO") return "Auto Loan";
-      if (s === "BT_TOP_UP" || s === "BT_TOPUP" || s === "BT") return "BT|Top Up";
+      if (s === "BT_TOP_UP" || s === "BT_TOPUP" || s === "BT") return "Loan Transfer|Top Up";
 
       // Fallback
       return str.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
