@@ -496,6 +496,11 @@ export const PrymeAPI = {
   updateAdminHeroOffer: async (id: string, data: any) =>
     fetchWithAuth(`/admin/offers/hero/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteAdminHeroOffer: async (id: string) => fetchWithAuth(`/admin/offers/hero/${id}`, { method: "DELETE" }),
+  /** Admin: presigned S3 upload for a marketing banner -- returns { uploadUrl, publicUrl }.
+   *  publicUrl is a permanent, unsigned link (public-marketing/ prefix) safe to store
+   *  as bannerImageUrl and embed directly in the public homepage. */
+  initiateMarketingBannerUpload: async (contentType: string) =>
+    fetchWithAuth("/admin/offers/hero/upload-banner", { method: "POST", body: JSON.stringify({ contentType }) }),
 
   /** Admin: Product Rewards CRUD — /api/v1/admin/offers/rewards */
   getAdminProductRewards: async () => fetchWithAuth("/admin/offers/rewards", { method: "GET" }),

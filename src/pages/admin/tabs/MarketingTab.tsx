@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Edit2, Trash2, Sparkles,
   Loader2, Eye, ToggleLeft, ToggleRight,
-  ImageIcon, Link2
+  ImageIcon, Link2, UploadCloud
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -85,6 +85,8 @@ export const MarketingTab: React.FC = () => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<HeroOfferFormData>(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const bannerFileInputRef = useRef<HTMLInputElement>(null);
 
   // 1. Fetch configured hero offers
   const { data: offers = [], isLoading, refetch } = useQuery({
@@ -151,6 +153,38 @@ export const MarketingTab: React.FC = () => {
       toast.error(err.message || "Failed to toggle status.");
     }
   });
+
+  // Direct banner upload -- gets a presigned S3 PUT URL scoped to the
+  // public-marketing/ prefix, uploads the file straight to S3, then stores
+  // the returned permanent public URL (not a signed one) as bannerImageUrl.
+  const handleBannerFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (bannerFileInputRef.current) bannerFileInputRef.current.value = "";
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      toast.error("Only JPG or PNG images are supported.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB.");
+      return;
+    }
+
+    setIsUploadingBanner(true);
+    try {
+      const { uploadUrl, publicUrl } = await PrymeAPI.initiateMarketingBannerUpload(file.type);
+      const s3Response = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!s3Response.ok) throw new Error("Upload rejected by storage. Please try again.");
+
+      setFormData(prev => ({ ...prev, bannerImageUrl: publicUrl }));
+      toast.success("Banner uploaded.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload banner image.");
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
 
   // 3. Form operations
   const handleSubmit = (e: React.FormEvent) => {
@@ -272,7 +306,7 @@ export const MarketingTab: React.FC = () => {
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-400 block mb-1">Offer Banner Image URL</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1">Offer Banner Image</label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
@@ -281,11 +315,28 @@ export const MarketingTab: React.FC = () => {
                         value={formData.bannerImageUrl}
                         onChange={e => setFormData({ ...formData, bannerImageUrl: e.target.value })}
                         className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm focus:outline-none focus:border-violet-500/40"
-                        placeholder="https://cdn.example.com/offer-banner.png"
+                        placeholder="https://cdn.example.com/offer-banner.png or upload below"
                       />
                     </div>
+                    <input
+                      ref={bannerFileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      onChange={handleBannerFileSelect}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isUploadingBanner}
+                      onClick={() => bannerFileInputRef.current?.click()}
+                      className="shrink-0 border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white"
+                    >
+                      {isUploadingBanner ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+                      <span className="ml-1.5 hidden sm:inline">{isUploadingBanner ? "Uploading..." : "Upload"}</span>
+                    </Button>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px (.png/.webp) — This replaces the text card with a full-bleed image.</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px, JPG or PNG, under 5MB — This replaces the text card with a full-bleed image.</p>
                   {formData.bannerImageUrl && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
                       <img src={formData.bannerImageUrl} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
