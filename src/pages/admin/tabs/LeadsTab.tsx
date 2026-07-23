@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Loader2, Briefcase, IndianRupee, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatISTDateTime } from "@/lib/utils";
+import { formatISTDateTime, cn } from "@/lib/utils";
 
 interface LeadsTabProps {
   isLoadingLeads: boolean;
@@ -11,6 +11,13 @@ interface LeadsTabProps {
   StatusBadge: React.FC<{ status: string }>;
   onUpdateStatus: (id: string, status: string) => void;
   isUpdating: boolean;
+  // 🧠 Backend's /admin/leads/{id}/assign has always existed and is itself
+  // gated ADMIN/SUPER_ADMIN only -- isEmployee mirrors that here so the
+  // control isn't shown as usable to a role that would just get a 403.
+  onAssign: (id: string, assigneeId: string) => void;
+  isAssigning: boolean;
+  teamMembers: any[];
+  isEmployee: boolean;
 }
 
 // 🧠 Safe metadata parser — the metadata field is a JSON string from the backend.
@@ -44,7 +51,7 @@ const formatEmploymentType = (raw: string | undefined): string => {
 const humanizeKey = (key: string): string =>
   key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
 
-export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating }) => {
+export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating, onAssign, isAssigning, teamMembers, isEmployee }) => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const selectedMeta = selectedLead ? parseMetadata(selectedLead.metadata) : {};
   // Callback fields get their own dedicated callout above, so they're
@@ -71,13 +78,14 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
               <th className="px-6 py-4">Loan Needs</th>
               <th className="px-6 py-4">Employment</th>
               <th className="px-6 py-4">Monthly Income</th>
+              <th className="px-6 py-4">Assigned To</th>
               <th className="px-6 py-4">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04] text-sm">
             <AnimatePresence>
               {rawLeads.length === 0 && !isLoadingLeads ? (
-                <tr><td colSpan={6} className="p-12 text-center text-slate-500">No raw inquiries found.</td></tr>
+                <tr><td colSpan={7} className="p-12 text-center text-slate-500">No raw inquiries found.</td></tr>
               ) : (
                 rawLeads.map((lead: any) => {
                   const meta = parseMetadata(lead.metadata);
@@ -126,6 +134,25 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                         ) : (
                           <span className="text-xs text-slate-600 italic">—</span>
                         )}
+                      </td>
+                      <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
+                        <Select
+                          value={lead.assignedTo || "UNASSIGNED"}
+                          onValueChange={(val) => onAssign(lead.id, val === "UNASSIGNED" ? "" : val)}
+                          disabled={isEmployee || isAssigning}
+                        >
+                          <SelectTrigger className={cn("w-[150px] h-8 text-xs font-medium border focus:ring-blue-500/50 outline-none transition-colors", !lead.assignedTo ? "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20" : "bg-white/[0.04] text-slate-300 border-white/[0.08]")}>
+                            <SelectValue placeholder="Assign" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#0d0d14] border-white/[0.08] text-white">
+                            <SelectItem value="UNASSIGNED" className="text-xs text-slate-400">Unassigned</SelectItem>
+                            {teamMembers.map((tm: any) => (
+                              <SelectItem key={tm.id} value={tm.id} className="text-xs">
+                                {tm.fullName || tm.full_name || tm.email}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </td>
                       <td className="px-6 py-4 align-top" onClick={(e) => e.stopPropagation()}>
                         {lead.status === "CONVERTED" ? (

@@ -570,6 +570,17 @@ const AdminDashboard = () => {
     }
   });
 
+  const leadAssignMutation = useMutation({
+    mutationFn: ({ id, assigneeId }: { id: string; assigneeId: string }) => PrymeAPI.assignRawLead(id, assigneeId),
+    onSuccess: () => {
+      toast.success("Lead assigned.");
+      queryClient.invalidateQueries({ queryKey: ["admin_leads"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to assign lead.");
+    }
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) => PrymeAPI.updateLeadProfile(id, payload),
     onSuccess: (data: any) => {
@@ -898,11 +909,15 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === "leads" && (
-                  <LeadsTab 
-                    isLoadingLeads={isLoadingLeads} rawLeads={rawLeads} 
-                    formatCurrency={formatCurrency} StatusBadge={StatusBadge} 
+                  <LeadsTab
+                    isLoadingLeads={isLoadingLeads} rawLeads={rawLeads}
+                    formatCurrency={formatCurrency} StatusBadge={StatusBadge}
                     onUpdateStatus={(id, status) => leadStatusMutation.mutate({ id, status })}
                     isUpdating={leadStatusMutation.isPending}
+                    onAssign={(id, assigneeId) => leadAssignMutation.mutate({ id, assigneeId })}
+                    isAssigning={leadAssignMutation.isPending}
+                    teamMembers={teamMembers}
+                    isEmployee={isEmployee}
                   />
                 )}
 

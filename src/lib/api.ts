@@ -465,6 +465,15 @@ export const PrymeAPI = {
   updateLeadStatus: async (leadId: string, status: string) =>
     fetchWithAuth(`/admin/leads/${leadId}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 
+  // 🧠 Backend endpoint (AdminLeadController) has always existed and enforces
+  // ADMIN/SUPER_ADMIN only via its own @PreAuthorize -- this was simply never
+  // wired up to any UI control. Named distinctly from the existing `assignLead`
+  // (which targets /admin/applications/{id}/assign, a different resource) to
+  // avoid colliding with it.
+  /** Admin: Assign a raw lead to a team member — PATCH /api/v1/admin/leads/{leadId}/assign */
+  assignRawLead: async (leadId: string, assigneeId: string) =>
+    fetchWithAuth(`/admin/leads/${leadId}/assign`, { method: "PATCH", body: JSON.stringify({ assigneeId }) }),
+
   /** Admin: Bank CRUD — /api/v1/admin/banks */
   getAdminBanks: async () => fetchWithAuth("/admin/banks", { method: "GET" }),
   createAdminBank: async (data: { bankName: string; logoUrl?: string; isActive: boolean }) =>
