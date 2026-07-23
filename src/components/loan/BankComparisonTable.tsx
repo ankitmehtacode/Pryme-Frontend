@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Building2, Star, ArrowRight, ExternalLink, ShieldCheck, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Building2, Star, ExternalLink, ShieldCheck } from "lucide-react";
+import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
 import { cn } from "@/lib/utils";
 
 interface BankOffer {
@@ -151,36 +151,28 @@ const BankComparisonTable = ({
                   </div>
                 </div>
 
-                {/* Call To Action Buttons */}
-                <div className="flex gap-3">
-                  <Button
+                {/* Call To Action Buttons -- same premium glossy design as
+                    BankComparisonCard.tsx's Offers page cards. */}
+                <div className="flex items-center gap-3">
+                  {/* GlossyRewardButton's height derives purely from its width
+                      (fixed aspect-ratio image) -- capped to match the other
+                      button's h-12 height, same constraint BankComparisonCard.tsx uses. */}
+                  <GlossyRewardButton
+                    colorScheme="ocean-blue"
                     onClick={() => onApplyWithPyrme(offer.id)}
-                    className={cn(
-                      "flex-1 group relative overflow-hidden rounded-xl text-sm md:text-base font-medium py-6 transition-all duration-300 hover:scale-[1.02]",
-                      offer.recommended 
-                        ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)]" 
-                        : "bg-transparent border border-primary/30 dark:border-[#103783]/30 hover:bg-primary/5 dark:hover:bg-[#103783]/10 text-primary dark:text-[#103783]"
-                    )}
-                  >
-                    {/* Apple-style Shimmer on Recommended Button */}
-                    {offer.recommended && (
-                      <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
-                    )}
-                    <span className="relative flex items-center justify-center gap-2">
-                      {offer.recommended && <Zap className="w-4 h-4 fill-current" />}
-                      Apply via PRYME
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
+                    className="flex-1 max-w-[175px]"
+                  />
 
-                  <Button
-                    variant="outline"
+                  <button
                     onClick={() => onApplyDirect(offer.id)}
-                    className="flex-none px-4 py-6 rounded-xl border-border bg-secondary/50 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"
+                    className="flex-none h-12 px-4 rounded-full border-2 border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors flex items-center justify-center gap-2 text-sm font-bold"
                     title="Apply directly on bank website"
                   >
-                    <ExternalLink className="w-5 h-5" />
-                  </Button>
+                    Apply Directly
+                    <span className="w-5 h-5 rounded-md border-2 border-current flex items-center justify-center shrink-0">
+                      <ExternalLink className="w-3 h-3" />
+                    </span>
+                  </button>
                 </div>
 
               </div>
