@@ -28,14 +28,6 @@ export const DesktopWidth: Story = {
   ),
 };
 
-export const NoRewardsRibbon: Story = {
-  render: () => (
-    <div style={{ width: 320, padding: 16, background: "#f8fafc" }}>
-      <GlossyRewardButton showRewardsRibbon={false} className="w-full" />
-    </div>
-  ),
-};
-
 export const Disabled: Story = {
   render: () => (
     <div style={{ width: 320, padding: 16, background: "#f8fafc" }}>
