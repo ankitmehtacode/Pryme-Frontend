@@ -114,7 +114,7 @@ export default function TrustMonologue() {
             Why Trust Us?
           </h2>
           <div className="border-l-2 border-primary/30 pl-4 py-1.5 text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed font-medium text-justify">
-            "Your data is securely processed and used only for bank matching."
+            "Your privacy is protected in accordance with RBI guidelines and the IT Act (PII standards). Your data is securely processed, used only for bank matching. We do not sell or share your personal information."
           </div>
         </div>
 
