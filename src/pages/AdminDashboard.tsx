@@ -727,12 +727,14 @@ const AdminDashboard = () => {
   const isEmployee = authUser?.role === "EMPLOYEE";
 
   // 🧠 EMPLOYEE surface restriction: an employee's job is working their
-  // assigned leads/applications, not company-wide analytics, the full
-  // customer directory, reward/pricing config, or the eligibility rules
-  // engine -- those stay ADMIN/SUPER_ADMIN only. This is a UI-level
-  // convenience filter; the actual security boundary is each endpoint's own
-  // @PreAuthorize on the backend, unaffected by what's shown in this list.
-  const employeeHiddenTabIds = new Set(["overview", "users", "productRewards", "settings", "banks", "marketing"]);
+  // assigned leads/applications, not the full customer directory,
+  // reward/pricing config, partner integrations, marketing/offers config,
+  // or the eligibility rules engine -- those stay ADMIN/SUPER_ADMIN only.
+  // Analytics Overview is intentionally visible to employees. This is a
+  // UI-level convenience filter; the actual security boundary is each
+  // endpoint's own @PreAuthorize on the backend, unaffected by what's
+  // shown in this list.
+  const employeeHiddenTabIds = new Set(["users", "productRewards", "settings", "banks", "marketing"]);
   const sidebarItems = [
     { id: "overview", label: "Analytics Overview", icon: BarChart3 }, { id: "applications", label: "CRM Pipeline", icon: LayoutGrid },
     { id: "leads", label: "Raw Inquiries", icon: LayoutList },
