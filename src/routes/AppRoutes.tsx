@@ -61,7 +61,7 @@ export const AppRoutes = () => {
   
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes location={location} key={location.pathname} caseSensitive>
 
         {/* ════════════════════════════════════════════════════════════
             MARKETING LAYER (Scaled by default)
