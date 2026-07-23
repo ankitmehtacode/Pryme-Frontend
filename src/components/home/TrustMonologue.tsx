@@ -84,14 +84,14 @@ export default function TrustMonologue() {
     {
       icon: Trash2,
       title: "Zero Retention Policy",
-      description: "No traces left behind",
+      description: "We permanently delete your data after 30 days of your account deletion.",
       tooltip: "We permanently delete your data after 30 days of your account deletion.",
     },
     {
       icon: EyeOff,
-      title: "Total Privacy",
-      description: "We can't see your details",
-      tooltip: "Our system is built so that even our own team cannot access or read your personal financial details.",
+      title: "Secure Data Handling",
+      description: "Handled with strict confidentiality",
+      tooltip: "Our information is accessed by authorised personnel only upon your consent for loan processing.",
     },
     {
       icon: Shield,
