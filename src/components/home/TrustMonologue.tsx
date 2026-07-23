@@ -113,8 +113,8 @@ export default function TrustMonologue() {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#0a1530] dark:text-white tracking-tight mb-4">
             Why Trust Us?
           </h2>
-          <div className="border-l-2 border-primary/30 pl-4 py-1.5 text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed font-medium">
-            "Your data is securely processed, used only for bank matching, and permanently deleted from the database after your session."
+          <div className="border-l-2 border-primary/30 pl-4 py-1.5 text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed font-medium text-justify">
+            "Your data is securely processed and used only for bank matching."
           </div>
         </div>
 
