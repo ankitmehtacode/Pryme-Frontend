@@ -107,9 +107,16 @@ export const BankComparisonCard = memo(function BankComparisonCard({
     // 2. Match Bank Name (case-insensitive)
     if (r.bank?.toLowerCase() !== offer.bankName?.toLowerCase()) return false;
     
-    // 3. Match Loan Amount Tier
-    const eligibleAmount = offer.originalEngineResult?.maxEligibleLoanAmount || offer.maxLoanAmount || 0;
-    
+    // 3. Match Loan Amount Tier -- against what's actually being funded
+    // (principalAmount = min(requested, true eligibility ceiling)), not the
+    // applicant's broader uncapped ceiling. A ₹50L-funded applicant who
+    // happens to be eligible for ₹90L should get the ₹50L-tier reward, not
+    // the ₹90L one -- matching a reward to money that was never disbursed.
+    // (offer.maxLoanAmount holds that uncapped ceiling -- previously used
+    // here via a nonexistent `maxEligibleLoanAmount` field that silently
+    // fell through to it.)
+    const eligibleAmount = principalAmount || 0;
+
     if (r.minLoanAmount != null && eligibleAmount < r.minLoanAmount) return false;
     if (r.maxLoanAmount != null && eligibleAmount > r.maxLoanAmount) return false;
     
