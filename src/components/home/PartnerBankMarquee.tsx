@@ -18,6 +18,7 @@ import bajajLogo from "@/assets/bajaj-finserv.png";
 import ltLogo from "@/assets/lt-finance.png";
 import bandhanLogo from "@/assets/bandhan-bank.png";
 import abflLogo from "@/assets/abfl.png";
+import federalLogo from "@/assets/federal-bank.png";
 
 export const banks = [
   { name: "Axis Bank", logo: axisLogo },
@@ -38,6 +39,7 @@ export const banks = [
   { name: "L&T Finance", logo: ltLogo },
   { name: "Bandhan Bank", logo: bandhanLogo },
   { name: "Aditya Birla Finance", logo: abflLogo },
+  { name: "Federal Bank", logo: federalLogo },
 ];
 
 const PartnerBankMarquee = memo(() => {

@@ -36,6 +36,7 @@ import idbiLogo from "@/assets/idbi-bank.png";
 import tataLogo from "@/assets/tata-capital.png";
 import idfcLogo from "@/assets/idfc.png";
 import jioLogo from "@/assets/jio.png";
+import federalLogo from "@/assets/federal-bank.png";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -362,6 +363,7 @@ export default function Offers() {
         if (name.includes("IDFC")) return { c: "bg-[#9d1d27]", x: "#9d1d27", img: idfcLogo, bankKey: "IDFC" };
         if (name.includes("IDBI")) return { c: "bg-[#00703c]", x: "#00703c", img: idbiLogo, bankKey: "IDBI" };
         if (name.includes("TATA")) return { c: "bg-[#005a9c]", x: "#005a9c", img: tataLogo, bankKey: "TATA" };
+        if (name.includes("FEDERAL")) return { c: "bg-[#084c97]", x: "#084c97", img: federalLogo, bankKey: "FEDERAL" };
 
         // Generic fallback colors using a stable hash so it doesn't change on re-render
         const fallbacks = [
