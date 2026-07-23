@@ -437,7 +437,7 @@ function OccupationSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <SmartField label="Business Domain" icon={Landmark} value={d.industryType} onChange={(v) => onUpdateBusiness?.({ industryType: v })} />
           <SmartField
-            label="Business Vintage" icon={Calendar} type="number" value={d.vintageYears}
+            label="Years in Business (Business Age)" icon={Calendar} type="number" value={d.vintageYears}
             displayValue={d.vintageYears ? `${d.vintageYears} yrs` : undefined}
             onChange={(v) => onUpdateBusiness?.({ vintageYears: v === "" ? undefined : Number(v) })}
           />

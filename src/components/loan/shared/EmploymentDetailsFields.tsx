@@ -454,7 +454,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                 error={errors.businessName}
               />
               <ValidatedInput
-                label="Business Vintage (Years)"
+                label="Years in Business (Business Age)"
                 type="number"
                 placeholder="e.g. 8"
                 icon={Calendar}
