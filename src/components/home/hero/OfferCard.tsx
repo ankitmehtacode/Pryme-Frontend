@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { initialOffers } from "./HeroOffers";
+import { resolveApiUrl } from "@/lib/api";
 
 const childVariants = {
   enter: { opacity: 0, y: 8, scale: 0.98 },
@@ -41,7 +42,7 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
       >
         {/* Full-bleed image */}
         <img
-          src={offer.bannerImageUrl}
+          src={resolveApiUrl(offer.bannerImageUrl)}
           alt={`${offer.bank} — ${offer.title}`}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           loading="eager"

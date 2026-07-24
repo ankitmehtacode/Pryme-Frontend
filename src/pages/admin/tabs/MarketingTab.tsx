@@ -242,8 +242,12 @@ export const MarketingTab: React.FC = () => {
   // Determine current active preview properties
   const activePreset = THEME_PRESETS[formData.logoType.toLowerCase()] || THEME_PRESETS.default;
   const currentLogo = LOGO_MAP[formData.logoType.toLowerCase()];
-  // Resolve banner: explicit URL > fallback asset by logoType
-  const resolvedBanner = formData.bannerImageUrl || BANNER_MAP[formData.logoType.toLowerCase()] || "";
+  // Resolve banner: explicit URL > fallback asset by logoType. Only the
+  // uploaded URL can be a backend-relative dummy-S3-mode path -- BANNER_MAP
+  // entries are locally bundled Vite assets and must NOT be run through
+  // resolveApiUrl (that would incorrectly redirect them to the API origin).
+  const resolvedBanner = (formData.bannerImageUrl ? resolveApiUrl(formData.bannerImageUrl) : "")
+    || BANNER_MAP[formData.logoType.toLowerCase()] || "";
 
   return (
     <div className="space-y-12 w-full animate-in fade-in slide-in-from-bottom-2">
@@ -345,7 +349,7 @@ export const MarketingTab: React.FC = () => {
                   <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px, JPG or PNG, under 5MB — This replaces the text card with a full-bleed image.</p>
                   {formData.bannerImageUrl && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
-                      <img src={formData.bannerImageUrl} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <img src={resolveApiUrl(formData.bannerImageUrl)} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                   )}
                 </div>
@@ -536,7 +540,8 @@ export const MarketingTab: React.FC = () => {
                     </tr>
                   ) : (
                     sortedOffers.map((offer: any) => {
-                      const offerBanner = offer.bannerImageUrl || BANNER_MAP[offer.logoType?.toLowerCase()] || "";
+                      const offerBanner = (offer.bannerImageUrl ? resolveApiUrl(offer.bannerImageUrl) : "")
+                        || BANNER_MAP[offer.logoType?.toLowerCase()] || "";
                       return (
                         <tr key={offer.id} className="hover:bg-white/[0.02] transition-colors group">
                           <td className="px-4 py-3 text-center font-bold font-mono text-slate-400">
