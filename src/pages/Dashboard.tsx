@@ -265,9 +265,19 @@ const Dashboard: React.FC = () => {
   const loadApplicationIntoFunnel = useCallback((targetApp: Application, allApps: Application[]) => {
     setActiveApplication(targetApp);
 
+    // The backend's sanitizeDocType() always uppercases whatever docType was
+    // sent (see DocumentVaultService.java), so a document uploaded with
+    // doc.id="hl_sale_deed" comes back here as docType="HL_SALE_DEED" --
+    // but the render-time lookups below check uploadedDocs[doc.id], which is
+    // still lowercase. Without also storing the lowercased key, that never
+    // matches, so every already-uploaded document silently reverted to
+    // "not uploaded" on refresh / re-selecting the application.
     const loadedDocs: Record<string, boolean> = {};
     (targetApp.documents || []).forEach((d) => {
-      if (d.docType) loadedDocs[d.docType] = true;
+      if (d.docType) {
+        loadedDocs[d.docType] = true;
+        loadedDocs[d.docType.toLowerCase()] = true;
+      }
     });
     setUploadedDocs(loadedDocs);
 
@@ -1444,9 +1454,14 @@ const Dashboard: React.FC = () => {
                                         }
 
                                         if (app.documents && app.documents.length > 0) {
+                                          // Same case-mismatch fix as loadApplicationIntoFunnel above --
+                                          // doc.id is lowercase, the backend's stored docType isn't.
                                           const loadedDocs: Record<string, boolean> = {};
                                           app.documents.forEach((d) => {
-                                            if (d.docType) loadedDocs[d.docType] = true;
+                                            if (d.docType) {
+                                              loadedDocs[d.docType] = true;
+                                              loadedDocs[d.docType.toLowerCase()] = true;
+                                            }
                                           });
                                           setUploadedDocs(loadedDocs);
                                         }
