@@ -210,6 +210,14 @@ const OffersDisclaimerModal = ({ open, onOpenChange }: { open: boolean; onOpenCh
               PRYME's Eligibility Engine uses proprietary calculations and lender policy mapping to estimate your eligibility. These estimates are designed to improve lender matching but should not be construed as a confirmation of loan approval.
             </p>
           </div>
+          <div>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary dark:text-[#9BAFD9] mb-2">
+              How Your Estimate Is Optimized
+            </h3>
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              The estimates displayed are based on each lender's standard lending policies. Our team then works to optimize your application using applicable lender programs and eligibility criteria to help secure the best possible offer available to you.
+            </p>
+          </div>
         </div>
 
         <div className="px-6 md:px-7 py-5 border-t border-white/30 dark:border-white/[0.06] shrink-0">
