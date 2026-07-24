@@ -49,9 +49,15 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ isInView, onActiveOf
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // ── Dynamic offers from API ────────────────────────────────────────────
+  // Overrides the app-wide 5-minute default staleTime (see AppProviders.tsx)
+  // -- these banners are admin-editable and time-sensitive (festive offers,
+  // deletions), so a visitor who's been on the homepage for a while should
+  // pick up a change soon after it happens rather than needing a hard
+  // reload to escape a 5-minute-stale cached copy.
   const { data: dynamicOffers = [] } = useQuery({
     queryKey: ["public_hero_offers"],
-    queryFn: () => PrymeAPI.getHeroOffers().then(res => res.offers || res.data || res)
+    queryFn: () => PrymeAPI.getHeroOffers().then(res => res.offers || res.data || res),
+    staleTime: 1000 * 30, // 30 seconds
   });
 
   const activeOffers = useMemo(() => {
