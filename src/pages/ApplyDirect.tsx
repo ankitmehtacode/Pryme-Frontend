@@ -39,6 +39,7 @@ import jioLogo from "@/assets/jio.png";
 import idfcLogo from "@/assets/idfc.png";
 import idbiLogo from "@/assets/idbi-bank.png";
 import tataLogo from "@/assets/tata-capital.png";
+import federalLogo from "@/assets/federal-bank.png";
 
 export interface BankDetails {
   id: string;
@@ -66,7 +67,8 @@ export const BANKS_MAP: Record<string, BankDetails> = {
   // one silently fell through to the HDFC fallback below. L&T alone has more
   // active products than any other lender, so this was firing constantly.
   lt: { id: "lt", name: "L&T FINANCE", logo: ltLogo },
-  indusind: { id: "indusind", name: "INDUSIND BANK", logo: indusindLogo }
+  indusind: { id: "indusind", name: "INDUSIND BANK", logo: indusindLogo },
+  federal: { id: "federal", name: "Federal Bank", logo: federalLogo }
 };
 
 // Bank offers carry a display name (e.g. Offers.tsx's offer.bankName), not a
