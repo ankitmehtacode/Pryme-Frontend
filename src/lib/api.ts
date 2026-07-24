@@ -16,12 +16,24 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
  * 3. Global 401/403 interceptor dispatches session expiry event (no localStorage)
  * 4. Global 429 interceptor for rate limiting
  */
+// Resolves a backend endpoint the same way fetchWithAuth does. Exported so
+// call sites that must bypass fetchWithAuth (e.g. a raw PUT straight to a
+// presigned S3 URL) can still correctly resolve a *relative* URL, such as the
+// backend's "dummy S3 mode" fallback (/api/v1/dummy-s3-upload/...) returned
+// whenever AWS_S3_BUCKET isn't configured. A bare `fetch(relativeUrl, ...)`
+// resolves against the CURRENT PAGE's origin, not the API's -- on this app
+// the frontend and backend are on different subdomains (gopryme.tech vs
+// api.gopryme.tech), so that always fails with an unhelpful "Failed to
+// fetch" instead of ever reaching the backend.
+export const resolveApiUrl = (endpoint: string): string =>
+  endpoint.startsWith("http")
+    ? endpoint
+    : `${API_BASE_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
+
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
-  
+
   // URL Normalizer — prevents slash bleeds like /api/v1applications
-  const normalizedUrl = endpoint.startsWith("http") 
-      ? endpoint 
-      : `${API_BASE_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
+  const normalizedUrl = resolveApiUrl(endpoint);
 
   const isFormData = options.body instanceof FormData;
   const method = (options.method || "GET").toUpperCase();

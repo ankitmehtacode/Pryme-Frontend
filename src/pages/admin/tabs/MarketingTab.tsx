@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { PrymeAPI } from "@/lib/api";
+import { PrymeAPI, resolveApiUrl } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 // Import bank logos for live preview resolution
@@ -174,7 +174,13 @@ export const MarketingTab: React.FC = () => {
     setIsUploadingBanner(true);
     try {
       const { uploadUrl, publicUrl } = await PrymeAPI.initiateMarketingBannerUpload(file.type);
-      const s3Response = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      // uploadUrl is a real, absolute S3 presigned URL in production, but a
+      // *relative* backend path (/api/v1/dummy-s3-upload/...) whenever the
+      // backend falls back to "dummy S3 mode" (AWS_S3_BUCKET not configured)
+      // -- resolveApiUrl correctly targets the backend's own origin for that
+      // case instead of the frontend's, which a bare fetch() would otherwise
+      // silently get wrong.
+      const s3Response = await fetch(resolveApiUrl(uploadUrl), { method: "PUT", headers: { "Content-Type": file.type }, body: file });
       if (!s3Response.ok) throw new Error("Upload rejected by storage. Please try again.");
 
       setFormData(prev => ({ ...prev, bannerImageUrl: publicUrl }));

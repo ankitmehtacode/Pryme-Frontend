@@ -163,6 +163,9 @@ interface Application {
   assignee?: string;
   documents?: ApplicationDoc[];
   metadata?: Record<string, any>;
+  // Backend's optimistic-locking version (ApplicationResponse.version) --
+  // required by PATCH /applications/{id}/status (see handleFinalSubmit).
+  version?: number;
 }
 
 interface DashboardFormData {
@@ -656,11 +659,20 @@ const Dashboard: React.FC = () => {
     setIsSaving(true);
 
     try {
-      await api.patch(`/applications/${activeApplication.applicationId}/status`, { status: "PROCESSING" });
+      // The /status endpoint enforces optimistic locking (ApplicationService.
+      // validateVersion) -- it 409s with "Optimistic Lock Fault: Version
+      // mismatch" whenever request.version() is null, which it always was
+      // here since Application never carried the backend's version field.
+      // Every "Submit to Underwriter" click failed for this reason alone,
+      // regardless of the application's actual state.
+      await api.patch(`/applications/${activeApplication.applicationId}/status`, {
+        status: "PROCESSING",
+        version: activeApplication.version,
+      });
       await api.patch(`/applications/${activeApplication.applicationId}`, { completionPercentage: 100 });
-      
+
       toast({ title: "Underwriting Initiated", description: "All documents secured. Routing to your portfolio tracker." });
-      
+
       setMyApplications(prev => {
         const updated = [...prev];
         if (updated.length > 0) {
@@ -673,10 +685,15 @@ const Dashboard: React.FC = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
       console.error("Submission Error:", error);
-      toast({ 
-        title: "Submission Failed", 
-        description: error.response?.data?.message || "Failed to submit application. Please try again.", 
-        variant: "destructive" 
+      // fetchWithAuth (src/lib/api.ts) throws a plain Error whose .message IS
+      // the backend's real reason -- there is no axios-style error.response
+      // on this client, so that lookup always came back undefined and every
+      // failure showed the same generic fallback text no matter what
+      // actually went wrong.
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Failed to submit application. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setIsSaving(false);
