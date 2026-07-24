@@ -231,25 +231,28 @@ const ApplyConfirmationModal = ({
   onOpenChange: (open: boolean) => void;
   onContinue: () => void;
 }) => (
-  <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+  // modal={false} + no Overlay: this is a corner toast, not a blocking
+  // dialog -- the offers list stays visible and interactive behind it so
+  // applying doesn't feel like it dead-ends the session. Anchored
+  // bottom-left (bottom-right is already the WhatsApp floating button).
+  <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
       <DialogPrimitive.Content
-        className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/90 dark:bg-[#0d1527]/90 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+        className="fixed bottom-4 left-4 right-4 sm:right-auto sm:left-6 sm:bottom-6 z-[101] w-auto sm:w-[380px] flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4"
       >
-        <div className="px-6 md:px-7 pt-7 pb-2 flex flex-col items-center text-center">
-          <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
-            <CheckCircle2 className="w-7 h-7" />
+        <div className="px-5 md:px-6 pt-6 pb-2 flex flex-col items-center text-center">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
+            <CheckCircle2 className="w-6 h-6" />
           </div>
-          <DialogPrimitive.Title className="text-lg md:text-xl font-heading font-bold text-foreground tracking-tight leading-tight">
+          <DialogPrimitive.Title className="text-base md:text-lg font-heading font-bold text-foreground tracking-tight leading-tight">
             Thanks for applying!
           </DialogPrimitive.Title>
-          <DialogPrimitive.Description className="text-sm text-muted-foreground mt-2.5 leading-relaxed">
+          <DialogPrimitive.Description className="text-sm text-muted-foreground mt-2 leading-relaxed">
             We've received your request. Our team will analyse your application and connect with you very soon.
           </DialogPrimitive.Description>
         </div>
 
-        <div className="px-6 md:px-7 pt-5 pb-6 flex flex-col gap-3">
+        <div className="px-5 md:px-6 pt-4 pb-5 flex flex-col gap-3">
           <Button onClick={onContinue} className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm">
             Login / Create Account to Fast-Track
           </Button>
