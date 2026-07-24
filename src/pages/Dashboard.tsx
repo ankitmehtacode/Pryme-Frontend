@@ -699,8 +699,14 @@ const Dashboard: React.FC = () => {
     setUploadingDocs(prev => ({ ...prev, [doc.id]: true }));
 
     try {
-      const { error } = await PrymeAPI.uploadApplicationDocument(activeApplication.applicationId, doc.name, file);
-      
+      // Use doc.id (a stable "hl_sale_deed"-style identifier), not doc.name --
+      // the backend's sanitizeDocType() only allows [A-Z0-9_-], and several
+      // real document labels contain parentheses or an en-dash (e.g. "Sale
+      // Deed (if resale property)", "Title chain documents (20–30 years)"),
+      // which always failed with "Vault Rejected: Document Name contains
+      // invalid characters".
+      const { error } = await PrymeAPI.uploadApplicationDocument(activeApplication.applicationId, doc.id, file);
+
       if (error) {
         toast({ title: "Vault Rejected", description: error.message || "Failed to encrypt file.", variant: "destructive" });
       } else {
@@ -725,7 +731,10 @@ const Dashboard: React.FC = () => {
     
     setUploadingDocs(prev => ({ ...prev, [doc.id]: true }));
     try {
-      const { error } = await PrymeAPI.deleteApplicationDocument(activeApplication.applicationId, normalizeDocName(doc.name));
+      // Same fix as upload: doc.id is the sanitizer-safe identifier the
+      // document was actually stored under, not a normalized form of the
+      // (potentially punctuation-containing) display label.
+      const { error } = await PrymeAPI.deleteApplicationDocument(activeApplication.applicationId, doc.id);
       if (error) {
          toast({ title: "Delete Failed", description: error.message || "Failed to remove document.", variant: "destructive" });
       } else {
