@@ -346,7 +346,12 @@ export const MarketingTab: React.FC = () => {
                       <span className="ml-1.5 hidden sm:inline">{isUploadingBanner ? "Uploading..." : "Upload"}</span>
                     </Button>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Recommended: 800×500px, JPG or PNG, under 5MB — This replaces the text card with a full-bleed image.</p>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Recommended: 1200×1000px (6:5), JPG or PNG, under 5MB — matches the live offer card's actual aspect
+                    ratio (~1.2:1 on desktop, 0.92:1 on tablet). Keep logo/headline within the centered ~70% safe zone
+                    since object-cover crops edges differently per breakpoint. This replaces the text card with a
+                    full-bleed image.
+                  </p>
                   {formData.bannerImageUrl && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02] p-1">
                       <img src={resolveApiUrl(formData.bannerImageUrl)} alt="Banner preview" className="w-full h-20 object-cover rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -451,9 +456,14 @@ export const MarketingTab: React.FC = () => {
 
               {/* Offer Card Mockup (Replicating Homepage Premium glassmorphic look) */}
               <div className="z-10 max-w-xl w-full">
-                {/* ─── BANNER IMAGE PREVIEW (always resolves via BANNER_MAP fallback) ─── */}
+                {/* ─── BANNER IMAGE PREVIEW (always resolves via BANNER_MAP fallback) ───
+                     aspect-[6/5] (1.2:1) matches the live offer card's actual desktop
+                     rendering (HeroCarousel.tsx's --landing-offer-width/-height CSS
+                     vars resolve to ~1.14-1.2:1 on desktop, not the previous 21:9 this
+                     preview used to show -- that made every banner look correctly
+                     framed here while getting cropped hard on the real homepage. */}
                 <div
-                  className="w-full rounded-2xl overflow-hidden relative aspect-[21/9] min-h-[140px] border border-white/60 shadow-xl flex flex-col justify-between group transition-all duration-300"
+                  className="w-full rounded-2xl overflow-hidden relative aspect-[6/5] min-h-[140px] border border-white/60 shadow-xl flex flex-col justify-between group transition-all duration-300"
                   style={{
                     boxShadow: `0 8px 32px 0 rgba(16,55,131,0.06), 0 20px 40px -10px ${activePreset.accentColor}15`
                   }}
