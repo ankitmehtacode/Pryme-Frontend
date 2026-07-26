@@ -22,12 +22,12 @@ const childVariants = {
 
 export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initialOffers[0] & { bannerImageUrl?: string | null; heroImageUrl?: string | null; targetUrl?: string | null }; compact?: boolean }) => {
   const targetUrl = offer.targetUrl || "/apply";
-  // 200-IQ FOMO badge based on offer details
-  const fomoBadge = offer.id.includes("axis")
-    ? { text: "Only 4 slots left", color: "bg-rose-500/10 text-rose-700 border-rose-500/20" }
-    : offer.id.includes("hdfc")
-    ? { text: "Closing in 2 hours", color: "bg-amber-500/10 text-amber-700 border-amber-500/20" }
-    : { text: "Sanctioned in 4h", color: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" };
+  // Badge shows the offer's actual configured tag (Badge Tag in the admin
+  // panel) tinted with its accent color -- previously hardcoded to one of 3
+  // fixed strings chosen by checking offer.id for "axis"/"hdfc" substrings,
+  // which admin-configured offers (UUID ids) never match, so every real
+  // offer silently showed "Sanctioned in 4h" no matter what tag was set.
+  const badgeAccent = offer.accentColor || "#0f766e";
 
   // ─── IMAGE MODE: Full-bleed banner image (PaisaBazaar/BankBazaar style) ───
   if (offer.bannerImageUrl) {
@@ -52,10 +52,19 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
         {/* Subtle gradient overlay at bottom for contrast */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 via-black/10 to-transparent pointer-events-none" />
 
-        {/* Floating FOMO badge — top right */}
-        <span className={`absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border backdrop-blur-md bg-white/70 shadow-lg ${fomoBadge.color}`}>
+        {/* Floating badge — top right — shows the offer's actual configured tag */}
+        <span
+          className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border backdrop-blur-md bg-white/70 shadow-lg"
+          style={{ color: badgeAccent, borderColor: `${badgeAccent}33` }}
+        >
           <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shrink-0" />
-          {fomoBadge.text}
+          {offer.tag}
+        </span>
+
+        {/* Bank name — bottom left, mirrors the admin panel's preview mockup
+            (which previously had no equivalent in this real component at all) */}
+        <span className="absolute bottom-5 left-5 z-10 text-[9px] text-white font-bold uppercase tracking-widest bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-sm">
+          {offer.bank}
         </span>
 
         {/* Floating CTA button overlay — bottom right */}
@@ -127,10 +136,13 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
             )}
           </div>
 
-          {/* Pulse FOMO Tag */}
-          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] md:text-[8px] font-extrabold uppercase tracking-wider border ${fomoBadge.color}`}>
+          {/* Pulse Tag — offer's actual configured Badge Tag */}
+          <span
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] md:text-[8px] font-extrabold uppercase tracking-wider border"
+            style={{ color: badgeAccent, borderColor: `${badgeAccent}33` }}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shrink-0" />
-            {fomoBadge.text}
+            {offer.tag}
           </span>
         </motion.div>
 
