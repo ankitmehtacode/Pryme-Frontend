@@ -107,6 +107,16 @@ export function validateStage3(store: StoreSnapshot): ValidationErrors {
     } else if (lr.propertyValue < lr.loanAmount) {
       errors.propertyValue = "Property value must be ≥ loan amount";
     }
+
+    // Home Loan / LAP are not offered below ₹15 lakhs or 5-year tenure --
+    // block progression here rather than letting the customer fill out the
+    // rest of the form only to be rejected on submission.
+    if (lr.loanAmount && lr.loanAmount <= 1500000) {
+      errors.loanAmount = "Loan amount must be greater than ₹15,00,000 for Home Loan / LAP";
+    }
+    if (lr.tenureYears && lr.tenureYears <= 5) {
+      errors.tenure = "Tenure must be greater than 5 years for Home Loan / LAP";
+    }
   }
 
   return errors;

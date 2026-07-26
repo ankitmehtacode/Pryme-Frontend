@@ -467,12 +467,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="flex-1 xl:flex-none xl:w-[210px] rounded-full h-12 md:h-[52px] px-4 text-base font-extrabold transition-all border-2 bg-transparent border-[#2563eb] text-[#2563eb] dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 flex items-center justify-center gap-2"
+                className="flex-1 xl:flex-none xl:w-[210px] rounded-full h-12 md:h-[52px] px-4 text-sm font-semibold transition-all border bg-transparent border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/40 flex items-center justify-center gap-2"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly
-                <span className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center shrink-0">
-                  <ExternalLink className="w-3.5 h-3.5" />
+                <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
+                  <ExternalLink className="w-3 h-3" />
                 </span>
               </button>
             </div>

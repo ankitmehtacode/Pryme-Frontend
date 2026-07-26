@@ -61,6 +61,7 @@ interface HeroOfferFormData {
   logoType: string;
   title: string;
   highlights: string;
+  cta: string;
   active: boolean;
   orderIndex: number;
   bannerImageUrl: string;
@@ -74,6 +75,7 @@ const initialFormState: HeroOfferFormData = {
   logoType: "axis",
   title: "Pre-Approved Limit up to ₹50,00,000",
   highlights: "",
+  cta: "Apply Now",
   active: true,
   orderIndex: 0,
   bannerImageUrl: "",
@@ -215,6 +217,7 @@ export const MarketingTab: React.FC = () => {
       logoType: offer.logoType || "default",
       title: offer.title || "",
       highlights: offer.highlights || "",
+      cta: offer.cta || "Apply Now",
       active: offer.active ?? true,
       orderIndex: offer.orderIndex ?? 0,
       bannerImageUrl: offer.bannerImageUrl || "",
@@ -304,6 +307,19 @@ export const MarketingTab: React.FC = () => {
                   placeholder="e.g. HDFC Bank"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block mb-1">Button Text (CTA)</label>
+                <input
+                  type="text"
+                  value={formData.cta}
+                  onChange={e => setFormData({ ...formData, cta: e.target.value })}
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500/40"
+                  placeholder="e.g. Apply Now, View Special Terms"
+                  maxLength={100}
+                />
+                <p className="text-[10px] text-slate-500 mt-1">Text shown on the offer card's CTA button on the homepage. Defaults to "View Details" if left empty.</p>
               </div>
             </div>
 
@@ -498,7 +514,7 @@ export const MarketingTab: React.FC = () => {
                   <div className="mt-auto p-3.5 z-10 flex justify-between items-center w-full">
                     <span className="text-[7px] text-white font-bold uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">{formData.bank || "BANK"}</span>
                     <button type="button" className="bg-[#103783] text-white px-3.5 py-1.5 rounded-full text-[8px] font-black uppercase tracking-wider transition-all shadow-md hover:scale-[1.02]" style={{ backgroundColor: activePreset.accentColor, boxShadow: `0 4px 10px ${activePreset.accentColor}30` }}>
-                      Apply Now
+                      {formData.cta || "View Details"}
                     </button>
                   </div>
 
