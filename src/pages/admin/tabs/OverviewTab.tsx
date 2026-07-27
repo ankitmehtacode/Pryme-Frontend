@@ -184,7 +184,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
               <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] group-hover:border-blue-500/30 group-hover:bg-blue-500/10 transition-all"><metric.icon className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" /></div>
               <ArrowUpRight className="w-4 h-4 text-slate-700 opacity-0 group-hover:opacity-100 group-hover:text-blue-400 transition-all duration-300 relative z-10" />
             </div>
-            <p className="text-sm font-medium text-slate-500 relative z-10">{metric.label}</p><p className="text-2xl font-semibold text-white mt-1 relative z-10">{metric.value}</p>
+            <p className="text-sm font-medium text-slate-500 relative z-10 truncate">{metric.label}</p>
+            <p
+              className="text-xl xl:text-lg 2xl:text-2xl font-semibold text-white mt-1 relative z-10 truncate"
+              title={String(metric.value)}
+            >
+              {metric.value}
+            </p>
           </button>
         ))}
       </div>
