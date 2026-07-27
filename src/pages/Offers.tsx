@@ -293,6 +293,28 @@ export default function Offers() {
 
   const leadData = location.state as LeadDataPayload | null;
 
+  // ── STALE-SNAPSHOT GUARD ────────────────────────────────────────────────
+  // leadData is a frozen snapshot of engineResults captured once, at
+  // submit-time (Apply.tsx's navigate() call). If the user leaves this page,
+  // changes their loan type back on the application (the Loan Product
+  // dropdown in LoanDetailsStep, or the landing page's product grid), then
+  // returns here via browser Back/Forward instead of resubmitting, React
+  // Router restores this exact frozen snapshot — silently showing offers
+  // computed for a loan type the live application no longer reflects.
+  // Compare against the live store on every render and bounce back into the
+  // (already-populated, still-editable) form rather than ever render
+  // results for the wrong product.
+  const currentLoanType = useApplicationStore((s) => s.loanRequirements.loanType);
+  useEffect(() => {
+    if (leadData && currentLoanType && leadData.productType !== currentLoanType) {
+      toast({
+        title: "Your loan type has changed",
+        description: "Please review and resubmit your application to see updated offers.",
+      });
+      navigate("/apply", { replace: true });
+    }
+  }, [leadData, currentLoanType, navigate]);
+
   const [isLocking, setIsLocking] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
