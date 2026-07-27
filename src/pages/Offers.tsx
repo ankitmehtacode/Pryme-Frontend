@@ -890,7 +890,7 @@ export default function Offers() {
                   { icon: ShieldCheck, label: "No credit score impact", color: "text-emerald-500" },
                   { icon: Lock, label: "256-bit SSL encryption", color: "text-blue-500" },
                   { icon: BadgeCheck, label: "RBI-regulated partners", color: "text-blue-500" },
-                  { icon: Users, label: "Trusted by 2,00,000+ users", color: "text-muted-foreground" },
+                  { icon: Users, label: "Trusted by 1000+ users", color: "text-muted-foreground" },
                 ].map((t, i) => (
                   <div key={i} className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground/50">
                     <t.icon className={`w-3.5 h-3.5 ${t.color}`} /> {t.label}
