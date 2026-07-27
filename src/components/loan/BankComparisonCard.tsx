@@ -445,7 +445,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-row flex-wrap items-center justify-center xl:justify-end gap-3 xl:gap-2.5">
+            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col items-end xl:flex-row xl:items-center xl:justify-end gap-3 xl:gap-2.5">
               {/* Apply with Pryme -- always the premium glossy design now,
                   regardless of whether a reward matched this offer. The
                   image has no room for loading/applied states itself, so
@@ -453,7 +453,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               <GlossyRewardButton
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
-                className="flex-1 xl:flex-none xl:w-[210px]"
+                className="w-fit xl:w-[210px]"
                 overlay={
                   localStatus === "resolved" ? (
                     <span className="flex items-center gap-1.5 text-white font-extrabold text-sm whitespace-nowrap">
@@ -467,7 +467,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="flex-1 xl:flex-none xl:w-[150px] rounded-full h-10 md:h-11 px-3 text-xs font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-2"
+                className="w-fit xl:w-[150px] rounded-full h-10 md:h-11 px-3 text-xs font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-2"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly
