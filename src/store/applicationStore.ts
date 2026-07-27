@@ -275,10 +275,55 @@ export const useApplicationStore = create<ApplicationStore>()(
         }),
 
       updateLoanRequirements: (data: Partial<LoanRequirements>) =>
-        set((state) => ({
-          loanRequirements: { ...state.loanRequirements, ...data },
-          lastModifiedAt: new Date().toISOString(),
-        })),
+        set((state) => {
+          const updatedRequirements = { ...state.loanRequirements, ...data };
+
+          // 🧠 CRITICAL: If loanType changed (e.g. HOME_LOAN -> LAP, or vice
+          // versa, via the in-form Loan Product dropdown in LoanDetailsStep,
+          // or by switching products from the landing page mid-session),
+          // reset every field that only makes sense for the PREVIOUS loan
+          // type. Without this, a property value/type entered for HOME_LOAN
+          // silently rides along into a LAP (or PERSONAL_LOAN/AUTO_LOAN)
+          // submission, and a previously locked offer's bank name keeps
+          // showing on the review screen for a product it was never quoted
+          // for -- producing wrong eligibility results for the loan type the
+          // user actually ends up applying for. Mirrors updateBasicKYC's
+          // employmentType-change guard above.
+          const loanTypeChanged =
+            data.loanType !== undefined &&
+            data.loanType !== state.loanRequirements.loanType &&
+            state.loanRequirements.loanType !== '';
+
+          if (loanTypeChanged) {
+            updatedRequirements.propertyIdentified = undefined;
+            updatedRequirements.propertyType = undefined;
+            updatedRequirements.propertyCategory = undefined;
+            updatedRequirements.businessPropertyCategory = undefined;
+            updatedRequirements.propertyValue = undefined;
+            updatedRequirements.propertyCity = undefined;
+            updatedRequirements.vehicleOnRoadPrice = undefined;
+            updatedRequirements.vehicleQuotationPrice = undefined;
+            updatedRequirements.selectedBankName = undefined;
+          }
+
+          return {
+            loanRequirements: updatedRequirements,
+            // financialFootprint duplicates a property snapshot outside
+            // loanRequirements (propertyIdentified/estimatedPropertyValue/
+            // isAbove50Lakhs) -- Apply.tsx falls back to these when
+            // loanRequirements' own copy is empty, so they must be cleared
+            // in lockstep or the same staleness leaks through that fallback.
+            financialFootprint: loanTypeChanged
+              ? {
+                  ...state.financialFootprint,
+                  propertyIdentified: false,
+                  estimatedPropertyValue: 0,
+                  isAbove50Lakhs: false,
+                }
+              : state.financialFootprint,
+            lastModifiedAt: new Date().toISOString(),
+          };
+        }),
 
       updateFinancialFootprint: (data: Partial<FinancialFootprint>) =>
         set((state) => ({
