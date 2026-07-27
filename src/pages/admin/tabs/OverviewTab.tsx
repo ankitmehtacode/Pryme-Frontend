@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Wallet, Activity, CheckCircle2, Users, TrendingUp, TrendingDown, ArrowUpRight, CalendarDays } from "lucide-react";
+import { Wallet, Activity, CheckCircle2, Users, LogIn, Banknote, XCircle, TrendingUp, TrendingDown, ArrowUpRight, CalendarDays } from "lucide-react";
 import {
   PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid
@@ -11,6 +11,11 @@ interface OverviewTabProps {
     pendingApplications: number;
     approvedLoans: number;
     totalDisbursed: number;
+    assignedCases: number;
+    loggedIn: number;
+    sanctioned: number;
+    disbursed: number;
+    rejected: number;
   };
   formatCurrency: (val: number) => string;
   portfolioData: any[];
@@ -19,6 +24,10 @@ interface OverviewTabProps {
   // with a term (used by Portfolio Mix segments to pre-filter the CRM
   // Pipeline down to one loan type).
   onNavigate?: (tabId: string, searchTerm?: string) => void;
+  // Employee Console gets a pipeline-stage KPI breakdown instead of the
+  // admin's user-base/approval metrics -- admins manage the whole org,
+  // employees work their own assigned case queue.
+  isEmployee?: boolean;
 }
 
 // ── Trend Time Ranges ────────────────────────────────────────────────────
@@ -60,7 +69,7 @@ const TrendTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency, portfolioData, applications = [], onNavigate }) => {
+export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency, portfolioData, applications = [], onNavigate, isEmployee = false }) => {
   const [trendRange, setTrendRange] = useState<TrendRange>("30d");
 
   // ── Aggregate applications into daily time-series ──────────────────────
@@ -148,13 +157,22 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
       {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
+      {/* Employee Console gets a 6-card pipeline-stage breakdown (its own
+          assigned case queue); Admin keeps the 4-card org-wide summary. */}
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${isEmployee ? "xl:grid-cols-6" : ""}`}>
+        {(isEmployee ? [
+          { label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
+          { label: "Assigned Cases", value: stats.assignedCases, icon: Activity, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
+          { label: "Logged In", value: stats.loggedIn, icon: LogIn, glow: "from-blue-700/20 to-blue-700/0", tab: "applications" },
+          { label: "Sanctioned", value: stats.sanctioned, icon: CheckCircle2, glow: "from-emerald-500/20 to-emerald-500/0", tab: "applications" },
+          { label: "Disbursed", value: stats.disbursed, icon: Banknote, glow: "from-amber-500/20 to-amber-500/0", tab: "applications" },
+          { label: "Rejected", value: stats.rejected, icon: XCircle, glow: "from-red-500/20 to-red-500/0", tab: "applications" },
+        ] : [
           { label: "Total Volume", value: formatCurrency(stats.totalDisbursed), icon: Wallet, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
           { label: "Active Leads", value: stats.pendingApplications, icon: Activity, glow: "from-blue-500/20 to-blue-500/0", tab: "applications" },
           { label: "Approvals", value: stats.approvedLoans, icon: CheckCircle2, glow: "from-blue-700/20 to-blue-700/0", tab: "applications" },
           { label: "User Base", value: stats.totalUsers, icon: Users, glow: "from-amber-500/20 to-amber-500/0", tab: "users" }
-        ].map((metric, i) => (
+        ]).map((metric, i) => (
           <button
             key={i}
             type="button"

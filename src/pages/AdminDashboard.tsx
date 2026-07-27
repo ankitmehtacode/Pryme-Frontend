@@ -612,6 +612,13 @@ const AdminDashboard = () => {
       pendingApplications: applications.filter((a: any) => ['NEW', 'LOGIN'].includes(a.status)).length,
       approvedLoans: applications.filter((a: any) => ['SANCTIONED', 'DISBURSED'].includes(a.status)).length,
       totalDisbursed: applications.reduce((sum: number, app: any) => sum + (app.requestedAmount || 0), 0),
+      // Employee Console pipeline-stage breakdown (OverviewTab only renders
+      // these when isEmployee is true -- admins keep the metrics above).
+      assignedCases: applications.length,
+      loggedIn: applications.filter((a: any) => a.status === 'LOGIN').length,
+      sanctioned: applications.filter((a: any) => a.status === 'SANCTIONED').length,
+      disbursed: applications.filter((a: any) => a.status === 'DISBURSED').length,
+      rejected: applications.filter((a: any) => ['REJECTED', 'DECLINED'].includes(a.status)).length,
     };
   }, [applications, users]);
 
@@ -888,7 +895,7 @@ const AdminDashboard = () => {
               {/* MAIN CONTENT AREA */}
               <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-blue-500 animate-spin" /></div>}>
                 {activeTab === "overview" && (
-                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} applications={applications} onNavigate={handleOverviewNavigate} />
+                  <OverviewTab stats={stats} formatCurrency={formatCurrency} portfolioData={portfolioData} applications={applications} onNavigate={handleOverviewNavigate} isEmployee={isEmployee} />
                 )}
 
                 {activeTab === "applications" && (
