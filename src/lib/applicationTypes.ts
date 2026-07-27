@@ -232,7 +232,6 @@ export interface BusinessDetails {
   businessAddress: string;
 
   // ── ITR-Based ──
-  annualTurnover?: number;
   netProfit?: number;
   itrFiledYears?: number;        // 2-3 required
   /** Depreciation add-back for P&L normalisation — shown for HOME_LOAN / LAP only */

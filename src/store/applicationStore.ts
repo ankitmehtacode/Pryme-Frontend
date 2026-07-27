@@ -137,7 +137,6 @@ const defaultBusiness: BusinessDetails = {
   vintageYears: 0,
   businessAddress: '',
   // ITR fields
-  annualTurnover: 0,
   netProfit: 0,
   itrFiledYears: undefined,
   depreciation: 0,                   // P&L add-back for LAP / HOME_LOAN

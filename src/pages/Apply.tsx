@@ -267,12 +267,12 @@ const Apply = () => {
           programName: hasItrProfit ? "NIP" : (hasGstTurnover ? "GST" : "NIP"),
           pat: data.netProfit || 0,
           depreciation: data.depreciation || 0,
-          // Caps PAT+Depreciation in SurrogateIncomeResolver.resolveNip() so a large
-          // self-reported depreciation add-back can't inflate income past what the
-          // business actually turns over. annualTurnover (the ITR-relevant figure)
-          // takes priority; GST turnover / gross receipts are fallbacks for cases
-          // where turnover itself wasn't entered.
-          grossReceipts: data.annualTurnover || data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
+          // grossReceipts is unused for SELF_EMPLOYED today -- the SENP program
+          // is never attempted for this employment bucket (see
+          // CANDIDATE_PROGRAMS_BY_EMPLOYMENT: NIP/GST/BANKING only), but the
+          // field is still forwarded for forward-compatibility with the
+          // record shape.
+          grossReceipts: data.last12MonthsGstTurnover || data.annualGrossReceipts || 0,
           gstrTurnover12Months: data.last12MonthsGstTurnover || 0,
           businessType: data.businessIndustryType || "Service",
           averageBankBalance: data.averageBankBalance || 0,

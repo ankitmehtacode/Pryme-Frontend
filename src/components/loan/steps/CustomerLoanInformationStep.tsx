@@ -446,7 +446,6 @@ function OccupationSection({
           <SmartField label="Annual Income (As Per ITR)" icon={IndianRupee} value={d.netProfit} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ netProfit: v === "" ? undefined : Number(v) })} />
           <SmartField label="Total GST Turnover (Last 12 Months)" icon={Percent} value={d.last12MonthsGstTurnover} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ last12MonthsGstTurnover: v === "" ? undefined : Number(v) })} />
         </div>
-        <SmartField label="Annual Turnover" icon={IndianRupee} value={d.annualTurnover} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ annualTurnover: v === "" ? undefined : Number(v) })} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <SmartField label="Current Monthly EMI" icon={IndianRupee} value={d.existingEMI} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ existingEMI: v === "" ? undefined : Number(v) })} />
           <SmartField label="EMIs Closing in 12 Months" icon={IndianRupee} value={d.maturingLoanEMI} formatAsCurrency onChange={(v) => onUpdateBusiness?.({ maturingLoanEMI: v === "" ? undefined : Number(v) })} />

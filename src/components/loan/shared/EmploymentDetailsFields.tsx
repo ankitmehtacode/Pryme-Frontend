@@ -538,21 +538,6 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <ValidatedInput
-                label="Annual Turnover (Yearly, ₹)"
-                formatAsCurrency
-                placeholder="5000000"
-                icon={IndianRupee}
-                value={fin.path === "SELF_EMPLOYED" ? (fin.data.annualTurnover || "") : ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const val = Number(e.target.value);
-                  onUpdateBusiness({
-                    annualTurnover: val,
-                    subType: "ITR_BASED"
-                  });
-                }}
-                isValid={(fin.path === "SELF_EMPLOYED" ? fin.data.annualTurnover || 0 : 0) >= 0}
-              />
-              <ValidatedInput
                 label="Business Income as per ITR (Yearly, ₹)"
                 formatAsCurrency
                 placeholder="e.g. 500000"

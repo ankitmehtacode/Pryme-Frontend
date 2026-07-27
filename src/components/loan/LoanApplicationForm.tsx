@@ -786,9 +786,8 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
           const d = fin.data as any;
           const gstTurnover = Number(d.last12MonthsGstTurnover ?? 0);
           const itrIncome = Number(d.netMonthlyIncome ?? 0);
-          const annualTurnover = Number(d.annualTurnover ?? 0);
-          
-          if (gstTurnover > 0 && annualTurnover === 0 && itrIncome === 0) {
+
+          if (gstTurnover > 0 && itrIncome === 0) {
             return "GST_BASED";
           }
           if (gstTurnover > 0) {
@@ -824,7 +823,6 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
 
         // Phase 5 underwriting variables safely mapped
         depreciation: Number((fin?.data as any)?.depreciation ?? (fin?.data as any)?.annualDepreciation ?? 0),
-        annualTurnover: Number((fin?.data as any)?.annualTurnover ?? 0),
         netProfit: Number((fin?.data as any)?.netProfit ?? 0),
         grossSalary: Number((fin?.data as any)?.grossSalary ?? 0),
         isCaCertifiedOrAudited: Boolean((fin?.data as any)?.isCaCertifiedOrAudited ?? (fin?.data as any)?.caCertifiedAccounts ?? false),
