@@ -215,14 +215,16 @@ const formatLoanTypeLabel = (raw?: string) => {
 
 const getStatusConfig = (status: string) => {
   switch (status?.toUpperCase()) {
-    case "SUBMITTED":
+    case "NEW":
       return { color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50 dark:text-blue-400", icon: FileText, progress: 20, label: "Submitted" };
-    case "PROCESSING":
+    case "LOGIN":
       return { color: "text-blue-800 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50 dark:text-blue-400", icon: Activity, progress: 50, label: "Processing" };
     case "VERIFIED":
       return { color: "text-indigo-600 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/40 dark:border-indigo-800/50 dark:text-indigo-400", icon: ShieldCheck, progress: 75, label: "Verified" };
-    case "APPROVED":
-      return { color: "text-blue-800 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-950/50 dark:text-blue-400", icon: CheckCircle, progress: 100, label: "Approved" };
+    case "SANCTIONED":
+      return { color: "text-blue-800 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-950/50 dark:text-blue-400", icon: CheckCircle, progress: 90, label: "Approved" };
+    case "DISBURSED":
+      return { color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800/50 dark:text-emerald-400", icon: Wallet, progress: 100, label: "Disbursed" };
     case "REJECTED":
       return { color: "text-red-600 bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-400", icon: AlertCircle, progress: 100, label: "Rejected" };
     default:
@@ -666,7 +668,7 @@ const Dashboard: React.FC = () => {
       // Every "Submit to Underwriter" click failed for this reason alone,
       // regardless of the application's actual state.
       await api.patch(`/applications/${activeApplication.applicationId}/status`, {
-        status: "PROCESSING",
+        status: "LOGIN",
         version: activeApplication.version,
       });
       await api.patch(`/applications/${activeApplication.applicationId}`, { completionPercentage: 100 });
@@ -677,7 +679,7 @@ const Dashboard: React.FC = () => {
         const updated = [...prev];
         if (updated.length > 0) {
           updated[0].completionPercentage = 100;
-          updated[0].status = "PROCESSING";
+          updated[0].status = "LOGIN";
         }
         return updated;
       });

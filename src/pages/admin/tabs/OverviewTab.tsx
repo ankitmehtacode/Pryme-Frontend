@@ -91,7 +91,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, formatCurrency,
       const day = new Date(app.createdAt).toISOString().split("T")[0];
       if (!buckets[day]) buckets[day] = { leads: 0, approved: 0, rejected: 0, volume: 0 };
       buckets[day].leads += 1;
-      if (["APPROVED", "DISBURSED"].includes(app.status)) {
+      if (["SANCTIONED", "DISBURSED"].includes(app.status)) {
         buckets[day].approved += 1;
         buckets[day].volume += app.requestedAmount || 0;
       }

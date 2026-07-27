@@ -230,7 +230,7 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
                         <StatusBadge status={app.status} />
                       </td>
                       <td className="px-6 py-4 align-top text-right" onClick={(e) => e.stopPropagation()}>
-                        {["APPROVED", "REJECTED"].includes(app.status?.toUpperCase()) ? (
+                        {["DISBURSED", "REJECTED"].includes(app.status?.toUpperCase()) ? (
                           <span className="text-[10px] text-slate-600 font-medium uppercase">Terminal</span>
                         ) : (
                           <Select
@@ -283,7 +283,7 @@ export const ApplicationsTab: React.FC<ApplicationsTabProps> = ({
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 p-2">
                   {filteredApplications.filter((a: any) => a.status === stage).map((app: any) => (
-                    <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'APPROVED' ? '#103783' : 'rgba(255,255,255,0.08)' }}>
+                    <div key={app.id} onClick={() => setSelectedApp(app)} className="bg-[#0d0d14] p-4 rounded-xl border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer border-l-4" style={{ borderLeftColor: stage === 'SANCTIONED' ? '#103783' : stage === 'DISBURSED' ? '#10b981' : 'rgba(255,255,255,0.08)' }}>
                       <div className="flex justify-between items-start mb-1.5">
                         <span className="text-xs font-mono text-slate-500">{app.applicationId}</span>
                         <span className="text-[10px] bg-white/[0.06] text-slate-300 px-1.5 py-0.5 rounded font-medium border border-white/[0.06] uppercase">{app.loanType}</span>

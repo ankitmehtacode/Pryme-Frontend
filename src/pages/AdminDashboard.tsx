@@ -275,7 +275,7 @@ const AdminDashboard = () => {
     }
   ]);
 
-  const pipelineStages = ["NEW", "SUBMITTED", "PROCESSING", "APPROVED", "REJECTED"];
+  const pipelineStages = ["NEW", "LOGIN", "SANCTIONED", "DISBURSED", "REJECTED"];
 
 
 
@@ -609,8 +609,8 @@ const AdminDashboard = () => {
   const stats = useMemo(() => {
     return {
       totalUsers: users.length,
-      pendingApplications: applications.filter((a: any) => ['SUBMITTED', 'NEW', 'PROCESSING'].includes(a.status)).length,
-      approvedLoans: applications.filter((a: any) => ['APPROVED'].includes(a.status)).length,
+      pendingApplications: applications.filter((a: any) => ['NEW', 'LOGIN'].includes(a.status)).length,
+      approvedLoans: applications.filter((a: any) => ['SANCTIONED', 'DISBURSED'].includes(a.status)).length,
       totalDisbursed: applications.reduce((sum: number, app: any) => sum + (app.requestedAmount || 0), 0),
     };
   }, [applications, users]);
@@ -688,7 +688,7 @@ const AdminDashboard = () => {
 
   // 🧠 INTELLIGENT PIPELINE ADVANCEMENT: Calculates the next logical stage
   const getNextStage = (currentStatus: string): string | null => {
-    const flow: Record<string, string> = { NEW: "SUBMITTED", SUBMITTED: "PROCESSING", PROCESSING: "APPROVED" };
+    const flow: Record<string, string> = { NEW: "LOGIN", LOGIN: "SANCTIONED", SANCTIONED: "DISBURSED" };
     return flow[currentStatus?.toUpperCase()] || null;
   };
 
@@ -705,9 +705,9 @@ const AdminDashboard = () => {
   const getStatusColor = (status: string) => {
     const map: Record<string, string> = {
       NEW: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-      SUBMITTED: "bg-blue-500/15 text-blue-400 border-blue-500/25",
-      PROCESSING: "bg-blue-700/15 text-blue-400 border-blue-700/25",
-      APPROVED: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+      LOGIN: "bg-blue-700/15 text-blue-400 border-blue-700/25",
+      SANCTIONED: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+      DISBURSED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
       REJECTED: "bg-red-500/15 text-red-400 border-red-500/25",
       CONTACTED: "bg-cyan-500/15 text-cyan-400 border-cyan-500/25",
       FOLLOW_UP_PENDING: "bg-orange-500/15 text-orange-400 border-orange-500/25",
@@ -1216,7 +1216,7 @@ const AdminDashboard = () => {
 
             <div className="p-5 border-t border-white/[0.06] bg-[#0d0d14] grid grid-cols-2 gap-3">
               <Button disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "REJECTED", version: selectedApp.version })} variant="outline" className="w-full text-red-400 border-red-500/20 hover:bg-red-500/10 active:scale-95 transition-all bg-transparent">Reject Lead</Button>
-              <Button disabled={statusMutation.isPending || selectedApp.status === "APPROVED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "APPROVED", version: selectedApp.version })} className="w-full bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white shadow-lg shadow-blue-500/25 active:scale-95 transition-all">Mark Approved</Button>
+              <Button disabled={statusMutation.isPending || selectedApp.status === "SANCTIONED"} onClick={() => statusMutation.mutate({ id: selectedApp.applicationId, status: "SANCTIONED", version: selectedApp.version })} className="w-full bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white shadow-lg shadow-blue-500/25 active:scale-95 transition-all">Mark Sanctioned</Button>
             </div>
           </div>
         </div>
