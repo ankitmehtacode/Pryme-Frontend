@@ -163,7 +163,7 @@ const BankComparisonTable = ({
 
                   <button
                     onClick={() => onApplyDirect(offer.id)}
-                    className="flex-1 max-w-[185px] h-10 md:h-11 px-3.5 rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 text-xs font-semibold"
+                    className="flex-1 max-w-[150px] h-10 md:h-11 px-3 rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 text-xs font-semibold"
                     title="Apply directly on bank website"
                   >
                     Apply Directly
