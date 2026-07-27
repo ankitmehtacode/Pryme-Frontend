@@ -100,7 +100,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   ];
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col flex-1 min-h-0 space-y-6">
+    <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col space-y-6">
 
       {/* ── Sub-Section Segmented Toggle ──────────────────────────────── */}
       <div className="flex items-center gap-1 bg-[#0d0d14] p-1.5 rounded-xl border border-white/[0.06] w-fit shadow-xl shrink-0">
@@ -249,8 +249,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           </div>
 
           {/* Rules Datatable */}
-          <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
-            <div className="flex-1 overflow-auto relative">
+          <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] shadow-xl overflow-hidden flex flex-col">
+            <div className="relative">
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 bg-[#0d0d14] shadow-[0_1px_0_0_rgba(255,255,255,0.06)] z-10">
                   <tr className="border-b border-white/[0.06] bg-slate-900/40 text-[10px] uppercase tracking-widest text-slate-400">
