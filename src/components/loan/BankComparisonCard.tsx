@@ -438,14 +438,14 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               </div>
             )}
 
-            {/* ── CTAs (side-by-side on all breakpoints) ──────────────────────── */}
+            {/* ── CTAs (stacked, identical size, at every breakpoint) ──────────── */}
             {/* xl:row-start-1 pins this to the same grid row as bank identity/EMI/
                 metrics. Without it, the Amount Capping banner above (col-span-full,
                 placed between the metrics chips and this div in DOM order) can't fit
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            <div className="w-full xl:w-auto min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col items-end xl:flex-row xl:items-center xl:justify-end gap-3 xl:gap-2.5">
+            <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
               {/* Apply with Pryme -- always the premium glossy design now,
                   regardless of whether a reward matched this offer. The
                   image has no room for loading/applied states itself, so
@@ -453,7 +453,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
               <GlossyRewardButton
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
-                className="w-fit xl:w-[210px]"
                 overlay={
                   localStatus === "resolved" ? (
                     <span className="flex items-center gap-1.5 text-white font-extrabold text-sm whitespace-nowrap">
@@ -467,12 +466,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="w-fit xl:w-[150px] rounded-full h-10 md:h-11 px-3 text-xs font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-2"
+                className="w-full h-12 md:h-[52px] rounded-full text-sm font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-2"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly
-                <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
-                  <ExternalLink className="w-2.5 h-2.5" />
+                <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
+                  <ExternalLink className="w-3 h-3" />
                 </span>
               </button>
             </div>

@@ -152,23 +152,22 @@ const BankComparisonTable = ({
                 </div>
 
                 {/* Call To Action Buttons -- same premium glossy design as
-                    BankComparisonCard.tsx's Offers page cards. Both buttons
-                    share the same flex-1/max-w-[210px] so they stay equal
-                    width, not just equal height. */}
-                <div className="flex items-center gap-3">
+                    BankComparisonCard.tsx's Offers page cards. Stacked, and
+                    both share the same w-full/max-w-[210px] container so
+                    they render at identical width and height. */}
+                <div className="w-full max-w-[210px] flex flex-col items-stretch gap-3">
                   <GlossyRewardButton
                     onClick={() => onApplyWithPyrme(offer.id)}
-                    className="flex-1 max-w-[210px]"
                   />
 
                   <button
                     onClick={() => onApplyDirect(offer.id)}
-                    className="flex-1 max-w-[150px] h-10 md:h-11 px-3 rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 text-xs font-semibold"
+                    className="w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
                     title="Apply directly on bank website"
                   >
                     Apply Directly
-                    <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
-                      <ExternalLink className="w-2.5 h-2.5" />
+                    <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
+                      <ExternalLink className="w-3 h-3" />
                     </span>
                   </button>
                 </div>
