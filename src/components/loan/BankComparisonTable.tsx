@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Building2, Star, ExternalLink, ShieldCheck } from "lucide-react";
-import { GlossyRewardButton, GLOSSY_BUTTON_ASPECT } from "@/components/admin/GlossyRewardButton";
+import { GlossyRewardButton, GLOSSY_BUTTON_SIBLING_WIDTH } from "@/components/admin/GlossyRewardButton";
 import { cn } from "@/lib/utils";
 
 interface BankOffer {
@@ -154,9 +154,9 @@ const BankComparisonTable = ({
                 {/* Call To Action Buttons -- same premium glossy design as
                     BankComparisonCard.tsx's Offers page cards. Stacked in a
                     210px column; the glossy graphic renders at its own natural
-                    width inside that column, so Apply Directly derives its
-                    width from the same aspect ratio to match its footprint
-                    rather than stretching the full column. */}
+                    width inside that column, so Apply Directly tracks that
+                    footprint via GLOSSY_BUTTON_SIBLING_WIDTH rather than
+                    stretching the full column. */}
                 <div className="w-full max-w-[210px] flex flex-col items-stretch gap-3">
                   <GlossyRewardButton
                     onClick={() => onApplyWithPyrme(offer.id)}
@@ -164,8 +164,7 @@ const BankComparisonTable = ({
 
                   <button
                     onClick={() => onApplyDirect(offer.id)}
-                    style={{ aspectRatio: GLOSSY_BUTTON_ASPECT }}
-                    className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 text-[11px] font-semibold"
+                    className={`self-center ${GLOSSY_BUTTON_SIBLING_WIDTH} max-w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 text-[11px] font-semibold`}
                   >
                     Apply Directly
                     <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">

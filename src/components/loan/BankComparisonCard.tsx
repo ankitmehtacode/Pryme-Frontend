@@ -2,7 +2,7 @@ import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, TrendingUp, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
-import { GlossyRewardButton, GLOSSY_BUTTON_ASPECT } from "@/components/admin/GlossyRewardButton";
+import { GlossyRewardButton, GLOSSY_BUTTON_SIBLING_WIDTH } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
   if (val == null || val === "" || val === "0" || val === 0) return null;
@@ -468,12 +468,11 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 }
               />
 
-              {/* Width comes from the glossy graphic's aspect ratio (not w-full)
-                  so this pill matches its footprint instead of overhanging it. */}
+              {/* Width tracks the glossy graphic's footprint (not w-full), inset
+                  5px per side -- see GLOSSY_BUTTON_SIBLING_WIDTH. */}
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                style={{ aspectRatio: GLOSSY_BUTTON_ASPECT }}
-                className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full text-[11px] font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-1.5"
+                className={`self-center ${GLOSSY_BUTTON_SIBLING_WIDTH} max-w-full h-12 md:h-[52px] rounded-full text-[11px] font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-1.5`}
               >
                 Apply Directly
                 <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">

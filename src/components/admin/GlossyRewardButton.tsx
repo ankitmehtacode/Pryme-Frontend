@@ -17,11 +17,15 @@ interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
 // the pill -- rendering the whole graphic as one image removes that seam
 // entirely, at the cost of the button no longer stretching edge-to-edge in
 // wider containers (it stays centered at its natural width instead).
-// Intrinsic aspect ratio of the graphic above (1335x384). Because the image
-// renders h-full w-auto, its *visible* width is height x this ratio -- narrower
-// than the CTA column it sits in. A sibling CTA that must look the same size
-// has to derive its width from the same ratio instead of stretching w-full.
-export const GLOSSY_BUTTON_ASPECT = "1335 / 384";
+// Width for a sibling CTA that sits directly under this button.
+//
+// The graphic renders h-full w-auto, so its *visible* width is its intrinsic
+// ratio (1335/384 = 3.477) x its height -- 167px at h-12, 181px at md:h-[52px]
+// -- never the full width of whatever column it sits in. A sibling that
+// stretches w-full therefore reads as much larger. These widths track the
+// graphic at both heights, inset 5px per side so the bordered sibling sits
+// just within it. Re-derive them if the asset is ever re-exported.
+export const GLOSSY_BUTTON_SIBLING_WIDTH = "w-[157px] md:w-[171px]";
 
 export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   className,
