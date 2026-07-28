@@ -445,11 +445,11 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            {/* xl:ml-10 nudges the stack 40px further into the trailing 1fr
+            {/* xl:ml-[75px] nudges the stack that far into the trailing 1fr
                 column, away from the metrics chips. The column has ~120px of
                 slack to its right at xl, so this only consumes dead space --
                 it never pushes the buttons past the card's inner padding. */}
-            <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-10 xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
+            <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-[75px] xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
               {/* Apply with Pryme -- always the premium glossy design now,
                   regardless of whether a reward matched this offer. The
                   image has no room for loading/applied states itself, so
