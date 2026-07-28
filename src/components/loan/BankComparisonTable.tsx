@@ -165,7 +165,7 @@ const BankComparisonTable = ({
                   <button
                     onClick={() => onApplyDirect(offer.id)}
                     style={{ aspectRatio: GLOSSY_BUTTON_ASPECT }}
-                    className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 text-[13px] font-semibold"
+                    className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 text-[11px] font-semibold"
                   >
                     Apply Directly
                     <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
