@@ -2,7 +2,7 @@ import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, TrendingUp, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
-import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
+import { GlossyRewardButton, GLOSSY_BUTTON_ASPECT } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
   if (val == null || val === "" || val === "0" || val === 0) return null;
@@ -464,14 +464,17 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 }
               />
 
+              {/* Width comes from the glossy graphic's aspect ratio (not w-full)
+                  so this pill matches its footprint instead of overhanging it. */}
               <button
                 onClick={() => navigate(`/apply-direct/${offer.id}`)}
-                className="w-full h-12 md:h-[52px] rounded-full text-sm font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-2"
+                style={{ aspectRatio: GLOSSY_BUTTON_ASPECT }}
+                className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full text-[13px] font-semibold transition-all border bg-transparent border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center gap-1.5"
                 title={`Apply directly on ${offer.bankName} website`}
               >
                 Apply Directly
-                <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
-                  <ExternalLink className="w-3 h-3" />
+                <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
+                  <ExternalLink className="w-2.5 h-2.5" />
                 </span>
               </button>
             </div>

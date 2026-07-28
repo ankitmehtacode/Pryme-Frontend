@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Building2, Star, ExternalLink, ShieldCheck } from "lucide-react";
-import { GlossyRewardButton } from "@/components/admin/GlossyRewardButton";
+import { GlossyRewardButton, GLOSSY_BUTTON_ASPECT } from "@/components/admin/GlossyRewardButton";
 import { cn } from "@/lib/utils";
 
 interface BankOffer {
@@ -152,9 +152,11 @@ const BankComparisonTable = ({
                 </div>
 
                 {/* Call To Action Buttons -- same premium glossy design as
-                    BankComparisonCard.tsx's Offers page cards. Stacked, and
-                    both share the same w-full/max-w-[210px] container so
-                    they render at identical width and height. */}
+                    BankComparisonCard.tsx's Offers page cards. Stacked in a
+                    210px column; the glossy graphic renders at its own natural
+                    width inside that column, so Apply Directly derives its
+                    width from the same aspect ratio to match its footprint
+                    rather than stretching the full column. */}
                 <div className="w-full max-w-[210px] flex flex-col items-stretch gap-3">
                   <GlossyRewardButton
                     onClick={() => onApplyWithPyrme(offer.id)}
@@ -162,12 +164,13 @@ const BankComparisonTable = ({
 
                   <button
                     onClick={() => onApplyDirect(offer.id)}
-                    className="w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
+                    style={{ aspectRatio: GLOSSY_BUTTON_ASPECT }}
+                    className="self-center w-auto max-w-full h-12 md:h-[52px] rounded-full border border-primary text-slate-600 dark:border-[#103783] dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 text-[13px] font-semibold"
                     title="Apply directly on bank website"
                   >
                     Apply Directly
-                    <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
-                      <ExternalLink className="w-3 h-3" />
+                    <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center shrink-0 opacity-70">
+                      <ExternalLink className="w-2.5 h-2.5" />
                     </span>
                   </button>
                 </div>

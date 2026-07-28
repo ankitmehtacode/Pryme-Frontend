@@ -17,6 +17,12 @@ interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
 // the pill -- rendering the whole graphic as one image removes that seam
 // entirely, at the cost of the button no longer stretching edge-to-edge in
 // wider containers (it stays centered at its natural width instead).
+// Intrinsic aspect ratio of the graphic above (1335x384). Because the image
+// renders h-full w-auto, its *visible* width is height x this ratio -- narrower
+// than the CTA column it sits in. A sibling CTA that must look the same size
+// has to derive its width from the same ratio instead of stretching w-full.
+export const GLOSSY_BUTTON_ASPECT = "1335 / 384";
+
 export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   className,
   disabled,
