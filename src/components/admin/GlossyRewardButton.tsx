@@ -46,8 +46,30 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
     >
       <img src={fullButton} alt="" className="h-full w-auto max-w-full object-contain pointer-events-none" />
 
+      {/* The graphic renders at its natural width, centered -- it does not fill
+          this (w-full) container. An overlay spanning inset-0 with its own
+          rounded-full radius therefore overhangs the pill on both sides and
+          cuts across the gold ribbon, which pokes outside the pill's rounded
+          rect in the asset. Masking the overlay with that same asset clips it
+          to the graphic's exact alpha instead. mask-size:contain + center
+          mirrors the img's object-contain, so the two stay aligned at any
+          container width, and it needs no re-derivation if the asset changes.
+          Opaque, not translucent: at 85% the graphic's own "Apply with Pryme"
+          wordmark and arrow ghosted through behind the overlay's label. */}
       {overlay && (
-        <div className="absolute inset-0 rounded-full bg-[#0a1530]/85 flex items-center justify-center z-10">
+        <div
+          className="absolute inset-0 bg-[#0a1530] flex items-center justify-center z-10"
+          style={{
+            WebkitMaskImage: `url(${fullButton})`,
+            maskImage: `url(${fullButton})`,
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+          }}
+        >
           {overlay}
         </div>
       )}
