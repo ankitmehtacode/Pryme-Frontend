@@ -5,7 +5,7 @@ import fullButton from '../../assets/apply-with-pryme-full.png';
 interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   disabled?: boolean;
-  // Optional state overlay (loading spinner, "Applied" checkmark, etc.)
+  // Optional state overlay rendered on top of the graphic (loading spinner).
   overlay?: React.ReactNode;
 }
 
@@ -55,7 +55,7 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
           mirrors the img's object-contain, so the two stay aligned at any
           container width, and it needs no re-derivation if the asset changes.
           Opaque, not translucent: at 85% the graphic's own "Apply with Pryme"
-          wordmark and arrow ghosted through behind the overlay's label. */}
+          wordmark and arrow ghosted through behind the overlay's content. */}
       {overlay && (
         <div
           className="absolute inset-0 bg-[#0a1530] flex items-center justify-center z-10"

@@ -1,7 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, Loader2, Calculator, FileText, CheckCircle2, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
+import { Building2, TrendingUp, Loader2, Calculator, FileText, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
 import { GlossyRewardButton, GLOSSY_BUTTON_SIBLING_WIDTH } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
@@ -79,24 +79,30 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   rewards = [],
 }: BankComparisonCardProps) {
   const navigate = useNavigate();
-  const [localStatus, setLocalStatus] = useState<"idle" | "processing" | "resolved">("idle");
+  const [isLocking, setIsLocking] = useState(false);
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
     setLogoError(false);
   }, [offer.logoUrl]);
 
+  // There is no terminal "Applied" state on this button: applying opens the
+  // confirmation popup and routes the user to /auth, so the card is about to
+  // unmount either way. A persistent Applied badge only claimed the offer was
+  // locked in on a screen the user immediately leaves.
   const handleApplyClick = async () => {
-    setLocalStatus("processing");
+    setIsLocking(true);
     try {
       await onApply(offer.id);
-      setLocalStatus("resolved");
     } catch {
-      setLocalStatus("idle");
+      // Swallowed deliberately: onApply (Offers.tsx handleUnlock) already
+      // surfaces its own error toast, and an async throw out of an event
+      // handler would escape React's error boundaries as an unhandled
+      // rejection rather than being caught by one.
+    } finally {
+      setIsLocking(false);
     }
   };
-
-  const isLocking = localStatus === "processing";
   const brand = offer.brandHex;
 
   const matchingReward = rewards?.find(r => {
@@ -451,21 +457,13 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 it never pushes the buttons past the card's inner padding. */}
             <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-[75px] xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
               {/* Apply with Pryme -- always the premium glossy design now,
-                  regardless of whether a reward matched this offer. The
-                  image has no room for loading/applied states itself, so
-                  those render as an opaque overlay on top instead. */}
+                  regardless of whether a reward matched this offer. The image
+                  has no room for a loading state itself, so the spinner
+                  renders as an opaque overlay on top instead. */}
               <GlossyRewardButton
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
-                overlay={
-                  localStatus === "resolved" ? (
-                    <span className="flex items-center gap-1.5 text-white font-extrabold text-sm whitespace-nowrap">
-                      Applied <CheckCircle2 className="w-4 h-4" />
-                    </span>
-                  ) : isLocking ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-white" />
-                  ) : undefined
-                }
+                overlay={isLocking ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : undefined}
               />
 
               {/* Width tracks the glossy graphic's footprint (not w-full), inset

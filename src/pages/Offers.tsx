@@ -232,12 +232,20 @@ const OffersDisclaimerModal = ({ open, onOpenChange }: { open: boolean; onOpenCh
   </DialogPrimitive.Root>
 );
 
+// How long the "Thanks for applying!" confirmation stays up before the user
+// is taken to /auth. Long enough to read the two lines, short enough that the
+// offers list behind it doesn't read as still-actionable.
+const APPLY_CONFIRMATION_REDIRECT_MS = 2600;
+
+// Message only, no CTAs: the user is sent to /auth automatically a moment
+// after this appears (see APPLY_CONFIRMATION_REDIRECT_MS), so the former
+// "Login / Create Account to Fast-Track" and "I'll do this later" buttons
+// would have been racing that redirect.
 const ApplyConfirmationModal = ({
-  open, onOpenChange, onContinue,
+  open, onOpenChange,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onContinue: () => void;
 }) => (
   // modal={false} + no Overlay: this is a corner toast, not a blocking
   // dialog -- the offers list stays visible and interactive behind it so
@@ -248,7 +256,7 @@ const ApplyConfirmationModal = ({
       <DialogPrimitive.Content
         className="fixed bottom-4 left-4 right-4 sm:right-auto sm:left-6 sm:bottom-6 z-[101] w-auto sm:w-[380px] flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4"
       >
-        <div className="px-5 md:px-6 pt-6 pb-2 flex flex-col items-center text-center">
+        <div className="px-5 md:px-6 py-6 flex flex-col items-center text-center">
           <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
             <CheckCircle2 className="w-6 h-6" />
           </div>
@@ -258,17 +266,6 @@ const ApplyConfirmationModal = ({
           <DialogPrimitive.Description className="text-sm text-muted-foreground mt-2 leading-relaxed">
             We've received your request. Our team will analyse your application and connect with you very soon.
           </DialogPrimitive.Description>
-        </div>
-
-        <div className="px-5 md:px-6 pt-4 pb-5 flex flex-col gap-3">
-          <Button onClick={onContinue} className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm">
-            Login / Create Account to Fast-Track
-          </Button>
-          <DialogPrimitive.Close asChild>
-            <button className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
-              I'll do this later
-            </button>
-          </DialogPrimitive.Close>
         </div>
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
@@ -321,6 +318,13 @@ export default function Offers() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showApplyConfirmation, setShowApplyConfirmation] = useState(false);
   const [callbackStatus, setCallbackStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
+
+  // Cleared on unmount so a user who navigates away (Back, the header, a
+  // WhatsApp tap) during the confirmation isn't yanked to /auth afterwards.
+  const authRedirectTimer = useRef<number | null>(null);
+  useEffect(() => () => {
+    if (authRedirectTimer.current !== null) window.clearTimeout(authRedirectTimer.current);
+  }, []);
 
   // Consent-style callback request for the zero-offers screen -- tags the
   // lead that was already silently captured pre-eligibility (Apply.tsx) as
@@ -618,6 +622,23 @@ export default function Offers() {
   // SCENARIO B: EXCEPTION ZERO-STATE (No Offers Matched Engine Profile)
   // ═══════════════════════════════════════════════════════════════════════
   // ── Handlers (must be declared before any early returns to avoid conditional hook-like patterns) ──
+
+  // Declared above handleUnlock deliberately: handleUnlock lists this in its
+  // useCallback dependency array, which is evaluated during render, so a
+  // later declaration would throw a TDZ ReferenceError on first render.
+  const scheduleAuthRedirect = useCallback(() => {
+    // The confirmation is a non-blocking corner toast, so a second offer can
+    // still be applied to during the countdown -- replace the pending timer
+    // rather than letting two fire.
+    if (authRedirectTimer.current !== null) window.clearTimeout(authRedirectTimer.current);
+    authRedirectTimer.current = window.setTimeout(() => {
+      // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
+      // Read from the actual source of truth where Apply.tsx:116 saved it.
+      const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
+      navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
+    }, APPLY_CONFIRMATION_REDIRECT_MS);
+  }, [navigate]);
+
   const handleUnlock = useCallback(async (offer: BankOffer) => {
     if (!leadData) return;
     setIsLocking(offer.id);
@@ -636,26 +657,18 @@ export default function Offers() {
         toast({ title: "Offer Secured ✨", description: `${offer.bankName} application locked. Redirecting to your dashboard.` });
         navigate("/dashboard", { state: { selectedBank: offer.bankName, leadData } });
       } else {
-        // Confirm the application was received and let the user choose when
-        // to log in/create an account to fast-track it, instead of yanking
-        // them straight to /auth before they've seen any confirmation.
+        // Confirm the application was received, then send them to /auth on
+        // their behalf -- the confirmation is a message, not a decision point.
         setShowApplyConfirmation(true);
         setIsLocking(null);
+        scheduleAuthRedirect();
       }
     } catch {
       toast({ title: "Connection Error", description: "Please try again.", variant: "destructive" });
       setIsLocking(null);
       throw new Error("API Gateway routing failed"); // Throw so the error boundary can catch it
     }
-  }, [leadData, isAuthenticated, navigate]);
-
-  const handleApplyConfirmationContinue = useCallback(() => {
-    setShowApplyConfirmation(false);
-    // 🧠 RELAY FIX: leadData.leadId is undefined (Apply.tsx stores it in localStorage, not router state)
-    // Read from the actual source of truth where Apply.tsx:116 saved it.
-    const storedLeadId = localStorage.getItem("pryme_pending_lead_id");
-    navigate("/auth", { state: { emailHint: "", intent: "track_lead", leadId: storedLeadId } });
-  }, [navigate]);
+  }, [leadData, isAuthenticated, navigate, scheduleAuthRedirect]);
 
   const handleToggleExpand = useCallback((id: string) => {
     setExpandedCard(prev => prev === id ? null : id);
@@ -786,7 +799,7 @@ export default function Offers() {
       </Helmet>
       <Header />
       <OffersDisclaimerModal open={showDisclaimer} onOpenChange={handleDisclaimerChange} />
-      <ApplyConfirmationModal open={showApplyConfirmation} onOpenChange={setShowApplyConfirmation} onContinue={handleApplyConfirmationContinue} />
+      <ApplyConfirmationModal open={showApplyConfirmation} onOpenChange={setShowApplyConfirmation} />
 
       <main className="flex-1 pt-24 md:pt-28 pb-24 relative overflow-x-clip">
         {/* 🧠 PERF FIX: radial-gradient replaces transform-gpu — zero CPU rasterization */}
