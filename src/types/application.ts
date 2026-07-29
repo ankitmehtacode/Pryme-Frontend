@@ -49,7 +49,9 @@ export type FormStep =
 export interface BasicKYC {
   fullName: string;           // Legal name as per PAN
   mobileNumber: string;       // 10-digit Indian mobile
-  mobileVerified: boolean;    // OTP verification status
+  mobileVerified: boolean;
+  /** Server-signed proof of OTP verification, presented at lead submission. */
+  mobileVerificationToken?: string;    // OTP verification status
   email: string;
   dateOfBirth: string;        // ISO date string (YYYY-MM-DD)
   panNumber: string;          // Format: ABCDE1234F

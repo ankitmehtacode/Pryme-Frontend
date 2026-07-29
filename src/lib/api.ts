@@ -1,6 +1,7 @@
 // src/lib/api.ts
 import { generateSafeUUID, buildCleanMetadata } from "@/lib/utils";
 import type { MeResponse, DictionaryMap } from "@/types/auth.types";
+import type { OtpSendResponse, OtpVerifyResponse } from "@/types/otp.types";
 
 
 // ARCHITECTURE: one build serves every brand (gopryme.tech, prymeloans.in,
@@ -186,6 +187,73 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 // Safe null/undefined checking to prevent malformed payloads
 const prepareBody = (body: any) => body == null ? undefined : (body instanceof FormData ? body : JSON.stringify(body));
 
+
+/**
+ * Transport for the OTP endpoints.
+ *
+ * Preserves the server's JSON error envelope ({ reason, message, retryAt,
+ * attemptsRemaining }) on the thrown error so the verifier UI can render an
+ * exact state. fetchWithAuth deliberately flattens errors -- especially 429 --
+ * which is right for the rest of the app and wrong for a flow whose rate limits
+ * are part of its normal, user-visible behaviour.
+ */
+class OtpRequestError extends Error {
+  body?: any;
+  status: number;
+  constructor(message: string, status: number, body?: any) {
+    super(message);
+    this.name = "OtpRequestError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
+const otpFetch = async (endpoint: string, payload: unknown) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(resolveApiUrl(endpoint), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Same idempotency contract as every other mutating call.
+        "Idempotency-Key": generateSafeUUID(),
+      },
+      credentials: "include",
+      mode: "cors",
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    const text = await response.text();
+    let parsed: any = null;
+    try { parsed = text ? JSON.parse(text) : null; } catch { /* non-JSON error page */ }
+
+    if (!response.ok) {
+      throw new OtpRequestError(
+        parsed?.message || `Request failed (${response.status})`,
+        response.status,
+        parsed
+      );
+    }
+    return parsed;
+  } catch (e) {
+    if (e instanceof OtpRequestError) throw e;
+    if ((e as Error)?.name === "AbortError") {
+      throw new OtpRequestError("The request timed out. Please try again.", 0, {
+        reason: "TEMPORARILY_UNAVAILABLE",
+        message: "The request timed out. Please try again.",
+      });
+    }
+    throw new OtpRequestError("Network error. Please check your connection.", 0, {
+      reason: "TEMPORARILY_UNAVAILABLE",
+      message: "Network error. Please check your connection.",
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
 export const PrymeAPI = {
 
   // ==========================================
@@ -305,6 +373,28 @@ export const PrymeAPI = {
   evaluateEligibility: async (payload: any) => {
     return fetchWithAuth("/public/eligibility/evaluate", { method: "POST", body: JSON.stringify(payload) });
   },
+
+  // ── Mobile OTP ────────────────────────────────────────────────────────────
+  // These use otpFetch, not fetchWithAuth. fetchWithAuth converts every 429 into
+  // a generic "rate limit exceeded" Error and fires pryme_rate_limited -- correct
+  // for accidental hammering of ordinary endpoints, wrong here: the cooldown and
+  // the 5-per-hour cap are normal, expected states of this flow that the UI must
+  // render precisely (how long to wait, how many sends are left). Routing them
+  // through the global shield would replace that with a scary banner and discard
+  // reason/retryAt. The global behaviour is deliberately left untouched.
+  // The code itself is generated, stored (hashed) and checked entirely server
+  // side; these calls only ever carry the number, an opaque requestId and the
+  // digits the user typed. Expiry, the 5-per-hour limit and the attempt cap are
+  // enforced by the backend -- the timings returned here are for rendering
+  // countdowns, never for deciding what is allowed.
+  sendMobileOtp: async (mobileNumber: string): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/send", { mobileNumber }),
+
+  resendMobileOtp: async (mobileNumber: string): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/resend", { mobileNumber }),
+
+  verifyMobileOtp: async (requestId: string, otp: string): Promise<OtpVerifyResponse> =>
+    otpFetch("/public/otp/verify", { requestId, otp }),
 
   submitLead: async (formData: any) => {
     // 🧠 PIPELINE FIX: Forward strictly mapped form fields into metadata so Admin Dashboard

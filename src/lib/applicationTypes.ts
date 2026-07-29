@@ -138,6 +138,8 @@ export interface BasicKYC extends PersonalProfileExtension {
   fullName: string;
   mobileNumber: string;
   mobileVerified: boolean;
+  /** Server-signed proof of OTP verification, presented at lead submission. */
+  mobileVerificationToken?: string;
   email: string;
   dateOfBirth: string;           // YYYY-MM-DD
   panNumber: string;             // ABCDE1234F

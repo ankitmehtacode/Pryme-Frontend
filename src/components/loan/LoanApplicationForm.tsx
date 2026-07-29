@@ -759,6 +759,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         fullName: store.basicKYC?.fullName ?? "Guest",
         email: store.basicKYC?.email ?? "",
         phone: store.basicKYC?.mobileNumber ?? "",
+        // Server-signed proof that this number passed SMS OTP. The backend
+        // re-validates the signature and its binding to `phone`; it does not
+        // trust any client-side "verified" flag.
+        mobileVerificationToken: store.basicKYC?.mobileVerificationToken ?? "",
         panCard: store.basicKYC?.panNumber ?? "",
         dob: store.basicKYC?.dateOfBirth ?? "",
         // BUG-1 FIX: Raw loanType — no .toLowerCase().replace() mangling.
@@ -1096,6 +1100,10 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
              type="submit"
              disabled={
                isSubmitting || isAnalyzing || !consent1 || !consent2 ||
+               // Mobile OTP is mandatory. This is the UI half of the gate; the
+               // backend independently re-checks the signed verification token,
+               // because a disabled button stops a person and nothing else.
+               !store.basicKYC?.mobileVerified ||
                (() => {
                  const empType = store.basicKYC?.employmentType;
                  const fin = store.financialDetails || {};

@@ -43,6 +43,7 @@ const createFreshState = (): ApplicationState => ({
     fullName: '',
     mobileNumber: '',
     mobileVerified: false,
+    mobileVerificationToken: undefined,
     email: '',
     dateOfBirth: '',
     panNumber: '',

@@ -38,6 +38,9 @@ export interface MeResponse {
   role: AppRole;
   permissions: Permission[];
   phone?: string;
+  /** True when `phone` has been proven via SMS OTP -- lets the application
+   *  form prefill it and skip re-verification for a returning user. */
+  mobileVerified?: boolean;
   customerId?: string;
   employeeId?: string;
 }

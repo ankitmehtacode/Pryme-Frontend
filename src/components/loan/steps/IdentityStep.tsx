@@ -1,11 +1,12 @@
-import React from "react";
-import { User, Phone, CheckCircle2, Mail, Calendar, MapPin, Building2, Hash } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useRef } from "react";
+import { User, Phone, Calendar, MapPin, Building2, Hash } from "lucide-react";
 import { SelectItem } from "@/components/ui/select";
 import { useApplicationStore } from "@/store/applicationStore";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ValidatedInput, StyledSelect } from "../shared/FormComponents";
+import { MobileOtpVerifier } from "../shared/MobileOtpVerifier";
 import { STATE_CITIES } from "../shared/constants";
 
 interface IdentityStepProps {
@@ -27,6 +28,25 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
     employmentType: null,
   };
   const errors = store.validationErrors || {};
+  const { user, isAuthenticated } = useAuth();
+
+  // Returning verified user: prefill the number they already proved and mark it
+  // verified, so they are not asked to repeat an SMS round-trip on every visit.
+  //
+  // Guarded by a ref rather than by "is the field empty": this must run once per
+  // session hydration, never fight a user who is deliberately typing a different
+  // number. Only the backend's mobileVerified flag can set this -- the form can
+  // trust it because it arrives from an authenticated /auth/me, not from anything
+  // the browser could have written.
+  const prefillApplied = useRef(false);
+  useEffect(() => {
+    if (prefillApplied.current) return;
+    if (!isAuthenticated || !user?.mobileVerified || !user?.phone) return;
+    if (basicKYC.mobileNumber && basicKYC.mobileNumber !== user.phone) return;
+
+    prefillApplied.current = true;
+    store.updateBasicKYC({ mobileNumber: user.phone, mobileVerified: true });
+  }, [isAuthenticated, user?.mobileVerified, user?.phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div id="section-identity" className={cn(cardCn, 'transition-all duration-500')}>
@@ -52,7 +72,7 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
           <div className="flex flex-col gap-2 relative">
             <ValidatedInput
               label="Mobile Number"
-              placeholder="9876543210"
+              placeholder="e.g. 9876543210"
               icon={Phone}
               maxLength={10}
               value={basicKYC.mobileNumber}
@@ -60,44 +80,22 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
               isValid={/^[6-9]\d{9}$/.test(basicKYC.mobileNumber)}
               error={errors.mobileNumber}
             />
-            {/^[6-9]\d{9}$/.test(basicKYC.mobileNumber) && !basicKYC.mobileVerified && (
-              <div className="animate-in fade-in slide-in-from-top-1 mt-1 space-y-2">
-                {/* Verify Now / Verify Later toggle */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-9 text-xs font-semibold border-primary/30 text-primary hover:bg-primary hover:text-white transition-all"
-                    onClick={() => {
-                      toast({ title: "OTP Sent", description: `A 6-digit OTP has been sent to ${basicKYC.mobileNumber}` });
-                    }}
-                  >
-                    <Phone className="w-3 h-3 mr-1.5" /> Verify Now
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 h-9 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all"
-                    onClick={() => {
-                      // Skip verification — mark as not verified but allow progression
-                      store.updateBasicKYC({ mobileVerified: false });
-                      toast({ title: "Skipped", description: "You can verify your mobile later from your profile." });
-                    }}
-                  >
-                    Verify Later
-                  </Button>
-                </div>
-                <p className="text-[10px] text-muted-foreground/50 ml-0.5">Verification is optional. You can proceed without it.</p>
-              </div>
-            )}
-            {basicKYC.mobileVerified && (
-              <div className="flex items-center gap-1.5 mt-1 animate-in fade-in">
-                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-semibold text-primary">Mobile Verified</span>
-              </div>
-            )}
+            {/* Verification is mandatory -- the submit button stays disabled
+                until this reports success. The component owns the OTP exchange;
+                the token it returns is the server's proof and the only thing
+                submission is checked against. */}
+            <MobileOtpVerifier
+              mobileNumber={basicKYC.mobileNumber}
+              verified={!!basicKYC.mobileVerified}
+              onVerified={(token, verifiedNumber) => {
+                store.updateBasicKYC({
+                  mobileNumber: verifiedNumber,
+                  mobileVerified: true,
+                  mobileVerificationToken: token,
+                });
+                toast({ title: "Mobile verified", description: "Your number has been confirmed." });
+              }}
+            />
           </div>
           <ValidatedInput
             label="Date of Birth"
@@ -142,7 +140,7 @@ export const IdentityStep: React.FC<IdentityStepProps> = ({ cardCn }) => {
 
           <ValidatedInput
             label="PIN Code"
-            placeholder="400001"
+            placeholder="e.g. 400001"
             icon={Hash}
             maxLength={6}
             value={basicKYC.pinCode}
