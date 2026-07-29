@@ -3,10 +3,41 @@ import { generateSafeUUID, buildCleanMetadata } from "@/lib/utils";
 import type { MeResponse, DictionaryMap } from "@/types/auth.types";
 
 
-// ARCHITECTURE: VITE_API_URL = "/api/v1" in dev (Vite proxy handles routing).
-// In production, set to the actual API domain (e.g., https://crm.pryme.in/api/v1).
-// Fallback to /api/v1 guarantees the app never breaks — it just uses the proxy.
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+// ARCHITECTURE: one build serves every brand (gopryme.tech, prymeloans.in,
+// prymeloans.com). The API base is resolved in this order:
+//
+//   1. VITE_API_URL, when set — dev uses "/api/v1" so the Vite proxy handles
+//      routing (.env.local), and it stays available as an explicit override.
+//   2. Derived from the page's own hostname: https://api.<host-minus-www>/api/v1
+//   3. "/api/v1" for localhost/preview, where no api.<host> exists.
+//
+// Deriving rather than baking one host in at build time is deliberate. A build
+// pinned to api.gopryme.tech but served from prymeloans.com would be talking to
+// a different registrable domain, making every request cross-site — at which
+// point the browser stops sending the SameSite=Lax PRYME_SID cookie and every
+// user appears logged out with no error anywhere. Derivation keeps the frontend
+// and its API on one domain automatically, for any brand, with no per-deploy
+// env var to forget. Each derived host must exist in nginx's server_name and in
+// the backend's app.security.allowed-origins.
+const resolveApiBaseUrl = (): string => {
+  const configured = import.meta.env.VITE_API_URL;
+  if (configured) return configured;
+
+  // Guard for non-browser build contexts (prerender tooling importing this module).
+  if (typeof window === "undefined") return "/api/v1";
+
+  const { hostname } = window.location;
+  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") {
+    return "/api/v1";
+  }
+
+  return `https://api.${hostname.replace(/^www\./, "")}/api/v1`;
+};
+
+// Exported so every caller resolves the API the same way — notably the SSE
+// EventSource in useAuth, which must hit the identical origin or its credentialed
+// stream is a cross-site request the cookie never reaches.
+export const API_BASE_URL = resolveApiBaseUrl();
 
 /**
  * 🧠 SECURE FETCH ENGINE (PRODUCTION GRADE — ZERO-TRUST)

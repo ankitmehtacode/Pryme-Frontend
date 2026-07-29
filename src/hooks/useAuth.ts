@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { PrymeAPI } from "@/lib/api";
+import { PrymeAPI, API_BASE_URL } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import type { MeResponse, Permission } from "@/types/auth.types";
 
@@ -153,9 +153,13 @@ export const useAuth = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // 🧠 CLOSED-LOOP FIX: VITE_API_URL is '/api/v1', so we append '/stream/system-events'
-    // relative to that base. Without this fix, the URL was '/api/v1/api/v1/stream/...' → 404
-    const apiBase = (import.meta.env.VITE_API_URL || "/api/v1").replace(/\/$/, "");
+    // 🧠 CLOSED-LOOP FIX: the API base already ends at '/api/v1', so we append
+    // '/stream/system-events' relative to it. Without this the URL was
+    // '/api/v1/api/v1/stream/...' → 404.
+    // Uses the shared API_BASE_URL rather than re-reading VITE_API_URL: this is a
+    // credentialed EventSource, so it must resolve to the exact same origin as
+    // every other call or the session cookie is not sent and the stream 401s.
+    const apiBase = API_BASE_URL.replace(/\/$/, "");
     const eventSource = new EventSource(
       `${apiBase}/stream/system-events`,
       { withCredentials: true }

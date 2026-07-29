@@ -24,6 +24,15 @@
     <meta name="author" content="PRYME Intelligence" />
     <meta name="keywords" content="personal loan, business loan, home loan, loan aggregator, RBI compliant, secure loan, PRYME" />
 
+    <!--
+      connect-src lists the API host of EVERY brand this build is deployed to
+      (gopryme.tech, prymeloans.in, prymeloans.com). This shell is static HTML,
+      parsed before any script runs, so it cannot know which brand is serving it
+      and must cover all of them. src/lib/api.ts still only ever calls the api
+      host matching the current domain — this list is the ceiling, not the route.
+      Adding a brand means adding its api.<brand> host here as well as to nginx's
+      server_name and the backend's app.security.allowed-origins.
+    -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://accounts.google.com;
@@ -31,7 +40,7 @@
       font-src 'self' https://fonts.gstatic.com data:;
       img-src 'self' data: https: http: blob:;
       media-src 'self' https://videos.pexels.com blob: data:;
-      connect-src 'self' wss://* https://api.gopryme.tech https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com;
+      connect-src 'self' wss://* https://api.gopryme.tech https://api.prymeloans.in https://api.prymeloans.com https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com;
       worker-src 'self' blob:;
       frame-src 'self' https://accounts.google.com;
     ">
