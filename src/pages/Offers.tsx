@@ -248,13 +248,16 @@ const ApplyConfirmationModal = ({
   onOpenChange: (open: boolean) => void;
 }) => (
   // modal={false} + no Overlay: this is a corner toast, not a blocking
-  // dialog -- the offers list stays visible and interactive behind it so
-  // applying doesn't feel like it dead-ends the session. Anchored
-  // bottom-left (bottom-right is already the WhatsApp floating button).
+  // dialog -- the offers list stays visible behind it so applying doesn't
+  // feel like it dead-ends the session. Anchored bottom-right at every
+  // breakpoint; on phones it stays pinned right and shrinks to the viewport
+  // rather than stretching corner to corner. Its z-[101] deliberately sits
+  // above the WhatsApp bubble (z-[60]) and ScrollToTop (z-50) that share
+  // this corner -- it covers them for the ~2.6s before the redirect.
   <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
     <DialogPrimitive.Portal>
       <DialogPrimitive.Content
-        className="fixed bottom-4 left-4 right-4 sm:right-auto sm:left-6 sm:bottom-6 z-[101] w-auto sm:w-[380px] flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[101] w-[calc(100vw-2rem)] max-w-[380px] flex flex-col overflow-hidden rounded-[1.75rem] border border-white/40 dark:border-white/[0.08] bg-white/95 dark:bg-[#0d1527]/95 backdrop-blur-2xl shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4"
       >
         <div className="px-5 md:px-6 py-6 flex flex-col items-center text-center">
           <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
@@ -648,7 +651,11 @@ export default function Offers() {
       // Customer & Loan Information review screen can render this bank's
       // logo -- localStorage's copy gets deleted after a single read.
       useApplicationStore.getState().updateLoanRequirements({ selectedBankName: offer.bankName });
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // No artificial delay here: the 1.5s wait this used to hold existed
+      // only so the button's loading spinner had something to show. With the
+      // spinner gone it was 1.5s of dead air between the click and the
+      // confirmation, with nothing on screen to explain it. Nothing in this
+      // handler calls the network -- the lead was captured back in Apply.tsx.
 
       // 🧠 AUTH-AWARE ROUTING FIX: If the user is already authenticated,
       // send them to their dashboard to continue the application — NOT

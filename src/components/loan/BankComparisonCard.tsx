@@ -1,7 +1,7 @@
 import { useState, memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, TrendingUp, Loader2, Calculator, FileText, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
+import { Building2, TrendingUp, Calculator, FileText, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
 import { GlossyRewardButton, GLOSSY_BUTTON_SIBLING_WIDTH } from "@/components/admin/GlossyRewardButton";
 
 const parseExpenseValue = (val: any): string | null => {
@@ -86,10 +86,11 @@ export const BankComparisonCard = memo(function BankComparisonCard({
     setLogoError(false);
   }, [offer.logoUrl]);
 
-  // There is no terminal "Applied" state on this button: applying opens the
-  // confirmation popup and routes the user to /auth, so the card is about to
-  // unmount either way. A persistent Applied badge only claimed the offer was
-  // locked in on a screen the user immediately leaves.
+  // The button shows no state of its own -- no spinner, no "Applied" badge.
+  // Applying opens the confirmation popup and routes the user to /auth, so
+  // the card is about to unmount either way. isLocking is kept only to guard
+  // against a double submit and to keep this card out of the disabled state
+  // its siblings enter while a lock is in flight.
   const handleApplyClick = async () => {
     setIsLocking(true);
     try {
@@ -457,13 +458,12 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 it never pushes the buttons past the card's inner padding. */}
             <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-[75px] xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
               {/* Apply with Pryme -- always the premium glossy design now,
-                  regardless of whether a reward matched this offer. The image
-                  has no room for a loading state itself, so the spinner
-                  renders as an opaque overlay on top instead. */}
+                  regardless of whether a reward matched this offer. The button
+                  renders no click state of its own: the confirmation popup is
+                  the feedback, and it opens immediately. */}
               <GlossyRewardButton
                 onClick={!(isGlobalLocking && !isLocking) ? handleApplyClick : undefined}
                 disabled={isGlobalLocking && !isLocking}
-                overlay={isLocking ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : undefined}
               />
 
               {/* Width tracks the glossy graphic's footprint (not w-full), inset
