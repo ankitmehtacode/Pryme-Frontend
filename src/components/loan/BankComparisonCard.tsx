@@ -1,4 +1,4 @@
-import { useState, memo, useEffect } from "react";
+import { useState, memo, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, TrendingUp, Calculator, FileText, ChevronDown, ExternalLink, Star, Gift, Smartphone, Car, Tag, AlertCircle, Info, Percent, Calendar } from "lucide-react";
@@ -16,6 +16,66 @@ const parseExpenseValue = (val: any): string | null => {
     return `₹${Math.round(num).toLocaleString("en-IN")}`;
   }
   return cleanStr;
+};
+
+// ── Upfront fee parsing ─────────────────────────────────────────────────────
+// Module scope so the metric chip and the expandable breakdown panel below
+// derive Total Cost from one implementation rather than two.
+
+// A range like "9,000-18,000" (SBI Legal & Technical) or a variable formula
+// like "5000+Mortgage charge between 2500-15000 according to loan amount"
+// (BOB-LAP Other Fees) isn't a single number -- shown as text and deliberately
+// excluded from the upfront total rather than guessing a point estimate.
+const isRangeOrFormula = (s: string) => /\d\s*-\s*\d|according to loan amount/i.test(s);
+
+// Parse a raw fee value (real data only -- no fallback substitution; if the
+// backend has no figure for this product, it's excluded from the total rather
+// than silently replaced with a guessed default).
+const toNumericFee = (val: any, principalAmount: number): number => {
+  if (val == null || val === "") return 0;
+  if (val === "Nil" || val === "0" || val === 0) return 0;
+  if (typeof val === "number") return val;
+  const s = String(val).trim();
+  if (isRangeOrFormula(s)) return 0;
+  const cleaned = s.replace(/[₹,\s]/g, "");
+  if (cleaned.includes("%")) {
+    const pct = parseFloat(cleaned.replace("%", ""));
+    return isNaN(pct) ? 0 : Math.round(principalAmount * pct / 100);
+  }
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+};
+
+// Format a value for display. No fallback substitution to a guessed default --
+// but a missing/null figure still renders as ₹0 rather than leaking "null" or
+// an ambiguous placeholder into the UI.
+const formatFee = (val: any, principalAmount: number): string => {
+  if (val == null || val === "") return "₹0";
+  if (val === 0 || val === "0" || val === 0.0) return "₹0";
+  if (typeof val === "number") return `₹${Math.round(val).toLocaleString("en-IN")}`;
+  const s = String(val).trim();
+  if (s === "0" || s.toLowerCase() === "nil") return "₹0";
+  if (s.includes("%")) {
+    const pct = parseFloat(s.replace(/[^\d.]/g, ""));
+    if (!isNaN(pct)) {
+      return `₹${Math.round(principalAmount * pct / 100).toLocaleString("en-IN")}`;
+    }
+  }
+  if (isRangeOrFormula(s)) {
+    // Format bare number ranges ("9000-18000") as currency; leave free-text
+    // formulas (BOB-LAP's mortgage-charge note) as-is.
+    const rangeMatch = s.match(/^([\d,]+)\s*-\s*([\d,]+)$/);
+    if (rangeMatch) {
+      const lo = parseInt(rangeMatch[1].replace(/,/g, ""), 10);
+      const hi = parseInt(rangeMatch[2].replace(/,/g, ""), 10);
+      return `₹${lo.toLocaleString("en-IN")} - ₹${hi.toLocaleString("en-IN")} (est.)`;
+    }
+    return `${s} (est.)`;
+  }
+  if (s.startsWith("₹")) return s;
+  const n = parseFloat(s.replace(/[₹,\s]/g, ""));
+  if (!isNaN(n)) return `₹${Math.round(n).toLocaleString("en-IN")}`;
+  return s;
 };
 
 export interface BankOfferDTO {
@@ -159,6 +219,34 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   const pfAmount = offer.processingFee >= 100
     ? Math.round(offer.processingFee)
     : Math.round(principalAmount * offer.processingFee / 100);
+
+  // Total upfront cost = processing fee + login fee + stamp duty + other
+  // charges. Hoisted for the same reason as pfAmount: the top-row "Total Cost"
+  // chip and the "Total Upfront Cost" line in the breakdown panel are the same
+  // number and must not be able to drift apart.
+  const { totalUpfront, otherChargesDisplay, hasEstimatedFees } = useMemo(() => {
+    const er = offer.originalEngineResult;
+
+    // "Other Charges" = Legal & Technical Fees + Other Fees combined into one
+    // line, since both are lender-side fixed/variable charges that aren't
+    // stamp duty or processing/login fees.
+    const legalTechRaw = er?.legalTechnicalCharges;
+    const otherExpenseRaw = er?.otherExpense;
+    const otherChargesNum = toNumericFee(legalTechRaw, principalAmount) + toNumericFee(otherExpenseRaw, principalAmount);
+    const otherChargesEstimated = [legalTechRaw, otherExpenseRaw].some(
+      (v) => typeof v === "string" && isRangeOrFormula(v)
+    );
+
+    return {
+      totalUpfront:
+        pfAmount +
+        toNumericFee(er?.loginFee, principalAmount) +
+        toNumericFee(er?.stampDuty, principalAmount) +
+        otherChargesNum,
+      otherChargesDisplay: `₹${otherChargesNum.toLocaleString("en-IN")}${otherChargesEstimated ? " (est.)" : ""}`,
+      hasEstimatedFees: otherChargesEstimated || (typeof er?.stampDuty === "string" && isRangeOrFormula(er.stampDuty)),
+    };
+  }, [offer.originalEngineResult, principalAmount, pfAmount]);
 
   return (
     <motion.div
@@ -316,7 +404,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 {[
                   { label: "Interest", value: `${offer.interestRate}%` },
                   { label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
-                  { label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                  { label: "Total Cost", value: `₹${totalUpfront.toLocaleString("en-IN")}` },
                 ].map((m, i) => (
                   <div
                     key={i}
@@ -394,7 +482,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                   {[
                     { icon: Percent, label: "Interest Rate", value: `${offer.interestRate}%` },
                     { icon: Calendar, label: "Tenure", value: `${offer.effectiveTenureYears} yrs` },
-                    { icon: FileText, label: "Processing Fees", value: `₹${pfAmount.toLocaleString("en-IN")}` },
+                    { icon: FileText, label: "Total Cost", value: `₹${totalUpfront.toLocaleString("en-IN")}` },
                   ].map((m, i) => (
                     <div key={i} className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -500,80 +588,6 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 {(() => {
                   const er = offer.originalEngineResult;
 
-                  // A range like "9,000-18,000" (SBI Legal & Technical) or a variable
-                  // formula like "5000+Mortgage charge between 2500-15000 according to
-                  // loan amount" (BOB-LAP Other Fees) isn't a single number -- shown as
-                  // text and deliberately excluded from Total Upfront Cost rather than
-                  // guessing a point estimate.
-                  const isRangeOrFormula = (s: string) => /\d\s*-\s*\d|according to loan amount/i.test(s);
-
-                  // Parse a raw fee value (real data only -- no fallback substitution;
-                  // if the backend has no figure for this product, it's excluded from
-                  // the total rather than silently replaced with a guessed default).
-                  const toNumeric = (val: any): number => {
-                    if (val == null || val === "") return 0;
-                    if (val === "Nil" || val === "0" || val === 0) return 0;
-                    if (typeof val === "number") return val;
-                    const s = String(val).trim();
-                    if (isRangeOrFormula(s)) return 0;
-                    const cleaned = s.replace(/[₹,\s]/g, "");
-                    if (cleaned.includes("%")) {
-                      const pct = parseFloat(cleaned.replace("%", ""));
-                      return isNaN(pct) ? 0 : Math.round(principalAmount * pct / 100);
-                    }
-                    const n = parseFloat(cleaned);
-                    return isNaN(n) ? 0 : n;
-                  };
-
-                  // Format a value for display. No fallback substitution to a guessed
-                  // default -- but a missing/null figure still renders as ₹0 rather
-                  // than leaking "null" or an ambiguous placeholder into the UI.
-                  const fmt = (val: any): string => {
-                    if (val == null || val === "") return "₹0";
-                    if (val === 0 || val === "0" || val === 0.0) return "₹0";
-                    if (typeof val === "number") return `₹${Math.round(val).toLocaleString("en-IN")}`;
-                    const s = String(val).trim();
-                    if (s === "0" || s.toLowerCase() === "nil") return "₹0";
-                    if (s.includes("%")) {
-                      const pct = parseFloat(s.replace(/[^\d.]/g, ""));
-                      if (!isNaN(pct)) {
-                        return `₹${Math.round(principalAmount * pct / 100).toLocaleString("en-IN")}`;
-                      }
-                    }
-                    if (isRangeOrFormula(s)) {
-                      // Format bare number ranges ("9000-18000") as currency; leave
-                      // free-text formulas (BOB-LAP's mortgage-charge note) as-is.
-                      const rangeMatch = s.match(/^([\d,]+)\s*-\s*([\d,]+)$/);
-                      if (rangeMatch) {
-                        const lo = parseInt(rangeMatch[1].replace(/,/g, ""), 10);
-                        const hi = parseInt(rangeMatch[2].replace(/,/g, ""), 10);
-                        return `₹${lo.toLocaleString("en-IN")} - ₹${hi.toLocaleString("en-IN")} (est.)`;
-                      }
-                      return `${s} (est.)`;
-                    }
-                    if (s.startsWith("₹")) return s;
-                    const n = parseFloat(s.replace(/[₹,\s]/g, ""));
-                    if (!isNaN(n)) return `₹${Math.round(n).toLocaleString("en-IN")}`;
-                    return s;
-                  };
-
-                  const loginFeeNum = toNumeric(er?.loginFee);
-                  const stampDutyNum = toNumeric(er?.stampDuty);
-
-                  // "Other Charges" = Legal & Technical Fees + Other Fees combined into
-                  // one line, since both are lender-side fixed/variable charges that
-                  // aren't stamp duty or processing/login fees.
-                  const legalTechRaw = er?.legalTechnicalCharges;
-                  const otherExpenseRaw = er?.otherExpense;
-                  const otherChargesNum = toNumeric(legalTechRaw) + toNumeric(otherExpenseRaw);
-                  const otherChargesEstimated = [legalTechRaw, otherExpenseRaw].some(
-                    (v) => typeof v === "string" && isRangeOrFormula(v)
-                  );
-                  const otherChargesDisplay = `₹${otherChargesNum.toLocaleString("en-IN")}${otherChargesEstimated ? " (est.)" : ""}`;
-
-                  const totalUpfront = pfAmount + loginFeeNum + stampDutyNum + otherChargesNum;
-                  const hasEstimatedFees = otherChargesEstimated || (typeof er?.stampDuty === "string" && isRangeOrFormula(er.stampDuty));
-
                   const coreRows = [
                     { label: "Principal Amount", value: `₹${principalAmount.toLocaleString("en-IN")}` },
                     { label: "Interest Rate", value: `${offer.interestRate}% p.a.` },
@@ -585,8 +599,8 @@ export const BankComparisonCard = memo(function BankComparisonCard({
 
                   const feeRows = [
                     { label: "Processing Fees(Inclusive of GST)", value: `₹${pfAmount.toLocaleString("en-IN")}` },
-                    { label: "Login Fees", value: fmt(er?.loginFee) },
-                    { label: "Stamp Duty", value: fmt(er?.stampDuty) },
+                    { label: "Login Fees", value: formatFee(er?.loginFee, principalAmount) },
+                    { label: "Stamp Duty", value: formatFee(er?.stampDuty, principalAmount) },
                     { label: "Other Charges(approx.)", value: otherChargesDisplay },
                   ];
 
