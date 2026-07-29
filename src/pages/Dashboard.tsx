@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -145,12 +145,40 @@ function numberOrUndefined(value: unknown): number | undefined {
 }
 
 // --- Types & Interfaces ---
+/** What the document matrix shows for a slot that has a file in it. */
+interface UploadedDocInfo {
+  fileName?: string;
+  url?: string;
+  docType?: string;
+}
+
 interface ApplicationDoc {
   docType: string;
   url?: string;
   name?: string;
   id?: string;
 }
+
+/**
+ * Builds the document-matrix lookup from whatever the server says exists.
+ *
+ * Keyed three ways on purpose: the backend uppercases docType (see
+ * DocumentVaultService.sanitizeDocType), the matrix renders from lowercase
+ * doc.id, and older rows were keyed by normalised display name. One document
+ * therefore has to answer to all three, or an already-uploaded file renders as
+ * an empty slot after a refresh.
+ */
+const buildUploadedDocMap = (documents: ApplicationDoc[] | undefined): Record<string, UploadedDocInfo> => {
+  const map: Record<string, UploadedDocInfo> = {};
+  (documents || []).forEach((d) => {
+    if (!d.docType) return;
+    const info: UploadedDocInfo = { fileName: d.name, url: d.url, docType: d.docType };
+    map[d.docType] = info;
+    map[d.docType.toLowerCase()] = info;
+  });
+  return map;
+};
+
 
 interface Application {
   applicationId: string;
@@ -245,7 +273,11 @@ const Dashboard: React.FC = () => {
   const [activeApplication, setActiveApplication] = useState<Application | null>(null);
   
   const [uploadingDocs, setUploadingDocs] = useState<Record<string, boolean>>({});
-  const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
+  // Holds the uploaded file itself, not a bare boolean. Every existing
+  // truthiness check (uploadedDocs[id]) still works, but the row can now render
+  // what was actually uploaded -- filename, and a link to view it -- so the
+  // matrix shows the documents rather than just a tick that they exist.
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, UploadedDocInfo>>({});
   const [dragOverDocId, setDragOverDocId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
@@ -277,14 +309,7 @@ const Dashboard: React.FC = () => {
     // still lowercase. Without also storing the lowercased key, that never
     // matches, so every already-uploaded document silently reverted to
     // "not uploaded" on refresh / re-selecting the application.
-    const loadedDocs: Record<string, boolean> = {};
-    (targetApp.documents || []).forEach((d) => {
-      if (d.docType) {
-        loadedDocs[d.docType] = true;
-        loadedDocs[d.docType.toLowerCase()] = true;
-      }
-    });
-    setUploadedDocs(loadedDocs);
+    setUploadedDocs(buildUploadedDocMap(targetApp.documents));
 
     // 🧠 Must run before the 100%-completion early return below, not after --
     // otherwise a completed application's Applicant Information silently
@@ -297,13 +322,30 @@ const Dashboard: React.FC = () => {
     loadApplicationDataIntoStore(store, targetApp, allApps);
 
     const progress = targetApp.completionPercentage || 0;
-    if (progress >= 100) {
-      setViewState("DASHBOARD");
-      return;
-    }
 
+    // A completed application no longer bounces to the portfolio on login. Once
+    // the details are in and the documents are uploaded, the document matrix is
+    // the only screen the applicant has any reason to return to -- it is where
+    // they check what was received and swap anything wrong. The portfolio stays
+    // one click away via the header link in the funnel.
     setViewState("FUNNEL");
-    setCurrentStage(progress === 0 || progress < 50 ? 1 : 2);
+
+    // Land on the document matrix whenever stage 1 has already been captured.
+    // Once we hold the applicant's details, stage 1 is not something they came
+    // back to do -- re-entering there makes them page past a filled-in form to
+    // reach the documents, which is the only part still needing them. Stage 1
+    // stays one "Back" away for anyone who does want to change a detail.
+    //
+    // Keyed off the stored data rather than completionPercentage alone: the
+    // percentage is written by handleNextStage, so an application whose details
+    // arrived by any other route (elevated lead, admin edit) would otherwise be
+    // sent back to a form it had already answered.
+    const stageOneCaptured =
+      progress >= 50 ||
+      Boolean(targetApp.documents?.length) ||
+      Boolean(store.basicKYC?.fullName && store.basicKYC?.mobileNumber);
+
+    setCurrentStage(stageOneCaptured ? 2 : 1);
 
     // 🧠 SINGLE SOURCE OF TRUTH: fall back to financialDetails.data.existingEMI
     // (the same field the eligibility engine already used) when this application
@@ -655,7 +697,16 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleFinalSubmit = async () => {
+  /**
+   * Hands the application to underwriting. Formerly the "Submit to Underwriter"
+   * click; now fired once every required document is in the vault.
+   *
+   * The status PATCH and the completion PATCH are unchanged -- ops still sees
+   * the application arrive exactly as before. What changed is the trigger: the
+   * user no longer has to press anything, because with a direct-pass matrix
+   * there is no moment where the files are "not yet sent".
+   */
+  const submitToUnderwriting = async () => {
     if (!activeApplication) return;
 
     setIsSaving(true);
@@ -673,7 +724,7 @@ const Dashboard: React.FC = () => {
       });
       await api.patch(`/applications/${activeApplication.applicationId}`, { completionPercentage: 100 });
 
-      toast({ title: "Underwriting Initiated", description: "All documents secured. Routing to your portfolio tracker." });
+      toast({ title: "Underwriting Initiated", description: "All required documents are in. You can still replace or remove them from My Applications." });
 
       setMyApplications(prev => {
         const updated = [...prev];
@@ -683,8 +734,6 @@ const Dashboard: React.FC = () => {
         }
         return updated;
       });
-      setViewState("DASHBOARD");
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
       console.error("Submission Error:", error);
       // fetchWithAuth (src/lib/api.ts) throws a plain Error whose .message IS
@@ -701,6 +750,56 @@ const Dashboard: React.FC = () => {
       setIsSaving(false);
     }
   };
+
+  /**
+   * Re-reads the vault's document list and repaints the matrix from it.
+   *
+   * The matrix is a direct view of what the vault holds -- there is no batch
+   * submit, so a slot must reflect the server the moment an upload or delete
+   * settles. Failure here is deliberately silent: the optimistic state already
+   * shows the right thing, and a toast about a background refresh would only
+   * confuse someone whose upload plainly worked.
+   */
+  const refreshDocuments = useCallback(async () => {
+    const applicationId = activeApplication?.applicationId;
+    if (!applicationId) return;
+    try {
+      const docs = await PrymeAPI.getApplicationDocuments(applicationId);
+      const list: ApplicationDoc[] = Array.isArray(docs) ? docs : (docs?.documents ?? []);
+      setUploadedDocs(buildUploadedDocMap(list));
+      setActiveApplication(prev => (prev ? { ...prev, documents: list } : prev));
+    } catch (e) {
+      console.warn("Document list refresh failed; keeping optimistic state", e);
+    }
+  }, [activeApplication?.applicationId]);
+
+  // Fires submitToUnderwriting exactly once, when the last required document
+  // lands. Guarded by a ref rather than by application status because the status
+  // PATCH is asynchronous -- two uploads finishing together would otherwise both
+  // observe the old status and both submit.
+  const underwritingHandoffFired = useRef(false);
+  useEffect(() => {
+    if (viewState !== "FUNNEL" || currentStage !== 2) return;
+    if (!activeApplication || underwritingHandoffFired.current) return;
+
+    const required = docGroups.flatMap(g => g.docs.filter(d => d.required));
+    if (required.length === 0) return;
+
+    const allPresent = required.every(d =>
+      uploadedDocs[d.id] || uploadedDocs[d.id.toUpperCase()] || uploadedDocs[normalizeDocName(d.name)]
+    );
+    if (!allPresent) return;
+
+    // Already handed over on a previous visit -- re-uploading a file should not
+    // re-submit an application that underwriting is already working on.
+    if (activeApplication.status === "LOGIN" || (activeApplication.completionPercentage || 0) >= 100) {
+      underwritingHandoffFired.current = true;
+      return;
+    }
+
+    underwritingHandoffFired.current = true;
+    void submitToUnderwriting();
+  }, [uploadedDocs, docGroups, currentStage, viewState, activeApplication]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFileUpload = async (doc: { id: string; name: string; required: boolean }, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -740,12 +839,16 @@ const Dashboard: React.FC = () => {
         toast({ title: "Vault Rejected", description: error.message || "Failed to encrypt file.", variant: "destructive" });
       } else {
         toast({ title: "Document Secured", description: `${doc.name} successfully encrypted in vault.` });
-        // 🧠 DETERMINISTIC STATE MUTATION: Use both local ID and backend format to guarantee sync
-        setUploadedDocs(prev => ({ 
-          ...prev, 
-          [doc.id]: true,
-          [normalizeDocName(doc.name)]: true 
+        // Show it immediately from the local file, then reconcile against the
+        // vault. The optimistic entry keeps the slot from flickering empty while
+        // the round-trip completes; refreshDocuments replaces it with the
+        // server's record, which is what carries the viewable URL.
+        setUploadedDocs(prev => ({
+          ...prev,
+          [doc.id]: { fileName: file.name, docType: doc.id },
+          [doc.id.toUpperCase()]: { fileName: file.name, docType: doc.id },
         }));
+        void refreshDocuments();
       }
     } catch (err: any) {
       console.error("Upload stream disrupted:", err);
@@ -770,9 +873,11 @@ const Dashboard: React.FC = () => {
          setUploadedDocs(prev => {
             const next = { ...prev };
             delete next[doc.id];
+            delete next[doc.id.toUpperCase()];
             delete next[normalizeDocName(doc.name)];
             return next;
          });
+         void refreshDocuments();
          setConfirmDeleteId(null);
          toast({ title: "Document Removed", description: `${doc.name} was successfully removed.` });
       }
@@ -854,9 +959,27 @@ const Dashboard: React.FC = () => {
                           <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                           Your Application
                         </Inline>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-display tracking-tight leading-tight">
-                          Let's get you funded
-                        </h1>
+                        <Inline justify="space-between" align="center" className="gap-3 flex-wrap">
+                          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-display tracking-tight leading-tight">
+                            Let's get you funded
+                          </h1>
+                          {/* The only route back to the portfolio now that login lands
+                              here. Without it a returning applicant would have no way to
+                              reach their other applications or the delete action. */}
+                          {myApplications.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setViewState("DASHBOARD");
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                              }}
+                              className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-colors"
+                            >
+                              <Wallet className="w-3.5 h-3.5" />
+                              My Portfolio
+                            </button>
+                          )}
+                        </Inline>
                       </div>
 
                       {/* Application switcher -- only shown once there's more than one
@@ -1167,7 +1290,11 @@ const Dashboard: React.FC = () => {
                                       <Stack gap="var(--space-3)" className="px-4 pb-4">
                                         {group.docs.map((doc) => {
                                           const isUploading = uploadingDocs[doc.id];
-                                          const isUploaded = uploadedDocs[doc.id] || uploadedDocs[normalizeDocName(doc.name)];
+                                          // The record itself, so the row can show the file rather than a tick.
+                                          const uploadedInfo = uploadedDocs[doc.id]
+                                            || uploadedDocs[doc.id.toUpperCase()]
+                                            || uploadedDocs[normalizeDocName(doc.name)];
+                                          const isUploaded = Boolean(uploadedInfo);
                                           const isDragging = dragOverDocId === doc.id;
                                           const isConfirmingDelete = confirmDeleteId === doc.id;
 
@@ -1194,7 +1321,24 @@ const Dashboard: React.FC = () => {
                                                   </span>
                                                 </Inline>
                                                 {!isUploaded && <span className="text-[10px] font-medium text-slate-500 mt-0.5">PDF, JPG, PNG up to 10MB</span>}
-                                                {isUploaded && <span className="text-[10px] text-emerald-600 font-bold tracking-wide mt-0.5">Secured with AES-256</span>}
+                                                {isUploaded && (
+                                                  <Inline align="center" gap="var(--space-2)" className="mt-0.5 flex-wrap">
+                                                    <span className="text-[10px] text-slate-600 font-medium max-w-[220px] truncate" title={uploadedInfo?.fileName}>
+                                                      {uploadedInfo?.fileName || "Document on file"}
+                                                    </span>
+                                                    {uploadedInfo?.url && (
+                                                      <a
+                                                        href={uploadedInfo.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-[10px] font-bold text-blue-600 hover:underline"
+                                                      >
+                                                        View
+                                                      </a>
+                                                    )}
+                                                    <span className="text-[10px] text-emerald-600 font-bold tracking-wide">Secured</span>
+                                                  </Inline>
+                                                )}
                                               </Stack>
                                               
                                               <Inline align="center" gap="var(--space-3)" className="z-10">
@@ -1205,7 +1349,9 @@ const Dashboard: React.FC = () => {
                                                   className="hidden" 
                                                   accept=".pdf,.jpg,.jpeg,.png"
                                                   onChange={(e) => handleFileUpload(doc, e)}
-                                                  disabled={isUploading || isUploaded}
+                                                  // Not disabled when uploaded: the same input backs Replace,
+                                                  // so a user can swap a wrong file without deleting first.
+                                                  disabled={isUploading}
                                                 />
                                                 
                                                 {isUploading && (
@@ -1223,14 +1369,23 @@ const Dashboard: React.FC = () => {
                                                         <Button size="sm" variant="ghost" className="h-7 hover:bg-slate-100 px-2" onClick={() => setConfirmDeleteId(null)}>No</Button>
                                                       </Inline>
                                                     ) : (
-                                                      <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-8 w-8 text-emerald-600/50 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                                                        onClick={() => setConfirmDeleteId(doc.id)}
-                                                      >
-                                                        <X className="w-4 h-4" />
-                                                      </Button>
+                                                      <>
+                                                        <Label
+                                                          htmlFor={`upload-${doc.id}`}
+                                                          className="inline-flex items-center justify-center rounded-lg text-[11px] font-bold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 h-8 px-3 cursor-pointer transition-colors"
+                                                        >
+                                                          Replace
+                                                        </Label>
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="icon"
+                                                          title={`Remove ${doc.name}`}
+                                                          className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                                          onClick={() => setConfirmDeleteId(doc.id)}
+                                                        >
+                                                          <X className="w-4 h-4" />
+                                                        </Button>
+                                                      </>
                                                     )}
                                                   </Inline>
                                                 )}
@@ -1270,17 +1425,32 @@ const Dashboard: React.FC = () => {
                             </Button>
                           ) : <div />}
 
-                          <Button 
-                            onClick={currentStage === 2 ? handleFinalSubmit : handleNextStage} 
-                            disabled={isSaving}
-                            className="h-12 px-8 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/10 disabled:opacity-70 transition-all rounded-xl hover:-translate-y-0.5"
-                          >
-                            {isSaving ? (
-                              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {currentStage === 2 ? "Submitting..." : "Saving..."}</>
-                            ) : (
-                              <>{currentStage === 2 ? "Submit to Underwriter" : "Save & Continue"} <ChevronRight className="w-4 h-4 ml-1.5" /></>
-                            )}
-                          </Button>
+                          {/* No submit button on the documents stage. Documents pass
+                              straight through to the vault as they are uploaded, so there
+                              is nothing left to "submit" -- a button there would imply the
+                              files were still being held locally. The application is
+                              handed to underwriting automatically once every required
+                              document is present (see the effect that calls
+                              submitToUnderwriting), and the user can keep replacing or
+                              removing files afterwards from My Applications. */}
+                          {currentStage === 2 ? (
+                            <Inline align="center" gap="var(--space-2)" className="text-xs font-semibold text-slate-500">
+                              {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                              <span>Documents save automatically as you upload them.</span>
+                            </Inline>
+                          ) : (
+                            <Button
+                              onClick={handleNextStage}
+                              disabled={isSaving}
+                              className="h-12 px-8 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/10 disabled:opacity-70 transition-all rounded-xl hover:-translate-y-0.5"
+                            >
+                              {isSaving ? (
+                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                              ) : (
+                                <>Save &amp; Continue <ChevronRight className="w-4 h-4 ml-1.5" /></>
+                              )}
+                            </Button>
+                          )}
                         </div>
 
                       </div>
@@ -1416,46 +1586,95 @@ const Dashboard: React.FC = () => {
                         const StatusIcon = config.icon;
                         return (
                           <motion.div key={app.applicationId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", ...spring, delay: index * 0.1 }}>
-                            <Surface className="overflow-hidden hover:border-primary/20 transition-all shadow-sm">
-                              <div className="p-[var(--space-6)] md:p-[var(--space-8)] flex flex-col md:flex-row gap-[var(--space-6)] md:gap-[var(--space-12)] justify-between">
-                                <Stack gap="var(--space-4)" className="flex-1">
-                                  <Inline gap="var(--space-3)" align="center">
-                                    <span className={cn("inline-flex items-center gap-[var(--space-1)] px-3 py-1 rounded-full text-[length:var(--text-caption)] font-semibold border", config.color)}>
+                            <Surface className="group relative overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-blue-50/40 shadow-lg shadow-slate-200/40 transition-all hover:border-blue-300/60 hover:shadow-xl hover:shadow-slate-200/60">
+                              {/* Brand accent rail -- ties the card to the same blue
+                                  gradient language used by the funnel and empty states,
+                                  and gives the layout a defined left edge instead of
+                                  text floating in a white void. */}
+                              <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-500 via-blue-600 to-blue-700" />
+
+                              <div className="p-[var(--space-6)] md:p-[var(--space-8)] pl-[calc(var(--space-6)+4px)] md:pl-[calc(var(--space-8)+4px)]">
+                                {/* Header: identity on the left, destructive action kept
+                                    small and on the right. Previously delete was a
+                                    full-width red row that competed with the primary CTA. */}
+                                <Inline justify="space-between" align="center" className="gap-3 flex-wrap mb-[var(--space-6)]">
+                                  <Inline gap="var(--space-3)" align="center" className="min-w-0">
+                                    <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[length:var(--text-caption)] font-bold border", config.color)}>
                                       <StatusIcon className="w-3.5 h-3.5" /> {config.label}
                                     </span>
-                                    <span className="text-[length:var(--text-small)] font-mono font-medium text-[hsl(var(--muted-foreground))]">{app.applicationId}</span>
+                                    <span className="text-[length:var(--text-small)] font-mono font-medium text-slate-400 truncate">
+                                      {app.applicationId}
+                                    </span>
                                   </Inline>
-                                  <div>
-                                    <p className="text-[length:var(--text-caption)] font-bold text-[hsl(var(--muted-foreground))] uppercase tracking-widest mb-[var(--space-1)]">{app.loanType?.replace(/_/g, " ") || "PERSONAL LOAN"}</p>
-                                    <h3 className="text-3xl font-bold text-[hsl(var(--foreground))] flex items-center gap-2">
-                                      <Wallet className="w-6 h-6 text-[hsl(var(--muted-foreground))]" />
-                                      ₹{app.requestedAmount?.toLocaleString("en-IN") || "0"}
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    title="Delete application"
+                                    className="h-8 w-8 shrink-0 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                    onClick={() => setAppPendingDeletion(app)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </Inline>
+
+                                <div className="flex flex-col lg:flex-row lg:items-end gap-[var(--space-6)] lg:gap-[var(--space-10)]">
+                                  {/* Amount block -- the single most important fact on the
+                                      card, so it leads and is the largest type. */}
+                                  <Stack gap="none" className="min-w-0">
+                                    <p className="text-[length:var(--text-caption)] font-bold text-blue-600 uppercase tracking-[0.15em] mb-1.5">
+                                      {formatLoanTypeLabel(app.loanType) || "Personal Loan"}
+                                    </p>
+                                    <h3 className="text-[2rem] md:text-4xl font-extrabold text-slate-900 tracking-tight leading-none flex items-baseline gap-2">
+                                      <Wallet className="w-6 h-6 md:w-7 md:h-7 text-blue-500/70 shrink-0 self-center" />
+                                      <span className="tabular-nums">₹{app.requestedAmount?.toLocaleString("en-IN") || "0"}</span>
                                     </h3>
-                                  </div>
-                                </Stack>
-                                <Stack gap="var(--space-6)" className="flex-1 max-w-sm">
-                                  <div>
-                                    <Inline justify="space-between" align="center" className="text-[length:var(--text-small)] mb-[var(--space-3)] font-medium">
-                                      <span className="text-[hsl(var(--foreground))]">Processing Matrix</span>
-                                      <span className="text-primary tabular-nums">{app.completionPercentage || config.progress}%</span>
+                                  </Stack>
+
+                                  {/* Progress + meta, right-aligned on desktop so the two
+                                      halves read as one row rather than two disconnected
+                                      columns with a gap between them. */}
+                                  <Stack gap="var(--space-4)" className="flex-1 lg:max-w-sm w-full">
+                                    <div>
+                                      <Inline justify="space-between" align="center" className="text-[length:var(--text-small)] mb-2 font-semibold">
+                                        <span className="text-slate-500">Application progress</span>
+                                        <span className="text-blue-600 tabular-nums font-bold">{app.completionPercentage || config.progress}%</span>
+                                      </Inline>
+                                      <Progress
+                                        value={app.completionPercentage || config.progress}
+                                        className="h-1.5 bg-slate-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-blue-600"
+                                      />
+                                    </div>
+
+                                    <Inline gap="var(--space-2)" className="flex-wrap">
+                                      <Inline gap="var(--space-2)" align="center" className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 min-w-0">
+                                        <CalendarDays className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <Stack gap="none" className="min-w-0">
+                                          <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 leading-none">Initiated</span>
+                                          <span className="text-[length:var(--text-small)] font-semibold text-slate-700 truncate">
+                                            {app.createdAt ? formatISTDate(app.createdAt) : "N/A"}
+                                          </span>
+                                        </Stack>
+                                      </Inline>
+                                      <Inline gap="var(--space-2)" align="center" className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 min-w-0">
+                                        <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <Stack gap="none" className="min-w-0">
+                                          <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 leading-none">Assignee</span>
+                                          <span className="text-[length:var(--text-small)] font-semibold text-slate-700 truncate">
+                                            {app.assignee || "Evaluating"}
+                                          </span>
+                                        </Stack>
+                                      </Inline>
                                     </Inline>
-                                    <Progress value={app.completionPercentage || config.progress} className="h-2 bg-[hsl(var(--muted))] [&>div]:bg-primary" />
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-[var(--space-4)] pt-[var(--space-4)] border-t border-[hsl(var(--border))]">
-                                    <div>
-                                      <p className="text-[10px] text-[hsl(var(--muted-foreground))] uppercase tracking-widest font-bold mb-[var(--space-1)]">Initiated</p>
-                                      <p className="text-[length:var(--text-small)] font-medium text-[hsl(var(--foreground))]">{app.createdAt ? formatISTDate(app.createdAt) : "N/A"}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-[10px] text-[hsl(var(--muted-foreground))] uppercase tracking-widest font-bold mb-[var(--space-1)]">Assignee</p>
-                                      <p className="text-[length:var(--text-small)] font-medium text-[hsl(var(--foreground))]">{app.assignee || "Evaluating"}</p>
-                                    </div>
-                                  </div>
-                                  <div className="pt-[var(--space-2)] border-t border-[hsl(var(--border))]/50">
-                                    <Button 
-                                      variant="ghost" 
-                                      className="w-full justify-between hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
-                                      onClick={() => {
+                                  </Stack>
+                                </div>
+
+                                {/* Primary action as an actual button. It used to be a
+                                    ghost row that read as plain text, so the one thing a
+                                    user comes here to do looked like a label. */}
+                                <div className="mt-[var(--space-6)] pt-[var(--space-5)] border-t border-slate-100">
+                                  <Button
+                                    className="w-full sm:w-auto h-11 px-6 justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md shadow-blue-600/20 transition-all hover:-translate-y-0.5"
+                                    onClick={() => {
                                         setActiveApplication(app);
                                         // 🧠 SILICON VALLEY FEATURE: Re-hydrate the form allowing post-submission edits
                                         // loadApplicationDataIntoStore populates the Zustand store
@@ -1475,33 +1694,22 @@ const Dashboard: React.FC = () => {
                                         if (app.documents && app.documents.length > 0) {
                                           // Same case-mismatch fix as loadApplicationIntoFunnel above --
                                           // doc.id is lowercase, the backend's stored docType isn't.
-                                          const loadedDocs: Record<string, boolean> = {};
-                                          app.documents.forEach((d) => {
-                                            if (d.docType) {
-                                              loadedDocs[d.docType] = true;
-                                              loadedDocs[d.docType.toLowerCase()] = true;
-                                            }
-                                          });
-                                          setUploadedDocs(loadedDocs);
+                                          setUploadedDocs(buildUploadedDocMap(app.documents));
                                         }
 
                                         setViewState("FUNNEL");
-                                        setCurrentStage(1);
+                                        // Straight to the document matrix: this button exists so a user
+                                        // can revisit what they uploaded, and landing on Applicant
+                                        // Information made them page past a form they did not come for.
+                                        setCurrentStage(2);
                                         window.scrollTo({ top: 0, behavior: "smooth" });
                                       }}
-                                    >
-                                      <span className="flex items-center"><Edit2 className="w-4 h-4 mr-2" /> Update Information / Documents</span>
-                                      <ChevronRight className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-1"
-                                      onClick={() => setAppPendingDeletion(app)}
-                                    >
-                                      <Trash2 className="w-4 h-4 mr-2" /> Delete Application
-                                    </Button>
-                                  </div>
-                                </Stack>
+                                  >
+                                    <Edit2 className="w-4 h-4 mr-2" />
+                                    Manage Documents &amp; Details
+                                    <ChevronRight className="w-4 h-4 ml-1.5" />
+                                  </Button>
+                                </div>
                               </div>
                             </Surface>
                           </motion.div>
