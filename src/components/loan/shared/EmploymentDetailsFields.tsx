@@ -129,7 +129,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <ValidatedInput
               label="Gross Monthly Income (₹)"
               formatAsCurrency
-              placeholder="100000"
+              placeholder="e.g. 100000"
               icon={IndianRupee}
               value={fin.path === "SALARIED" ? (fin.data.grossSalary || "") : ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateSalaried({ grossSalary: Number(e.target.value) })}
@@ -138,7 +138,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <ValidatedInput
               label="Net Monthly Income (₹)"
               formatAsCurrency
-              placeholder="85000"
+              placeholder="e.g. 85000"
               icon={IndianRupee}
               value={fin.path === "SALARIED" ? (fin.data.netMonthlySalary || "") : ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateSalaried({ netMonthlySalary: Number(e.target.value) })}
@@ -151,7 +151,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <ValidatedInput
               label="Total Experience (Years)"
               type="number"
-              placeholder="5"
+              placeholder="e.g. 5"
               icon={Calendar}
               value={fin.path === "SALARIED" ? (fin.data.totalExperienceYears || "") : ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateSalaried({ totalExperienceYears: Number(e.target.value) })}
@@ -161,7 +161,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             <ValidatedInput
               label="Current Experience (Years)"
               type="number"
-              placeholder="2"
+              placeholder="e.g. 2"
               icon={Calendar}
               value={fin.path === "SALARIED" ? (fin.data.currentCompanyYears || "") : ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateSalaried({ currentCompanyYears: Number(e.target.value) })}
@@ -370,10 +370,10 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                     htmlFor="ca-certified-professional"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Accounts are CA-Certified / Audited
+                    Accounts are Audited
                   </label>
                   <p className="text-xs text-muted-foreground">
-                    Declaring CA-certified accounts improves creditworthiness assessment and may unlock better rates.
+                    Declaring audited accounts improves creditworthiness assessment and may unlock better rates.
                   </p>
                 </div>
               </div>
@@ -583,7 +583,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   <ValidatedInput
                     label="On Road Price of Vehicle (₹)"
                     formatAsCurrency
-                    placeholder="1050000"
+                    placeholder="e.g. 1050000"
                     icon={IndianRupee}
                     value={vehicleOnRoadPrice || ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateLoanRequirements({ vehicleOnRoadPrice: Number(e.target.value) })}
@@ -592,7 +592,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
                   <ValidatedInput
                     label="Quotation of Vehicle (₹)"
                     formatAsCurrency
-                    placeholder="850000"
+                    placeholder="e.g. 850000"
                     icon={IndianRupee}
                     value={vehicleQuotationPrice || ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateLoanRequirements({ vehicleQuotationPrice: Number(e.target.value) })}
@@ -626,7 +626,10 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             </AnimatePresence>
           </div>
 
-          {/* ── CA Certification toggle — universal signal for all SELF_EMPLOYED ── */}
+          {/* ── Audited-accounts toggle — universal signal for all SELF_EMPLOYED.
+                 The applicant-facing wording says "Audited" only; the field it
+                 writes is still isCaCertifiedOrAudited, which the engine and
+                 CRM read by that name. ── */}
           <div className="flex items-start gap-4 p-4 rounded-xl border border-border dark:border-white/[0.06] bg-secondary/30 dark:bg-white/[0.02]">
             <button
               type="button"
@@ -648,10 +651,10 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
             </button>
             <div>
               <p className="text-sm font-semibold text-foreground leading-snug">
-                Accounts are CA-Certified / Audited
+                Accounts are Audited
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
-                Declaring CA-certified accounts improves creditworthiness assessment and may unlock better rates.
+                Declaring audited accounts improves creditworthiness assessment and may unlock better rates.
               </p>
             </div>
           </div>

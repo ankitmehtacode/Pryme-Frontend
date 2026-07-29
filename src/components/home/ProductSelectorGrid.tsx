@@ -47,7 +47,7 @@ export const products = [
   },
   {
     id: "transfer",
-    label: "BALANCE TRANSFER | TOP UP",
+    label: "LOAN TRANSFER | TOP UP",
     image: product6,
     tag: "REDUCED EMI",
     href: "/coming-soon?type=transfer",

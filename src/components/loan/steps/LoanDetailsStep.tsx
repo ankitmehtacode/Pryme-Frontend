@@ -82,7 +82,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
           <ValidatedInput
             label="Loan Amount (₹)"
             formatAsCurrency
-            placeholder="500000"
+            placeholder="e.g. 500000"
             icon={IndianRupee}
             value={loanRequirements.loanAmount || ""}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ loanAmount: Number(e.target.value) })}
@@ -91,7 +91,7 @@ export const LoanDetailsStep: React.FC<LoanDetailsStepProps> = ({ cardCn }) => {
           <ValidatedInput
             label="Tenure (Years)"
             type="number"
-            placeholder="5"
+            placeholder="e.g. 5"
             icon={Calendar}
             value={loanRequirements.tenureYears || ""}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => store.updateLoanRequirements({ tenureYears: parseInt(e.target.value) || 0 })}

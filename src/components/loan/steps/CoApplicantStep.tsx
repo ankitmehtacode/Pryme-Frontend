@@ -73,7 +73,7 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                 <ValidatedInput
                   label="Mobile Number"
                   type="tel"
-                  placeholder="9876543210"
+                  placeholder="e.g. 9876543210"
                   icon={Phone}
                   value={coApplicant.mobileNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ mobileNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
@@ -106,7 +106,7 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                 />
                 <ValidatedInput
                   label="PIN Code"
-                  placeholder="400001"
+                  placeholder="e.g. 400001"
                   icon={MapPin}
                   value={coApplicant.pinCode}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCoApplicant({ pinCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
