@@ -273,6 +273,10 @@ export const PrymeAPI = {
   signup: async (...args: any[]) => {
     let fullName = "Pryme Client";
     let email, password, phone;
+    // Server-signed proofs from the signup OTP flow. Forwarded whenever present;
+    // the backend decides whether they are required (app.otp.enforce-on-signup),
+    // so an older cached bundle that omits them still registers.
+    let emailVerificationToken, mobileVerificationToken;
 
     if (args.length >= 2 && typeof args[0] === 'string') {
       if (args.length === 3) {
@@ -286,6 +290,8 @@ export const PrymeAPI = {
       email = obj.email || obj.username;
       password = obj.password || obj.securityKey || obj.key;
       phone = obj.phone || obj.mobileNumber; // 🧠 Capture mobile from registration form
+      emailVerificationToken = obj.emailVerificationToken;
+      mobileVerificationToken = obj.mobileVerificationToken;
     }
 
     if (!email || !password) throw new Error("Validation Error: Email and Security Key are required.");
@@ -294,7 +300,10 @@ export const PrymeAPI = {
     // Registration is permitAll in SecurityConfig, so the missing cookie is fine.
     return fetchWithAuth("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ fullName, email, password, phone, role: "USER" }),
+      body: JSON.stringify({
+        fullName, email, password, phone, role: "USER",
+        emailVerificationToken, mobileVerificationToken,
+      }),
     });
   },
 
@@ -395,6 +404,15 @@ export const PrymeAPI = {
 
   verifyMobileOtp: async (requestId: string, otp: string): Promise<OtpVerifyResponse> =>
     otpFetch("/public/otp/verify", { requestId, otp }),
+
+  // Email verification at signup. Same policy engine, same response shape, same
+  // verify endpoint -- a requestId already identifies which channel issued the
+  // code, so only the send path differs.
+  sendEmailOtp: async (email: string): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/email/send", { email }),
+
+  resendEmailOtp: async (email: string): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/email/resend", { email }),
 
   submitLead: async (formData: any) => {
     // 🧠 PIPELINE FIX: Forward strictly mapped form fields into metadata so Admin Dashboard

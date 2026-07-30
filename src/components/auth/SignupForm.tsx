@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { signupSchema, type SignupData } from "./schemas";
+import { OtpVerifier } from "@/components/loan/shared/OtpVerifier";
 
 interface SignupFormProps {
   from: string | null;
@@ -19,26 +20,47 @@ interface SignupFormProps {
 export const SignupForm = ({ from, children }: SignupFormProps) => {
   const { signUp } = useAuth();
   const navigate = useNavigate();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+
+  // The server-signed proofs, not booleans. A "verified: true" flag in component
+  // state is set by this component and therefore means nothing; these tokens are
+  // issued by the server, bound to the exact address/number, and re-checked at
+  // registration. Held against the value they were issued for, so editing the
+  // field after verifying correctly invalidates the proof rather than carrying a
+  // token for a contact the user no longer entered.
+  const [emailToken, setEmailToken] = useState<{ value: string; token: string } | null>(null);
+  const [mobileToken, setMobileToken] = useState<{ value: string; token: string } | null>(null);
 
   const form = useForm<SignupData>({
     resolver: zodResolver(signupSchema),
     mode: "onChange",
   });
 
+  const emailValue = form.watch("email") ?? "";
+  const mobileValue = form.watch("mobileNumber") ?? "";
+
+  const emailVerified = emailToken?.value.toLowerCase() === emailValue.trim().toLowerCase()
+    && Boolean(emailToken?.token);
+  const mobileVerified = mobileToken?.value === mobileValue.trim() && Boolean(mobileToken?.token);
+
   const onSubmit = async (data: SignupData) => {
     setIsLoading(true);
-    
+
     const { error, user: loggedInUser } = await signUp({
       fullName: data.fullName,
       email: data.email,
       password: data.password,
       mobileNumber: data.mobileNumber,
+      // Sent whenever we hold them. The backend decides whether they are
+      // REQUIRED via app.otp.enforce-on-signup, so this ships safely before
+      // enforcement is switched on.
+      emailVerificationToken: emailVerified ? emailToken?.token : undefined,
+      mobileVerificationToken: mobileVerified ? mobileToken?.token : undefined,
     });
-    
+
     if (error) {
       toast({
         title: "Registration Failed",
@@ -96,6 +118,15 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         {form.formState.errors.email && (
           <p className="text-[10px] text-rose-500 mt-1 pl-1">{form.formState.errors.email.message}</p>
         )}
+        {/* Renders nothing until the address is well-formed, so it does not
+            nag while the user is still typing. */}
+        <OtpVerifier
+          channel="email"
+          value={emailValue.trim()}
+          verified={emailVerified}
+          onVerified={(token, value) => setEmailToken({ value, token })}
+          disabled={isLoading}
+        />
       </div>
 
       <div className="space-y-1">
@@ -110,6 +141,13 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         {form.formState.errors.mobileNumber && (
           <p className="text-[10px] text-rose-500 mt-1 pl-1">{form.formState.errors.mobileNumber.message}</p>
         )}
+        <OtpVerifier
+          channel="mobile"
+          value={mobileValue.trim()}
+          verified={mobileVerified}
+          onVerified={(token, value) => setMobileToken({ value, token })}
+          disabled={isLoading}
+        />
       </div>
 
       <div className="space-y-1">
