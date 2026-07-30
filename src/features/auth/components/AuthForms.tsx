@@ -20,11 +20,19 @@ export function AuthForms() {
   const location = useLocation();
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
-  const [view, setView] = useState<AuthView>("login");
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-
   const pendingLeadId = location.state?.leadId || null;
   const from = location.state?.from || null;
+
+  // Someone arriving from "Apply with Pryme" has just filled in a whole
+  // application and does not have an account yet -- landing them on Log in makes
+  // the very next thing they see a form they cannot complete. The apply flow is
+  // the only route that sets this intent, so every other entry to /auth still
+  // opens on Log in, and the "Already have an account?" toggle is one click away
+  // for the returning applicant.
+  const arrivedFromApply = location.state?.intent === "track_lead" || Boolean(pendingLeadId);
+
+  const [view, setView] = useState<AuthView>(arrivedFromApply ? "signup" : "login");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   useEffect(() => {
     if (pendingLeadId) {

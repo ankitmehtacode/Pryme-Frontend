@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { signupSchema, type SignupData } from "./schemas";
 import { OtpVerifier } from "@/components/loan/shared/OtpVerifier";
+import { useApplicationStore } from "@/store/applicationStore";
 
 interface SignupFormProps {
   from: string | null;
@@ -32,11 +33,33 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
   // field after verifying correctly invalidates the proof rather than carrying a
   // token for a contact the user no longer entered.
   const [emailToken, setEmailToken] = useState<{ value: string; token: string } | null>(null);
-  const [mobileToken, setMobileToken] = useState<{ value: string; token: string } | null>(null);
+
+  // Carried from the application form.
+  //
+  // Someone reaching signup via "Apply with Pryme" has already typed their name
+  // and number AND proven that number by SMS -- the store holds the verification
+  // token the OTP exchange issued. Asking them to retype it and verify a second
+  // time, minutes later, is asking them to prove something we already have
+  // server-signed evidence for.
+  //
+  // Seeded as initial state rather than synced: after first render this form owns
+  // its own fields, so editing the number correctly drops the carried token
+  // instead of a store value reviving it.
+  const carried = useApplicationStore.getState().basicKYC;
+  const [mobileToken, setMobileToken] = useState<{ value: string; token: string } | null>(
+    carried?.mobileVerified && carried?.mobileVerificationToken && carried?.mobileNumber
+      ? { value: carried.mobileNumber, token: carried.mobileVerificationToken }
+      : null
+  );
 
   const form = useForm<SignupData>({
     resolver: zodResolver(signupSchema),
     mode: "onChange",
+    defaultValues: {
+      fullName: carried?.fullName || "",
+      email: carried?.email || "",
+      mobileNumber: carried?.mobileNumber || "",
+    },
   });
 
   const emailValue = form.watch("email") ?? "";
@@ -62,9 +85,18 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
     });
 
     if (error) {
+      // A verification token can be refused for reasons this form cannot see --
+      // most likely a carried token that aged past its 30-minute TTL between the
+      // application form and here. Dropping it brings the Verify control back;
+      // without this the user is left looking at a "Verified" chip while the
+      // server insists they verify, with no way to act on it.
+      const message = error.message || "";
+      if (/verify your email/i.test(message)) setEmailToken(null);
+      if (/verify your mobile/i.test(message)) setMobileToken(null);
+
       toast({
         title: "Registration Failed",
-        description: error.message || "Could not create account. Please try again.",
+        description: message || "Could not create account. Please try again.",
         variant: "destructive"
       });
     } else {
