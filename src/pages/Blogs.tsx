@@ -30,10 +30,10 @@ const Blogs = () => {
         <meta property="og:title" content="Insights & News | PRYME Consulting" />
         <meta property="og:description" content="Financial literacy, loan tips, and credit insights from PRYME." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech/blogs" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:url" content="https://www.prymeloans.in/blogs" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://www.gopryme.tech/blogs" />
+        <link rel="canonical" href="https://www.prymeloans.in/blogs" />
       </Helmet>
       
       <Header />

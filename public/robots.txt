@@ -1,16 +1,27 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# PRYME — https://www.prymeloans.in
+#
+# One build serves prymeloans.in, prymeloans.com and gopryme.tech, so this file
+# is served on all three. That is fine: the canonical tag on every page and the
+# sitemap below both point at prymeloans.in, which is what tells Google the
+# other two are the same site rather than rivals of it.
+#
+# Note what is deliberately NOT here: a Disallow aimed at the secondary domains.
+# Blocking them would stop Google crawling them, which also stops it seeing
+# their canonical tags and redirects — the very signals that consolidate
+# authority onto prymeloans.in. A duplicate you can crawl and resolve is worth
+# far more than one you have hidden.
 
 User-agent: *
 Allow: /
 
-Sitemap: https://www.gopryme.tech/sitemap.xml
+# Signed-in surfaces and stateful funnels. Nothing here is useful in a search
+# result, and /apply-direct and /auth generate thin, near-identical pages that
+# dilute the pages that should rank.
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /notifications
+Disallow: /apply-direct
+Disallow: /auth
+
+Sitemap: https://www.prymeloans.in/sitemap.xml

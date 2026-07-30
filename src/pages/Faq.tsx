@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { faqSchema } from "@/lib/seo";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, HelpCircle, ArrowRight, ShieldCheck, Mail } from "lucide-react";
@@ -182,11 +184,19 @@ const Faq = () => {
         <meta property="og:title" content="Frequently Asked Questions | PRYME" />
         <meta property="og:description" content="Find answers to all your queries regarding loan eligibility, bank comparison, data security, and applications on PRYME." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech/faq" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:url" content="https://www.prymeloans.in/faq" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://www.gopryme.tech/faq" />
+        <link rel="canonical" href="https://www.prymeloans.in/faq" />
       </Helmet>
+
+      {/* FAQPage schema, built from the same FAQS array the page renders.
+          Derived rather than hand-written on purpose: marking up questions a
+          visitor cannot see is a spam-policy violation, and a hand-kept copy
+          would drift into exactly that the first time someone edits the list.
+          Eligible entries can expand directly in the result, taking vertical
+          space from competitors on the same page. */}
+      <JsonLd data={faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })))} />
 
       <SmoothScroll>
         <PageShell>

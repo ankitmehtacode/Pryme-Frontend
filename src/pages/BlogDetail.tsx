@@ -25,7 +25,7 @@ const BlogDetail = () => {
 
   const shareUrl = window.location.href;
   const shareTitle = blog.title;
-  const canonicalUrl = `https://www.gopryme.tech/blogs/${blog.slug}`;
+  const canonicalUrl = `https://www.prymeloans.in/blogs/${blog.slug}`;
   // Meta descriptions must be distinct from the title -- derive a plain-text
   // excerpt from the article body instead of repeating the headline.
   const excerpt = blog.content

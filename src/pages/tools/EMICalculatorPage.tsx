@@ -16,10 +16,10 @@ const EMICalculatorPage = () => {
         <meta property="og:title" content="EMI Calculator | PRYME Consulting" />
         <meta property="og:description" content="Calculate your monthly loan payments with precision." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech/emi-calculator" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:url" content="https://www.prymeloans.in/emi-calculator" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://www.gopryme.tech/emi-calculator" />
+        <link rel="canonical" href="https://www.prymeloans.in/emi-calculator" />
       </Helmet>
       
       <Header />

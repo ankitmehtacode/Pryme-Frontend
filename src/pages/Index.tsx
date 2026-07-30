@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Helmet } from "react-helmet-async";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organisationSchema } from "@/lib/seo";
 import { Building2 } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
@@ -141,24 +143,42 @@ const Index = () => {
   return (
     <LocalErrorBoundary>
       <Helmet>
-        <title>PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks</title>
+        {/*
+          Title leads with the products and the city, not the brand.
+          "Compare & Apply for Loans" competes nationally against HDFC, SBI and
+          BankBazaar for terms no new domain wins. "Home Loan, LAP & Business
+          Loan in Indore" competes for the queries that actually convert here and
+          that a local business can realistically rank for. The brand still wins
+          branded search on its own — exact-match domain plus the schema below.
+
+          Kept under ~60 characters so Google does not truncate it mid-phrase.
+        */}
+        <title>Home Loan, LAP &amp; Business Loan in Indore | PRYME</title>
         <meta
           name="description"
-          content="Compare loan offers from 15+ banks. Personal loans, business loans, home loans with competitive rates. Quick approval, transparent process. Apply now!"
+          content="Compare home loan, loan against property and business loan offers from 15+ banks in Indore. Transparent rates, fast approval, and guidance from PRYME's Indore team."
         />
-        <meta name="keywords" content="personal loan, business loan, home loan, loan against property, compare loans, best interest rates, quick loan approval" />
-        <meta property="og:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
-        <meta property="og:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
+        {/* Google has ignored the keywords meta since 2009. Left in place only
+            because removing it changes nothing either way. */}
+        <meta name="keywords" content="home loan indore, loan against property indore, business loan indore, personal loan indore, loan agent indore, compare loans, PRYME" />
+        <meta property="og:title" content="Home Loan, LAP &amp; Business Loan in Indore | PRYME" />
+        <meta property="og:description" content="Compare home loan, LAP and business loan offers from 15+ banks in Indore. Transparent rates, fast approval." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech" />
+        <meta property="og:url" content="https://www.prymeloans.in" />
         <meta property="og:site_name" content="PRYME" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="PRYME - Compare & Apply for Loans | Best Rates from 15+ Banks" />
-        <meta name="twitter:description" content="Compare loan offers from 15+ banks. Quick approval, transparent process." />
-        <meta name="twitter:image" content="https://www.gopryme.tech/og-image.png" />
-        <link rel="canonical" href="https://www.gopryme.tech" />
+        <meta name="twitter:title" content="Home Loan, LAP &amp; Business Loan in Indore | PRYME" />
+        <meta name="twitter:description" content="Compare home loan, LAP and business loan offers from 15+ banks in Indore. Transparent rates, fast approval." />
+        <meta name="twitter:image" content="https://www.prymeloans.in/og-image.png" />
+        <link rel="canonical" href="https://www.prymeloans.in" />
       </Helmet>
+
+      {/* FinancialService + WebSite. The site previously emitted no structured
+          data at all; this is what lets Google read the address, hours, service
+          area and product list as facts rather than inferring them from prose,
+          and it is a precondition for the Maps local pack. */}
+      <JsonLd data={organisationSchema()} />
 
       {/* Safe Smooth Scrolling wrapper */}
       <SmoothScroll>

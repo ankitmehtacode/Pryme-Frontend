@@ -119,10 +119,10 @@ export default function Careers() {
         <meta property="og:title" content="Careers | PRYME" />
         <meta property="og:description" content="Join PRYME and help build the future of lending." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech/careers" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:url" content="https://www.prymeloans.in/careers" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://www.gopryme.tech/careers" />
+        <link rel="canonical" href="https://www.prymeloans.in/careers" />
       </Helmet>
       
       <SmoothScroll>

@@ -25,10 +25,10 @@ const PrepaymentCalculatorPage = () => {
         <meta property="og:title" content="Prepayment Calculator | PRYME Consulting" />
         <meta property="og:description" content="Calculate how much you can save by prepaying your loan early. See interest savings and reduced tenure instantly." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.gopryme.tech/prepayment-calculator" />
-        <meta property="og:image" content="https://www.gopryme.tech/og-image.png" />
+        <meta property="og:url" content="https://www.prymeloans.in/prepayment-calculator" />
+        <meta property="og:image" content="https://www.prymeloans.in/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://www.gopryme.tech/prepayment-calculator" />
+        <link rel="canonical" href="https://www.prymeloans.in/prepayment-calculator" />
       </Helmet>
 
       <Header />
