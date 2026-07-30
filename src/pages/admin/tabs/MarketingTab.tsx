@@ -182,8 +182,45 @@ export const MarketingTab: React.FC = () => {
       // -- resolveApiUrl correctly targets the backend's own origin for that
       // case instead of the frontend's, which a bare fetch() would otherwise
       // silently get wrong.
-      const s3Response = await fetch(resolveApiUrl(uploadUrl), { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-      if (!s3Response.ok) throw new Error("Upload rejected by storage. Please try again.");
+
+      // The two ways this PUT fails need telling apart, because they have
+      // nothing to do with each other and only one of them is fixable here.
+      //
+      // A browser blocks a cross-origin PUT before it is ever sent when the
+      // bucket's CORS rules do not allow it. That surfaces as fetch() *throwing*
+      // a TypeError -- there is no response object and no status code to read,
+      // by design, so the old `!s3Response.ok` check never even ran and the
+      // generic catch below reported "Failed to upload banner image", which
+      // points at the file. It is not the file. It is the bucket.
+      //
+      // A 403 that does arrive is the opposite: the request reached S3 and was
+      // refused -- expired presign, or a signed Content-Type the request did not
+      // match. Same toast previously, completely different fix.
+      //
+      // This mirrors what uploadApplicationDocument in lib/api.ts already does
+      // for the document vault; the same failure had already been diagnosed
+      // once there.
+      let s3Response: Response;
+      try {
+        s3Response = await fetch(resolveApiUrl(uploadUrl), {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+      } catch (networkErr) {
+        console.error("Banner PUT blocked before dispatch (CORS or network):", networkErr, { uploadUrl });
+        throw new Error(
+          "The storage bucket refused the connection. Its CORS rules need to allow PUT from this admin origin."
+        );
+      }
+
+      if (!s3Response.ok) {
+        console.error("Banner PUT rejected by storage:", s3Response.status, { uploadUrl });
+        if (s3Response.status === 403) {
+          throw new Error("Storage rejected the upload (403). The upload link expired or the bucket policy denies it — try again, and if it repeats the bucket policy needs checking.");
+        }
+        throw new Error(`Storage rejected the upload (${s3Response.status}). Please try again.`);
+      }
 
       setFormData(prev => ({ ...prev, bannerImageUrl: publicUrl }));
       toast.success("Banner uploaded.");
