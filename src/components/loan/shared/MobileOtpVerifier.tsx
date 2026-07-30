@@ -239,7 +239,12 @@ export const MobileOtpVerifier: React.FC<Props> = ({
                 maxLength={otpLength}
                 disabled={phase === "verifying" || expired}
                 aria-label={`Digit ${i + 1} of ${otpLength}`}
-                className="w-11 h-11 text-center text-base font-bold rounded-xl bg-secondary/50 dark:bg-white/[0.03] border border-border dark:border-white/[0.08] text-foreground outline-none transition-all focus:border-primary/60 focus:ring-2 focus:ring-inset focus:ring-primary/10 disabled:opacity-50"
+                // border-border is --brand-border at 91.4% lightness -- a divider
+                // tone. On the bg-secondary/50 fill these slots use, it left the
+                // boxes with no discernible edge. An empty input has nothing but
+                // its outline to say "type here", so this one needs real contrast
+                // rather than the subtle value the rest of the surface uses.
+                className="w-11 h-11 text-center text-base font-bold rounded-xl bg-secondary/50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/[0.18] text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-inset focus:ring-primary/10 disabled:opacity-50"
               />
             ))}
             {phase === "verifying" && (
