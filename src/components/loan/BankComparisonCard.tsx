@@ -540,11 +540,24 @@ export const BankComparisonCard = memo(function BankComparisonCard({
                 in row 1's remaining space and gets auto-placed into row 2 -- which
                 then pushes this col-start-4 item into row 3 instead of staying next
                 to the rest of the card's top row, whenever that banner is shown. */}
-            {/* xl:ml-[75px] nudges the stack that far into the trailing 1fr
-                column, away from the metrics chips. The column has ~120px of
-                slack to its right at xl, so this only consumes dead space --
-                it never pushes the buttons past the card's inner padding. */}
-            <div className="w-full xl:w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-[75px] xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
+            {/* Pushed right with an auto margin, never a fixed one.
+
+                This previously used xl:ml-[75px] on a xl:w-[210px] stack -- 285px
+                of hard requirement inside a track that is not always that wide.
+                Offers.tsx caps the page at max-w-6xl, so the card's inner width is
+                a constant 1096px at every viewport, while this grid widens its
+                fixed columns at 2xl (200/210/300 -> 220/230/340, gap 20 -> 24).
+                Cols 1-3 therefore grow from 770px to 862px with nothing paying for
+                it, and the trailing 1fr track drops from 326px to 234px -- 51px
+                short. The overflow was invisible as overflow because the card is
+                overflow-hidden: the buttons were simply sliced off.
+
+                ml-auto cannot do that. An auto margin consumes only free space
+                that exists, collapsing to zero when there is none, so the stack
+                stays inside the track at any width. max-w keeps the intended
+                210px cap while w-full lets it shrink below that if a future
+                layout ever leaves less. */}
+            <div className="w-full xl:w-full xl:max-w-[210px] min-w-0 mt-1 xl:mt-0 xl:ml-auto xl:col-start-4 xl:row-start-1 flex flex-col items-stretch gap-3">
               {/* Apply with Pryme -- always the premium glossy design now,
                   regardless of whether a reward matched this offer. The button
                   renders no click state of its own: the confirmation popup is
