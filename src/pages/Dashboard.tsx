@@ -30,7 +30,7 @@ import { useApplicationStore } from "@/store/applicationStore";
 import { CustomerLoanInformationStep } from "@/components/loan/steps/CustomerLoanInformationStep";
 
 // 🧠 ARCHITECTURE IMPORTS
-import api, { PrymeAPI } from "@/lib/api";
+import api, { PrymeAPI, resolveApiUrl } from "@/lib/api";
 import { getDocumentsForLoanType, groupDocumentsByCategory, ProductType, EmploymentType } from "@/lib/documentData";
 import { LOAN_TYPE_LABELS, type ApplicationStore } from "@/lib/applicationTypes";
 
@@ -157,6 +157,10 @@ interface ApplicationDoc {
   url?: string;
   name?: string;
   id?: string;
+  // The vault's GET /applications/{id}/documents returns DocumentMetadataResponse,
+  // which names these differently from the shape the rest of this page assumed.
+  originalFilename?: string;
+  storagePath?: string;
 }
 
 /**
@@ -172,7 +176,16 @@ const buildUploadedDocMap = (documents: ApplicationDoc[] | undefined): Record<st
   const map: Record<string, UploadedDocInfo> = {};
   (documents || []).forEach((d) => {
     if (!d.docType) return;
-    const info: UploadedDocInfo = { fileName: d.name, url: d.url, docType: d.docType };
+    const info: UploadedDocInfo = {
+      // originalFilename is what the vault actually returns; d.name only exists
+      // on the (never-populated) shape the application payload was assumed to have.
+      fileName: d.originalFilename || d.name,
+      // No URL is returned either -- the file is fetched through the authenticated
+      // download gateway, keyed by document id. Same-site top-level navigation, so
+      // the PRYME_SID cookie rides along and the link just works.
+      url: d.url || (d.id ? resolveApiUrl(`/documents/${d.id}/download`) : undefined),
+      docType: d.docType,
+    };
     map[d.docType] = info;
     map[d.docType.toLowerCase()] = info;
   });
@@ -299,6 +312,24 @@ const Dashboard: React.FC = () => {
   // by the application picker below. Documents/stage are a hard replace (each
   // application's own, never merged with another's); personal/employment data
   // carries over via loadApplicationDataIntoStore, loan-specific data resets.
+  /**
+   * Loads the document matrix straight from the vault for a given application.
+   *
+   * Takes the id as an argument rather than reading activeApplication, because
+   * callers invoke it in the same tick they set that state -- reading it here
+   * would see the previous application, or none at all on first load.
+   */
+  const hydrateDocumentsFromVault = useCallback(async (applicationId?: string) => {
+    if (!applicationId) return;
+    try {
+      const docs = await PrymeAPI.getApplicationDocuments(applicationId);
+      const list: ApplicationDoc[] = Array.isArray(docs) ? docs : (docs?.documents ?? []);
+      if (list.length > 0) setUploadedDocs(buildUploadedDocMap(list));
+    } catch (e) {
+      console.warn("Could not load documents for application", applicationId, e);
+    }
+  }, []);
+
   const loadApplicationIntoFunnel = useCallback((targetApp: Application, allApps: Application[]) => {
     setActiveApplication(targetApp);
 
@@ -309,7 +340,13 @@ const Dashboard: React.FC = () => {
     // still lowercase. Without also storing the lowercased key, that never
     // matches, so every already-uploaded document silently reverted to
     // "not uploaded" on refresh / re-selecting the application.
+    // Seed from the application payload if it happens to carry documents, then
+    // fetch the vault's list -- which is the only reliable source. The backend's
+    // ApplicationResponse has no documents field at all, so relying on it left
+    // the matrix empty on every login even though the files were safely stored
+    // (and visible in the CRM, which reads the document table directly).
     setUploadedDocs(buildUploadedDocMap(targetApp.documents));
+    void hydrateDocumentsFromVault(targetApp.applicationId);
 
     // 🧠 Must run before the 100%-completion early return below, not after --
     // otherwise a completed application's Applicant Information silently
@@ -766,6 +803,8 @@ const Dashboard: React.FC = () => {
     try {
       const docs = await PrymeAPI.getApplicationDocuments(applicationId);
       const list: ApplicationDoc[] = Array.isArray(docs) ? docs : (docs?.documents ?? []);
+      // Unconditional here (unlike the hydrate path): an empty list after a
+      // delete is the correct new state, not a failed read.
       setUploadedDocs(buildUploadedDocMap(list));
       setActiveApplication(prev => (prev ? { ...prev, documents: list } : prev));
     } catch (e) {
@@ -1691,11 +1730,8 @@ const Dashboard: React.FC = () => {
                                           } catch(e) { console.error(e); }
                                         }
 
-                                        if (app.documents && app.documents.length > 0) {
-                                          // Same case-mismatch fix as loadApplicationIntoFunnel above --
-                                          // doc.id is lowercase, the backend's stored docType isn't.
-                                          setUploadedDocs(buildUploadedDocMap(app.documents));
-                                        }
+                                        setUploadedDocs(buildUploadedDocMap(app.documents));
+                                        void hydrateDocumentsFromVault(app.applicationId);
 
                                         setViewState("FUNNEL");
                                         // Straight to the document matrix: this button exists so a user
