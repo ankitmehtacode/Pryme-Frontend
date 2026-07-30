@@ -1276,10 +1276,19 @@ const Dashboard: React.FC = () => {
                               return (
                                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
                                   <p className="text-sm font-semibold text-slate-500 mb-3">Overall Progress</p>
-                                  <div className="flex items-center gap-6">
+                                  {/* whitespace-nowrap AND shrink-0 on the same
+                                      element forbids both wrapping and shrinking,
+                                      so on a narrow screen it can only overflow --
+                                      which it did, slicing "Documents Uploaded"
+                                      mid-word and pushing a scrollbar onto the
+                                      whole page. The count is not lost on mobile:
+                                      the line below already states it, so the
+                                      inline copy is redundant there and only
+                                      earns its place once there is room. */}
+                                  <div className="flex items-center gap-3 sm:gap-6">
                                     <span className="text-4xl font-black text-blue-600 leading-none shrink-0">{overallPercent}%</span>
-                                    <Progress value={overallPercent} className="h-2 flex-1 bg-slate-100 [&>div]:bg-blue-600" />
-                                    <span className="text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">{uploadedDocsCount} / {totalDocsCount} Documents Uploaded</span>
+                                    <Progress value={overallPercent} className="h-2 flex-1 min-w-0 bg-slate-100 [&>div]:bg-blue-600" />
+                                    <span className="hidden sm:inline text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">{uploadedDocsCount} / {totalDocsCount} Documents Uploaded</span>
                                   </div>
                                   <p className="text-xs font-medium text-slate-500 mt-2">{uploadedDocsCount} of {totalDocsCount} Uploaded</p>
                                 </div>
@@ -1351,7 +1360,14 @@ const Dashboard: React.FC = () => {
                                   <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
                                     <FileText className="w-5 h-5 text-orange-500" />
                                   </div>
-                                  <div>
+                                  {/* Defensive, not a fix for a measured bug: this
+                                      block does not currently overflow at 320px.
+                                      A flex child defaults to min-width:auto and
+                                      refuses to shrink below its content, so a
+                                      longer sentence here would push past the card
+                                      edge rather than wrap. One class to make that
+                                      impossible. */}
+                                  <div className="min-w-0">
                                     <h3 className="font-bold text-slate-800 text-base">Upload Documents</h3>
                                     <p className="text-xs text-slate-500 font-medium">Upload the required documents to proceed.</p>
                                   </div>
