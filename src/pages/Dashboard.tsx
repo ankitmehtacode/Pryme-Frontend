@@ -209,6 +209,44 @@ interface Application {
   version?: number;
 }
 
+/**
+ * Which application this user was last working in.
+ *
+ * localStorage, not sessionStorage: the whole point is to survive closing the
+ * tab and signing back in, which is exactly when sessionStorage is gone.
+ *
+ * It holds an application id, which is not a secret and is useless without the
+ * session cookie -- every read of it is re-validated against the list the
+ * backend returned for the *current* user, so a stale id from a previous
+ * account on a shared machine simply doesn't match and is ignored.
+ */
+const ACTIVE_APPLICATION_KEY = "pryme_active_application_id";
+
+/**
+ * The application to open on boot.
+ *
+ * Prefers the one the user was last in. /applications/me is ordered by
+ * updatedAt, so apps[0] is the most recently *modified* application -- a good
+ * fallback, but it answers a slightly different question, since an admin
+ * editing an old application also moves it to the front. The remembered id is
+ * the only signal that reflects what the user themselves was doing.
+ *
+ * Always re-validated against `apps` rather than trusted: an application that
+ * has since been withdrawn, or that belongs to a different account on a shared
+ * browser, is simply absent from the list and falls through to the default.
+ */
+const pickInitialApplication = (apps: Application[]): Application => {
+  let rememberedId: string | null = null;
+  try {
+    rememberedId = localStorage.getItem(ACTIVE_APPLICATION_KEY);
+  } catch {
+    // Safari private mode throws on access. Losing the preference is fine;
+    // failing to load the dashboard over it is not.
+  }
+  if (!rememberedId) return apps[0];
+  return apps.find((a) => a.applicationId === rememberedId) ?? apps[0];
+};
+
 interface DashboardFormData {
   panNumber: string;
   dob: string;
@@ -304,6 +342,27 @@ const Dashboard: React.FC = () => {
 
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [formData, setFormData] = useState<DashboardFormData>(initialFormData);
+
+  // Remembers the active application, from one place rather than at each call
+  // site that switches it.
+  //
+  // There are four such sites today -- initial boot, the switcher dropdown,
+  // "Manage Documents & Details" in the portfolio, and the pending-lead
+  // elevation inside handleNextStage (which *changes* the id mid-session, from
+  // a synthetic "pending-" scaffold to the real one the backend minted). An
+  // effect on the id catches all four, and catches the fifth that someone adds
+  // later without knowing this preference exists.
+  useEffect(() => {
+    const id = activeApplication?.applicationId;
+    // "pending-<timestamp>" scaffolds are client-only and never persisted, so
+    // remembering one would just be an id that can never match again.
+    if (!id || id.startsWith("pending-")) return;
+    try {
+      localStorage.setItem(ACTIVE_APPLICATION_KEY, id);
+    } catch {
+      // Private mode. The dashboard still works, it just forgets.
+    }
+  }, [activeApplication?.applicationId]);
 
   // 🧠 SMART NORMALIZER: Aligns React frontend names with Java Backend Sanitized Names
   const normalizeDocName = (name: string) => name.trim().toUpperCase().replace(/\s+/g, '_');
@@ -430,6 +489,18 @@ const Dashboard: React.FC = () => {
       const remaining = myApplications.filter((a) => a.applicationId !== app.applicationId);
       setMyApplications(remaining);
 
+      // Drop the remembered id if it pointed at what was just withdrawn.
+      // pickInitialApplication would ignore the stale value anyway (it is
+      // re-validated against the list), but leaving a tombstone in storage
+      // makes the next person to read this code wonder whether it can.
+      try {
+        if (localStorage.getItem(ACTIVE_APPLICATION_KEY) === app.applicationId) {
+          localStorage.removeItem(ACTIVE_APPLICATION_KEY);
+        }
+      } catch {
+        /* private mode -- nothing was stored to begin with */
+      }
+
       if (activeApplication?.applicationId === app.applicationId) {
         if (remaining.length > 0) {
           loadApplicationIntoFunnel(remaining[0], remaining);
@@ -499,7 +570,11 @@ const Dashboard: React.FC = () => {
         setMyApplications(apps);
 
         if (apps.length > 0) {
-          loadApplicationIntoFunnel(apps[0], apps);
+          // Not apps[0]: a user with several applications was landed on the
+          // most recently touched one rather than the one they were actually
+          // in, which reads as an empty application -- blank matrix, no
+          // documents -- even though nothing was lost.
+          loadApplicationIntoFunnel(pickInitialApplication(apps), apps);
         } else {
           // 🧠 RELAY FIX: If there's a cached pending application from the /apply flow,
           // scaffold a synthetic FUNNEL so the user sees the form immediately instead of
