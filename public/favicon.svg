@@ -1,0 +1,39 @@
+<!--
+  PRYME favicon.
+
+  NOTE: no double-hyphen sequences anywhere in this comment. XML forbids them
+  inside comments, and an SVG that fails to parse does not degrade to a plain
+  icon; it renders as nothing at all.
+
+  Square on purpose. The source mark (public/Pryme2.svg) is 362x258, a 1.4:1
+  rectangle. Google requires a 1:1 aspect ratio for a favicon to appear in
+  search results, and browsers letterbox a non-square icon unpredictably, so the
+  mark is centred on a 512x512 canvas here rather than shipped as-is.
+
+  Solid white background rather than transparent. The mark is #103783, a deep
+  navy that all but disappears against a dark browser tab or a dark-mode search
+  result. White keeps the brand colours intact and legible on every surface.
+
+  Squared corners, not rounded: iOS applies its own mask to apple-touch-icon,
+  and pre-rounding produces a double-rounded icon with clipped edges.
+
+  Centring maths, so this can be redone if the mark is ever re-exported: the
+  mark is scaled to 384 wide (75% of the canvas, leaving breathing room at
+  16px), so the factor is 384/362 = 1.0608. Scaled height is 258 x 1.0608 =
+  273.7, giving offsets of (512-384)/2 = 64 across and (512-273.7)/2 = 119.15
+  down.
+-->
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <g transform="translate(64,119.15) scale(1.0608)">
+    <path d="M172.669 83.3016C172.669 37.2953 209.964 0 255.971 0H362V95.0512C362 141.197 324.486 178.55 278.341 178.352L209.705 178.058C194.676 177.993 180.677 185.682 172.669 198.4V83.3016Z" fill="url(#pryme_favicon_gradient)"/>
+    <path d="M172.669 233.26C172.669 208.165 193.012 187.822 218.106 187.822H285.619C317.908 187.822 347.288 169.163 361.016 139.938L362 137.844V212.052C362 237.146 341.657 257.489 316.563 257.489H172.669V233.26Z" fill="#9BAFD9"/>
+    <path d="M151.001 257.482C104.994 257.482 67.6991 220.187 67.6991 174.181V84.759C67.6991 52.5156 49.0916 23.1679 19.9283 9.415L0 0.017175H86.3387C128.163 0.017175 162.067 33.9221 162.067 75.746V257.482H151.001Z" fill="#103783"/>
+  </g>
+  <defs>
+    <linearGradient id="pryme_favicon_gradient" x1="174.111" y1="198.4" x2="361.617" y2="-0.0183046" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#103783"/>
+      <stop offset="1" stop-color="#9BAFD9"/>
+    </linearGradient>
+  </defs>
+</svg>

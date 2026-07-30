@@ -1,0 +1,13 @@
+{
+  "name": "PRYME",
+  "short_name": "PRYME",
+  "description": "Compare and apply for loans from 15+ banks.",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "theme_color": "#103783",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+}

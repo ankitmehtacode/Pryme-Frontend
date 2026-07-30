@@ -22,6 +22,30 @@
     -->
     <title>PRYME | Bank-Grade Intelligent Loan Matchmaking</title>
     <meta name="author" content="PRYME Intelligence" />
+
+    <!--
+      Favicons. There were none at all before this, which is why no brand mark
+      appeared in a browser tab or in a search result for any of the three
+      domains: a crawler has nothing to pick up if the page never declares one.
+
+      Ordered widest-support-last on purpose. A browser takes the last icon it
+      understands, so the SVG (sharp at every size, one file) wins in modern
+      browsers, and the 96px PNG is what older Safari and Windows shortcuts fall
+      back to. 48px is listed because that is the minimum Google states it will
+      consider for search results.
+
+      Served from the static shell rather than react-helmet-async: a crawler
+      fetching the favicon does not execute React, so a per-page Helmet tag
+      would be invisible to it. This is one of the few tags that belongs here.
+
+      One build serves gopryme.tech, prymeloans.in and prymeloans.com, so all
+      three pick these up with no per-brand step.
+    -->
+    <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="keywords" content="personal loan, business loan, home loan, loan aggregator, RBI compliant, secure loan, PRYME" />
 
     <!--
