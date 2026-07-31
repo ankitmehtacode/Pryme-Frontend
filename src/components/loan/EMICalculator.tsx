@@ -95,8 +95,9 @@ const EMICalculator = ({
             {/* Amount Slider */}
             <div className="p-2.5 md:px-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-lg border border-transparent shadow-none transition-all">
               <div className="flex justify-between items-center mb-2 gap-2">
-                <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount (₹)</label>
+                <label htmlFor="emi-loan-amount" className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Amount (₹)</label>
                 <input
+                  id="emi-loan-amount"
                   type="text"
                   inputMode="numeric"
                   value={formatIndianCommas(amount)}
@@ -105,7 +106,7 @@ const EMICalculator = ({
                   className="text-sm md:text-base font-bold text-foreground bg-secondary/40 dark:bg-black/10 px-3 py-1.5 rounded-lg border border-transparent shadow-none w-32 text-right focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
-              <Slider value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={500000000} step={100000} className="cursor-pointer py-1" />
+              <Slider aria-label="Loan amount in rupees" value={[amount]} onValueChange={(v) => setAmount(v[0])} min={100000} max={500000000} step={100000} className="cursor-pointer py-1" />
               <div className="flex justify-between mt-1.5">
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹1 Lakh</span>
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">₹50 Cr</span>
@@ -118,8 +119,9 @@ const EMICalculator = ({
             {/* Rate Slider */}
             <div className="p-2.5 md:px-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-lg border border-transparent shadow-none transition-all">
               <div className="flex justify-between items-center mb-2 gap-2">
-                <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate (% p.a.)</label>
+                <label htmlFor="emi-interest-rate" className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Interest Rate (% p.a.)</label>
                 <input 
+                  id="emi-interest-rate"
                   type="number"
                   value={rate}
                   onChange={(e) => setRate(Number(e.target.value))}
@@ -130,7 +132,7 @@ const EMICalculator = ({
                   step={0.1}
                 />
               </div>
-              <Slider value={[rate]} onValueChange={(v) => setRate(v[0])} min={1} max={36} step={0.25} className="cursor-pointer py-1" />
+              <Slider aria-label="Annual interest rate, percent" value={[rate]} onValueChange={(v) => setRate(v[0])} min={1} max={36} step={0.25} className="cursor-pointer py-1" />
               <div className="flex justify-between mt-1.5">
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">1%</span>
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">36%</span>
@@ -140,9 +142,10 @@ const EMICalculator = ({
             {/* Tenure Slider */}
             <div className="p-2.5 md:px-3 bg-secondary/15 dark:bg-[#0d1829]/35 rounded-lg border border-transparent shadow-none transition-all">
               <div className="flex justify-between items-center mb-2 gap-2">
-                <label className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure (Months)</label>
+                <label htmlFor="emi-loan-tenure" className="text-[10px] font-bold text-primary dark:text-[#103783] uppercase tracking-wider">Loan Tenure (Months)</label>
                 <div className="flex items-center gap-2">
                   <input 
+                    id="emi-loan-tenure"
                     type="number"
                     value={months}
                     onChange={(e) => setMonths(Number(e.target.value))}
@@ -154,7 +157,7 @@ const EMICalculator = ({
                   <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:inline-block whitespace-nowrap">({(months / 12).toFixed(1)} Yrs)</span>
                 </div>
               </div>
-              <Slider value={[months]} onValueChange={(v) => setMonths(v[0])} min={6} max={360} step={6} className="cursor-pointer py-1" />
+              <Slider aria-label="Loan tenure in months" value={[months]} onValueChange={(v) => setMonths(v[0])} min={6} max={360} step={6} className="cursor-pointer py-1" />
               <div className="flex justify-between mt-1.5">
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">6 Mo</span>
                 <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">30 Yrs</span>

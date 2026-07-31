@@ -181,7 +181,7 @@ const PrepaymentCalculator = ({
                   className="text-xs font-bold text-foreground bg-background dark:bg-[#080d1e] px-2 py-1 rounded border border-border dark:border-white/5 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
-              <Slider max={500000000} min={100000} step={100000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+              <Slider aria-label="Outstanding loan amount in rupees" max={500000000} min={100000} step={100000} value={[loanAmount]} onValueChange={(val) => setLoanAmount(val[0])} className="w-full cursor-pointer py-0.5" />
               {loanAmount > 0 && (
                 <p className="text-[9px] font-bold text-emerald-700/70 dark:text-emerald-400/70 uppercase tracking-wider text-right mt-1">{numberToIndianWords(loanAmount)}</p>
               )}
@@ -202,7 +202,7 @@ const PrepaymentCalculator = ({
                   step={0.1}
                 />
               </div>
-              <Slider max={24} min={6} step={0.25} value={[interestRate]} onValueChange={(val) => setInterestRate(val[0])} className="w-full cursor-pointer py-0.5" />
+              <Slider aria-label="Current interest rate, percent" max={24} min={6} step={0.25} value={[interestRate]} onValueChange={(val) => setInterestRate(val[0])} className="w-full cursor-pointer py-0.5" />
             </div>
 
             {/* Tenure */}
@@ -222,7 +222,7 @@ const PrepaymentCalculator = ({
                   <span className="text-[8px] text-muted-foreground whitespace-nowrap">({(tenureMonths / 12).toFixed(1)} Yrs)</span>
                 </div>
               </div>
-              <Slider max={360} min={12} step={12} value={[tenureMonths]} onValueChange={(val) => setTenureMonths(val[0])} className="w-full cursor-pointer py-0.5" />
+              <Slider aria-label="Remaining tenure in months" max={360} min={12} step={12} value={[tenureMonths]} onValueChange={(val) => setTenureMonths(val[0])} className="w-full cursor-pointer py-0.5" />
             </div>
 
             {strategy === "lump-sum" ? (
@@ -240,7 +240,7 @@ const PrepaymentCalculator = ({
                       className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-500/10 px-2 py-1 rounded border border-emerald-200/50 dark:border-emerald-500/20 w-28 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     />
                   </div>
-                  <Slider max={loanAmount} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
+                  <Slider aria-label="Lump sum prepayment amount in rupees" max={loanAmount} min={10000} step={10000} value={[prepaymentAmount]} onValueChange={(val) => setPrepaymentAmount(val[0])} className="w-full cursor-pointer py-0.5" />
                   {prepaymentAmount > 0 && (
                     <p className="text-[9px] font-bold text-emerald-700/70 dark:text-emerald-400/70 uppercase tracking-wider text-right mt-1">{numberToIndianWords(prepaymentAmount)}</p>
                   )}
