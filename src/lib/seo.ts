@@ -41,7 +41,18 @@ export const BUSINESS = {
   name: "PRYME",
   phone: "+91 92432 94291",
   email: "contact@gopryme.in",
-  street: "4th Floor, Above Mr. DIY Showroom, Ranjeet Hanuman Main Road, Mhow Naka Square",
+  /**
+   * One string, rendered everywhere the address appears: the footer, the contact
+   * page, and the LocalBusiness schema.
+   *
+   * The site previously stated two different addresses -- a "204, Near BATA
+   * showroom" version in the footer and a "4th Floor, Above Mr. DIY Showroom"
+   * version on the contact page. Google cross-references this against the
+   * Business Profile and third-party citations, so contradicting yourself is
+   * worse than a single imperfect entry. Anything that renders the address now
+   * imports it from here rather than retyping it.
+   */
+  street: "204, Ranjeet Hanuman Main Road, Near BATA Showroom, Mhow Naka",
   locality: "Indore",
   region: "Madhya Pradesh",
   postalCode: "452009",

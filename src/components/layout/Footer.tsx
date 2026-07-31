@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram, FileText } from "lucide-react";
+import { BUSINESS } from "@/lib/seo";
 import prymeLogo from "@/assets/Pryme2.svg";
 import { Container } from "@/components/layout/Primitives";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,12 +10,14 @@ const CONTACT_PHONE = "+91 92432 94291";
 const CONTACT_PHONE_LINK = "tel:+919243294291";
 const CONTACT_EMAIL = "contact@gopryme.in";
 
+// Rendered from BUSINESS so the footer, the contact page and the LocalBusiness
+// schema cannot drift apart again -- they previously stated two different
+// addresses, which dilutes the local-search signal rather than adding to it.
 const COMPANY_ADDRESS_NODE = (
   <span className="block leading-relaxed">
     <strong className="font-semibold text-white dark:text-foreground">Pryme Headquarters</strong><br />
-    204, Ranjeet Hanuman Main Road,<br />
-    Near BATA showroom, Mahu Naka,<br />
-    Indore, Madhya Pradesh
+    {BUSINESS.street},<br />
+    {BUSINESS.locality}, {BUSINESS.region} {BUSINESS.postalCode}
   </span>
 );
 

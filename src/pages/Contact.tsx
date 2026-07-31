@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { BUSINESS } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 
 const Contact = () => {
@@ -69,7 +70,7 @@ const Contact = () => {
                   {[
                     { icon: Phone, title: "Call Us", detail: "+91 92432 94291", sub: "Mon-Sat, 10AM - 7PM" },
                     { icon: Mail, title: "Email Support", detail: "contact@gopryme.in", sub: "24/7 Priority Response" },
-                    { icon: MapPin, title: "Headquarters", detail: "Indore HQ", sub: "4th Floor, Above Mr. DIY Showroom,\nRanjeet Hanuman Main Road, Mhow Naka Square,\nIndore, Madhya Pradesh, 452009, India" }
+                    { icon: MapPin, title: "Headquarters", detail: "Indore HQ", sub: `${BUSINESS.street},\n${BUSINESS.locality}, ${BUSINESS.region}, ${BUSINESS.postalCode}, India` }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-6 items-start p-6 rounded-3xl bg-secondary/50 border border-border backdrop-blur-sm">
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">

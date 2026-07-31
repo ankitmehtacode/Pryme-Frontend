@@ -43,6 +43,34 @@ const DIST = path.resolve(__dirname, '../dist');
 const canonicalFor = (routePath) =>
   `${SITE_URL}${routePath === '/' ? '' : routePath}`;
 
+/**
+ * Business details, read out of src/lib/seo.ts rather than copied.
+ *
+ * This file is plain ESM run by node before any bundle exists, so it cannot
+ * import the TypeScript module -- but hand-copying the address is exactly how
+ * the site ended up publishing two different ones. Parsing the single source
+ * keeps them in step, and throws loudly if the shape ever changes rather than
+ * silently shipping a stale address.
+ */
+function businessFromSource() {
+  const src = fs.readFileSync(path.resolve(__dirname, '../src/lib/seo.ts'), 'utf-8');
+  const field = (name) => {
+    const m = src.match(new RegExp(`${name}:\\s*"([^"]*)"`));
+    if (!m) throw new Error(`inject-seo-head: could not read BUSINESS.${name} from src/lib/seo.ts`);
+    return m[1];
+  };
+  return {
+    legalName: field('legalName'),
+    phone: field('phone'),
+    email: field('email'),
+    street: field('street'),
+    locality: field('locality'),
+    region: field('region'),
+    postalCode: field('postalCode'),
+  };
+}
+const B = businessFromSource();
+
 /** Site-wide identity. Mirrors organisationSchema() in src/lib/seo.ts. */
 const organisationSchema = {
   '@context': 'https://schema.org',
@@ -51,20 +79,20 @@ const organisationSchema = {
       '@type': 'FinancialService',
       '@id': `${SITE_URL}/#organization`,
       name: 'PRYME',
-      legalName: 'Pryme Consulting India',
+      legalName: B.legalName,
       url: SITE_URL,
       logo: `${SITE_URL}/icon-512.png`,
       image: `${SITE_URL}/icon-512.png`,
-      telephone: '+91 92432 94291',
-      email: 'contact@gopryme.in',
+      telephone: B.phone,
+      email: B.email,
       priceRange: '₹₹',
       address: {
         '@type': 'PostalAddress',
         streetAddress:
-          '4th Floor, Above Mr. DIY Showroom, Ranjeet Hanuman Main Road, Mhow Naka Square',
-        addressLocality: 'Indore',
-        addressRegion: 'Madhya Pradesh',
-        postalCode: '452009',
+          '204, Ranjeet Hanuman Main Road, Near BATA Showroom, Mhow Naka',
+        addressLocality: B.locality,
+        addressRegion: B.region,
+        postalCode: B.postalCode,
         addressCountry: 'IN',
       },
       geo: { '@type': 'GeoCoordinates', latitude: 22.7196, longitude: 75.8577 },
