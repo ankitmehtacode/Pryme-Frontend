@@ -396,11 +396,14 @@ export const PrymeAPI = {
   // digits the user typed. Expiry, the 5-per-hour limit and the attempt cap are
   // enforced by the backend -- the timings returned here are for rendering
   // countdowns, never for deciding what is allowed.
-  sendMobileOtp: async (mobileNumber: string): Promise<OtpSendResponse> =>
-    otpFetch("/public/otp/send", { mobileNumber }),
+  // forSignup gates the "already registered" refusal server-side. The loan
+  // application form leaves it false: a number that already has an account
+  // verifying itself there is an existing customer, and must keep working.
+  sendMobileOtp: async (mobileNumber: string, forSignup = false): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/send", { mobileNumber, forSignup }),
 
-  resendMobileOtp: async (mobileNumber: string): Promise<OtpSendResponse> =>
-    otpFetch("/public/otp/resend", { mobileNumber }),
+  resendMobileOtp: async (mobileNumber: string, forSignup = false): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/resend", { mobileNumber, forSignup }),
 
   verifyMobileOtp: async (requestId: string, otp: string): Promise<OtpVerifyResponse> =>
     otpFetch("/public/otp/verify", { requestId, otp }),
@@ -408,11 +411,11 @@ export const PrymeAPI = {
   // Email verification at signup. Same policy engine, same response shape, same
   // verify endpoint -- a requestId already identifies which channel issued the
   // code, so only the send path differs.
-  sendEmailOtp: async (email: string): Promise<OtpSendResponse> =>
-    otpFetch("/public/otp/email/send", { email }),
+  sendEmailOtp: async (email: string, forSignup = false): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/email/send", { email, forSignup }),
 
-  resendEmailOtp: async (email: string): Promise<OtpSendResponse> =>
-    otpFetch("/public/otp/email/resend", { email }),
+  resendEmailOtp: async (email: string, forSignup = false): Promise<OtpSendResponse> =>
+    otpFetch("/public/otp/email/resend", { email, forSignup }),
 
   submitLead: async (formData: any) => {
     // 🧠 PIPELINE FIX: Forward strictly mapped form fields into metadata so Admin Dashboard

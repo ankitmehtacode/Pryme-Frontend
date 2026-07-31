@@ -154,6 +154,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
             nag while the user is still typing. */}
         <OtpVerifier
           channel="email"
+          forSignup
           value={emailValue.trim()}
           verified={emailVerified}
           onVerified={(token, value) => setEmailToken({ value, token })}
@@ -175,6 +176,7 @@ export const SignupForm = ({ from, children }: SignupFormProps) => {
         )}
         <OtpVerifier
           channel="mobile"
+          forSignup
           value={mobileValue.trim()}
           verified={mobileVerified}
           onVerified={(token, value) => setMobileToken({ value, token })}

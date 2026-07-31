@@ -41,6 +41,13 @@ interface Props {
   /** Receives the server-signed proof. Store it; submission needs it. */
   onVerified: (token: string, value: string) => void;
   disabled?: boolean;
+  /**
+   * True on the registration form only. The server then refuses to send a code
+   * to a contact that already has an account, so the user is told at the Verify
+   * button rather than after filling in the rest of the form -- and no SMS
+   * credit is spent on an attempt that could never succeed.
+   */
+  forSignup?: boolean;
 }
 
 const isValidMobile = (m: string) => /^[6-9]\d{9}$/.test(m || "");
@@ -69,6 +76,7 @@ export const OtpVerifier: React.FC<Props> = ({
   verified,
   onVerified,
   disabled = false,
+  forSignup = false,
 }) => {
   const [phase, setPhase] = useState<Phase>(verified ? "verified" : "idle");
   const [session, setSession] = useState<OtpSendResponse | null>(null);
@@ -129,11 +137,11 @@ export const OtpVerifier: React.FC<Props> = ({
       try {
         const res = isEmail
           ? isResend
-            ? await PrymeAPI.resendEmailOtp(value)
-            : await PrymeAPI.sendEmailOtp(value)
+            ? await PrymeAPI.resendEmailOtp(value, forSignup)
+            : await PrymeAPI.sendEmailOtp(value, forSignup)
           : isResend
-            ? await PrymeAPI.resendMobileOtp(value)
-            : await PrymeAPI.sendMobileOtp(value);
+            ? await PrymeAPI.resendMobileOtp(value, forSignup)
+            : await PrymeAPI.sendMobileOtp(value, forSignup);
         setSession(res);
         setDigits(new Array(res.otpLength).fill(""));
         setAttemptsLeft(res.maxAttempts);
@@ -145,7 +153,7 @@ export const OtpVerifier: React.FC<Props> = ({
         setPhase(session ? "entry" : "idle");
       }
     },
-    [channel, value, disabled, session, isEmail]
+    [channel, value, disabled, session, isEmail, forSignup]
   );
 
   const submit = useCallback(
