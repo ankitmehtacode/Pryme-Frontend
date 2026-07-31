@@ -5,7 +5,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const SITE_URL = 'https://www.gopryme.tech';
+// Canonical host. One build serves prymeloans.in, prymeloans.com and
+// gopryme.tech; to a crawler that is three sites with identical content, so
+// every generated URL points at the one host that consolidates them.
+//
+// This constant is the reason a hand-edit of public/sitemap.xml does not stick:
+// the prebuild step regenerates that file from here on every build.
+export const SITE_URL = 'https://www.prymeloans.in';
 const BLOGS_DATA_PATH = path.resolve(__dirname, '../src/data/blogs.ts');
 
 // Only genuinely public, indexable marketing pages -- anything personalized,

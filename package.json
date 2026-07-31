@@ -8,7 +8,7 @@
     "postinstall": "playwright install --with-deps chromium || playwright install chromium || echo 'prerender.js: Playwright Chromium install skipped -- prerendering will silently no-op this build'",
     "prebuild": "node scripts/generate-sitemap.js",
     "build": "vite build",
-    "postbuild": "node scripts/prerender.js",
+    "postbuild": "node scripts/prerender.js && node scripts/inject-seo-head.js",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
