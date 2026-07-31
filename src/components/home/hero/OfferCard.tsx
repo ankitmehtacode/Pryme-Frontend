@@ -41,11 +41,23 @@ export const OfferCard = memo(({ offer, compact = false }: { offer: typeof initi
         }}
       >
         {/* Full-bleed image */}
+        {/* This is the largest element above the fold, so it is the page's LCP.
+            loading="eager" alone only opts out of lazy-loading -- it does not
+            promote the image ahead of the scripts and fonts the preload scanner
+            has already queued. fetchPriority="high" does, which is the whole
+            difference between the card appearing with the page and appearing a
+            beat after it.
+
+            decoding="async" keeps the decode off the main thread so a large
+            image cannot stall the first paint of everything around it. */}
         <img
           src={resolveApiUrl(offer.bannerImageUrl)}
           alt={`${offer.bank} — ${offer.title}`}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           loading="eager"
+          // @ts-expect-error - fetchPriority is missing from React's ImgHTMLAttributes
+          fetchPriority="high"
+          decoding="async"
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
 

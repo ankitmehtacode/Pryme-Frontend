@@ -156,6 +156,52 @@ export const MarketingTab: React.FC = () => {
     }
   });
 
+  /**
+   * Downscales and re-encodes before upload.
+   *
+   * The hero card renders at roughly 450px wide, but the two banners live in
+   * production were 1402px PNGs weighing 1.7MB each. The card paints its
+   * container immediately and the image lands seconds later, so a visitor's
+   * first impression of the homepage was a soft empty rectangle -- read as "the
+   * offer card is blurry" rather than "3.4MB is still downloading".
+   *
+   * 1600px wide covers a 2x retina render of the largest layout with margin.
+   * JPEG at 0.82 is the point where artefacts stop being visible on photographic
+   * banners; the two live images came down 16-18x at that setting.
+   *
+   * Flattened onto white first: JPEG has no alpha, and a transparent PNG
+   * converted without a backing colour renders its transparent regions black.
+   */
+  const compressBanner = (file: File): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, 1600 / img.width);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Canvas unavailable"));
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error("Could not re-encode the image"))),
+          "image/jpeg",
+          0.82
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("That file could not be read as an image."));
+      };
+      img.src = url;
+    });
+
   // Direct banner upload -- gets a presigned S3 PUT URL scoped to the
   // public-marketing/ prefix, uploads the file straight to S3, then stores
   // the returned permanent public URL (not a signed one) as bannerImageUrl.
@@ -175,7 +221,12 @@ export const MarketingTab: React.FC = () => {
 
     setIsUploadingBanner(true);
     try {
-      const { uploadUrl, publicUrl } = await PrymeAPI.initiateMarketingBannerUpload(file.type);
+      // Re-encoded before it leaves the browser, so the presigned URL must be
+      // signed for image/jpeg -- the signature binds Content-Type, and a PUT
+      // whose header disagrees with what was signed is rejected by S3 with a
+      // 403 that reads exactly like an expired link.
+      const compressed = await compressBanner(file);
+      const { uploadUrl, publicUrl } = await PrymeAPI.initiateMarketingBannerUpload("image/jpeg");
       // uploadUrl is a real, absolute S3 presigned URL in production, but a
       // *relative* backend path (/api/v1/dummy-s3-upload/...) whenever the
       // backend falls back to "dummy S3 mode" (AWS_S3_BUCKET not configured)
@@ -204,8 +255,8 @@ export const MarketingTab: React.FC = () => {
       try {
         s3Response = await fetch(resolveApiUrl(uploadUrl), {
           method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file,
+          headers: { "Content-Type": "image/jpeg" },
+          body: compressed,
         });
       } catch (networkErr) {
         console.error("Banner PUT blocked before dispatch (CORS or network):", networkErr, { uploadUrl });
@@ -223,7 +274,7 @@ export const MarketingTab: React.FC = () => {
       }
 
       setFormData(prev => ({ ...prev, bannerImageUrl: publicUrl }));
-      toast.success("Banner uploaded.");
+      toast.success(`Banner uploaded (${Math.round(compressed.size / 1024)} KB, from ${Math.round(file.size / 1024)} KB).`);
     } catch (err: any) {
       toast.error(err.message || "Failed to upload banner image.");
     } finally {
