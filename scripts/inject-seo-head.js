@@ -3,13 +3,16 @@
  *
  * WHY THIS EXISTS
  *
- * prerender.js produces perfect per-route HTML, but it drives a real Chromium
- * through Playwright. Vercel's build image has the playwright npm package (it is
- * a devDependency) but not the browser binary, so chromium.launch() throws there
- * — and prerender.js deliberately swallows the failure rather than failing the
- * build. The result was silent and expensive: builds went green, and production
- * served the raw shell with the placeholder title, no canonical, and no
- * structured data, while every local build looked correct.
+ * prerender.js produces perfect per-route HTML, but it runs in the npm postbuild
+ * hook, and hooks only fire when the host's build command is `npm run build`.
+ * Cloudflare Pages was running `vite build` directly, so neither prebuild nor
+ * postbuild ever ran. The failure was silent and expensive: builds went green,
+ * every local build looked perfect, and production served the raw shell with the
+ * placeholder title, no canonical and no structured data.
+ *
+ * That is why this is wired into vite.config.ts as a plugin as well as being a
+ * CLI script — a plugin runs whenever Vite runs, which is the one thing that is
+ * certain regardless of how the host is configured.
  *
  * Google does execute JavaScript, so the Helmet tags were eventually seen on a
  * second-pass render. But the canonical is what stops prymeloans.com and
@@ -102,7 +105,7 @@ function withOrganisationSchema(html) {
   return html.replace('</head>', `${block}  </head>`);
 }
 
-function main() {
+export function injectSeoHead() {
   const shellPath = path.join(DIST, 'index.html');
   if (!fs.existsSync(shellPath)) {
     console.warn('inject-seo-head.js: dist/index.html not found, skipping');
@@ -147,4 +150,9 @@ function main() {
   );
 }
 
-main();
+// CLI entry: `node scripts/inject-seo-head.js`. Also invoked directly from
+// vite.config.ts so the tags land even when the host's build command skips the
+// npm postbuild hook -- which is exactly what was happening on Cloudflare Pages.
+if (process.argv[1] && process.argv[1].endsWith('inject-seo-head.js')) {
+  injectSeoHead();
+}

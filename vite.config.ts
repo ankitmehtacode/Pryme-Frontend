@@ -7,6 +7,33 @@ import path from "path";
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
+// @ts-expect-error - plain ESM build script, no type declarations
+import { injectSeoHead } from './scripts/inject-seo-head.js';
+
+/**
+ * Writes canonical tags and the organisation schema into the built HTML.
+ *
+ * Runs as a Vite plugin rather than only as an npm postbuild hook because the
+ * host decides the build command. Cloudflare Pages was running `vite build`
+ * directly, so prebuild and postbuild never fired and production shipped with no
+ * canonical at all -- while every local `npm run build` looked perfect. A plugin
+ * runs whenever Vite does, which is the one thing that is certain.
+ *
+ * Idempotent: when prerender.js has already run, Helmet's tags are present and
+ * this reports zero changes.
+ */
+const seoHeadPlugin = () => ({
+  name: 'pryme-inject-seo-head',
+  apply: 'build' as const,
+  closeBundle() {
+    try {
+      injectSeoHead();
+    } catch (err) {
+      // Never fail a build over an SEO enhancement; surface it loudly instead.
+      console.warn('[pryme-inject-seo-head] skipped:', (err as Error).message);
+    }
+  },
+});
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
@@ -42,7 +69,7 @@ export default defineConfig({
       }
     }
   },
-  plugins: [react()],
+  plugins: [react(), seoHeadPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src")
