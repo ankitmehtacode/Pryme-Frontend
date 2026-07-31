@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import applyCustomBg from "@/assets/images/apply-bg-custom.png";
+import applyCustomBg from "@/assets/images/apply-bg-custom.jpg";
 import comingSoonWallet from "@/assets/images/coming-soon-wallet.png";
 import comingSoonRm from "@/assets/images/coming-soon-rm.png";
 

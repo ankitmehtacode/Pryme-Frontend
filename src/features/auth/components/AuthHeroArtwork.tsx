@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
-import authHeroImg from "@/assets/images/auth-hero-v2.png";
+import authHeroImg from "@/assets/images/auth-hero-v2.jpg";
 
 export function AuthHeroArtwork() {
   const navigate = useNavigate();

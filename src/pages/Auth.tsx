@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { PageShell } from "@/components/layout/PageShell";
 import { AuthForms } from "@/features/auth/components/AuthForms";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
-import authCustomBg from "@/assets/images/auth-bg-custom.png";
+import authCustomBg from "@/assets/images/auth-bg-custom.jpg";
 
 const Auth = () => {
   return (

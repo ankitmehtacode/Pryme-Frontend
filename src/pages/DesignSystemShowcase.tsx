@@ -1,6 +1,6 @@
 import React from "react";
 import { PageShell, Surface, Section, Container, Stack, Inline, SplitLayout, MediaPanel } from "@/components/layout";
-import authHeroImg from "@/assets/images/auth-hero-v2.png";
+import authHeroImg from "@/assets/images/auth-hero-v2.jpg";
 
 export default function DesignSystemShowcase() {
   return (

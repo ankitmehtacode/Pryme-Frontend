@@ -6,7 +6,7 @@ import { Shield, Clock, CheckCircle, CheckCircle2, TrendingUp, Info, LockKeyhole
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import prymeLogo from "@/assets/pryme-typo-logo.svg";
-import applyCustomBg from "@/assets/images/apply-bg-custom.png";
+import applyCustomBg from "@/assets/images/apply-bg-custom.jpg";
 
 // Core Layout & Utilities
 import Header from "@/components/layout/Header";

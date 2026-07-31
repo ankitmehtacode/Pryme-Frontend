@@ -1,6 +1,6 @@
 import React from "react";
 import HeroIllustration from "../HeroIllustration";
-import heroBankImg from "@/assets/hero-bank-building.png";
+import heroBankImg from "@/assets/hero-bank-building.jpg";
 
 interface HeroArtworkProps {
   currentOffer?: any;
