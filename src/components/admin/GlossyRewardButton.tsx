@@ -23,7 +23,11 @@ interface GlossyRewardButtonProps extends React.HTMLAttributes<HTMLDivElement> {
 // stretches w-full therefore reads as much larger. These widths track the
 // graphic at both heights, inset 5px per side so the bordered sibling sits
 // just within it. Re-derive them if the asset is ever re-exported.
-export const GLOSSY_BUTTON_SIBLING_WIDTH = "w-[157px] md:w-[171px]";
+// Below sm the glossy button spans the full card width (see the wrapper below),
+// so its sibling must too, or the two stop lining up. From sm up the graphic
+// returns to its fixed height and intrinsic width, and these pinned values match
+// it again.
+export const GLOSSY_BUTTON_SIBLING_WIDTH = "w-full sm:w-[157px] md:w-[171px]";
 
 export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
   className,
@@ -32,8 +36,25 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
 }) => {
   return (
     <div
+      // Height is driven by the image below sm, and fixed from sm up.
+      //
+      // The graphic is a single PNG at a 3.48:1 ratio, so at a fixed 48px height
+      // its visible width is locked to ~167px no matter how wide this wrapper is
+      // -- which is why the button sat as a narrow pill in the middle of a
+      // full-width card on phones. Letting the image drive the height lets it
+      // span the card edge to edge without stretching; the trade is a taller
+      // button, roughly 90px on a typical phone.
+      //
+      // The switch is at sm rather than md because by ~640px the proportional
+      // height would exceed 180px, which is no longer a button.
       className={cn(
-        "relative flex items-center justify-center h-12 md:h-[52px] w-full rounded-full overflow-hidden transition-transform duration-300 select-none",
+        "relative flex items-center justify-center w-full rounded-full overflow-hidden transition-transform duration-300 select-none",
+        // aspect-ratio, not h-auto on the image. In a flex container with
+        // align-items:center, a replaced element sized width:100% has no
+        // resolvable cross-size -- the browser computes height:0 and the button
+        // vanishes. Measured, not guessed: h-auto rendered 318x0. Giving the
+        // wrapper a definite ratio breaks the circularity.
+        "aspect-[1335/384] sm:aspect-auto sm:h-12 md:h-[52px]",
         disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.03] active:scale-[0.98]",
         className
       )}
@@ -46,7 +67,15 @@ export const GlossyRewardButton: React.FC<GlossyRewardButtonProps> = ({
           had to be masked to the graphic's alpha to avoid overhanging the
           pill and slicing the gold ribbon -- see git history if a state
           layer is ever wanted back. */}
-      <img src={fullButton} alt="" className="h-full w-auto max-w-full object-contain pointer-events-none" />
+      {/* w-full h-auto below sm so the graphic fills the card; h-full w-auto from
+          sm up so it keeps its intrinsic width inside a fixed-height pill. Never
+          object-fill or object-cover: the first stretches the gold ribbon and the
+          wordmark, the second crops the ribbon off the corner. */}
+      <img
+        src={fullButton}
+        alt=""
+        className="w-full h-full sm:h-full sm:w-auto max-w-full object-contain pointer-events-none"
+      />
     </div>
   );
 };
