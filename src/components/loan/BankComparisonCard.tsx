@@ -206,7 +206,7 @@ export const BankComparisonCard = memo(function BankComparisonCard({
   });
 
   const dynamicRewardText = matchingReward 
-    ? (matchingReward.rewardText || [matchingReward.reward1, matchingReward.reward2, matchingReward.pfWaiver].filter(Boolean).join(" • "))
+    ? (matchingReward.rewardText || [matchingReward.reward1, matchingReward.reward2].filter(Boolean).join(" • "))
     : "";
 
   const RewardIcon = matchingReward?.iconType === "GIFT" ? Gift :

@@ -36,7 +36,6 @@ const rewards = [
     iconType: "GIFT",
     reward1: "Top Load Semi Automatic Washing Machine",
     reward2: "32\" Smart LED TV",
-    pfWaiver: "50% PF Waiver",
     buttonDesign: "ocean-blue",
   },
 ];

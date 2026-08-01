@@ -82,7 +82,6 @@ interface ProductRewardRow {
   employmentType?: string;
   reward1?: string;
   reward2?: string;
-  pfWaiver?: string;
 }
 
 // A reward *item* deduplicated across every matched bank -- e.g. if 8 banks
@@ -91,9 +90,7 @@ interface ProductRewardRow {
 interface DerivedRewardItem {
   key: string;           // trimmed-uppercase, used for dedup + selection identity
   label: string;         // raw sheet text, unchanged casing/spelling
-  kind: "product" | "pf_waiver";
   bankCount: number;     // how many distinct matched banks offer this
-  worth?: string;        // "Up to 50%" -- parsed from real pf_waiver text, product items get none (no fabricated pricing)
 }
 
 const CARD_THEMES = [
@@ -103,7 +100,6 @@ const CARD_THEMES = [
   "text-rose-600 bg-rose-500/10 border-rose-500/20",
   "text-cyan-600 bg-cyan-500/10 border-cyan-500/20",
 ];
-const PF_WAIVER_THEME = "text-emerald-600 bg-emerald-500/10 border-emerald-500/20";
 
 const products = [
   { id: "personal", label: "Personal Loan" },
@@ -206,38 +202,26 @@ const OffersRewards = () => {
     });
 
     // Deduplicate by the actual reward TEXT across every matched bank, not
-    // by bank -- the user picks a reward (TV, vacuum, PF waiver...), not a
-    // lender, on this screen. Exact-match dedup deliberately does NOT fuzzy-
-    // merge near-duplicate spellings already present in the real sheet data
-    // (e.g. "REFRIDGERATOR" vs "REFRIGERATOR") -- the sheet is source of
-    // truth, not something this UI silently "corrects".
-    const itemMap = new Map<string, { label: string; kind: "product" | "pf_waiver"; banks: Set<string> }>();
-    const addItem = (raw: string | undefined, bank: string, kind: "product" | "pf_waiver") => {
+    // by bank -- the user picks a reward (TV, vacuum...), not a lender, on
+    // this screen. Exact-match dedup deliberately does NOT fuzzy-merge
+    // near-duplicate spellings already present in the real sheet data --
+    // the sheet is source of truth, not something this UI silently "corrects".
+    const itemMap = new Map<string, { label: string; banks: Set<string> }>();
+    const addItem = (raw: string | undefined, bank: string) => {
       const trimmed = raw?.trim();
       if (!trimmed) return;
       const key = trimmed.toUpperCase();
-      if (!itemMap.has(key)) itemMap.set(key, { label: trimmed, kind, banks: new Set() });
+      if (!itemMap.has(key)) itemMap.set(key, { label: trimmed, banks: new Set() });
       itemMap.get(key)!.banks.add(bank);
     };
     for (const r of matches) {
-      addItem(r.reward1, r.bank, "product");
-      addItem(r.reward2, r.bank, "product");
-      addItem(r.pfWaiver, r.bank, "pf_waiver");
+      addItem(r.reward1, r.bank);
+      addItem(r.reward2, r.bank);
     }
 
-    const items: DerivedRewardItem[] = Array.from(itemMap.entries()).map(([key, v]) => {
-      const pctMatch = v.kind === "pf_waiver" ? v.label.match(/(\d+)\s*%/) : null;
-      return {
-        key,
-        label: v.label,
-        kind: v.kind,
-        bankCount: v.banks.size,
-        worth: pctMatch ? `Up to ${pctMatch[1]}%` : undefined,
-      };
-    }).sort((a, b) => {
-      if (a.kind !== b.kind) return a.kind === "product" ? -1 : 1;
-      return b.bankCount - a.bankCount;
-    });
+    const items: DerivedRewardItem[] = Array.from(itemMap.entries())
+      .map(([key, v]) => ({ key, label: v.label, bankCount: v.banks.size }))
+      .sort((a, b) => b.bankCount - a.bankCount);
 
     setRewardItems(items);
     setSelectedReward(null);
@@ -534,8 +518,8 @@ const OffersRewards = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                   {rewardItems.map((item, i) => {
                     const isSelected = selectedReward === item.key;
-                    const theme = item.kind === "pf_waiver" ? PF_WAIVER_THEME : CARD_THEMES[i % CARD_THEMES.length];
-                    const Icon = item.kind === "pf_waiver" ? Percent : PackageCheck;
+                    const theme = CARD_THEMES[i % CARD_THEMES.length];
+                    const Icon = PackageCheck;
                     const photo = REWARD_IMAGE_BY_KEY[item.key];
 
                     return (
@@ -548,7 +532,7 @@ const OffersRewards = () => {
                       >
                         {/* Worth / availability badge */}
                         <span className={cn("absolute top-3 right-3 text-[9px] font-extrabold uppercase tracking-wider px-2 py-1 rounded-full border z-10", theme)}>
-                          {item.worth || `${item.bankCount} ${item.bankCount === 1 ? "Bank" : "Banks"}`}
+                          {`${item.bankCount} ${item.bankCount === 1 ? "Bank" : "Banks"}`}
                         </span>
 
                         {photo ? (
@@ -569,9 +553,7 @@ const OffersRewards = () => {
                           {item.label}
                         </h4>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mb-4">
-                          {item.kind === "pf_waiver"
-                            ? "Save more on your processing fees"
-                            : `Offered by ${item.bankCount} participating ${item.bankCount === 1 ? "bank" : "banks"}`}
+                          {`Offered by ${item.bankCount} participating ${item.bankCount === 1 ? "bank" : "banks"}`}
                         </p>
 
                         <button

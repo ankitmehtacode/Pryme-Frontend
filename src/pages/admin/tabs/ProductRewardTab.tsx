@@ -19,7 +19,6 @@ interface ProductRewardFormData {
   employmentType?: string;
   reward1?: string;
   reward2?: string;
-  pfWaiver?: string;
 }
 
 const initialRewardFormState: ProductRewardFormData = {
@@ -33,8 +32,7 @@ const initialRewardFormState: ProductRewardFormData = {
   maxLoanAmount: 9999999999,
   employmentType: "SALARIED",
   reward1: "",
-  reward2: "",
-  pfWaiver: ""
+  reward2: ""
 };
 
 export const ProductRewardTab: React.FC = () => {
@@ -318,17 +316,6 @@ export const ProductRewardTab: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-400">PF Waiver</label>
-                <input
-                  type="text"
-                  value={rewardFormData.pfWaiver || ""}
-                  onChange={(e) => setRewardFormData({ ...rewardFormData, pfWaiver: e.target.value })}
-                  placeholder="e.g. 50% PF WAIVER"
-                  className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-400">Reward Text (Override / Memo)</label>
                 <input
                   type="text"
@@ -428,7 +415,7 @@ export const ProductRewardTab: React.FC = () => {
                           })()}
                         </td>
                         <td className="px-4 py-3 text-slate-300">
-                          {reward.rewardText || [reward.reward1, reward.reward2, reward.pfWaiver].filter(Boolean).join(" • ")}
+                          {reward.rewardText || [reward.reward1, reward.reward2].filter(Boolean).join(" • ")}
                           <p className="text-[10px] text-slate-500 mt-0.5">
                             {reward.employmentType} | ₹{(reward.minLoanAmount/100000).toFixed(0)}L+
                           </p>
