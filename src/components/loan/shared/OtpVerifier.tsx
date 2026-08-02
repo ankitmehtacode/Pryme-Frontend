@@ -193,13 +193,17 @@ export const OtpVerifier: React.FC<Props> = ({
       return;
     }
     // Paste of a whole code into any box fills the row, which is how people
-    // actually move a code across from their SMS or mail app.
+    // actually move a code across from their SMS or mail app -- and it is also
+    // the path SMS autofill takes, since the browser drops the entire code into
+    // the one-time-code box in a single change event.
     if (clean.length > 1) {
       const next = clean.slice(0, otpLength).split("");
       const filled = new Array(otpLength).fill("").map((_, i) => next[i] ?? "");
       setDigits(filled);
       const full = filled.join("");
-      if (full.length === otpLength && !full.includes("")) void submit(full);
+      // `filled`, not `full`: "1234".includes("") is always true for a string,
+      // so testing the joined code here never submitted.
+      if (full.length === otpLength && !filled.includes("")) void submit(full);
       inputsRef.current[Math.min(next.length, otpLength - 1)]?.focus();
       return;
     }
