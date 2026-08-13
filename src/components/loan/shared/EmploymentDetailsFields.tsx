@@ -35,6 +35,15 @@ interface EmploymentDetailsFieldsProps {
   onUpdateSalaried: (data: Partial<SalariedDetails>) => void;
   onUpdateProfessional: (data: Partial<ProfessionalDetails>) => void;
   onUpdateBusiness: (data: Partial<BusinessDetails>) => void;
+  // Fired when the user picks "Other" from the Profession pills instead of a
+  // listed profession. There's no curated SEP/CPM_SEP multiplier data for an
+  // unlisted profession, so rather than a dead-end form, this converts the
+  // applicant onto the SELF_EMPLOYED path — same fields, same NIP/GST/BANKING
+  // backend calculation as Business, via the exact same store actions the top-
+  // level "Self Employed / Business" pill already uses. Optional because the
+  // co-applicant/review-screen callers wire it in only where the top-level
+  // employmentType picker also lives.
+  onSelectOtherProfession?: () => void;
   loanType?: LoanType;
   errors?: Record<string, string>;
   // Loan-level (not per-applicant) vehicle price fields. Tied to the asset
@@ -52,6 +61,7 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
   onUpdateSalaried,
   onUpdateProfessional,
   onUpdateBusiness,
+  onSelectOtherProfession,
   loanType,
   errors = {},
   vehicleOnRoadPrice,
@@ -234,9 +244,10 @@ export const EmploymentDetailsFields: React.FC<EmploymentDetailsFieldsProps> = (
               { value: "DOCTOR", label: "Doctor", icon: Stethoscope },
               { value: "LAWYER", label: "Advocate", icon: Scale },
               { value: "ARCHITECT", label: "Architect", icon: PenTool },
+              { value: "OTHER", label: "Other", icon: BriefcaseBusiness },
             ]}
             value={fin.path === "PROFESSIONAL" ? fin.data.subType : null}
-            onChange={(v) => onUpdateProfessional({ subType: v })}
+            onChange={(v) => (v === "OTHER" ? onSelectOtherProfession?.() : onUpdateProfessional({ subType: v }))}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

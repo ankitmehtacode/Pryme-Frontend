@@ -35,7 +35,13 @@ export type EmploymentType = 'SALARIED' | 'PROFESSIONAL' | 'SELF_EMPLOYED';
 
 export type SalariedSubType = 'PRIVATE' | 'GOVERNMENT';
 
-export type ProfessionalSubType = 'CA' | 'CS' | 'DOCTOR' | 'LAWYER' | 'ARCHITECT';
+// 'OTHER' is never persisted as a real subType: selecting it in the
+// Profession picker immediately converts the applicant to the SELF_EMPLOYED
+// path (see EmploymentDetailsFields.tsx's onSelectOtherProfession), whose
+// BusinessDetails shape has no subType concept of its own. It only exists
+// here so the picker can offer it as a PillSelector<ProfessionalSubType>
+// option without an inline type cast.
+export type ProfessionalSubType = 'CA' | 'CS' | 'DOCTOR' | 'LAWYER' | 'ARCHITECT' | 'OTHER';
 
 // Standard relationship set used by PolicyBazaar/BankBazaar-style aggregators
 // for co-applicant KYC -- most lenders' co-applicant eligibility is
@@ -71,6 +77,7 @@ export const PROFESSIONAL_LABELS: Record<ProfessionalSubType, string> = {
   DOCTOR: 'Doctor / Medical Practitioner',
   LAWYER: 'Advocate',
   ARCHITECT: 'Architect',
+  OTHER: 'Other',
 };
 
 export const BUSINESS_LABELS: Record<BusinessSubType, string> = {

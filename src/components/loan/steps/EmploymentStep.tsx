@@ -79,6 +79,11 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({ cardCn }) => {
             onUpdateSalaried={store.updateSalariedDetails}
             onUpdateProfessional={store.updateProfessionalDetails}
             onUpdateBusiness={store.updateBusinessDetails}
+            onSelectOtherProfession={() => {
+              store.updateBasicKYC({ employmentType: 'SELF_EMPLOYED' });
+              store.updateBusinessDetails({});
+              setErrors({});
+            }}
             loanType={store.loanRequirements.loanType}
             errors={errors}
             vehicleOnRoadPrice={store.loanRequirements.vehicleOnRoadPrice}

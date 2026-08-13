@@ -131,6 +131,10 @@ export const CoApplicantStep: React.FC<CoApplicantStepProps> = ({ cardCn }) => {
                 onUpdateSalaried={store.updateCoApplicantSalariedDetails}
                 onUpdateProfessional={store.updateCoApplicantProfessionalDetails}
                 onUpdateBusiness={store.updateCoApplicantBusinessDetails}
+                onSelectOtherProfession={() => {
+                  updateCoApplicant({ employmentType: 'SELF_EMPLOYED' });
+                  store.updateCoApplicantBusinessDetails({});
+                }}
                 loanType={store.loanRequirements?.loanType}
               />
             </div>
