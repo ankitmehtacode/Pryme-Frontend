@@ -10,12 +10,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { LegalDocumentModal, LegalDocType } from "@/components/legal/LegalDocumentModal";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import React from "react";
@@ -550,7 +545,7 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [consent1, setConsent1] = useState(false);
   const [consent2, setConsent2] = useState(false);
-  const [openDoc, setOpenDoc] = useState<'privacy' | 'terms' | null>(null);
+  const [openDoc, setOpenDoc] = useState<LegalDocType | null>(null);
 
   const formEndRef = useRef<HTMLDivElement>(null);
   const [isBottomVisible, setIsBottomVisible] = useState(false);
@@ -1147,23 +1142,14 @@ const LoanApplicationForm = ({ onAmountChange, onFormSubmit }: LoanApplicationFo
         </div>
       </motion.div>
 
-      <Dialog open={!!openDoc} onOpenChange={(open) => !open && setOpenDoc(null)}>
-        <DialogContent className="max-w-2xl h-[75vh] p-0 flex flex-col gap-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl bg-background/95 backdrop-blur-3xl sm:rounded-xl">
-          <DialogHeader className="p-4 md:p-6 border-b border-slate-200 dark:border-white/10 shrink-0 bg-background/95">
-            <DialogTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-white">
-              <FileText className="w-5 h-5 text-primary" />
-              {openDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 w-full bg-white/5 relative h-full">
-            <iframe 
-              src={openDoc === 'privacy' ? '/documents/privacy-policy.pdf#toolbar=0&navpanes=0&scrollbar=0' : '/documents/terms-conditions.pdf#toolbar=0&navpanes=0&scrollbar=0'}
-              className="absolute inset-0 w-full h-full border-0"
-              title="Document Viewer"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <LegalDocumentModal
+        openDoc={openDoc}
+        onClose={() => setOpenDoc(null)}
+        onAccept={() => {
+          setConsent2(true);
+          setOpenDoc(null);
+        }}
+      />
     </>
   );
 };

@@ -5,6 +5,7 @@ import { BUSINESS } from "@/lib/seo";
 import prymeLogo from "@/assets/Pryme2.svg";
 import { Container } from "@/components/layout/Primitives";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { LegalDocumentModal, LegalDocType } from "@/components/legal/LegalDocumentModal";
 
 const CONTACT_PHONE = "+91 92432 94291";
 const CONTACT_PHONE_LINK = "tel:+919243294291";
@@ -30,7 +31,7 @@ const SOCIAL_LINKS = {
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const [openDoc, setOpenDoc] = useState<'privacy' | 'terms' | null>(null);
+  const [openDoc, setOpenDoc] = useState<LegalDocType | null>(null);
 
   // 200 IQ fix: Scroll to top on route change, but preserve native behavior for anchor hash links
   const handleLinkClick = (href: string) => {
@@ -277,24 +278,11 @@ const Footer = () => {
                   </DialogContent>
                 </Dialog>
 
-                {/* PDF Document Viewer Modal */}
-                <Dialog open={!!openDoc} onOpenChange={(open) => !open && setOpenDoc(null)}>
-                  <DialogContent className="max-w-2xl h-[75vh] p-0 flex flex-col gap-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl bg-background/95 backdrop-blur-3xl sm:rounded-xl">
-                    <DialogHeader className="p-4 md:p-6 border-b border-slate-200 dark:border-white/10 shrink-0 bg-background/95">
-                      <DialogTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-white">
-                        <FileText className="w-5 h-5 text-primary" />
-                        {openDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="flex-1 w-full bg-white/5 relative h-full">
-                      <iframe 
-                        src={openDoc === 'privacy' ? '/documents/privacy-policy.pdf#toolbar=0&navpanes=0&scrollbar=0' : '/documents/terms-conditions.pdf#toolbar=0&navpanes=0&scrollbar=0'}
-                        className="absolute inset-0 w-full h-full border-0"
-                        title="Document Viewer"
-                      />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                {/* Silicon Valley Grade Legal Document Viewer Modal */}
+                <LegalDocumentModal
+                  openDoc={openDoc}
+                  onClose={() => setOpenDoc(null)}
+                />
               </div>
             </div>
           </div>
