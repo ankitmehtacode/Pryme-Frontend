@@ -119,10 +119,34 @@ const organisationSchema = {
   ],
 };
 
+/**
+ * Insert `block` immediately before the document's real closing head tag.
+ *
+ * Deliberately NOT html.replace('</head>', ...). String.replace with a string
+ * argument rewrites the FIRST occurrence, and index.html's head comments have
+ * quoted that tag literally before now (the Meta Pixel block described where
+ * it injects). When that happened the first match was inside the comment, so
+ * the canonical link and the JSON-LD below were injected INTO the comment and
+ * shipped inert — every route went live with no canonical and no Organization
+ * schema, on a site already struggling to get indexed, and the build stayed
+ * green throughout because nothing here validates where it landed.
+ *
+ * lastIndexOf anchors on the real tag instead: a conforming document has
+ * exactly one closing head tag and it is always the last such string.
+ */
+function insertBeforeHeadClose(html, block) {
+  const i = html.lastIndexOf('</head>');
+  if (i === -1) {
+    console.warn('inject-seo-head.js: no closing head tag found, skipping injection');
+    return html;
+  }
+  return html.slice(0, i) + block + html.slice(i);
+}
+
 function withCanonical(html, url) {
   // Already present (prerender.js ran and Helmet emitted it) — leave it be.
   if (/<link[^>]+rel="canonical"/i.test(html)) return html;
-  return html.replace('</head>', `  <link rel="canonical" href="${url}" />\n  </head>`);
+  return insertBeforeHeadClose(html, `  <link rel="canonical" href="${url}" />\n  `);
 }
 
 function withOrganisationSchema(html) {
@@ -130,7 +154,7 @@ function withOrganisationSchema(html) {
     return html;
   }
   const block = `  <script type="application/ld+json">${JSON.stringify(organisationSchema)}</script>\n`;
-  return html.replace('</head>', `${block}  </head>`);
+  return insertBeforeHeadClose(html, `${block}  `);
 }
 
 export function injectSeoHead() {

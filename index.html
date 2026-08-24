@@ -100,9 +100,17 @@
 
       Lives in this static shell rather than in a React component so that it is
       present in the prerendered HTML of every route -- scripts/prerender.js and
-      scripts/inject-seo-head.js both only append before </head>, so this block
-      survives the build and propagates to all three brand domains from the one
-      build, exactly like the favicons above.
+      scripts/inject-seo-head.js both only append at the end of the head, so
+      this block survives the build and propagates to all three brand domains
+      from the one build, exactly like the favicons above.
+
+      Do NOT write the closing-head tag literally anywhere in this file's
+      comments. inject-seo-head.js locates its insertion point by searching for
+      that exact string, so a copy of it inside a comment becomes the match and
+      the canonical link plus the Organization JSON-LD get injected INTO the
+      comment, where they are inert. That shipped once: every route went live
+      with no canonical and no schema, and nothing failed loudly. The injector
+      now anchors on the LAST occurrence, so this is belt and braces.
 
       KNOWN LIMITATION -- this fires PageView ONCE, on initial document load.
       PRYME is a client-routed SPA (react-router), so moving between routes does
