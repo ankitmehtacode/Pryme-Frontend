@@ -56,15 +56,23 @@
       host matching the current domain — this list is the ceiling, not the route.
       Adding a brand means adding its api.<brand> host here as well as to nginx's
       server_name and the backend's app.security.allowed-origins.
+
+      The Meta Pixel needs three of these directives and fails silently without
+      them -- the browser blocks the request and the console CSP violation is
+      the only symptom, so the pixel simply reports nothing:
+        script-src   https://connect.facebook.net  -- loads fbevents.js
+        connect-src  https://www.facebook.com      -- where events are POSTed
+        img-src      already permits https:        -- the <noscript> beacon
+      If tracking ever goes quiet, check here before re-issuing the pixel ID.
     -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://accounts.google.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://accounts.google.com https://connect.facebook.net;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com;
       font-src 'self' https://fonts.gstatic.com data:;
       img-src 'self' data: https: http: blob:;
       media-src 'self' https://videos.pexels.com blob: data:;
-      connect-src 'self' wss://* https://api.gopryme.tech https://api.prymeloans.in https://api.prymeloans.com https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com;
+      connect-src 'self' wss://* https://api.gopryme.tech https://api.prymeloans.in https://api.prymeloans.com https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com https://www.facebook.com https://connect.facebook.net;
       worker-src 'self' blob:;
       frame-src 'self' https://accounts.google.com;
     ">
@@ -87,6 +95,44 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 
+    <!--
+      Meta Pixel (base code), pixel ID 2097278684487779.
+
+      Lives in this static shell rather than in a React component so that it is
+      present in the prerendered HTML of every route -- scripts/prerender.js and
+      scripts/inject-seo-head.js both only append before </head>, so this block
+      survives the build and propagates to all three brand domains from the one
+      build, exactly like the favicons above.
+
+      KNOWN LIMITATION -- this fires PageView ONCE, on initial document load.
+      PRYME is a client-routed SPA (react-router), so moving between routes does
+      NOT re-fire it: Meta will attribute every visit to the first URL loaded and
+      report no funnel beyond it. Fixing that needs an fbq('track','PageView')
+      on route change from inside the router, which is a separate change to
+      src/ and is deliberately not done here.
+    -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '2097278684487779');
+      fbq('track', 'PageView');
+    </script>
+    <!--
+      Meta's snippet also carries a <noscript><img> beacon. It is NOT here,
+      because an <img> inside a <noscript> that sits in <head> is invalid HTML --
+      only <link>, <style> and <meta> are allowed there. Vite parses index.html
+      with parse5 and hard-fails the build on it
+      (disallowed-content-in-noscript-in-head). It lives in <body> instead,
+      next to the existing no-JS banner, which is where the spec allows it.
+    -->
+    <!-- End Meta Pixel Code -->
+
   </head>
 
   <body class="bg-[#0a0a0a] text-white overflow-x-hidden">
@@ -96,6 +142,18 @@
         ⚠️ <strong>JavaScript is required.</strong> Please enable JavaScript to access the PRYME secure portal.
       </div>
     </noscript>
+
+    <!--
+      Meta Pixel no-script fallback (see the head block for the main snippet).
+      In <body> because it is invalid inside a <head> <noscript> and breaks the
+      Vite build there. Note this can only ever record a bounce: the banner
+      above says the portal does not work without JavaScript, so a visitor who
+      trips this beacon cannot proceed. Kept because Meta's setup checker looks
+      for it and it costs nothing.
+    -->
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=2097278684487779&ev=PageView&noscript=1"
+      alt="" /></noscript>
 
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
