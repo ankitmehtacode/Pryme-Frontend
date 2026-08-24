@@ -76,6 +76,63 @@ if [[ -n "${W:-}" ]] && (( W < 3200 )); then
   exit 65
 fi
 echo "source: $SRC  (${W:-?}x${H:-?})"
+
+# A dimension check alone is not enough. Enlarging the old 1600px JPEG to
+# 3200 in Photoshop or an AI upscaler satisfies it while adding no real
+# detail, and would ship a ~1MB file that is every bit as blurry — the same
+# failure wearing a bigger number.
+#
+# So test for detail rather than size: halve the image and enlarge it back.
+# A genuine 3200px export loses real information doing that and diverges from
+# the original; an upscaled one is reconstructed almost exactly, because
+# everything it contains was already derivable from half resolution. High
+# similarity therefore means "no detail beyond 1600px", i.e. an upscale.
+#
+# The threshold is a heuristic, calibrated against a synthetic stand-in rather
+# than a real export of this artwork: a native-resolution render of the same
+# mostly-smooth design scored 41.4 dB and a 1600->3200 enlargement 53.9 dB, so
+# 45 sits in the gap with room either side. If a legitimate export ever trips
+# it anyway, ALLOW_UPSCALE=1 skips the check rather than blocking real work:
+#   ALLOW_UPSCALE=1 ./scripts/optimize-bg.sh <file>
+python3 - "$SRC" "${ALLOW_UPSCALE:-0}" <<'PY' || exit 65
+import sys
+try:
+    from PIL import Image, ImageChops
+    import math
+except Exception:
+    sys.exit(0)                      # Pillow missing: skip rather than block
+try:
+    im = Image.open(sys.argv[1]).convert("RGB")
+except Exception:
+    sys.exit(0)
+half  = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
+back  = half.resize(im.size, Image.LANCZOS)
+diff  = ImageChops.difference(im, back)
+hist  = diff.histogram()
+sq    = sum(v * (i % 256) ** 2 for i, v in enumerate(hist))
+mse   = sq / (im.width * im.height * 3)
+psnr  = 99.0 if mse == 0 else 10 * math.log10((255 ** 2) / mse)
+print(f"  detail check: round-trip PSNR {psnr:.1f} dB", end="")
+if psnr > 45 and sys.argv[2] == "1":
+    print("  <-- would fail, overridden by ALLOW_UPSCALE=1")
+    sys.exit(0)
+if psnr > 45:
+    print("  <-- NO REAL DETAIL BEYOND HALF RESOLUTION")
+    print()
+    print("REFUSING: this looks like an UPSCALE, not a true high-res export.",
+          file=sys.stderr)
+    print("Shrinking it by half and enlarging it back reproduces it almost",
+          file=sys.stderr)
+    print("exactly, which means it carries no information a 1600px file did",
+          file=sys.stderr)
+    print("not already have. Converting it would ship a much larger file that",
+          file=sys.stderr)
+    print("is just as blurry. Re-export from the original design file at",
+          file=sys.stderr)
+    print("3200x1800 instead of enlarging the JPEG.", file=sys.stderr)
+    sys.exit(65)
+print("  (genuine detail present)")
+PY
 echo
 
 mkdir -p "$OUT_DIR"
