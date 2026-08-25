@@ -36,6 +36,7 @@ import rewardSmartphone from "@/assets/rewards/reward-smartphone.png";
 import rewardSamsungGalaxyA07 from "@/assets/rewards/reward-samsung-galaxy-a07-5g.png";
 import rewardSamsungGalaxyM06 from "@/assets/rewards/reward-samsung-galaxy-m06-5g.png";
 import rewardSamsungA27 from "@/assets/rewards/reward-samsung-a27-5g.png";
+import rewardSamsungM36 from "@/assets/rewards/reward-samsung-m36-5g.png";
 import rewardPfWaiver50 from "@/assets/rewards/reward-pf-waiver-50.png";
 import rewardPfWaiver100 from "@/assets/rewards/reward-pf-waiver-100.png";
 
@@ -78,14 +79,15 @@ const REWARD_IMAGE_BY_KEY: Record<string, string> = {
   "SAMSUNG GALAXY A07 5G": rewardSamsungGalaxyA07,
   "SAMSUNG GALAXY M06 5G": rewardSamsungGalaxyM06,
   "SAMSUNG A27 5G": rewardSamsungA27,
-  // INTERIM: the supplied M36 photo carried a MOBILEDOKAN.CO watermark, which
-  // cannot ship on a customer-facing offer card, and automated removal left
-  // visible damage where the mark crossed the screen/bezel edge. Pointed at
-  // the generic phone photo until a clean product shot is supplied -- a real
-  // photo of the wrong model beats an icon here, and this is 1 row of 602
-  // (HDFC-LAP, SALARIED, 75L-1Cr). Swap in reward-samsung-m36-5g.png when it
-  // arrives.
-  "SAMSUNG M36 5G": rewardSmartphone,
+  // This photo carries a visible MOBILEDOKAN.CO watermark, top-left and
+  // bottom-right. Shipped that way on an explicit call, so nobody needs to
+  // rediscover it: removal was attempted and abandoned because the lower mark
+  // sits across the screen/bezel boundary and patching it left a light block
+  // that read worse than the watermark. Replace with a clean product shot
+  // when one is available -- rebuild to the same 800x764 / rgb(222,226,241)
+  // convention and this line needs no change. Affects 1 row of 602 (HDFC-LAP,
+  // SALARIED, 75L-1Cr).
+  "SAMSUNG M36 5G": rewardSamsungM36,
   // Both banded AC tiers reuse the existing air-conditioner photo: the sheet
   // now names a capacity and star rating, but it is the same product class and
   // no per-capacity photography exists.
