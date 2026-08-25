@@ -33,6 +33,9 @@ import rewardMixerSet from "@/assets/rewards/reward-mixer-set.png";
 import rewardRefrigerator from "@/assets/rewards/reward-refrigerator.png";
 import rewardWashingMachine from "@/assets/rewards/reward-washing-machine.png";
 import rewardSmartphone from "@/assets/rewards/reward-smartphone.png";
+import rewardSamsungGalaxyA07 from "@/assets/rewards/reward-samsung-galaxy-a07-5g.png";
+import rewardSamsungGalaxyM06 from "@/assets/rewards/reward-samsung-galaxy-m06-5g.png";
+import rewardSamsungA27 from "@/assets/rewards/reward-samsung-a27-5g.png";
 import rewardPfWaiver50 from "@/assets/rewards/reward-pf-waiver-50.png";
 import rewardPfWaiver100 from "@/assets/rewards/reward-pf-waiver-100.png";
 
@@ -66,6 +69,28 @@ const REWARD_IMAGE_BY_KEY: Record<string, string> = {
   "TOP LOAD FULLY AUTOMATIC WASHING MACHINE": rewardWashingMachine,
   "TOP LOAD SEMI AUTOMATIC WASHING MACHINE": rewardWashingMachine,
   "SMART PHONE": rewardSmartphone,
+  // V115 (2026-08-24 sheet) replaced the generic "SMART PHONE" / "AIR
+  // CONDITIONER" names in the top three loan tiers with specific models.
+  // Those new strings had no entry here, so 129 of 602 reward rows were
+  // silently falling back to the generic icon. Keys are the sheet's exact
+  // text -- note it is inconsistent about the word GALAXY (A07/M06 carry it,
+  // M36/A27 do not), so these must be transcribed, not inferred.
+  "SAMSUNG GALAXY A07 5G": rewardSamsungGalaxyA07,
+  "SAMSUNG GALAXY M06 5G": rewardSamsungGalaxyM06,
+  "SAMSUNG A27 5G": rewardSamsungA27,
+  // INTERIM: the supplied M36 photo carried a MOBILEDOKAN.CO watermark, which
+  // cannot ship on a customer-facing offer card, and automated removal left
+  // visible damage where the mark crossed the screen/bezel edge. Pointed at
+  // the generic phone photo until a clean product shot is supplied -- a real
+  // photo of the wrong model beats an icon here, and this is 1 row of 602
+  // (HDFC-LAP, SALARIED, 75L-1Cr). Swap in reward-samsung-m36-5g.png when it
+  // arrives.
+  "SAMSUNG M36 5G": rewardSmartphone,
+  // Both banded AC tiers reuse the existing air-conditioner photo: the sheet
+  // now names a capacity and star rating, but it is the same product class and
+  // no per-capacity photography exists.
+  "1.5 TON 3 STAR AIR CONDITIONER": rewardAirConditioner,
+  "2 TON 5 STAR AIR CONDITIONER": rewardAirConditioner,
   "50% PF WAIVER": rewardPfWaiver50,
   "100% PF WAIVER": rewardPfWaiver100,
 };
