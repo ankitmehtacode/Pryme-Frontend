@@ -165,17 +165,43 @@
       SPA page views ever stop showing up, check that toggle in the GA UI
       (Admin > Data streams > Enhanced measurement) BEFORE adding code here.
 
-      Cross-domain: this single stream serves gopryme.tech, prymeloans.in and
-      prymeloans.com. The domain list lives in the GA UI (Configure tag settings
-      > Configure your domains), not in this file. Without it, moving between
-      brand domains counts as a new session with the other domain as referrer.
+      SCOPED TO prymeloans.in BY DELIBERATE DECISION.
+
+      One build serves three brand domains from this one shell, so an
+      unconditional Google tag would report gopryme.tech and prymeloans.com into
+      this property too. The hostname guard below is what keeps GA to
+      prymeloans.in -- there is NO setting in the GA UI that does this, so if
+      this guard is ever removed the other two brands start reporting silently.
+
+      The guard also means gtag.js is never requested at all off prymeloans.in:
+      no third-party script, no cookie, no hit. That is why the tag is injected
+      from script rather than written as a static <script src> -- a static tag
+      would download on every domain and only then be told to do nothing.
+
+      To add a brand later, add its hostname to ALLOWED_GA_HOSTS. To go back to
+      tracking every brand, delete the guard and restore the plain snippet from
+      GA's install instructions -- and then set up cross-domain linking in the
+      UI (Configure tag settings > Configure your domains), or journeys between
+      brands will count as new referred sessions.
     -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q7BZPKGVVY"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-Q7BZPKGVVY');
+      (function () {
+        var ALLOWED_GA_HOSTS = ['prymeloans.in', 'www.prymeloans.in'];
+        if (ALLOWED_GA_HOSTS.indexOf(location.hostname) === -1) return;
+
+        window.dataLayer = window.dataLayer || [];
+        // Assigned onto window, not declared as a function, so it stays global
+        // despite this IIFE -- future event tracking in src/ expects gtag().
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date());
+        window.gtag('config', 'G-Q7BZPKGVVY');
+
+        // Queued calls above are replayed by gtag.js once it loads.
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-Q7BZPKGVVY';
+        document.head.appendChild(s);
+      })();
     </script>
     <!-- End Google Analytics -->
 
