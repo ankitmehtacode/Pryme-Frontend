@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AppBootstrapper } from "@/components/AppBootstrapper";
+import { MetaPixelRouteTracker } from "@/components/MetaPixelRouteTracker";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,6 +29,8 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
       <BrowserRouter
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
+        {/* Sits outside AppBootstrapper so a bootstrap-time redirect (401 → /auth) is still counted. */}
+        <MetaPixelRouteTracker />
         {/* 🧠 ZERO-TRUST: AppBootstrapper gates the render tree until /auth/me and /config/dictionaries resolve. */}
         <AppBootstrapper>
           <TooltipProvider>
