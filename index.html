@@ -64,15 +64,25 @@
         connect-src  https://www.facebook.com      -- where events are POSTed
         img-src      already permits https:        -- the <noscript> beacon
       If tracking ever goes quiet, check here before re-issuing the pixel ID.
+
+      GA4 (gtag.js) needs the same treatment and fails the same silent way:
+        script-src   https://www.googletagmanager.com  -- loads gtag.js
+        connect-src  https://*.google-analytics.com    -- where hits are POSTed
+        connect-src  https://*.analytics.google.com    -- regional endpoints
+        img-src      already permits https:            -- legacy pixel beacon
+      The google-analytics hosts are wildcarded deliberately: GA4 does not post
+      to a fixed host, it resolves a regional one at runtime (region1, region4,
+      ... .google-analytics.com), so pinning a single host breaks collection for
+      a subset of users only -- which looks like a traffic dip, not an outage.
     -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://accounts.google.com https://connect.facebook.net;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://accounts.google.com https://connect.facebook.net https://www.googletagmanager.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com;
       font-src 'self' https://fonts.gstatic.com data:;
       img-src 'self' data: https: http: blob:;
       media-src 'self' https://videos.pexels.com blob: data:;
-      connect-src 'self' wss://* https://api.gopryme.tech https://api.prymeloans.in https://api.prymeloans.com https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com https://www.facebook.com https://connect.facebook.net;
+      connect-src 'self' wss://* https://api.gopryme.tech https://api.prymeloans.in https://api.prymeloans.com https://*.amazonaws.com https://cloudflareinsights.com https://accounts.google.com https://www.facebook.com https://connect.facebook.net https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com;
       worker-src 'self' blob:;
       frame-src 'self' https://accounts.google.com;
     ">
@@ -140,6 +150,34 @@
       next to the existing no-JS banner, which is where the spec allows it.
     -->
     <!-- End Meta Pixel Code -->
+
+    <!--
+      Google Analytics 4 (gtag.js), measurement ID G-Q7BZPKGVVY.
+
+      Same placement rationale as the Meta Pixel above: it lives in this static
+      shell rather than a React component so it is present in the prerendered
+      HTML of every route, and survives scripts/inject-seo-head.js.
+
+      NO route-change hook is needed here, unlike the Meta Pixel. GA4's Enhanced
+      Measurement includes "page changes based on browser history events", which
+      fires page_view on history.pushState -- exactly what react-router does. A
+      manual page_view on route change would DOUBLE-COUNT every navigation. If
+      SPA page views ever stop showing up, check that toggle in the GA UI
+      (Admin > Data streams > Enhanced measurement) BEFORE adding code here.
+
+      Cross-domain: this single stream serves gopryme.tech, prymeloans.in and
+      prymeloans.com. The domain list lives in the GA UI (Configure tag settings
+      > Configure your domains), not in this file. Without it, moving between
+      brand domains counts as a new session with the other domain as referrer.
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q7BZPKGVVY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Q7BZPKGVVY');
+    </script>
+    <!-- End Google Analytics -->
 
   </head>
 
