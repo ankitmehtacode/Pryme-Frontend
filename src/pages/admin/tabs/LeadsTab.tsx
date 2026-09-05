@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Loader2, Briefcase, IndianRupee, X } from "lucide-react";
+import React, { useCallback, useRef, useState } from "react";
+import { Download, Loader2, Briefcase, IndianRupee, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatISTDateTime, cn } from "@/lib/utils";
@@ -18,6 +18,18 @@ interface LeadsTabProps {
   isAssigning: boolean;
   teamMembers: any[];
   isEmployee: boolean;
+  // Infinite-scroll pagination — the backend still only ever returns one
+  // page (default 20/req size 50) at a time; the table asks for the next
+  // one as the admin scrolls near the bottom instead of silently capping
+  // the list at page 1.
+  onLoadMore: () => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  // CSV export is gated ADMIN/SUPER_ADMIN server-side (AdminLeadController's
+  // /admin/leads/export), so the button itself is hidden for isEmployee
+  // rather than surfacing a 403.
+  onExport: () => void;
+  isExporting: boolean;
 }
 
 // 🧠 Safe metadata parser — the metadata field is a JSON string from the backend.
@@ -51,7 +63,7 @@ const formatEmploymentType = (raw: string | undefined): string => {
 const humanizeKey = (key: string): string =>
   key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
 
-export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating, onAssign, isAssigning, teamMembers, isEmployee }) => {
+export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, formatCurrency, StatusBadge, onUpdateStatus, isUpdating, onAssign, isAssigning, teamMembers, isEmployee, onLoadMore, hasMore, isLoadingMore, onExport, isExporting }) => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const selectedMeta = selectedLead ? parseMetadata(selectedLead.metadata) : {};
   // Callback fields get their own dedicated callout above, so they're
@@ -59,12 +71,34 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
   const CALLBACK_META_KEYS = new Set(["callbackRequested", "callbackRequestedAt", "rejectionReason"]);
   const formDetailEntries = Object.entries(selectedMeta).filter(([key]) => !CALLBACK_META_KEYS.has(key));
 
+  // Fires the next page fetch once the scroller is within 200px of the
+  // bottom, so the next batch is already in flight before the admin hits
+  // the literal end of the list.
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const handleScroll = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el || !hasMore || isLoadingMore) return;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 200) {
+      onLoadMore();
+    }
+  }, [hasMore, isLoadingMore, onLoadMore]);
+
   return (
     <div className="bg-[#0d0d14] rounded-2xl border border-white/[0.06] flex flex-col flex-1 min-h-0 relative animate-in fade-in slide-in-from-bottom-2">
       <div className="p-4 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.02] rounded-t-2xl">
         <h3 className="font-semibold text-white">Raw Inquiries (Initial Capture)</h3>
+        {!isEmployee && (
+          <button
+            onClick={onExport}
+            disabled={isExporting}
+            className="flex items-center gap-2 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            Download Last 100 (CSV)
+          </button>
+        )}
       </div>
-      <div className="flex-1 overflow-auto relative">
+      <div ref={scrollerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative">
         {isLoadingLeads ? (
           <div className="absolute inset-0 z-50 bg-black/20 backdrop-transform-gpu flex items-center justify-center">
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
@@ -186,6 +220,16 @@ export const LeadsTab: React.FC<LeadsTabProps> = ({ isLoadingLeads, rawLeads, fo
                 })
               )}
             </AnimatePresence>
+            {isLoadingMore && (
+              <tr><td colSpan={7} className="p-4 text-center text-slate-500 text-xs">
+                <Loader2 className="w-4 h-4 animate-spin inline-block mr-2" /> Loading more inquiries…
+              </td></tr>
+            )}
+            {!hasMore && !isLoadingLeads && rawLeads.length > 0 && (
+              <tr><td colSpan={7} className="p-4 text-center text-slate-600 text-xs">
+                End of list — {rawLeads.length} inquiries loaded.
+              </td></tr>
+            )}
           </tbody>
         </table>
       </div>

@@ -149,7 +149,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
     // Binary Content Inspector — PDF/Image from Document Vault
     const contentType = response.headers.get("content-type");
-    if (contentType && (contentType.includes("application/pdf") || contentType.includes("image/"))) {
+    if (contentType && (contentType.includes("application/pdf") || contentType.includes("image/") || contentType.includes("text/csv"))) {
         const blob = await response.blob();
         return window.URL.createObjectURL(blob);
     }
@@ -613,7 +613,10 @@ export const PrymeAPI = {
   // ==========================================
 
   /** Admin: List all raw leads — GET /api/v1/admin/leads */
-  getAdminLeads: async () => fetchWithAuth("/admin/leads", { method: "GET" }),
+  getAdminLeads: async (page = 0, size = 50) => fetchWithAuth(`/admin/leads?page=${page}&size=${size}`, { method: "GET" }),
+  // 🧠 Returns an object URL (see fetchWithAuth's binary content inspector) — caller
+  // hands it straight to an <a download> the same way document downloads do.
+  exportAdminLeads: async (limit = 100) => fetchWithAuth(`/admin/leads/export?limit=${limit}`, { method: "GET" }),
 
   /** Admin: Update status of a raw lead — PATCH /api/v1/admin/leads/{leadId}/status */
   updateLeadStatus: async (leadId: string, status: string) =>

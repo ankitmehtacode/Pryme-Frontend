@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Users, FileText, Building2, Settings,
   LogOut, Bell, Search, LayoutGrid,
@@ -506,15 +506,31 @@ const AdminDashboard = () => {
     else createEligibilityRuleMutation.mutate(data);
   };
 
-  const { data: rawLeads = [], isLoading: isLoadingLeads } = useQuery({
+  const LEADS_PAGE_SIZE = 50;
+  const {
+    data: leadsPages,
+    isLoading: isLoadingLeads,
+    fetchNextPage: fetchNextLeadsPage,
+    hasNextPage: hasNextLeadsPage,
+    isFetchingNextPage: isFetchingNextLeadsPage,
+  } = useInfiniteQuery({
     queryKey: ["admin_leads"],
-    queryFn: async () => {
-      const res = await PrymeAPI.getAdminLeads();
-      return res?.content ? res.content : (Array.isArray(res) ? res : []);
+    queryFn: async ({ pageParam }) => {
+      const res = await PrymeAPI.getAdminLeads(pageParam, LEADS_PAGE_SIZE);
+      // Non-paginated fallback (e.g. a stubbed/older backend returning a bare array)
+      // is treated as a single, final page rather than crashing the flattener below.
+      return res?.content
+        ? res
+        : { content: Array.isArray(res) ? res : [], last: true };
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => (lastPage.last ? undefined : allPages.length),
     enabled: activeTab === "leads",
     refetchInterval: 15000,
   });
+  // 🧠 Every fetched page is retained and flattened -- "scroll for more" only ever
+  // grows this list, it never re-pages away leads the admin already scrolled past.
+  const rawLeads = useMemo(() => leadsPages?.pages.flatMap((p: any) => p.content) ?? [], [leadsPages]);
 
   // 1. Fetch current live value of the specific field
   const { data: currentPolicyValue } = useQuery({
@@ -580,6 +596,25 @@ const AdminDashboard = () => {
       toast.error(error.message || "Failed to assign lead.");
     }
   });
+
+  const [isExportingLeads, setIsExportingLeads] = useState(false);
+  const handleExportLeads = async () => {
+    setIsExportingLeads(true);
+    try {
+      const url = await PrymeAPI.exportAdminLeads(100);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `pryme-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast.success("Exported the 100 most recent leads.");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to export leads.");
+    } finally {
+      setIsExportingLeads(false);
+    }
+  };
 
   const updateProfileMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) => PrymeAPI.updateLeadProfile(id, payload),
@@ -925,6 +960,11 @@ const AdminDashboard = () => {
                     isAssigning={leadAssignMutation.isPending}
                     teamMembers={teamMembers}
                     isEmployee={isEmployee}
+                    onLoadMore={fetchNextLeadsPage}
+                    hasMore={!!hasNextLeadsPage}
+                    isLoadingMore={isFetchingNextLeadsPage}
+                    onExport={handleExportLeads}
+                    isExporting={isExportingLeads}
                   />
                 )}
 
